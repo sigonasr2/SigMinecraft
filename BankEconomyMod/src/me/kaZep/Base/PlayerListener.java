@@ -1457,6 +1457,11 @@ public class PlayerListener
 			  }
 		  }
 		  if (despawn) {
+			  if (this.plugin.getConfig().getBoolean("halloween-enabled") && Math.random()<=0.75) {
+				  //Just despawn it right now.
+				  entity.remove();
+				  e.setCancelled(true);
+			  }
 			  double distancefromcity = Math.abs(1627-entity.getLocation().getX())+Math.abs((67-entity.getLocation().getY()))+Math.abs(-267-entity.getLocation().getZ());
 			  int maxgroup=0; //The maximum number of mobs that may be near each other and together when spawning.
 			  double chancer=1.0d; //The percent chance a duplicated mob will form.
