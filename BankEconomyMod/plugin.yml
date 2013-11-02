@@ -1,0 +1,25 @@
+name: BankEconomy
+main: me.kaZep.Base.Main
+version: 1.3.0
+description: Bank plugin which stores money.
+commands:
+  bankeconomy:
+    description: Bank.
+  revive:
+    description: Revive.
+  tele:
+    description: Teleport.
+  transfer:
+    description: Transfer money to another player.
+  jobs:
+    description: Jobs.
+  sp:
+    description: Modify your allocated stat points.
+  maintenance:
+    description: Toggles Server maintenance status.
+  settings:
+    description: Modify notification settings.
+  unenchant:
+    description: Unenchant your currently held item.
+  event:
+    description: Toggles or untoggles events.

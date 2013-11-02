@@ -1,0 +1,69 @@
+package me.kaZep.Base;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+
+public class PlayerData {
+	int buildamt=10;
+	Material lastblocktype=null;
+	long lastinteracttime=0;
+	long lastminetime=0;
+	int minestreak=0;
+	Player data=null;
+	public PlayerData(Player p) {
+		this.data=p;
+		this.lastblocktype=Material.DIRT;
+		lastinteracttime=Bukkit.getWorld("world").getFullTime();
+		lastminetime=Bukkit.getWorld("world").getFullTime();
+		minestreak=0;
+	}
+	public boolean CheckMineStreak() {
+		//Increases mining streak by one if the miner hasn't stopped mining for more than 10 seconds.
+		//Resets when the miner hasn't mined for 10 seconds.
+		//If it reaches 10 blocks, we assume the miner is mining, and we need to do something about it.
+		//Attempt to spawn Charge Zombie II's in rooms that are unlit.
+		if (Bukkit.getWorld("world").getFullTime()>lastminetime+200) {
+			//Reset. Too much time has passed.
+			lastminetime=Bukkit.getWorld("world").getFullTime();
+			minestreak=0;
+		} else {
+			minestreak++;
+			lastminetime=Bukkit.getWorld("world").getFullTime();
+			if (minestreak>10) {
+				minestreak=0;
+				return true;
+			}
+		}
+		return false;
+	}
+	public boolean GoodInteract() {
+		//A good interact is doing their part of the job.
+		buildamt--;
+		if (buildamt<=0) {
+			buildamt=0;
+			return true;
+		} else {
+			if (buildamt>10) {
+				buildamt=10; //This is the upper bound of this value.
+			}
+			return false;
+		}
+		//Use this whenever you do a good interaction. Check the return value to see if we are allowed to gain exp from it.
+	}
+	public void BadInteract(Material blockType) {
+		//This method will add to the list of blocks created/destroyed, in an attempt to detect any further attempts to not be allowed to destroy things.
+		//This event should be called whenever a bad interaction happens.
+		if (blockType!=this.lastblocktype) {
+			//We are interacting with a different type of block. Give more lee-way for this block.
+			buildamt+=1;
+			this.lastblocktype=blockType;
+		} else {
+			//This is a block type we are dealing with from beforehand. We will need to add more to buildamt to  make sure we are not cheating the system.
+			buildamt+=2;
+		}
+	}
+	public Player getPlayer() {
+		return data;
+	}
+}
