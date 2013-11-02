@@ -5534,10 +5534,18 @@ public ItemStack getGoodie() {
 			  if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
 				  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Block Chance")) {
-						  block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  if (block_chance==0) {
+							  block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  } else {
+							  block_chance+=block_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+						  }
 					  }
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Speed Boost Chance")) {
-						speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  if (speed_boost_chance==0) {
+							  speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  } else {
+							  speed_boost_chance+=speed_boost_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
+						  }
 					  }
 				  }
 			  }
@@ -5589,10 +5597,18 @@ public ItemStack getGoodie() {
 			  if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
 				  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Block Chance")) {
-						  block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  if (block_chance==0) {
+							  block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  } else {
+							  block_chance+=block_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+						  }
 					  }
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Speed Boost Chance")) {
-						speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  if (speed_boost_chance==0) {
+							  speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  } else {
+							  speed_boost_chance+=speed_boost_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
+						  }
 					  }
 				  }
 			  }
@@ -5635,10 +5651,18 @@ public ItemStack getGoodie() {
 			  if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
 				  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Block Chance")) {
-						  block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  if (block_chance==0) {
+							  block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  } else {
+							  block_chance+=block_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+						  }
 					  }
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Speed Boost Chance")) {
-						speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  if (speed_boost_chance==0) {
+							  speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  } else {
+							  speed_boost_chance+=speed_boost_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
+						  }
 					  }
 				  }
 			  }
@@ -5681,10 +5705,18 @@ public ItemStack getGoodie() {
 			  if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
 				  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Block Chance")) {
-						  block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  if (block_chance==0) {
+							  block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  } else {
+							  block_chance+=block_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+						  }
 					  }
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Speed Boost Chance")) {
-						speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  if (speed_boost_chance==0) {
+							  speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+						  } else {
+							  speed_boost_chance+=speed_boost_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
+						  }
 					  }
 				  }
 			  }
@@ -5958,16 +5990,28 @@ public ItemStack getGoodie() {
 				  if (item.getType()!=Material.BOW && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) { //Make sure this isn't a ranged weapon.
 					  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 						  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Critical Chance")) {
-							  critical_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+							  if (critical_chance==0) {
+								  critical_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+							  } else {
+								  critical_chance+=critical_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+							  }
 						  }
 						  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Armor Penetration")) {
 							  armor_pen+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 						  }
 						  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Life Steal")) {
-							  life_steal+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+							  if (life_steal==0) {
+								  life_steal+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+							  } else {
+								  life_steal+=life_steal*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+							  }
 						  }
 						  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Attack Speed")) {
-							  attack_speed+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+							  if (attack_speed==0) {
+								  attack_speed+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+							  } else {
+								  attack_speed+=attack_speed*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+							  }
 						  }
 						  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Damage")) {
 							  dmg+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
@@ -6109,16 +6153,28 @@ public ItemStack getGoodie() {
 					  if (item.getType()==Material.BOW && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) { //Make sure we are using a ranged weapon.
 						  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 							  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Critical Chance")) {
-								  critical_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+								  if (critical_chance==0) {
+									  critical_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+								  } else {
+									  critical_chance+=critical_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+								  }
 							  }
 							  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Armor Penetration")) {
 								  armor_pen+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 							  }
 							  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Life Steal")) {
-								  life_steal+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+								  if (life_steal==0) {
+									  life_steal+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+								  } else {
+									  life_steal+=life_steal*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+								  }
 							  }
 							  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Attack Speed")) {
-								  attack_speed+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+								  if (attack_speed==0) {
+									  attack_speed+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
+								  } else {
+									  attack_speed+=attack_speed*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+								  }
 							  }
 							  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Damage")) {
 								  dmg+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
