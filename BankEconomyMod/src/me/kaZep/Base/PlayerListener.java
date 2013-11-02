@@ -5188,32 +5188,21 @@ public ItemStack getGoodie() {
 					  Bukkit.getLogger().info("We have "+piecount+" pies.");
 					  if (ideal_pie!=null && magic_pie!=null && piecount>=pies) {
 						  p.getInventory().remove(magic_pie);
-						  int deductpies=pies;
-						  int itemslot=0;
-						  while (deductpies>0 || itemslot<p.getInventory().getSize()) {
-							  if (deductpies>0) {
-								  if (p.getInventory().getItem(itemslot).getType()==Material.PUMPKIN_PIE && p.getInventory().getItem(itemslot).getItemMeta().getDisplayName()==null) {
-									  if (p.getInventory().getItem(itemslot).getAmount()>1) {
-										  p.getInventory().remove(p.getInventory().getItem(itemslot));
-										  deductpies-=p.getInventory().getItem(itemslot).getAmount();
-									  } else {
-										  p.getInventory().remove(p.getInventory().getItem(itemslot));
-										  deductpies-=1;
-									  }
-									  itemslot++;
-								  } else {
-									  itemslot++;
-								  }
-							  } else {
-								  itemslot++;
+						  //Check to see if there are any pies we need to keep for later.
+						  List<ItemStack> items = new ArrayList<ItemStack>();
+						  for (int i=0;i<p.getInventory().getContents().length;i++) {
+							  if (p.getInventory().getContents()[i].getType()==Material.PUMPKIN_PIE &&
+									  p.getInventory().getContents()[i].hasItemMeta() &&
+									  p.getInventory().getContents()[i].getItemMeta().getLore()!=null) {
+								  //This is a special pie. Must keep.
+								  items.add(p.getInventory().getContents()[i]);
 							  }
 						  }
-						  /*
 						  for (int i=0;i<pies;i++) {
 							  p.getInventory().remove(Material.PUMPKIN_PIE);
 							  //Remove the pies. Remove the magic pie.
-						  }*/
-						  /*
+						  }
+						  
 						  int amountleft = piecount-pies;
 						  while (amountleft>0) {
 							  if (amountleft>=64) {
@@ -5223,7 +5212,10 @@ public ItemStack getGoodie() {
 								  p.getInventory().addItem(new ItemStack(Material.PUMPKIN_PIE,1));
 								  amountleft--;
 							  }
-						  }*/
+						  }
+						  for (int i=0;i<items.size();i++) {
+							  p.getInventory().addItem(items.get(i));
+						  }
 						  //Give a legendary armor/weapon here.
 						  //Bukkit.getLogger().info("LEGENDARY!");
 						  giveLegendaryItem(p);
