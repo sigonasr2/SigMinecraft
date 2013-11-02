@@ -5191,11 +5191,13 @@ public ItemStack getGoodie() {
 						  //Check to see if there are any pies we need to keep for later.
 						  List<ItemStack> items = new ArrayList<ItemStack>();
 						  for (int i=0;i<p.getInventory().getContents().length;i++) {
-							  if (p.getInventory().getContents()[i].getType()==Material.PUMPKIN_PIE &&
-									  p.getInventory().getContents()[i].hasItemMeta() &&
-									  p.getInventory().getContents()[i].getItemMeta().getLore()!=null) {
-								  //This is a special pie. Must keep.
-								  items.add(p.getInventory().getContents()[i]);
+							  if (p.getInventory().getContents()[i]!=null) {
+								  if (p.getInventory().getContents()[i].getType()==Material.PUMPKIN_PIE &&
+										  p.getInventory().getContents()[i].hasItemMeta() &&
+										  p.getInventory().getContents()[i].getItemMeta().getLore()!=null) {
+									  //This is a special pie. Must keep.
+									  items.add(p.getInventory().getContents()[i]);
+								  }
 							  }
 						  }
 						  for (int i=0;i<pies;i++) {

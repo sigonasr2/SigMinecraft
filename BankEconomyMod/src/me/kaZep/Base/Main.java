@@ -2520,10 +2520,14 @@ public void checkJukeboxes() {
     			  if (Bukkit.getPlayer(supportmoblist.get(i).p.getName())!=null) {
 		  			  for (int j=0;j<supportmoblist.get(i).id.size();j++) {
 						  if (supportmoblist.get(i).registeredtime<Bukkit.getWorld("world").getFullTime()) {
-							  supportmoblist.remove(i);
-							  i--;
+							  supportmoblist.get(i).id.remove(j);
+							  j--;
 						  }
 		  			  }
+					  /*if (supportmoblist.get(i).registeredtime<Bukkit.getWorld("world").getFullTime()) {
+						  supportmoblist.remove(i);
+						  i--;
+					  }*/
     			  }
 			  }
 	          LOGGING_UPDATE_COUNTS++; //4
