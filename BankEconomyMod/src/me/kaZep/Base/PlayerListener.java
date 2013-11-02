@@ -5955,7 +5955,7 @@ public ItemStack getGoodie() {
 				  //p.sendMessage("No Damage Ticks: "+f.getNoDamageTicks());
 				  ItemStack item = p.getItemInHand();
 				  double critical_chance=0,armor_pen=0,life_steal=0,attack_speed=0,dmg=0;
-				  if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
+				  if (item.getType()!=Material.BOW && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) { //Make sure this isn't a ranged weapon.
 					  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 						  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Critical Chance")) {
 							  critical_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
@@ -6106,7 +6106,7 @@ public ItemStack getGoodie() {
 					  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
 					  ItemStack item = p.getItemInHand();
 					  double critical_chance=0,armor_pen=0,life_steal=0,attack_speed=0,dmg=0;
-					  if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
+					  if (item.getType()==Material.BOW && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) { //Make sure we are using a ranged weapon.
 						  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 							  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Critical Chance")) {
 								  critical_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
