@@ -3279,6 +3279,10 @@ public void payDay(int time)
 	public void gainMoneyExp(Player p,String job,double amount,double exp) {
 		String[] jobs = getJobs(p);
 		int slot=-1;
+		if (getConfig().getBoolean("halloween-enabled")) {
+			amount*=2;
+			exp*=2;
+		}
 		//Add to how much we've earned so far.
 		for (int i=0;i<SPEED_CONTROL.size();i++) {
 			if (SPEED_CONTROL.get(i).p.getName().equalsIgnoreCase(p.getName())) {
@@ -3313,6 +3317,9 @@ public void payDay(int time)
 	public void gainMoney(Player p,String job,double amount) {
 		String[] jobs = getJobs(p);
 		int slot=-1;
+		if (getConfig().getBoolean("halloween-enabled")) {
+			amount*=2;
+		}
 		//Add to how much we've earned so far.
 		for (int i=0;i<SPEED_CONTROL.size();i++) {
 			if (SPEED_CONTROL.get(i).p.getName().equalsIgnoreCase(p.getName())) {
