@@ -1367,15 +1367,29 @@ public class PlayerListener
   
   @EventHandler
   public void onPortalEnter(PlayerTeleportEvent e) {
-	  if (e.getPlayer().getLocation().distanceSquared(new Location(Bukkit.getWorld("world"),1606d,66d,-365d))<900) {
-		  //This is a player trying to enter a portal. Verify if they have selected their ultimate.
-		  if (this.plugin.getAccountsConfig().contains(e.getPlayer().getName()+".jobs.ultimate")) {
-			  //Check if this job's ultimate level is high enough.
-			  if (this.plugin.getJobLv(this.plugin.getAccountsConfig().getString(e.getPlayer().getName()+".jobs.ultimate"), e.getPlayer())>=40) {
-				  //Allow this teleport.
-				  e.setTo(new Location(Bukkit.getWorld("world"),-8990,68,-4));
-			  } else {
-				  e.setCancelled(true);
+	  final Player p = e.getPlayer();
+	  if (e.getFrom().getWorld()==Bukkit.getWorld("world")) {
+		  if (e.getFrom().distanceSquared(new Location(Bukkit.getWorld("world"),1606d,66d,-365d))<900) {
+			  //This is a player trying to enter a portal. Verify if they have selected their ultimate.
+			  if (this.plugin.getAccountsConfig().contains(e.getPlayer().getName()+".jobs.ultimate")) {
+				  //Check if this job's ultimate level is high enough.
+				  if (this.plugin.getJobLv(this.plugin.getAccountsConfig().getString(e.getPlayer().getName()+".jobs.ultimate"), e.getPlayer())>=40) {
+					  //Allow this teleport.
+					  //e.setTo(new Location(Bukkit.getWorld("world"),-8990,68,-4));
+					  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+					      @Override
+					      public void run() {
+					    	  p.getPlayer().teleport(new Location(Bukkit.getWorld("world"),-8990,68,-4));
+					      }
+					  	},5);
+				  } else {
+					  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+					      @Override
+					      public void run() {
+					    	  p.getPlayer().teleport(new Location(Bukkit.getWorld("world"),1606d,66d,-365d));
+					      }
+					  	},5);
+				  }
 			  }
 		  }
 	  }
@@ -2939,10 +2953,12 @@ public class PlayerListener
 		  }
 
 		  if (pot.getType()==PotionType.INSTANT_HEAL) {
-			  if (p.getHealth()+24>p.getMaxHealth()) {
-				  p.setHealth(p.getMaxHealth());
-			  } else {
-				  p.setHealth(p.getHealth()+24);
+			  if (!p.isDead()) {
+				  if (p.getHealth()+24>p.getMaxHealth()) {
+					  p.setHealth(p.getMaxHealth());
+				  } else {
+					  p.setHealth(p.getHealth()+24);
+				  }
 			  }
 		  }
 	  }
@@ -2998,18 +3014,20 @@ public class PlayerListener
 										  this.plugin.gainMoneyExp(shooter,"Support",0.25,12);
 									  }
 									  if (nextpotioneffect.getType().getName().compareTo("HEAL")==0) {
-										  if (p.getHealth()/p.getMaxHealth()<=0.30) {
-											  this.plugin.gainMoneyExp(shooter,"Support",0.60,30);
-											  //shooter.sendMessage("This is a big heal.");
-											  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+										  if (!p.isDead()) {
+											  if (p.getHealth()/p.getMaxHealth()<=0.30) {
+												  this.plugin.gainMoneyExp(shooter,"Support",0.60,30);
+												  //shooter.sendMessage("This is a big heal.");
+												  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+											  }
+											  this.plugin.gainMoneyExp(shooter,"Support",0.30,14);
+											  if (p.getHealth()+12>p.getMaxHealth()) {
+												  p.setHealth(p.getMaxHealth());
+											  } else {
+												  p.setHealth(p.getHealth()+12);
+											  }
+											  //shooter.sendMessage("This is a heal.");
 										  }
-										  this.plugin.gainMoneyExp(shooter,"Support",0.30,14);
-										  if (p.getHealth()+12>p.getMaxHealth()) {
-											  p.setHealth(p.getMaxHealth());
-										  } else {
-											  p.setHealth(p.getHealth()+12);
-										  }
-										  //shooter.sendMessage("This is a heal.");
 									  }
 									  if (nextpotioneffect.getType().getName().compareTo("REGENERATION")==0) {
 										  if (p.getHealth()/p.getMaxHealth()<=0.30) {
@@ -3082,13 +3100,15 @@ public class PlayerListener
 										  }
 									  }
 									  if (nextpotioneffect.getType().getName().compareTo("HEAL")==0) {
-										  if (p.getHealth()+12>p.getMaxHealth()) {
-											  p.setHealth(p.getMaxHealth());
-										  } else {
-											  p.setHealth(p.getHealth()+12);
+										  if (!p.isDead()) {
+											  if (p.getHealth()+12>p.getMaxHealth()) {
+												  p.setHealth(p.getMaxHealth());
+											  } else {
+												  p.setHealth(p.getHealth()+12);
+											  }
+											  //shooter.sendMessage("This is a heal.");
+											  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
 										  }
-										  //shooter.sendMessage("This is a heal.");
-										  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
 									  }
 								  }
 							  } catch (ConcurrentModificationException ex_e) {
@@ -3131,12 +3151,14 @@ public class PlayerListener
 									  }
 								  }
 								  if (nextpotioneffect.getType().getName().compareTo("HEAL")==0) {
-									  if (p.getHealth()+12>p.getMaxHealth()) {
-										  p.setHealth(p.getMaxHealth());
-									  } else {
-										  p.setHealth(p.getHealth()+12);
+									  if (!p.isDead()) {
+										  if (p.getHealth()+12>p.getMaxHealth()) {
+											  p.setHealth(p.getMaxHealth());
+										  } else {
+											  p.setHealth(p.getHealth()+12);
+										  }
+										  //shooter.sendMessage("This is a heal.");
 									  }
-									  //shooter.sendMessage("This is a heal.");
 								  }
 								  effects.remove();
 							  }

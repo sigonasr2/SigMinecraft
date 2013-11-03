@@ -190,6 +190,7 @@ public class Main extends JavaPlugin
     getCommand("settings").setExecutor(new commandBankEconomy(this));
     getCommand("maintenance").setExecutor(new commandBankEconomy(this));
     getCommand("event").setExecutor(new commandBankEconomy(this));
+    getCommand("dungeon").setExecutor(new commandBankEconomy(this));
 
     setupEconomy();
 
@@ -3153,9 +3154,14 @@ public void payDay(int time)
     		p.sendMessage(ChatColor.GOLD+"Sorry, that is not a valid job!");
     		return;
     	}
-    	getAccountsConfig().set(p.getName()+".jobs.ultimate", String.valueOf(ValidJobs[matchedjob]));
-    	saveAccountsConfig();
-    	p.sendMessage(ChatColor.YELLOW+"Set Declared Ultimate job to "+job);
+    	if (PlayerinJob(p,job)) {
+	    	getAccountsConfig().set(p.getName()+".jobs.ultimate", String.valueOf(ValidJobs[matchedjob]));
+	    	saveAccountsConfig();
+	    	p.sendMessage(ChatColor.YELLOW+"Set Declared Ultimate job to "+job);
+    	} else {
+    		p.sendMessage(ChatColor.GOLD+"Sorry, you are not in that job!");
+    		return;
+    	}
 	}
   
     public boolean joinJob(Player p, String job) {
