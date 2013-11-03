@@ -716,6 +716,10 @@ public class commandBankEconomy
           if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 1 && args[0].equalsIgnoreCase("buffs")) {
     		  p.sendMessage("Usage: "+ChatColor.GREEN+"/jobs buffs [JobName]"+ChatColor.WHITE+" - Get buffs information about a job. Type /jobs to see the jobs.");
           } else
+      if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 2 && args[0].equalsIgnoreCase("ultimate")) {
+		  //Attempt to join the job.
+    	  this.plugin.setUltimate(p,args[1]);
+      } else
       if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 2 && args[0].equalsIgnoreCase("join")) {
 		  //Attempt to join the job.
     	  this.plugin.joinJob(p,args[1]);

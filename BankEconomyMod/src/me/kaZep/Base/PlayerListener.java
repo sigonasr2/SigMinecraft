@@ -128,6 +128,7 @@ import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
@@ -1179,6 +1180,8 @@ public class PlayerListener
       this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job3", String.valueOf("None"));
       this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job3lv", Integer.valueOf(0));
       this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job3exp", Double.valueOf(0.0d));
+      this.plugin.getAccountsConfig().set(p.getName() + ".jobs.ultimate", String.valueOf("None"));
+	  this.plugin.getAccountsConfig().set(p.getName() + ".jobs.ultimatesealed", Boolean.valueOf(false));
       this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat1", Integer.valueOf(0));
       this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat2", Integer.valueOf(0));
       this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat3", Integer.valueOf(0));
@@ -1195,6 +1198,16 @@ public class PlayerListener
       this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify4", Boolean.valueOf(false));
       this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify5", Boolean.valueOf(false));
       this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify6", Boolean.valueOf(false));
+      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest1", Boolean.valueOf(false));
+      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest2", Boolean.valueOf(false));
+      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest3", Boolean.valueOf(false));
+      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest4", Boolean.valueOf(false));
+      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest5", Boolean.valueOf(false));
+      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest6", Boolean.valueOf(false));
+      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest7", Boolean.valueOf(false));
+      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest8", Boolean.valueOf(false));
+      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest9", Boolean.valueOf(false));
+      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest10", Boolean.valueOf(false));
       this.plugin.saveAccountsConfig();
       System.out.println("[BankEconomy] Bank account created for " + p.getName() + ".");
       if (playerwhitelisted) {
@@ -1283,6 +1296,10 @@ public class PlayerListener
 	    	      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest9", Boolean.valueOf(false));
 	    	      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest10", Boolean.valueOf(false));
 	    	}
+	    	if (!this.plugin.getAccountsConfig().contains(p.getName() + ".jobs.ultimate")) {
+	    		this.plugin.getAccountsConfig().set(p.getName() + ".jobs.ultimate", String.valueOf("None"));
+	    		this.plugin.getAccountsConfig().set(p.getName() + ".jobs.ultimatesealed", Boolean.valueOf(false));
+	    	}
     	}
     	//Check if this player has unallocated stat points.
     	if (this.plugin.getStatPointTotal(p)<this.plugin.getJobTotalLvs(p)/5+1) {
@@ -1347,6 +1364,22 @@ public class PlayerListener
 	  }
 	updateTopSPLEEFSigns();
    }
+  
+  @EventHandler
+  public void onPortalEnter(PlayerTeleportEvent e) {
+	  if (e.getPlayer().getLocation().distanceSquared(new Location(Bukkit.getWorld("world"),1606d,66d,-365d))<900) {
+		  //This is a player trying to enter a portal. Verify if they have selected their ultimate.
+		  if (this.plugin.getAccountsConfig().contains(e.getPlayer().getName()+".jobs.ultimate")) {
+			  //Check if this job's ultimate level is high enough.
+			  if (this.plugin.getJobLv(this.plugin.getAccountsConfig().getString(e.getPlayer().getName()+".jobs.ultimate"), e.getPlayer())>=40) {
+				  //Allow this teleport.
+				  e.setTo(new Location(Bukkit.getWorld("world"),-8990,68,-4));
+			  } else {
+				  e.setCancelled(true);
+			  }
+		  }
+	  }
+  }
 
   @EventHandler
   public void onPlayerInteract(PlayerInteractEntityEvent ev) {
@@ -2722,13 +2755,13 @@ public class PlayerListener
 				  this.plugin.gainMoneyExp(p,"Farmer",0.03,3);
 			  }
 			  if (e.getBlock().getType()==Material.BROWN_MUSHROOM) {
-				  this.plugin.gainMoneyExp(p,"Farmer",0.00,1);
+				  this.plugin.gainMoneyExp(p,"Farmer",0.00,3);
 			  }
 			  if (e.getBlock().getType()==Material.RED_MUSHROOM) {
-				  this.plugin.gainMoneyExp(p,"Farmer",0.00,1);
+				  this.plugin.gainMoneyExp(p,"Farmer",0.00,3);
 			  }
 			  if (e.getBlock().getType()==Material.NETHER_WARTS && e.getBlock().getData()==3) {
-				  this.plugin.gainMoneyExp(p,"Farmer",0.00,1);
+				  this.plugin.gainMoneyExp(p,"Farmer",0.03,3);
 			  }
 			  /*if (e.getBlock().getType()==Material.PUMPKIN) {
 				  this.plugin.gainMoneyExp(p,"Farmer",0.00,1);

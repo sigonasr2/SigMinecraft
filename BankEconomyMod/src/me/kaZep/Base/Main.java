@@ -452,16 +452,16 @@ public class Main extends JavaPlugin
     Farmer_job.addData("CACTUS", 0.00, 3, 0);
     Farmer_job.addData("BROWN MUSHROOM", 0.00, 3, 0);
     Farmer_job.addData("RED MUSHROOM", 0.00, 3, 0);
-    Farmer_job.addData("WHEAT", 0.01, 2, 0);
-    Farmer_job.addData("CARROT", 0.01, 2, 0);
-    Farmer_job.addData("POTATO", 0.03, 3, 0);
-    Farmer_job.addData("NETHER WART", 0.03, 3, 0);
+    Farmer_job.addData("WHEAT", 0.005, 2, 0);
+    Farmer_job.addData("CARROT", 0.005, 2, 0);
+    Farmer_job.addData("POTATO", 0.015, 3, 0);
+    Farmer_job.addData("NETHER WART", 0.015, 3, 0);
     //Farmer_job.addData("PUMPKIN SEEDS", 0.02, 4, 0);
     //Farmer_job.addData("PUMPKIN", 0.04, 8, 0);
-    Farmer_job.addData("MELON", 0.10, 10, 0);
-    Farmer_job.addData("SEEDS", 0.005, 1, 1);
-    Farmer_job.addData("PUMPKIN SEEDS", 0.01, 2, 1);
-    Farmer_job.addData("MELON SEEDS", 0.01, 2, 1);
+    Farmer_job.addData("MELON", 0.05, 10, 0);
+    Farmer_job.addData("SEEDS", 0.0025, 1, 1);
+    Farmer_job.addData("PUMPKIN SEEDS", 0.005, 2, 1);
+    Farmer_job.addData("MELON SEEDS", 0.005, 2, 1);
     //Farmer_job.addData("PUMPKIN", 0.00, -16, 1);
     Farmer_job.setBuffData("Hoes do not lose durability when used.",
     		"Killing skeletons yields triple the amount of bones.", 
@@ -3136,6 +3136,26 @@ public void payDay(int time)
 			count++;
 		}
 		return count;
+	}
+	
+	public void setUltimate(Player p, String job) {
+    	boolean valid=false;
+    	int matchedjob=0;
+    	for (int i=0;i<ValidJobs.length;i++) {
+    		if (job.equalsIgnoreCase(ValidJobs[i])) {
+    			valid=true;
+    			matchedjob=i;
+    			Bukkit.getLogger().info("Found the job to set ultimate to.");
+    			break;
+    		}
+    	}
+    	if (!valid) {
+    		p.sendMessage(ChatColor.GOLD+"Sorry, that is not a valid job!");
+    		return;
+    	}
+    	getAccountsConfig().set(p.getName()+".jobs.ultimate", String.valueOf(ValidJobs[matchedjob]));
+    	saveAccountsConfig();
+    	p.sendMessage(ChatColor.YELLOW+"Set Declared Ultimate job to "+job);
 	}
   
     public boolean joinJob(Player p, String job) {
