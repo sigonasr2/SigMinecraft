@@ -3730,6 +3730,7 @@ public class PlayerListener
 			  //this.plugin.gainMoneyExp(p,"Blacksmith",1.50*mult,175*mult);
 			  crafteditem=true;
 		  }
+		  /*
 		  if (this.plugin.getJobLv("Blacksmith", p)>=5 && crafteditem) {
 			  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
 			  ItemStack resulting = this.plugin.EnchantItem(result.getResult(),5);
@@ -3739,7 +3740,7 @@ public class PlayerListener
 			  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
 			  ItemStack resulting = this.plugin.EnchantItem(result.getResult(),10);
 			  result.setResult(resulting);
-		  }
+		  }*/
 		  if (this.plugin.getJobLv("Blacksmith", p)>=20) {
 			  ItemStack[] crafteditems = result.getMatrix();
 			  for (int i=0;i<crafteditems.length;i++) {
@@ -8363,6 +8364,7 @@ public ItemStack getGoodie() {
 			i.getType()==Material.IRON_SPADE ||
 			i.getType()==Material.IRON_HOE ||
 			i.getType()==Material.IRON_BOOTS ||
+			i.getType()==Material.IRON_PICKAXE ||
 			i.getType()==Material.IRON_LEGGINGS ||
 			i.getType()==Material.IRON_CHESTPLATE ||
 			i.getType()==Material.IRON_HELMET ||
@@ -8398,6 +8400,10 @@ public ItemStack getGoodie() {
 			enchant_data=ENCHANTMENT_DATA.stone_hoe;
 		} else
 		//DERP
+		if (item.getType()==Material.BOW) {enchant_data=ENCHANTMENT_DATA.bow;} else
+		if (item.getType()==Material.IRON_SWORD) {enchant_data=ENCHANTMENT_DATA.iron_sword;} else
+		if (item.getType()==Material.GOLD_SWORD) {enchant_data=ENCHANTMENT_DATA.gold_sword;} else
+		if (item.getType()==Material.DIAMOND_SWORD) {enchant_data=ENCHANTMENT_DATA.diamond_sword;} else
 		if (item.getType()==Material.STONE_SPADE) {enchant_data=ENCHANTMENT_DATA.stone_shovel;} else
 		if (item.getType()==Material.STONE_PICKAXE) {enchant_data=ENCHANTMENT_DATA.stone_pickaxe;} else
 		if (item.getType()==Material.LEATHER_BOOTS) {enchant_data=ENCHANTMENT_DATA.leather_boots;} else
@@ -8527,7 +8533,7 @@ public ItemStack getGoodie() {
             						  ItemStack resulting = EnchantItem(post,5);
             						  player.getInventory().setItem(i, resulting);
             					  }
-            					}
+            					}	
             					if (PlayerinJob((Player)player,"Blacksmith")) {
               					  if (getJobLv("Blacksmith", player.getName())>=10 && validItem_Blacksmith(post)) {
               						  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");

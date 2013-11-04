@@ -525,14 +525,14 @@ public class Main extends JavaPlugin
     Weaponsmith_job.setJobName("Weaponsmith");
     Weaponsmith_job.setJobDescription("A weaponsmith's job is to craft weapons for others and themselves.");
     Weaponsmith_job.setAction(0, "CRAFT");
-    Weaponsmith_job.setExp(100, 100, 30, 1.05);
+    Weaponsmith_job.setExp(100, 100, 32, 1.05);
     Weaponsmith_job.addData("ARROW", 0.025, 4, 0);
     //Weaponsmith_job.addData("WOODEN SWORD", 0.05, 10, 0);
     Weaponsmith_job.addData("FLINT AND STEEL", 0.06, 12, 0);
     Weaponsmith_job.addData("BOW", 0.075, 12, 0);
     Weaponsmith_job.addData("IRON SWORD", 0.375, 75, 0);
     Weaponsmith_job.addData("GOLD SWORD", 0.50, 100, 0);
-    Weaponsmith_job.addData("DIAMOND SWORD", 0.975, 175, 0);
+    Weaponsmith_job.addData("DIAMOND SWORD", 3.60, 280, 0);
     Weaponsmith_job.setBuffData("Materials used in crafting have a 10% chance of being preserved.",
     		"Weapons crafted gain a free level 5 enchantment.", 
     		"Materials used in crafting have a 25% chance of being preserved.", 
@@ -541,7 +541,7 @@ public class Main extends JavaPlugin
     Blacksmith_job.setJobName("Blacksmith");
     Blacksmith_job.setJobDescription("A blacksmith's job is to provide tools, armor, and other crafted materials to others and themselves to protect them.");
     Blacksmith_job.setAction(0, "CRAFT");
-    Blacksmith_job.setExp(250, 150, 37, 1.03);
+    Blacksmith_job.setExp(300, 180, 24, 1.06);
     //Blacksmith_job.addData("STONE HOE", 0.04, 7, 0);
     //Blacksmith_job.addData("STONE SHOVEL", 0.05, 8, 0);
     //Blacksmith_job.addData("STONE PICKAXE", 0.075, 15, 0);
@@ -550,37 +550,37 @@ public class Main extends JavaPlugin
     Blacksmith_job.addData("LEATHER PANTS", 0.175, 15, 0);
     Blacksmith_job.addData("LEATHER TUNIC", 0.20, 18, 0);
     Blacksmith_job.addData("IRON SHOVEL", 0.25, 18, 0);
-    Blacksmith_job.addData("IRON HOE", 0.325, 24, 0);
-    Blacksmith_job.addData("WEAK IRON BOOTS", 0.375, 27, 0);
-    Blacksmith_job.addData("IRON PICKAXE", 0.40, 30, 0);
-    Blacksmith_job.addData("WEAK IRON HELMET", 0.50, 45, 0);
-    Blacksmith_job.addData("GOLDEN SHOVEL", 0.625, 55, 0);
-    Blacksmith_job.addData("GOLDEN HOE", 0.65, 60, 0);
-    Blacksmith_job.addData("WEAK IRON LEGGINGS", 0.725, 60, 0);
-    Blacksmith_job.addData("DIAMOND SHOVEL", 0.75, 65, 0);
-    Blacksmith_job.addData("DIAMOND HOE", 0.8, 70, 0);
-    Blacksmith_job.addData("WEAK GOLDEN BOOTS", 0.825, 50, 0);
-    Blacksmith_job.addData("WEAK IRON CHESTPLATE", 0.875, 70, 0);
-    Blacksmith_job.addData("WEAK GOLDEN HELMET", 0.925, 80, 0);
-    Blacksmith_job.addData("DIAMOND PICKAXE", 0.925, 80, 0);
-    Blacksmith_job.addData("WEAK DIAMOND BOOTS", 1.0, 85, 0);
-    Blacksmith_job.addData("WEAK GOLDEN LEGGINGS", 1.025, 100, 0);
-    Blacksmith_job.addData("WEAK GOLDEN CHESTPLATE", 1.15, 130, 0);
-    Blacksmith_job.addData("WEAK DIAMOND HELMET", 1.15, 125, 0);
-    Blacksmith_job.addData("WEAK DIAMOND LEGGINGS", 1.325, 145, 0);
-    Blacksmith_job.addData("WEAK DIAMOND CHESTPLATE", 1.50, 175, 0);
-    Blacksmith_job.addData("IRON BOOTS", 0.375*8, 27*8, 0);
-    Blacksmith_job.addData("IRON HELMET", 0.50*8, 45*8, 0);
-    Blacksmith_job.addData("IRON LEGGINGS", 0.725*8, 60*8, 0);
-    Blacksmith_job.addData("GOLDEN BOOTS", 0.825*8, 50*8, 0);
-    Blacksmith_job.addData("IRON CHESTPLATE", 0.875*8, 70*8, 0);
-    Blacksmith_job.addData("GOLDEN HELMET", 0.925*8, 80*8, 0);
-    Blacksmith_job.addData("DIAMOND BOOTS", 1.0*8, 85*8, 0);
-    Blacksmith_job.addData("GOLDEN LEGGINGS", 1.025*8, 100*8, 0);
-    Blacksmith_job.addData("GOLDEN CHESTPLATE", 1.15*8, 130*8, 0);
-    Blacksmith_job.addData("DIAMOND HELMET", 1.15*8, 125*8, 0);
-    Blacksmith_job.addData("DIAMOND LEGGINGS", 1.325*8, 145*8, 0);
-    Blacksmith_job.addData("DIAMOND CHESTPLATE", 1.50*8, 175*8, 0);
+    Blacksmith_job.addData("IRON HOE", 0.325, 38, 0);
+    Blacksmith_job.addData("WEAK IRON BOOTS", 0.375, 80, 0);
+    Blacksmith_job.addData("IRON PICKAXE", 0.40, 58, 0);
+    Blacksmith_job.addData("WEAK IRON HELMET", 0.50, 100, 0);
+    Blacksmith_job.addData("GOLDEN SHOVEL", 0.625, 23, 0);
+    Blacksmith_job.addData("GOLDEN HOE", 0.65, 65, 0);
+    Blacksmith_job.addData("WEAK IRON LEGGINGS", 0.725, 140, 0);
+    Blacksmith_job.addData("DIAMOND SHOVEL", 0.75, 90, 0);
+    Blacksmith_job.addData("DIAMOND HOE", 0.8, 188, 0);
+    Blacksmith_job.addData("WEAK GOLDEN BOOTS", 0.825, 120, 0);
+    Blacksmith_job.addData("WEAK IRON CHESTPLATE", 0.875, 175, 0);
+    Blacksmith_job.addData("WEAK GOLDEN HELMET", 0.925, 150, 0);
+    Blacksmith_job.addData("DIAMOND PICKAXE", 0.925, 290, 0);
+    Blacksmith_job.addData("WEAK DIAMOND BOOTS", 1.0, 390, 0);
+    Blacksmith_job.addData("WEAK GOLDEN LEGGINGS", 1.025, 170, 0);
+    Blacksmith_job.addData("WEAK GOLDEN CHESTPLATE", 1.15, 192, 0);
+    Blacksmith_job.addData("WEAK DIAMOND HELMET", 1.15, 480, 0);
+    Blacksmith_job.addData("WEAK DIAMOND LEGGINGS", 1.325, 660, 0);
+    Blacksmith_job.addData("WEAK DIAMOND CHESTPLATE", 1.50, 750, 0);
+    Blacksmith_job.addData("IRON BOOTS", 0.375*10, 27*10, 0);
+    Blacksmith_job.addData("IRON HELMET", 0.50*10, 45*10, 0);
+    Blacksmith_job.addData("IRON LEGGINGS", 0.725*10, 60*10, 0);
+    Blacksmith_job.addData("GOLDEN BOOTS", 0.825*10, 50*10, 0);
+    Blacksmith_job.addData("IRON CHESTPLATE", 0.875*10, 70*10, 0);
+    Blacksmith_job.addData("GOLDEN HELMET", 0.925*10, 80*10, 0);
+    Blacksmith_job.addData("DIAMOND BOOTS", 1.0*10, 85*10, 0);
+    Blacksmith_job.addData("GOLDEN LEGGINGS", 1.025*10, 100*10, 0);
+    Blacksmith_job.addData("GOLDEN CHESTPLATE", 1.15*10, 130*10, 0);
+    Blacksmith_job.addData("DIAMOND HELMET", 1.15*10, 125*10, 0);
+    Blacksmith_job.addData("DIAMOND LEGGINGS", 1.325*10, 145*10, 0);
+    Blacksmith_job.addData("DIAMOND CHESTPLATE", 1.50*10, 175*10, 0);
     Blacksmith_job.setBuffData("All crafted items are buffed with a Lv5 enchantment.",
     		"All crafted items are buffed with a Lv10 enchantment.", 
     		"Crafting materials have a 30% chance of being preserved.", 
