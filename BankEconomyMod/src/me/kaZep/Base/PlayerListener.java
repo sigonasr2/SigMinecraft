@@ -611,7 +611,7 @@ public class PlayerListener
 				  Cow a = (Cow)e.getRightClicked();
 				  if (a.canBreed()) {
 					  if (Math.random()<=0.50) {
-						  p.getItemInHand().setAmount(p.getItemInHand().getAmount()+1);
+						  p.getItemInHand().setAmount(p.getItemInHand().getAmount());
 					  }
 				  }
 			  }
@@ -659,7 +659,7 @@ public class PlayerListener
 				  Sheep a = (Sheep)e.getRightClicked();
 				  if (a.canBreed()) {
 					  if (Math.random()<=0.50) {
-						  p.getItemInHand().setAmount(p.getItemInHand().getAmount()+1);
+						  p.getItemInHand().setAmount(p.getItemInHand().getAmount());
 					  }
 				  }
 				  }
@@ -707,7 +707,7 @@ public class PlayerListener
 				  Pig a = (Pig)e.getRightClicked();
 				  if (a.canBreed()) {
 					  if (Math.random()<=0.50) {
-						  p.getItemInHand().setAmount(p.getItemInHand().getAmount()+1);
+						  p.getItemInHand().setAmount(p.getItemInHand().getAmount());
 					  }
 				  }
 				  }
@@ -755,7 +755,7 @@ public class PlayerListener
 				  Chicken a = (Chicken)e.getRightClicked();
 				  if (a.canBreed()) {
 					  if (Math.random()<=0.50) {
-						  p.getItemInHand().setAmount(p.getItemInHand().getAmount()+1);
+						  p.getItemInHand().setAmount(p.getItemInHand().getAmount());
 					  }
 				  }
 				  }
@@ -803,7 +803,7 @@ public class PlayerListener
 				  Wolf a = (Wolf)e.getRightClicked();
 				  if (a.canBreed()) {
 					  if (Math.random()<=0.50) {
-						  p.getItemInHand().setAmount(p.getItemInHand().getAmount()+1);
+						  p.getItemInHand().setAmount(p.getItemInHand().getAmount());
 					  }
 				  }
 				  }
@@ -851,7 +851,7 @@ public class PlayerListener
 				  Ocelot a = (Ocelot)e.getRightClicked();
 				  if (a.canBreed()) {
 					  if (Math.random()<=0.50) {
-						  p.getItemInHand().setAmount(p.getItemInHand().getAmount()+1);
+						  p.getItemInHand().setAmount(p.getItemInHand().getAmount());
 					  }
 				  }
 				  }
@@ -891,6 +891,19 @@ public class PlayerListener
 					  }
 					  this.plugin.saveConfig();
 				  }
+		  }
+		  }
+		  if (p.getItemInHand().getType()==Material.GOLDEN_APPLE || p.getItemInHand().getType()==Material.GOLDEN_CARROT) {
+			  if (e.getRightClicked().getType()==EntityType.HORSE) {
+				  if (this.plugin.PlayerinJob(p, "Breeder") && this.plugin.getJobLv("Breeder", p)>=20) {
+				  Horse a = (Horse)e.getRightClicked();
+				  if (a.canBreed()) {
+					  if (Math.random()<=0.50) {
+						  p.getItemInHand().setAmount(p.getItemInHand().getAmount());
+					  }
+				  }
+				  }
+				  //This is a special entity and won't be added to the list of animals to despawn for now.
 		  }
 		  }
 	  }
@@ -3557,37 +3570,6 @@ public class PlayerListener
 		  }
 		  if (result.getResult().getType()==Material.DIAMOND_SWORD) {
 			  crafteditem=true;
-		  }
-		  if (this.plugin.getJobLv("Weaponsmith", p)>=20) {
-			  ItemStack[] crafteditems = result.getMatrix();
-			  for (int i=0;i<crafteditems.length;i++) {
-				  if (crafteditems[i]!=null) {
-					  if (Math.random()<=0.25) {
-						  ItemStack replenishitem = crafteditems[i].clone();
-						  replenishitem.setAmount(1);
-						  p.getInventory().addItem(replenishitem);
-						  p.updateInventory();
-					  }
-				  }
-			  }
-		  } else
-		  if (this.plugin.getJobLv("Weaponsmith", p)>=5) {
-			  ItemStack[] crafteditems = result.getMatrix();
-			  for (int i=0;i<crafteditems.length;i++) {
-				  if (crafteditems[i]!=null) {
-					  if (Math.random()<=0.10) {
-						  ItemStack replenishitem = crafteditems[i].clone();
-						  replenishitem.setAmount(1);
-						  p.getInventory().addItem(replenishitem);
-						  p.updateInventory();
-					  }
-				  }
-			  }
-		  }
-		  if (this.plugin.getJobLv("Weaponsmith", p)>=10 && crafteditem) {
-			  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-			  ItemStack resulting = this.plugin.EnchantItem(result.getResult(),10);
-			  result.setResult(resulting);
 		  }
 	  }
 	  if (this.plugin.PlayerinJob(p,"Blacksmith")) {
@@ -7631,7 +7613,18 @@ public ItemStack getGoodie() {
 	  meta.setLore(setLore);
 	  finalitem.setItemMeta(meta);
 	  //finalitem.setDurability((short)1560); //TESTING.
-	  p.getInventory().addItem(finalitem);
+	  boolean full=true;
+	  for (int i=0;i<p.getInventory().getContents().length;i++) {
+		  if (p.getInventory().getContents()[i]==null) {
+			  full=false;
+			  break;
+		  }
+	  }
+	  if (!full) {
+		  p.getInventory().addItem(finalitem);
+	  } else {
+		  p.getWorld().dropItemNaturally(p.getLocation(), finalitem); //Drop item on the ground if our inventory is full. That way we don't lose it.
+	  }
   }
   
   @EventHandler
@@ -8295,12 +8288,208 @@ public ItemStack getGoodie() {
 	        }
 	    }
 	}
+	
+	public String[] getJobs(Player p) {
+		String[] string= {this.plugin.getAccountsConfig().getString(p.getName()+".jobs.job1"),this.plugin.getAccountsConfig().getString(p.getName()+".jobs.job2"),this.plugin.getAccountsConfig().getString(p.getName()+".jobs.job3")};
+		return string;
+	}
+	
+	public String[] getJobs(String p) {
+		String[] string= {this.plugin.getAccountsConfig().getString(p+".jobs.job1"),this.plugin.getAccountsConfig().getString(p+".jobs.job2"),this.plugin.getAccountsConfig().getString(p+".jobs.job3")};
+		return string;
+	}
+	
+	public boolean PlayerinJob(String p,String job) {
+		String[] jobs = getJobs(p);
+		for (int i=0;i<jobs.length;i++) {
+			if (job.equalsIgnoreCase(jobs[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean PlayerinJob(Player p,String job) {
+		String[] jobs = getJobs(p);
+		for (int i=0;i<jobs.length;i++) {
+			if (job.equalsIgnoreCase(jobs[i])) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+
+	public int getJobLv(String job, String p) {
+		if (PlayerinJob(p,job)) {
+			int slot=-1;
+			//Check which slot contains our job.
+			for (int i=0;i<3;i++) {
+				if (this.plugin.getAccountsConfig().getString(p+".jobs.job"+(i+1)).equalsIgnoreCase(job)) {
+					slot=i;
+					break;
+				}
+			}
+			if (slot!=-1) {
+				return this.plugin.getAccountsConfig().getInt(p+".jobs.job"+(slot+1)+"lv");
+			} else {
+				return 0;
+			}
+		}
+		return 0;
+	}
+	
+	public boolean validItem_Weaponsmith(ItemStack i) {
+		if (i.getType()==Material.ARROW ||
+			//i.getType()==Material.WOODEN_SWORD ||
+			i.getType()==Material.FLINT_AND_STEEL ||
+			i.getType()==Material.BOW ||
+			i.getType()==Material.IRON_SWORD ||
+			i.getType()==Material.GOLD_SWORD ||
+			i.getType()==Material.DIAMOND_SWORD) {
+			return true;
+		}
+		 else {
+			return false;
+		 }
+	}
+	
+	public boolean validItem_Blacksmith(ItemStack i) {
+		if (i.getType()==Material.LEATHER_BOOTS ||
+			//i.getType()==Material.WOODEN_SWORD ||
+			i.getType()==Material.LEATHER_HELMET ||
+			i.getType()==Material.LEATHER_LEGGINGS ||
+			i.getType()==Material.LEATHER_CHESTPLATE ||
+			i.getType()==Material.IRON_SPADE ||
+			i.getType()==Material.IRON_HOE ||
+			i.getType()==Material.IRON_BOOTS ||
+			i.getType()==Material.IRON_LEGGINGS ||
+			i.getType()==Material.IRON_CHESTPLATE ||
+			i.getType()==Material.IRON_HELMET ||
+			i.getType()==Material.GOLD_SPADE ||
+			i.getType()==Material.GOLD_HOE ||
+			i.getType()==Material.GOLD_BOOTS ||
+			i.getType()==Material.GOLD_CHESTPLATE ||
+			i.getType()==Material.GOLD_LEGGINGS ||
+			i.getType()==Material.GOLD_HELMET ||
+			i.getType()==Material.DIAMOND_PICKAXE ||
+			i.getType()==Material.DIAMOND_HOE ||
+			i.getType()==Material.DIAMOND_SPADE ||
+			i.getType()==Material.DIAMOND_HELMET ||
+			i.getType()==Material.DIAMOND_CHESTPLATE ||
+			i.getType()==Material.DIAMOND_LEGGINGS ||
+			i.getType()==Material.DIAMOND_BOOTS) {
+			return true;
+		}
+		 else {
+			return false;
+		 }
+	}
+	
+	
+	public ItemStack EnchantItem(ItemStack item,int lv) {
+		boolean protection=false; //Set to true when a protection enchantment has been given.
+		boolean silktouch=false; //Set to true if silk touch OR fortune is set. Only one of these can be there.
+		boolean enhanceddmg=false; //Set to true if a damage increasing enchantment has been given.
+		//First figure out which item this is.
+	    final EnchantLevelDatabase ENCHANTMENT_DATA = new EnchantLevelDatabase();
+		List<StoreValues> enchant_data = new ArrayList<StoreValues>(); //OMGGGG. forgot to initialize the dang list!
+		if (item.getType()==Material.STONE_HOE || item.getType()==Material.IRON_HOE || item.getType()==Material.WOOD_HOE || item.getType()==Material.GOLD_HOE || item.getType()==Material.DIAMOND_HOE) {
+			enchant_data=ENCHANTMENT_DATA.stone_hoe;
+		} else
+		//DERP
+		if (item.getType()==Material.STONE_SPADE) {enchant_data=ENCHANTMENT_DATA.stone_shovel;} else
+		if (item.getType()==Material.STONE_PICKAXE) {enchant_data=ENCHANTMENT_DATA.stone_pickaxe;} else
+		if (item.getType()==Material.LEATHER_BOOTS) {enchant_data=ENCHANTMENT_DATA.leather_boots;} else
+		if (item.getType()==Material.LEATHER_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.leather_pants;} else
+		if (item.getType()==Material.LEATHER_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.leather_tunic;} else
+		if (item.getType()==Material.LEATHER_HELMET) {enchant_data=ENCHANTMENT_DATA.leather_cap;} else
+		if (item.getType()==Material.IRON_SPADE) {enchant_data=ENCHANTMENT_DATA.iron_shovel;} else
+		if (item.getType()==Material.IRON_BOOTS) {enchant_data=ENCHANTMENT_DATA.iron_boots;} else
+		if (item.getType()==Material.IRON_PICKAXE) {enchant_data=ENCHANTMENT_DATA.iron_pickaxe;} else
+		if (item.getType()==Material.IRON_HELMET) {enchant_data=ENCHANTMENT_DATA.iron_helmet;} else
+		if (item.getType()==Material.GOLD_SPADE) {enchant_data=ENCHANTMENT_DATA.golden_shovel;} else
+		if (item.getType()==Material.IRON_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.iron_leggings;} else
+		if (item.getType()==Material.DIAMOND_SPADE) {enchant_data=ENCHANTMENT_DATA.diamond_shovel;} else
+		if (item.getType()==Material.GOLD_BOOTS) {enchant_data=ENCHANTMENT_DATA.golden_boots;} else
+		if (item.getType()==Material.IRON_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.iron_chestplate;} else
+		if (item.getType()==Material.GOLD_HELMET) {enchant_data=ENCHANTMENT_DATA.golden_helmet;} else
+		if (item.getType()==Material.IRON_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.iron_chestplate;} else
+		if (item.getType()==Material.DIAMOND_PICKAXE) {enchant_data=ENCHANTMENT_DATA.diamond_pickaxe;} else
+		if (item.getType()==Material.DIAMOND_BOOTS) {enchant_data=ENCHANTMENT_DATA.diamond_boots;} else
+		if (item.getType()==Material.GOLD_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.golden_leggings;} else
+		if (item.getType()==Material.GOLD_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.golden_chestplate;} else
+		if (item.getType()==Material.DIAMOND_HELMET) {enchant_data=ENCHANTMENT_DATA.diamond_helmet;} else
+		if (item.getType()==Material.DIAMOND_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.diamond_leggings;} else
+		if (item.getType()==Material.DIAMOND_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.diamond_chestplate;}
+		int enchantments=0;
+		int iterations=0;
+		while (enchantments==0 && iterations<100) { //Attempt to enchant it, up to 100 tries.
+			iterations++;
+			//Bukkit.getPlayer("sigonasr2").sendMessage("Enchant data size is "+enchant_data.size());
+			for (int i=0;i<enchant_data.size();i++) {
+				//Bukkit.getPlayer("sigonasr2").sendMessage("Comparing level "+lv+" to enchant requirement: "+enchant_data.get(i).enchantlevel);
+				if (enchant_data.get(i).enchantlevel==lv) {
+					//Bukkit.getPlayer("sigonasr2").sendMessage("Checking "+enchant_data.get(i).enchant.getName());
+					if (Math.random()<=enchant_data.get(i).chance) {
+						//This enchantment can be added. (Assuming it's compatible.)
+						if ((enchant_data.get(i).enchant.getName()==Enchantment.PROTECTION_ENVIRONMENTAL.getName() ||
+								enchant_data.get(i).enchant.getName()==Enchantment.PROTECTION_EXPLOSIONS.getName() ||
+								enchant_data.get(i).enchant.getName()==Enchantment.PROTECTION_FALL.getName() ||
+								enchant_data.get(i).enchant.getName()==Enchantment.PROTECTION_FIRE.getName() ||
+								enchant_data.get(i).enchant.getName()==Enchantment.PROTECTION_PROJECTILE.getName()) && !protection) {
+							protection=true;
+							enchantments++;
+							item.addEnchantment(enchant_data.get(i).enchant, enchant_data.get(i).level);
+						} else
+						if ((enchant_data.get(i).enchant.getName()==Enchantment.DAMAGE_ALL.getName() ||
+								enchant_data.get(i).enchant.getName()==Enchantment.DAMAGE_ARTHROPODS.getName() ||
+								enchant_data.get(i).enchant.getName()==Enchantment.DAMAGE_UNDEAD.getName()) && !enhanceddmg) {
+							enhanceddmg=true;
+							enchantments++;
+							item.addEnchantment(enchant_data.get(i).enchant, enchant_data.get(i).level);
+						} else
+						if ((enchant_data.get(i).enchant.getName()==Enchantment.SILK_TOUCH.getName() ||
+								enchant_data.get(i).enchant.getName()==Enchantment.LOOT_BONUS_BLOCKS.getName() ||
+								enchant_data.get(i).enchant.getName()==Enchantment.LOOT_BONUS_MOBS.getName()) && !silktouch) {
+							silktouch=true;
+							enchantments++;
+							item.addEnchantment(enchant_data.get(i).enchant, enchant_data.get(i).level);
+						} else {
+							//It's not a special condition enchantment. Just make sure it doesn't exist and add it.
+							if (!item.containsEnchantment(enchant_data.get(i).enchant)) {
+								item.addEnchantment(enchant_data.get(i).enchant, enchant_data.get(i).level);
+							}
+						}
+					}
+					//see if we should try for a second/third/fourth enchantment.
+					boolean keepgoing=false;
+					if (lv==5) {
+						if (enchantments==1 && Math.random()<=0.07) {
+							keepgoing=true;
+						} else
+						if (enchantments==2 && Math.random()<=0.045) {
+							keepgoing=true;
+						} else
+						if (enchantments==3 && Math.random()<=0.03) {
+							keepgoing=true;
+						}
+						if (!keepgoing) {
+							break;
+						}
+					}
+				}
+			}
+		}
+		return item;
+	}
 	 
 	// HACK! The API doesn't allow us to easily determine the resulting number of
 	// crafted items, so we're forced to compare the inventory before and after.
 	private void schedulePostDetection(final HumanEntity player, final ItemStack compareItem) {
 	    final ItemStack[] preInv = player.getInventory().getContents();
 	    final int ticks = 1;
+	    
 	   
 	    // Clone the array. The content may (was for me) be mutable.
 	    for (int i = 0; i < preInv.length; i++) {
@@ -8331,6 +8520,26 @@ public ItemStack getGoodie() {
             				if (compareItem.getTypeId()==post.getTypeId() && compareItem.getDurability()==post.getDurability() &&
             				compareItem.getItemMeta().equals(post.getItemMeta()) && compareItem.getEnchantments().equals(post.getEnchantments())) {
             					newItemsCount += post.getAmount();
+            					//Do any enchants we need to do here.
+            					if (PlayerinJob((Player)player,"Weaponsmith")) {
+            					  if (getJobLv("Weaponsmith", player.getName())>=10 && validItem_Weaponsmith(post)) {
+            						  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
+            						  ItemStack resulting = EnchantItem(post,5);
+            						  player.getInventory().setItem(i, resulting);
+            					  }
+            					}
+            					if (PlayerinJob((Player)player,"Blacksmith")) {
+              					  if (getJobLv("Blacksmith", player.getName())>=10 && validItem_Blacksmith(post)) {
+              						  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
+              						  ItemStack resulting = EnchantItem(post,10);
+              						  player.getInventory().setItem(i, resulting);
+              					  } else
+              					  if (getJobLv("Blacksmith", player.getName())>=5 && validItem_Blacksmith(post)) {
+              						  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
+              						  ItemStack resulting = EnchantItem(post,5);
+              						  player.getInventory().setItem(i, resulting);
+              					  }
+              					}
             				}
 	            			//Bukkit.getPlayer("sigonasr2").sendMessage("Item amounts differ. New count: "+newItemsCount);
 	            		}

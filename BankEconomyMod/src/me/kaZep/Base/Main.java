@@ -527,7 +527,7 @@ public class Main extends JavaPlugin
     Weaponsmith_job.setAction(0, "CRAFT");
     Weaponsmith_job.setExp(100, 100, 30, 1.05);
     Weaponsmith_job.addData("ARROW", 0.025, 4, 0);
-    Weaponsmith_job.addData("WOODEN SWORD", 0.05, 10, 0);
+    //Weaponsmith_job.addData("WOODEN SWORD", 0.05, 10, 0);
     Weaponsmith_job.addData("FLINT AND STEEL", 0.06, 12, 0);
     Weaponsmith_job.addData("BOW", 0.075, 12, 0);
     Weaponsmith_job.addData("IRON SWORD", 0.375, 75, 0);
@@ -542,9 +542,9 @@ public class Main extends JavaPlugin
     Blacksmith_job.setJobDescription("A blacksmith's job is to provide tools, armor, and other crafted materials to others and themselves to protect them.");
     Blacksmith_job.setAction(0, "CRAFT");
     Blacksmith_job.setExp(250, 150, 37, 1.03);
-    Blacksmith_job.addData("STONE HOE", 0.04, 7, 0);
-    Blacksmith_job.addData("STONE SHOVEL", 0.05, 8, 0);
-    Blacksmith_job.addData("STONE PICKAXE", 0.075, 15, 0);
+    //Blacksmith_job.addData("STONE HOE", 0.04, 7, 0);
+    //Blacksmith_job.addData("STONE SHOVEL", 0.05, 8, 0);
+    //Blacksmith_job.addData("STONE PICKAXE", 0.075, 15, 0);
     Blacksmith_job.addData("LEATHER BOOTS", 0.125, 8, 0);
     Blacksmith_job.addData("LEATHER CAP", 0.15, 14, 0);
     Blacksmith_job.addData("LEATHER PANTS", 0.175, 15, 0);
@@ -3287,7 +3287,7 @@ public void payDay(int time)
 			getAccountsConfig().set(p+".jobs.job"+(slot+1)+"exp", Double.valueOf(0));
 		}
 		//Check for lv up.
-		if (getJobExp(job,getAccountsConfig().getInt(p+".jobs.job"+(slot+1)+"lv"))<=getAccountsConfig().getDouble(p+".jobs.job"+(slot+1)+"exp")) {
+		if (getJobLv(job,p)<40 && getJobExp(job,getAccountsConfig().getInt(p+".jobs.job"+(slot+1)+"lv"))<=getAccountsConfig().getDouble(p+".jobs.job"+(slot+1)+"exp")) { //Make sure we can't go over level cap.
 			//Level up! Level up! YEAH!
 			getAccountsConfig().set(p+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p+".jobs.job"+(slot+1)+"exp")-getJobExp(job,getAccountsConfig().getInt(p+".jobs.job"+(slot+1)+"lv"))));
 			getAccountsConfig().set(p+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p+".jobs.job"+(slot+1)+"lv")+1));
