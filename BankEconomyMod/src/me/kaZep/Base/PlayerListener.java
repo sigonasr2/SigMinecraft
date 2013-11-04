@@ -558,23 +558,23 @@ public class PlayerListener
 	  if (this.plugin.PlayerinJob(owner, "Cook")) {
 		  boolean crafteditem=false;
 		  if (e.getResult().getType()==Material.COOKED_FISH) {
-			  this.plugin.gainMoneyExp(owner,"Cook",0.03,12);
-			  crafteditem=true;
-		  }
-		  if (e.getResult().getType()==Material.getMaterial(393)) {
-			  this.plugin.gainMoneyExp(owner,"Cook",0.04,16);
-			  crafteditem=true;
-		  }
-		  if (e.getResult().getType()==Material.COOKED_CHICKEN) {
-			  this.plugin.gainMoneyExp(owner,"Cook",0.045,18);
-			  crafteditem=true;
-		  }
-		  if (e.getResult().getType()==Material.GRILLED_PORK) {
 			  this.plugin.gainMoneyExp(owner,"Cook",0.06,24);
 			  crafteditem=true;
 		  }
+		  if (e.getResult().getType()==Material.getMaterial(393)) {
+			  this.plugin.gainMoneyExp(owner,"Cook",0.08,32);
+			  crafteditem=true;
+		  }
+		  if (e.getResult().getType()==Material.COOKED_CHICKEN) {
+			  this.plugin.gainMoneyExp(owner,"Cook",0.09,36);
+			  crafteditem=true;
+		  }
+		  if (e.getResult().getType()==Material.GRILLED_PORK) {
+			  this.plugin.gainMoneyExp(owner,"Cook",0.12,48);
+			  crafteditem=true;
+		  }
 		  if (e.getResult().getType()==Material.COOKED_BEEF) {
-			  this.plugin.gainMoneyExp(owner,"Cook",0.10,40);
+			  this.plugin.gainMoneyExp(owner,"Cook",0.20,80);
 			  crafteditem=true;
 		  }
 		  if (this.plugin.getJobLv("Cook", owner)>=20 && crafteditem) {
@@ -2923,7 +2923,7 @@ public class PlayerListener
 			  Player support = this.plugin.getClosestSupport(p.getLocation());
 			  if (support!=null) {
 				  if (!alreadyhas) {
-					  this.plugin.gainMoneyExp(support,"Support",0.175,15);
+					  this.plugin.gainMoneyExp(support,"Support",1.05,90);
 				  } else {
 					  this.plugin.gainMoneyExp(support,"Support",0.01,1);
 				  }
@@ -3005,7 +3005,7 @@ public class PlayerListener
 								  for (PotionEffect nextpotioneffect : effects) {
 									  //shooter.sendMessage(nextpotioneffect.getType().getName()+" is the potion effect.");
 									  if (nextpotioneffect.getType().getName().compareTo("NIGHT_VISION")==0) {
-										  this.plugin.gainMoneyExp(shooter,"Support",0.10,5);
+										  //this.plugin.gainMoneyExp(shooter,"Support",0.10,5);
 									  }
 									  if (nextpotioneffect.getType().getName().compareTo("SPEED")==0) {
 										  this.plugin.gainMoneyExp(shooter,"Support",0.15,6);
@@ -3018,22 +3018,22 @@ public class PlayerListener
 										  }
 									  }
 									  if (nextpotioneffect.getType().getName().compareTo("INCREASE_DAMAGE")==0) {
-										  this.plugin.gainMoneyExp(shooter,"Support",0.20,9);
+										  //this.plugin.gainMoneyExp(shooter,"Support",0.20,9);
 									  }
 									  if (nextpotioneffect.getType().getName().compareTo("FIRE_RESISTANCE")==0) {
 										  if (p.getFireTicks()>0) {
-											  this.plugin.gainMoneyExp(shooter,"Support",0.60,30);
+											  this.plugin.gainMoneyExp(shooter,"Support",4.80,240);
 										  }
-										  this.plugin.gainMoneyExp(shooter,"Support",0.25,12);
+										  //this.plugin.gainMoneyExp(shooter,"Support",0.25,12);
 									  }
 									  if (nextpotioneffect.getType().getName().compareTo("HEAL")==0) {
 										  if (!p.isDead()) {
 											  if (p.getHealth()/p.getMaxHealth()<=0.30) {
-												  this.plugin.gainMoneyExp(shooter,"Support",0.60,30);
+												  this.plugin.gainMoneyExp(shooter,"Support",2.40,120);
 												  //shooter.sendMessage("This is a big heal.");
 												  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
 											  }
-											  this.plugin.gainMoneyExp(shooter,"Support",0.30,14);
+											  //this.plugin.gainMoneyExp(shooter,"Support",0.30,14);
 											  if (p.getHealth()+12>p.getMaxHealth()) {
 												  p.setHealth(p.getMaxHealth());
 											  } else {
@@ -3044,9 +3044,9 @@ public class PlayerListener
 									  }
 									  if (nextpotioneffect.getType().getName().compareTo("REGENERATION")==0) {
 										  if (p.getHealth()/p.getMaxHealth()<=0.30) {
-											  this.plugin.gainMoneyExp(shooter,"Support",0.60,30);
+											  //this.plugin.gainMoneyExp(shooter,"Support",0.60,30);
 										  }
-										  this.plugin.gainMoneyExp(shooter,"Support",0.30,14);
+										  //this.plugin.gainMoneyExp(shooter,"Support",0.30,14);
 										  //shooter.sendMessage("This is a heal.");
 									  }
 								  }
@@ -3571,6 +3571,83 @@ public class PlayerListener
 		  if (result.getResult().getType()==Material.DIAMOND_SWORD) {
 			  crafteditem=true;
 		  }
+		  if (this.plugin.getJobLv("Weaponsmith", p)>=20) {
+			  ItemStack[] crafteditems = result.getMatrix();
+			  if (e.getClick()==ClickType.SHIFT_RIGHT || e.getClick()==ClickType.SHIFT_LEFT) {
+				  int lowestamt=9999;
+				  for (int i=0;i<crafteditems.length;i++) {
+					  if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+						  if (crafteditems[i].getAmount()<lowestamt) {
+							  lowestamt=crafteditems[i].getAmount();
+						  }
+					  }
+				  }
+				  for (int i=0;i<crafteditems.length;i++) {
+					  if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+						  for (int j=0;j<lowestamt;j++) {
+							  if (Math.random()<=0.25) {
+								  //p.sendMessage("Restored an item.");
+								  ItemStack replenishitem = crafteditems[i].clone();
+								  replenishitem.setAmount(1);
+								  p.getInventory().addItem(replenishitem);
+							  }
+						  }
+					  }
+				  }
+			  } else {
+				  for (int i=0;i<crafteditems.length;i++) {
+					  if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+						  if (Math.random()<=0.25) {
+							  //p.sendMessage("Restored an item.");
+							  ItemStack replenishitem = crafteditems[i].clone();
+							  replenishitem.setAmount(1);
+							  p.getInventory().addItem(replenishitem);
+						  }
+					  }
+				  }
+			  }
+		  } else
+		  if (this.plugin.getJobLv("Weaponsmith", p)>=5) {
+			  ItemStack[] crafteditems = result.getMatrix();
+			  if (e.getClick()==ClickType.SHIFT_RIGHT || e.getClick()==ClickType.SHIFT_LEFT) {
+				  int lowestamt=9999;
+				  for (int i=0;i<crafteditems.length;i++) {
+					  if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+						  if (crafteditems[i].getAmount()<lowestamt) {
+							  lowestamt=crafteditems[i].getAmount();
+						  }
+					  }
+				  }
+				  for (int i=0;i<crafteditems.length;i++) {
+					  if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+						  for (int j=0;j<lowestamt;j++) {
+							  if (Math.random()<=0.10) {
+								  //p.sendMessage("Restored an item.");
+								  ItemStack replenishitem = crafteditems[i].clone();
+								  replenishitem.setAmount(1);
+								  p.getInventory().addItem(replenishitem);
+							  }
+						  }
+					  }
+				  }
+			  } else {
+				  for (int i=0;i<crafteditems.length;i++) {
+					  if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+						  if (Math.random()<=0.10) {
+							  //p.sendMessage("Restored an item.");
+							  ItemStack replenishitem = crafteditems[i].clone();
+							  replenishitem.setAmount(1);
+							  p.getInventory().addItem(replenishitem);
+						  }
+					  }
+				  }
+			  }
+		  }
+		  if (this.plugin.getJobLv("Weaponsmith", p)>=10 && crafteditem) {
+			  Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
+			  ItemStack resulting = this.plugin.EnchantItem(result.getResult(),5,p);
+			  result.setResult(resulting);
+		  }
 	  }
 	  if (this.plugin.PlayerinJob(p,"Blacksmith")) {
 		  boolean crafteditem=false;
@@ -3730,25 +3807,46 @@ public class PlayerListener
 			  //this.plugin.gainMoneyExp(p,"Blacksmith",1.50*mult,175*mult);
 			  crafteditem=true;
 		  }
-		  /*
 		  if (this.plugin.getJobLv("Blacksmith", p)>=5 && crafteditem) {
 			  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-			  ItemStack resulting = this.plugin.EnchantItem(result.getResult(),5);
+			  ItemStack resulting = this.plugin.EnchantItem(result.getResult(),5,p);
 			  result.setResult(resulting);
 		  }
 		  if (this.plugin.getJobLv("Blacksmith", p)>=10 && crafteditem) {
 			  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-			  ItemStack resulting = this.plugin.EnchantItem(result.getResult(),10);
+			  ItemStack resulting = this.plugin.EnchantItem(result.getResult(),10,p);
 			  result.setResult(resulting);
-		  }*/
+		  }
 		  if (this.plugin.getJobLv("Blacksmith", p)>=20) {
 			  ItemStack[] crafteditems = result.getMatrix();
-			  for (int i=0;i<crafteditems.length;i++) {
-				  if (crafteditems[i]!=null) {
-					  if (Math.random()<=0.30) {
-						  ItemStack replenishitem = crafteditems[i].clone();
-						  replenishitem.setAmount(1);
-						  p.getInventory().addItem(replenishitem);
+			  if (e.getClick()==ClickType.SHIFT_RIGHT || e.getClick()==ClickType.SHIFT_LEFT) {
+				  int lowestamt=9999;
+				  for (int i=0;i<crafteditems.length;i++) {
+					  if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+						  if (crafteditems[i].getAmount()<lowestamt) {
+							  lowestamt=crafteditems[i].getAmount();
+						  }
+					  }
+				  }
+				  for (int i=0;i<crafteditems.length;i++) {
+					  if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+						  for (int j=0;j<lowestamt;j++) {
+							  if (Math.random()<=0.30) {
+								  ItemStack replenishitem = crafteditems[i].clone();
+								  replenishitem.setAmount(1);
+								  p.getInventory().addItem(replenishitem);
+							  }
+						  }
+					  }
+				  }
+			  } else {
+				  for (int i=0;i<crafteditems.length;i++) {
+					  if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+						  if (Math.random()<=0.30) {
+							  ItemStack replenishitem = crafteditems[i].clone();
+							  replenishitem.setAmount(1);
+							  p.getInventory().addItem(replenishitem);
+						  }
 					  }
 				  }
 			  }
@@ -4560,8 +4658,24 @@ public ItemStack getGoodie() {
 		  if (this.plugin.getAccountsConfig().getBoolean("halloween-enabled")) {
 			  e.setDroppedExp(e.getDroppedExp()*2);
 		  }
-		  if (f.getKiller()!=null && f.getKiller().getType()==EntityType.PLAYER) {
-			  Player p = f.getKiller();
+		  Player p = null;
+		  for (int i=0;i<this.plugin.hitmoblist.size();i++) {
+			  for (int j=0;j<this.plugin.hitmoblist.get(i).id.size();j++) {
+				  if (this.plugin.hitmoblist.get(i).id.contains(e.getEntity().getUniqueId())) {
+					  //This is the player that killed. Also identify them.
+					  p = this.plugin.hitmoblist.get(i).p;
+					  //Bukkit.getPlayer("sigonasr2").sendMessage("Found: "+e.getEntity().getUniqueId().toString());
+					  //this.plugin.gainMoneyExp(this.plugin.hitmoblist.get(i).p,"Support",0.025,3);
+					  this.plugin.hitmoblist.get(i).id.remove(e.getEntity().getUniqueId());
+					  this.plugin.hitmoblist.get(i).p.giveExp(e.getDroppedExp());
+					  if (e.getDroppedExp()!=0) {
+						  p.playSound(p.getLocation(), Sound.ORB_PICKUP, 0.9f, 1f);
+					  }
+					  break;
+				  }
+			  }
+		  }
+		  if (p!=null) {
 			  for (int x=-10;x<10;x++) {
 				  for (int y=-3;y<3;y++) {
 					  for (int z=-10;z<10;z++) {
@@ -4592,7 +4706,7 @@ public ItemStack getGoodie() {
 						  if (this.plugin.supportmoblist.get(i).id.contains(e.getEntity().getUniqueId())) {
 							  //Award the support player.
 							  //Bukkit.getPlayer("sigonasr2").sendMessage("Found: "+e.getEntity().getUniqueId().toString());
-							  this.plugin.gainMoneyExp(this.plugin.supportmoblist.get(i).p,"Support",0.025,3);
+							  this.plugin.gainMoneyExp(this.plugin.supportmoblist.get(i).p,"Support",0.05,6);
 							  this.plugin.supportmoblist.get(i).id.remove(e.getEntity().getUniqueId());
 							  this.plugin.supportmoblist.get(i).p.giveExp(e.getDroppedExp()/2);
 							  if (e.getDroppedExp()/2!=0) {
@@ -4684,6 +4798,53 @@ public ItemStack getGoodie() {
 					  }
 				  }
 			  }
+		  } else {
+			  //We're going to see if a player killed it themselves then.
+			  Player pp = null;
+			  for (int i=0;i<this.plugin.hitmoblist.size();i++) {
+				  for (int j=0;j<this.plugin.hitmoblist.get(i).id.size();j++) {
+					  if (this.plugin.hitmoblist.get(i).id.contains(e.getEntity().getUniqueId())) {
+						  //This is the player that killed. Also identify them.
+						  pp = this.plugin.hitmoblist.get(i).p;
+						  //Bukkit.getPlayer("sigonasr2").sendMessage("Found: "+e.getEntity().getUniqueId().toString());
+						  //this.plugin.gainMoneyExp(this.plugin.hitmoblist.get(i).p,"Support",0.025,3);
+						  this.plugin.hitmoblist.get(i).id.remove(e.getEntity().getUniqueId());
+						  this.plugin.hitmoblist.get(i).p.giveExp(e.getDroppedExp());
+						  if (e.getDroppedExp()!=0) {
+							  pp.playSound(p.getLocation(), Sound.ORB_PICKUP, 0.9f, 1f);
+						  }
+						  break;
+					  }
+				  }
+			  }
+			  
+			  //Check other players and give them assist experience.
+
+			  for (int i=0;i<this.plugin.hitmoblist.size();i++) {
+				  for (int j=0;j<this.plugin.hitmoblist.get(i).id.size();j++) {
+					  if (this.plugin.hitmoblist.get(i).id.contains(e.getEntity().getUniqueId()) && this.plugin.hitmoblist.get(i).p!=pp) {
+						  //This is the player that killed. Also identify them.
+						  Player tempp = this.plugin.hitmoblist.get(i).p;
+						  if (this.plugin.PlayerinJob(tempp, "Support")) {
+						  //Bukkit.getPlayer("sigonasr2").sendMessage("Found: "+e.getEntity().getUniqueId().toString());
+						  //this.plugin.gainMoneyExp(this.plugin.hitmoblist.get(i).p,"Support",0.025,3);
+							  this.plugin.hitmoblist.get(i).id.remove(e.getEntity().getUniqueId());
+							  this.plugin.hitmoblist.get(i).p.giveExp(e.getDroppedExp()/4);
+							  if (e.getDroppedExp()/4!=0) {
+								  tempp.playSound(p.getLocation(), Sound.ORB_PICKUP, 0.4f, 0.6f);
+							  }
+						  } else {
+							  this.plugin.hitmoblist.get(i).id.remove(e.getEntity().getUniqueId());
+							  this.plugin.hitmoblist.get(i).p.giveExp(e.getDroppedExp()/2);
+							  if (e.getDroppedExp()/2!=0) {
+								  tempp.playSound(p.getLocation(), Sound.ORB_PICKUP, 0.4f, 0.6f);
+							  }
+						  }
+						  break;
+					  }
+				  }
+			  }
+			  
 		  }
 		  e.setDroppedExp(0);
 		  /*
@@ -4735,7 +4896,7 @@ public ItemStack getGoodie() {
 					  playernearby=true;
 					  if (((Player)nearby.get(i)).getFireTicks()>0 && ((Player)nearby.get(i)).getHealth()<=8) {
 						  //They are on fire, you intend to douse them.
-						  this.plugin.gainMoneyExp(p,"Support",0.60,30);
+						  this.plugin.gainMoneyExp(p,"Support",4.80,240);
 					  }
 				  }
 			  }
@@ -4759,7 +4920,7 @@ public ItemStack getGoodie() {
 					  }
 				  }
 				  if (foundlava) {
-					  this.plugin.gainMoneyExp(p,"Support",0.05,10);
+					  this.plugin.gainMoneyExp(p,"Support",0.15,60);
 				  }
 			  }
 		  }
@@ -5296,7 +5457,7 @@ public ItemStack getGoodie() {
 		  }
 		  if (this.plugin.PlayerinJob(p, "Explorer")) {
 			  if (this.plugin.getJobLv("Explorer", p)>=10) {
-				  //Check to see if our "fatal survivor" effect is available.
+				  //Check to see if our "fatal s	urvivor" effect is available.
 				  boolean survivor=false;
 				  for (int i=0;i<this.plugin.explorers.size();i++) {
 					  if (this.plugin.explorers.get(i).event==0 && this.plugin.explorers.get(i).name.compareTo(p.getName())==0) {
@@ -6124,7 +6285,7 @@ public ItemStack getGoodie() {
 						  if (this.plugin.hitmoblist.get(i).p.getName().compareTo(((Player)e.getDamager()).getName())==0) {
 							  if (!this.plugin.hitmoblist.get(i).id.contains(((Entity)f).getUniqueId())) {
 								  this.plugin.hitmoblist.get(i).id.add(((Entity)f).getUniqueId());
-								  //Bukkit.getPlayer("sigonasr2").sendMessage("Added to list: "+((Entity)f).getUniqueId().toString());
+								  //p.sendMessage("Added to list: "+((Entity)f).getUniqueId().toString());
 								  this.plugin.hitmoblist.get(i).registeredtime=Bukkit.getWorld("world").getFullTime()+1200;
 							  }
 						  }
@@ -6946,10 +7107,11 @@ public ItemStack getGoodie() {
 		  if (e.getBlockPlaced().getType()==Material.CROPS) {
 			  this.plugin.gainMoneyExp(p,"Farmer",0.005,1);
 		  }
-		  if (e.getBlockPlaced().getType()==Material.PUMPKIN_SEEDS) {
+		  //p.sendMessage("Placing down "+e.getBlockPlaced().getType()+" ("+e.getBlockPlaced().getTypeId()+"), "+e.getBlockPlaced().getData());
+		  if (e.getBlockPlaced().getType()==Material.PUMPKIN_STEM) {
 			  this.plugin.gainMoneyExp(p,"Farmer",0.01,2);
 		  }
-		  if (e.getBlockPlaced().getType()==Material.MELON_SEEDS) {
+		  if (e.getBlockPlaced().getType()==Material.MELON_STEM) {
 			  this.plugin.gainMoneyExp(p,"Farmer",0.01,2);
 		  }
 	  }
@@ -6974,7 +7136,7 @@ public ItemStack getGoodie() {
 				  }
 			  }
 			  if (!found) {
-				  this.plugin.gainMoneyExp(p,"Support",0.00,1);
+				  this.plugin.gainMoneyExp(p,"Support",0.01,2);
 			  }
 		  } else
 		  if (e.getBlockPlaced().getType()==Material.GLOWSTONE) {
@@ -8007,10 +8169,11 @@ public ItemStack getGoodie() {
 			  this.plugin.gainMoneyExp(p,"Weaponsmith",0.025*amount,4*amount);
 			  crafteditem=true;
 		  }
+		  /*
 		  if (item.getType()==Material.WOOD_SWORD) {
 			  this.plugin.gainMoneyExp(p,"Weaponsmith",0.05*amount,10*amount);
 			  crafteditem=true;
-		  }
+		  }*/
 		  if (item.getType()==Material.FLINT_AND_STEEL) {
 			  this.plugin.gainMoneyExp(p,"Weaponsmith",0.06*amount,12*amount);
 			  crafteditem=true;
@@ -8028,12 +8191,13 @@ public ItemStack getGoodie() {
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.DIAMOND_SWORD) {
-			  this.plugin.gainMoneyExp(p,"Weaponsmith",0.975*amount,175*amount);
+			  this.plugin.gainMoneyExp(p,"Weaponsmith",3.60*amount,280*amount);
 			  crafteditem=true;
 		  }
 	  }
 	  if (this.plugin.PlayerinJob(p,"Blacksmith")) {
 		  boolean crafteditem=false;
+		  /*
 		  if (item.getType()==Material.STONE_HOE) {
 			  this.plugin.gainMoneyExp(p,"Blacksmith",0.04*amount,7*amount);
 			  crafteditem=true;
@@ -8045,7 +8209,7 @@ public ItemStack getGoodie() {
 		  if (item.getType()==Material.STONE_PICKAXE) {
 			  this.plugin.gainMoneyExp(p,"Blacksmith",0.075*amount,15*amount);
 			  crafteditem=true;
-		  }
+		  }*/
 		  if (item.getType()==Material.LEATHER_BOOTS) {
 			  this.plugin.gainMoneyExp(p,"Blacksmith",0.125*amount,8*amount);
 			  crafteditem=true;
@@ -8067,158 +8231,158 @@ public ItemStack getGoodie() {
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.IRON_HOE) {
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.325*amount,24*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.325*amount,38*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.IRON_BOOTS) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
-				  mult=8;
+				  mult=10;
 			  }
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.375*mult*amount,27*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.375*mult*amount,80*mult*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.IRON_PICKAXE) {
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.40*amount,30*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.40*amount,58*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.IRON_HELMET) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
-				  mult=8;
+				  mult=10;
 			  }
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.50*mult*amount,45*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.50*mult*amount,100*mult*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.GOLD_SPADE) {
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.625*amount,55*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.625*amount,23*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.GOLD_HOE) {
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.65*amount,60*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.65*amount,65*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.IRON_LEGGINGS) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
-				  mult=8;
+				  mult=10;
 			  }
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.725*mult*amount,60*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.725*mult*amount,140*mult*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.DIAMOND_SPADE) {
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.75*amount,65*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.75*amount,90*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.DIAMOND_HOE) {
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.80*amount,70*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.80*amount,188*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.GOLD_BOOTS) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
-				  mult=8;
+				  mult=10;
 			  }
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.825*mult*amount,50*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.825*mult*amount,120*mult*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.IRON_CHESTPLATE) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
-				  mult=8;
+				  mult=10;
 			  }
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.875*mult*amount,70*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.875*mult*amount,175*mult*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.GOLD_HELMET) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
-				  mult=8;
+				  mult=10;
 			  }
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.925*mult*amount,80*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.925*mult*amount,150*mult*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.DIAMOND_PICKAXE) {
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.925*amount,80*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.925*amount,290*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.DIAMOND_BOOTS) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
-				  mult=8;
+				  mult=10;
 			  }
-			  this.plugin.gainMoneyExp(p,"Blacksmith",1.00*mult*amount,85*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",1.00*mult*amount,390*mult*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.GOLD_LEGGINGS) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
-				  mult=8;
+				  mult=10;
 			  }
-			  this.plugin.gainMoneyExp(p,"Blacksmith",1.025*mult*amount,100*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",1.025*mult*amount,170*mult*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.GOLD_CHESTPLATE) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
-				  mult=8;
+				  mult=10;
 			  }
-			  this.plugin.gainMoneyExp(p,"Blacksmith",1.15*mult*amount,130*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",1.15*mult*amount,192*mult*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.DIAMOND_HELMET) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
-				  mult=8;
+				  mult=10;
 			  }
-			  this.plugin.gainMoneyExp(p,"Blacksmith",1.15*mult*amount,125*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",1.15*mult*amount,480*mult*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.DIAMOND_LEGGINGS) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
-				  mult=8;
+				  mult=10;
 			  }
-			  this.plugin.gainMoneyExp(p,"Blacksmith",1.325*mult*amount,145*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",1.325*mult*amount,660*mult*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.DIAMOND_CHESTPLATE) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
-				  mult=8;
+				  mult=10;
 			  }
-			  this.plugin.gainMoneyExp(p,"Blacksmith",1.50*mult*amount,175*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",1.50*mult*amount,750*mult*amount);
 			  crafteditem=true;
 		  }
 	  }
 	  if (this.plugin.PlayerinJob(p,"Cook")) {
 		  boolean crafteditem=false;
 		  if (item.getType()==Material.BREAD) {
-			  this.plugin.gainMoneyExp(p,"Cook",0.0125*amount,5*amount);
-			  crafteditem=true;
-		  }
-		  if (item.getType()==Material.MUSHROOM_SOUP) {
-			  this.plugin.gainMoneyExp(p,"Cook",0.0375*amount,15*amount);
+			  this.plugin.gainMoneyExp(p,"Cook",0.003125*amount,1.25*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.COOKIE) {
-			  this.plugin.gainMoneyExp(p,"Cook",0.0675*amount,25*amount);
+			  this.plugin.gainMoneyExp(p,"Cook",0.016875*amount,1.50*amount);
+			  crafteditem=true;
+		  }
+		  if (item.getType()==Material.MUSHROOM_SOUP) {
+			  this.plugin.gainMoneyExp(p,"Cook",0.009375*amount,3.75*amount);
+			  crafteditem=true;
+		  }
+		  if (item.getType()==Material.PUMPKIN_PIE) {
+			  this.plugin.gainMoneyExp(p,"Cook",0.0375*amount,15*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.GOLDEN_CARROT) {
 			  this.plugin.gainMoneyExp(p,"Cook",0.0875*amount,35*amount);
 			  crafteditem=true;
 		  }
+		  if (item.getType()==Material.CAKE) {
+			  this.plugin.gainMoneyExp(p,"Cook",0.10625*amount,21.25*amount);
+			  crafteditem=true;
+		  }
 		  if (item.getType()==Material.GOLDEN_APPLE) {
 			  this.plugin.gainMoneyExp(p,"Cook",0.1125*amount,45*amount);
-			  crafteditem=true;
-		  }
-		  if (item.getType()==Material.PUMPKIN_PIE) {
-			  this.plugin.gainMoneyExp(p,"Cook",0.15*amount,60*amount);
-			  crafteditem=true;
-		  }
-		  if (item.getType()==Material.CAKE) {
-			  this.plugin.gainMoneyExp(p,"Cook",0.2125*amount,85*amount);
 			  crafteditem=true;
 		  }
 		  if (this.plugin.getJobLv("Cook", p)>=10 && crafteditem==true) {
@@ -8227,6 +8391,7 @@ public ItemStack getGoodie() {
 			  p.getInventory().addItem(new ItemStack(item.getType(),amount,item.getDurability(),item.getData().getData()));
 		  }
 	  }
+	  /*
 	  if (this.plugin.PlayerinJob(p,"Support")) {
 		  if (item.getType()==Material.BREAD) {
 			  this.plugin.gainMoneyExp(p,"Support",0.015*amount,2*amount);
@@ -8264,7 +8429,7 @@ public ItemStack getGoodie() {
 		  if (item.getType()==Material.CAKE) {
 			  this.plugin.gainMoneyExp(p,"Support",0.03*amount,2*amount);
 		  }
-	  }
+	  }*/
   }
 	 
 	private void handleCrafting(InventoryClickEvent event) {
@@ -8291,53 +8456,24 @@ public ItemStack getGoodie() {
 	}
 	
 	public String[] getJobs(Player p) {
-		String[] string= {this.plugin.getAccountsConfig().getString(p.getName()+".jobs.job1"),this.plugin.getAccountsConfig().getString(p.getName()+".jobs.job2"),this.plugin.getAccountsConfig().getString(p.getName()+".jobs.job3")};
-		return string;
+		return this.plugin.getJobs(p);
 	}
 	
 	public String[] getJobs(String p) {
-		String[] string= {this.plugin.getAccountsConfig().getString(p+".jobs.job1"),this.plugin.getAccountsConfig().getString(p+".jobs.job2"),this.plugin.getAccountsConfig().getString(p+".jobs.job3")};
-		return string;
+		return this.plugin.getJobs(p);
 	}
 	
 	public boolean PlayerinJob(String p,String job) {
-		String[] jobs = getJobs(p);
-		for (int i=0;i<jobs.length;i++) {
-			if (job.equalsIgnoreCase(jobs[i])) {
-				return true;
-			}
-		}
-		return false;
+		return this.plugin.PlayerinJob(p, job);
 	}
 	
 	public boolean PlayerinJob(Player p,String job) {
-		String[] jobs = getJobs(p);
-		for (int i=0;i<jobs.length;i++) {
-			if (job.equalsIgnoreCase(jobs[i])) {
-				return true;
-			}
-		}
-		return false;
+		return this.plugin.PlayerinJob(p, job);
 	}
 	
 
 	public int getJobLv(String job, String p) {
-		if (PlayerinJob(p,job)) {
-			int slot=-1;
-			//Check which slot contains our job.
-			for (int i=0;i<3;i++) {
-				if (this.plugin.getAccountsConfig().getString(p+".jobs.job"+(i+1)).equalsIgnoreCase(job)) {
-					slot=i;
-					break;
-				}
-			}
-			if (slot!=-1) {
-				return this.plugin.getAccountsConfig().getInt(p+".jobs.job"+(slot+1)+"lv");
-			} else {
-				return 0;
-			}
-		}
-		return 0;
+		return this.plugin.getJobLv(job, p);
 	}
 	
 	public boolean validItem_Weaponsmith(ItemStack i) {
@@ -8389,105 +8525,8 @@ public ItemStack getGoodie() {
 	}
 	
 	
-	public ItemStack EnchantItem(ItemStack item,int lv) {
-		boolean protection=false; //Set to true when a protection enchantment has been given.
-		boolean silktouch=false; //Set to true if silk touch OR fortune is set. Only one of these can be there.
-		boolean enhanceddmg=false; //Set to true if a damage increasing enchantment has been given.
-		//First figure out which item this is.
-	    final EnchantLevelDatabase ENCHANTMENT_DATA = new EnchantLevelDatabase();
-		List<StoreValues> enchant_data = new ArrayList<StoreValues>(); //OMGGGG. forgot to initialize the dang list!
-		if (item.getType()==Material.STONE_HOE || item.getType()==Material.IRON_HOE || item.getType()==Material.WOOD_HOE || item.getType()==Material.GOLD_HOE || item.getType()==Material.DIAMOND_HOE) {
-			enchant_data=ENCHANTMENT_DATA.stone_hoe;
-		} else
-		//DERP
-		if (item.getType()==Material.BOW) {enchant_data=ENCHANTMENT_DATA.bow;} else
-		if (item.getType()==Material.IRON_SWORD) {enchant_data=ENCHANTMENT_DATA.iron_sword;} else
-		if (item.getType()==Material.GOLD_SWORD) {enchant_data=ENCHANTMENT_DATA.gold_sword;} else
-		if (item.getType()==Material.DIAMOND_SWORD) {enchant_data=ENCHANTMENT_DATA.diamond_sword;} else
-		if (item.getType()==Material.STONE_SPADE) {enchant_data=ENCHANTMENT_DATA.stone_shovel;} else
-		if (item.getType()==Material.STONE_PICKAXE) {enchant_data=ENCHANTMENT_DATA.stone_pickaxe;} else
-		if (item.getType()==Material.LEATHER_BOOTS) {enchant_data=ENCHANTMENT_DATA.leather_boots;} else
-		if (item.getType()==Material.LEATHER_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.leather_pants;} else
-		if (item.getType()==Material.LEATHER_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.leather_tunic;} else
-		if (item.getType()==Material.LEATHER_HELMET) {enchant_data=ENCHANTMENT_DATA.leather_cap;} else
-		if (item.getType()==Material.IRON_SPADE) {enchant_data=ENCHANTMENT_DATA.iron_shovel;} else
-		if (item.getType()==Material.IRON_BOOTS) {enchant_data=ENCHANTMENT_DATA.iron_boots;} else
-		if (item.getType()==Material.IRON_PICKAXE) {enchant_data=ENCHANTMENT_DATA.iron_pickaxe;} else
-		if (item.getType()==Material.IRON_HELMET) {enchant_data=ENCHANTMENT_DATA.iron_helmet;} else
-		if (item.getType()==Material.GOLD_SPADE) {enchant_data=ENCHANTMENT_DATA.golden_shovel;} else
-		if (item.getType()==Material.IRON_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.iron_leggings;} else
-		if (item.getType()==Material.DIAMOND_SPADE) {enchant_data=ENCHANTMENT_DATA.diamond_shovel;} else
-		if (item.getType()==Material.GOLD_BOOTS) {enchant_data=ENCHANTMENT_DATA.golden_boots;} else
-		if (item.getType()==Material.IRON_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.iron_chestplate;} else
-		if (item.getType()==Material.GOLD_HELMET) {enchant_data=ENCHANTMENT_DATA.golden_helmet;} else
-		if (item.getType()==Material.IRON_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.iron_chestplate;} else
-		if (item.getType()==Material.DIAMOND_PICKAXE) {enchant_data=ENCHANTMENT_DATA.diamond_pickaxe;} else
-		if (item.getType()==Material.DIAMOND_BOOTS) {enchant_data=ENCHANTMENT_DATA.diamond_boots;} else
-		if (item.getType()==Material.GOLD_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.golden_leggings;} else
-		if (item.getType()==Material.GOLD_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.golden_chestplate;} else
-		if (item.getType()==Material.DIAMOND_HELMET) {enchant_data=ENCHANTMENT_DATA.diamond_helmet;} else
-		if (item.getType()==Material.DIAMOND_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.diamond_leggings;} else
-		if (item.getType()==Material.DIAMOND_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.diamond_chestplate;}
-		int enchantments=0;
-		int iterations=0;
-		while (enchantments==0 && iterations<100) { //Attempt to enchant it, up to 100 tries.
-			iterations++;
-			//Bukkit.getPlayer("sigonasr2").sendMessage("Enchant data size is "+enchant_data.size());
-			for (int i=0;i<enchant_data.size();i++) {
-				//Bukkit.getPlayer("sigonasr2").sendMessage("Comparing level "+lv+" to enchant requirement: "+enchant_data.get(i).enchantlevel);
-				if (enchant_data.get(i).enchantlevel==lv) {
-					//Bukkit.getPlayer("sigonasr2").sendMessage("Checking "+enchant_data.get(i).enchant.getName());
-					if (Math.random()<=enchant_data.get(i).chance) {
-						//This enchantment can be added. (Assuming it's compatible.)
-						if ((enchant_data.get(i).enchant.getName()==Enchantment.PROTECTION_ENVIRONMENTAL.getName() ||
-								enchant_data.get(i).enchant.getName()==Enchantment.PROTECTION_EXPLOSIONS.getName() ||
-								enchant_data.get(i).enchant.getName()==Enchantment.PROTECTION_FALL.getName() ||
-								enchant_data.get(i).enchant.getName()==Enchantment.PROTECTION_FIRE.getName() ||
-								enchant_data.get(i).enchant.getName()==Enchantment.PROTECTION_PROJECTILE.getName()) && !protection) {
-							protection=true;
-							enchantments++;
-							item.addEnchantment(enchant_data.get(i).enchant, enchant_data.get(i).level);
-						} else
-						if ((enchant_data.get(i).enchant.getName()==Enchantment.DAMAGE_ALL.getName() ||
-								enchant_data.get(i).enchant.getName()==Enchantment.DAMAGE_ARTHROPODS.getName() ||
-								enchant_data.get(i).enchant.getName()==Enchantment.DAMAGE_UNDEAD.getName()) && !enhanceddmg) {
-							enhanceddmg=true;
-							enchantments++;
-							item.addEnchantment(enchant_data.get(i).enchant, enchant_data.get(i).level);
-						} else
-						if ((enchant_data.get(i).enchant.getName()==Enchantment.SILK_TOUCH.getName() ||
-								enchant_data.get(i).enchant.getName()==Enchantment.LOOT_BONUS_BLOCKS.getName() ||
-								enchant_data.get(i).enchant.getName()==Enchantment.LOOT_BONUS_MOBS.getName()) && !silktouch) {
-							silktouch=true;
-							enchantments++;
-							item.addEnchantment(enchant_data.get(i).enchant, enchant_data.get(i).level);
-						} else {
-							//It's not a special condition enchantment. Just make sure it doesn't exist and add it.
-							if (!item.containsEnchantment(enchant_data.get(i).enchant)) {
-								item.addEnchantment(enchant_data.get(i).enchant, enchant_data.get(i).level);
-							}
-						}
-					}
-					//see if we should try for a second/third/fourth enchantment.
-					boolean keepgoing=false;
-					if (lv==5) {
-						if (enchantments==1 && Math.random()<=0.07) {
-							keepgoing=true;
-						} else
-						if (enchantments==2 && Math.random()<=0.045) {
-							keepgoing=true;
-						} else
-						if (enchantments==3 && Math.random()<=0.03) {
-							keepgoing=true;
-						}
-						if (!keepgoing) {
-							break;
-						}
-					}
-				}
-			}
-		}
-		return item;
+	public ItemStack EnchantItem(ItemStack item,int lv, Player p) {
+		return this.plugin.EnchantItem(item, lv, p);
 	}
 	 
 	// HACK! The API doesn't allow us to easily determine the resulting number of
@@ -8530,19 +8569,19 @@ public ItemStack getGoodie() {
             					if (PlayerinJob((Player)player,"Weaponsmith")) {
             					  if (getJobLv("Weaponsmith", player.getName())>=10 && validItem_Weaponsmith(post)) {
             						  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-            						  ItemStack resulting = EnchantItem(post,5);
+            						  ItemStack resulting = EnchantItem(post,5,(Player)player);
             						  player.getInventory().setItem(i, resulting);
             					  }
             					}	
             					if (PlayerinJob((Player)player,"Blacksmith")) {
               					  if (getJobLv("Blacksmith", player.getName())>=10 && validItem_Blacksmith(post)) {
               						  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-              						  ItemStack resulting = EnchantItem(post,10);
+              						  ItemStack resulting = EnchantItem(post,10,(Player)player);
               						  player.getInventory().setItem(i, resulting);
               					  } else
               					  if (getJobLv("Blacksmith", player.getName())>=5 && validItem_Blacksmith(post)) {
               						  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-              						  ItemStack resulting = EnchantItem(post,5);
+              						  ItemStack resulting = EnchantItem(post,5,(Player)player);
               						  player.getInventory().setItem(i, resulting);
               					  }
               					}
@@ -9857,6 +9896,13 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
     		e.getClickedBlock().setData((byte) ((e.getClickedBlock().getData()+2 % 4)));
     	}
     }*/
+    if (e.getAction()==Action.RIGHT_CLICK_AIR || e.getAction()==Action.RIGHT_CLICK_BLOCK) {
+    	if (p.getItemInHand()!=null && (p.getItemInHand().getType()==Material.FLINT_AND_STEEL || p.getItemInHand().getType()==Material.LAVA_BUCKET)) {
+    		if (this.plugin.PlayerinJob(p, "Support")) {
+    			this.plugin.setMoneyExp(p, "Support", 0, 0);
+    		}
+    	}
+    }
     if (e.getAction()==Action.RIGHT_CLICK_AIR || e.getAction()==Action.RIGHT_CLICK_BLOCK) {
     	boolean largechest=false;
 		boolean smallchest=false;

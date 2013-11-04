@@ -12,6 +12,7 @@ import java.util.ConcurrentModificationException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -569,18 +570,18 @@ public class Main extends JavaPlugin
     Blacksmith_job.addData("WEAK DIAMOND HELMET", 1.15, 480, 0);
     Blacksmith_job.addData("WEAK DIAMOND LEGGINGS", 1.325, 660, 0);
     Blacksmith_job.addData("WEAK DIAMOND CHESTPLATE", 1.50, 750, 0);
-    Blacksmith_job.addData("IRON BOOTS", 0.375*10, 27*10, 0);
-    Blacksmith_job.addData("IRON HELMET", 0.50*10, 45*10, 0);
-    Blacksmith_job.addData("IRON LEGGINGS", 0.725*10, 60*10, 0);
-    Blacksmith_job.addData("GOLDEN BOOTS", 0.825*10, 50*10, 0);
-    Blacksmith_job.addData("IRON CHESTPLATE", 0.875*10, 70*10, 0);
-    Blacksmith_job.addData("GOLDEN HELMET", 0.925*10, 80*10, 0);
-    Blacksmith_job.addData("DIAMOND BOOTS", 1.0*10, 85*10, 0);
-    Blacksmith_job.addData("GOLDEN LEGGINGS", 1.025*10, 100*10, 0);
-    Blacksmith_job.addData("GOLDEN CHESTPLATE", 1.15*10, 130*10, 0);
-    Blacksmith_job.addData("DIAMOND HELMET", 1.15*10, 125*10, 0);
-    Blacksmith_job.addData("DIAMOND LEGGINGS", 1.325*10, 145*10, 0);
-    Blacksmith_job.addData("DIAMOND CHESTPLATE", 1.50*10, 175*10, 0);
+    Blacksmith_job.addData("IRON BOOTS", 0.375*10, 80*10, 0);
+    Blacksmith_job.addData("IRON HELMET", 0.50*10, 100*10, 0);
+    Blacksmith_job.addData("IRON LEGGINGS", 0.725*10, 140*10, 0);
+    Blacksmith_job.addData("GOLDEN BOOTS", 0.825*10, 120*10, 0);
+    Blacksmith_job.addData("IRON CHESTPLATE", 0.875*10, 175*10, 0);
+    Blacksmith_job.addData("GOLDEN HELMET", 0.925*10, 150*10, 0);
+    Blacksmith_job.addData("DIAMOND BOOTS", 1.0*10, 390*10, 0);
+    Blacksmith_job.addData("GOLDEN LEGGINGS", 1.025*10, 170*10, 0);
+    Blacksmith_job.addData("GOLDEN CHESTPLATE", 1.15*10, 192*10, 0);
+    Blacksmith_job.addData("DIAMOND HELMET", 1.15*10, 480*10, 0);
+    Blacksmith_job.addData("DIAMOND LEGGINGS", 1.325*10, 660*10, 0);
+    Blacksmith_job.addData("DIAMOND CHESTPLATE", 1.50*10, 750*10, 0);
     Blacksmith_job.setBuffData("All crafted items are buffed with a Lv5 enchantment.",
     		"All crafted items are buffed with a Lv10 enchantment.", 
     		"Crafting materials have a 30% chance of being preserved.", 
@@ -591,18 +592,18 @@ public class Main extends JavaPlugin
     Cook_job.setAction(0, "CRAFT");
     Cook_job.setAction(1, "SMELT");
     Cook_job.setExp(250, 200, 40, 1.04);
-    Cook_job.addData("BREAD", 0.0125, 5, 0);
-    Cook_job.addData("MUSHROOM SOUP", 0.0375, 15, 0);
-    Cook_job.addData("COOKIE", 0.0675, 25, 0);
+    Cook_job.addData("BREAD", 0.003125, 1.25, 0);
+    Cook_job.addData("COOKIE", 0.016875, 1.50, 0);
+    Cook_job.addData("MUSHROOM SOUP", 0.009375, 3.75, 0);
+    Cook_job.addData("PUMPKIN PIE", 0.0375, 15, 0);
     Cook_job.addData("GOLDEN CARROT", 0.0875, 35, 0);
+    Cook_job.addData("CAKE", 0.10625, 21.25, 0);
     Cook_job.addData("GOLDEN APPLE", 0.1125, 45, 0);
-    Cook_job.addData("PUMPKIN PIE", 0.15, 60, 0);
-    Cook_job.addData("CAKE", 0.2125, 85, 0);
-    Cook_job.addData("COOKED FISH", 0.03, 12, 1);
-    Cook_job.addData("BAKED POTATO", 0.04, 16, 1);
-    Cook_job.addData("COOKED CHICKEN", 0.045, 18, 1);
-    Cook_job.addData("GRILLED PORK", 0.06, 24, 1);
-    Cook_job.addData("COOKED BEEF", 0.10, 40, 1);
+    Cook_job.addData("COOKED FISH", 0.06, 24, 1);
+    Cook_job.addData("BAKED POTATO", 0.08, 32, 1);
+    Cook_job.addData("COOKED CHICKEN", 0.09, 36, 1);
+    Cook_job.addData("GRILLED PORK", 0.12, 48, 1);
+    Cook_job.addData("COOKED BEEF", 0.20, 80, 1);
     Cook_job.setBuffData("Double the amount of cooking time with one fuel item in the furnace.",
     		"Results of crafting food is double the normal amount.", 
     		"Results of cooking food is double the normal amount.", 
@@ -702,13 +703,13 @@ public class Main extends JavaPlugin
 
     Support_job.setJobName("Support");
     Support_job.setJobDescription("A support's job is to provide assistance and keep others alive by providing potions to heal, materials to allow others to craft things, and being useful overall.");
-    Support_job.setAction(0, "GIVE");
+    /*Support_job.setAction(0, "GIVE");
     Support_job.setAction(1, "CRAFT");
-    Support_job.setAction(2, "SPLASH");
-    Support_job.setAction(3, "Supporting Situations");
+    Support_job.setAction(2, "SPLASH");*/
+    Support_job.setAction(0, "Supporting Situations");
     Support_job.setExp(100, 100, 5, 1.03);
-    Support_job.addExtraData("Simply give players items to earn some money. Note that if they give it back you lose the xp you gained from it.");
-    Support_job.addData("TORCH", 0.005, 1, 0);
+    Support_job.addExtraData("Give players items to earn some money. Note that if they give it back you lose the xp you gained from it. Setting people on fire will clear all experience you've earned for that level.");
+    /*Support_job.addData("TORCH", 0.005, 1, 0);
     Support_job.addData("WOOD", 0.005, 1, 0);
     Support_job.addData("COAL", 0.005, 1, 0);
     Support_job.addData("IRON", 0.005, 1, 0);
@@ -726,14 +727,13 @@ public class Main extends JavaPlugin
     Support_job.addData("SPEED", 0.15, 6, 2);
     Support_job.addData("STRENGTH", 0.40, 9, 2);
     Support_job.addData("FIRE RESISTANCE", 0.50, 12, 2);
-    Support_job.addData("HEALING", 0.30, 14, 2);
-    Support_job.addData("-Light up dark areas.", 0.00, 1, 3);
-    Support_job.addData("-Help kill things with others.", 0.025, 3, 3);
-    Support_job.addData("-Clear out lava areas to allow for safe passage.", 0.05, 10, 3);
-    Support_job.addData("-Providing materials that someone ran out of.", 0.35, 30, 3);
-    Support_job.addData("-Healing someone when they are low in health.", 0.80, 40, 3);
-    Support_job.addData("-Dousing or using a fire resistance potion on someone burning.", 1.20, 60, 3);
-    Support_job.addData("-Teleport to others who need help.", 0.00, 100, 3);
+    Support_job.addData("HEALING", 0.30, 14, 2);*/
+    Support_job.addData("-Light up dark areas.", 0.01, 2, 0);
+    Support_job.addData("-Help kill things with others.", 0.05, 6, 0);
+    Support_job.addData("-Clear out lava areas to allow for safe passage.", 0.15, 60, 0);
+    Support_job.addData("-Providing materials that someone ran out of.", 1.05, 90, 0);
+    Support_job.addData("-Healing someone when they are low in health.", 2.40, 120, 0);
+    Support_job.addData("-Dousing or using a fire resistance potion on someone burning.", 4.80, 240, 0);
     Support_job.setBuffData("Everyone around you gains +2 Armor.",
     		"Everyone around you gains +10 more Maximum Health.", 
     		"Everyone around you gains +4 Armor. Everyone's hunger degrades at half the speed. Players with 8 HP or less take half the damage from hits.", 
@@ -3301,6 +3301,24 @@ public void payDay(int time)
 		}
 		saveAccountsConfig();
 	}
+	
+	public void setMoneyExp(Player p,String job,double newamount,double newexp) {
+		String[] jobs = getJobs(p);
+		int slot=-1;
+		JobsDataInfo[] Jobsinfo = {Woodcutter_job,Miner_job,Builder_job,Digger_job,Farmer_job,Hunter_job,Fisherman_job,Weaponsmith_job,Blacksmith_job,Cook_job,Brewer_job,Enchanter_job,Breeder_job,Explorer_job,Support_job};
+		for (int i=0;i<jobs.length;i++) {
+			if (job.equalsIgnoreCase(jobs[i])) {
+				slot=i;
+				break;
+			}
+		}
+		JobsDataInfo info = Jobsinfo[getJobSlot(job)];
+		  double val=0;
+		val = economy.getBalance(p.getName());
+		  economy.withdrawPlayer(p.getName(), val);
+		getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"exp", Double.valueOf(newexp));
+		saveAccountsConfig();
+	}
 
 	public void gainMoneyExp(Player p,String job,double amount,double exp) {
 		String[] jobs = getJobs(p);
@@ -3421,16 +3439,21 @@ public void payDay(int time)
 		return 0;
 	}
 	
-	public ItemStack EnchantItem(ItemStack item,int lv) {
+	public ItemStack EnchantItem(ItemStack item,int lv,Player p) {
 		boolean protection=false; //Set to true when a protection enchantment has been given.
 		boolean silktouch=false; //Set to true if silk touch OR fortune is set. Only one of these can be there.
 		boolean enhanceddmg=false; //Set to true if a damage increasing enchantment has been given.
 		//First figure out which item this is.
+	    final EnchantLevelDatabase ENCHANTMENT_DATA = new EnchantLevelDatabase();
 		List<StoreValues> enchant_data = new ArrayList<StoreValues>(); //OMGGGG. forgot to initialize the dang list!
 		if (item.getType()==Material.STONE_HOE || item.getType()==Material.IRON_HOE || item.getType()==Material.WOOD_HOE || item.getType()==Material.GOLD_HOE || item.getType()==Material.DIAMOND_HOE) {
 			enchant_data=ENCHANTMENT_DATA.stone_hoe;
 		} else
 		//DERP
+		if (item.getType()==Material.BOW) {enchant_data=ENCHANTMENT_DATA.bow;} else
+		if (item.getType()==Material.IRON_SWORD) {enchant_data=ENCHANTMENT_DATA.iron_sword;} else
+		if (item.getType()==Material.GOLD_SWORD) {enchant_data=ENCHANTMENT_DATA.gold_sword;} else
+		if (item.getType()==Material.DIAMOND_SWORD) {enchant_data=ENCHANTMENT_DATA.diamond_sword;} else
 		if (item.getType()==Material.STONE_SPADE) {enchant_data=ENCHANTMENT_DATA.stone_shovel;} else
 		if (item.getType()==Material.STONE_PICKAXE) {enchant_data=ENCHANTMENT_DATA.stone_pickaxe;} else
 		if (item.getType()==Material.LEATHER_BOOTS) {enchant_data=ENCHANTMENT_DATA.leather_boots;} else
@@ -3514,6 +3537,76 @@ public void payDay(int time)
 				}
 			}
 		}
+		Map<Enchantment,Integer> map = item.getEnchantments();
+		  if (PlayerinJob(p, "Enchanter")) {
+			  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
+				  if (getJobLv("Enchanter", p)>=20) {
+					  if (entry.getKey().getMaxLevel()<entry.getValue()) {
+						  entry.setValue(entry.getValue()+1);
+					  }
+				  }
+				  if (entry.getKey().getName()==Enchantment.PROTECTION_ENVIRONMENTAL.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.04*entry.getValue(),2*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.DAMAGE_UNDEAD.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.05*entry.getValue(),4*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.PROTECTION_FIRE.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.05*entry.getValue(),3*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.DAMAGE_ARTHROPODS.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.06*entry.getValue(),4*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.PROTECTION_FALL.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.07*entry.getValue(),5*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.DAMAGE_ALL.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.075*entry.getValue(),7*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.DIG_SPEED.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.075*entry.getValue(),7*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.PROTECTION_EXPLOSIONS.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),8*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.THORNS.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),8*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.KNOCKBACK.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),9*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.ARROW_KNOCKBACK.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),9*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.FIRE_ASPECT.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.11*entry.getValue(),10*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.ARROW_FIRE.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.11*entry.getValue(),10*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.WATER_WORKER.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.125*entry.getValue(),8*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.OXYGEN.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.15*entry.getValue(),10*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.DURABILITY.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.175*entry.getValue(),12*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.ARROW_INFINITE.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),20*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.LOOT_BONUS_MOBS.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),15*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.LOOT_BONUS_BLOCKS.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.225*entry.getValue(),20*entry.getValue());
+				  }
+				  if (entry.getKey().getName()==Enchantment.SILK_TOUCH.getName()) {
+					  gainMoneyExp(p,"Enchanter",0.25*entry.getValue(),20*entry.getValue());
+				  }
+			  }
+		  }
 		return item;
 	}
 	

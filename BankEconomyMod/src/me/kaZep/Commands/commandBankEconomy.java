@@ -240,6 +240,10 @@ public class commandBankEconomy
   			  }
             } else
             if (cmd.getName().equalsIgnoreCase("event") && args.length==2 && p.hasPermission("maintenance-mode-admin")) {
+			  if (args[0].equalsIgnoreCase("fatal_survivor") && args[1].equalsIgnoreCase("reset")) {
+				  boolean survivor=false;
+				  this.plugin.explorers.clear();
+			  }
   			  if (args[0].equalsIgnoreCase("halloween") && args[1].equalsIgnoreCase("giant_pumpkin")) {
   				  if (this.plugin.getConfig().getBoolean("halloween-enabled")) {
   					  ItemStack item = new ItemStack(Material.PUMPKIN);
@@ -647,7 +651,7 @@ public class commandBankEconomy
 				        	  this.plugin.saveAccountsConfig();
 				        	  if (this.plugin.PlayerinJob(p, "Support")) {
 				        		  //Give exp for doing so.
-				        		  this.plugin.gainMoneyExp(p,"Support",0,100);
+				        		  //this.plugin.gainMoneyExp(p,"Support",0,100);
 				        	  }
 				        	  p.sendMessage("Teleported to "+ChatColor.GREEN+target.getName()+ChatColor.WHITE+" for $"+ChatColor.YELLOW+df.format(finalcost)+ChatColor.WHITE+". New Account balance: $"+df.format(mymoney-finalcost));
 				        	  target.sendMessage(ChatColor.GREEN+p.getName()+ChatColor.WHITE+" teleported to your location.");
@@ -826,7 +830,14 @@ public class commandBankEconomy
     		  for (int i=0;i<joblist.length;i++) {
     			  if (!joblist[i].equalsIgnoreCase("None")) {
     				  int mylv=this.plugin.getAccountsConfig().getInt(p.getName()+".jobs.job"+(i+1)+"lv");
-    				  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(p.getName()+".jobs.job"+(i+1)+"exp"))+"/"+Math.round(this.plugin.getJobExp(joblist[i], this.plugin.getAccountsConfig().getInt(p.getName()+".jobs.job"+(i+1)+"lv")))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));if (joblist[i].equalsIgnoreCase("Explorer") && this.plugin.getJobLv(joblist[i], p)>=10) {
+
+    				  if (mylv==40) {
+    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(p.getName()+".jobs.job"+(i+1)+"exp"))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
+    				  } else {
+    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(p.getName()+".jobs.job"+(i+1)+"exp"))+"/"+Math.round(this.plugin.getJobExp(joblist[i], this.plugin.getAccountsConfig().getInt(p.getName()+".jobs.job"+(i+1)+"lv")))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
+    				  }
+    				  
+    				  if (joblist[i].equalsIgnoreCase("Explorer") && this.plugin.getJobLv(joblist[i], p)>=10) {
     					  //Check to see if the buff is on cooldown for this player or not.
     					  boolean discovered=false;
     					  long timeleft=0;
