@@ -44,8 +44,8 @@ public class PlayerData {
 			buildamt=0;
 			return true;
 		} else {
-			if (buildamt>10) {
-				buildamt=10; //This is the upper bound of this value.
+			if (buildamt>100) {
+				buildamt=100; //This is the upper bound of this value.
 			}
 			return false;
 		}

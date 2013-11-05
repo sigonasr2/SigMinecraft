@@ -1,5 +1,7 @@
 package me.kaZep.Commands;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,6 +29,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import com.sk89q.worldedit.CuboidClipboard;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.data.DataException;
+import com.sk89q.worldedit.schematic.SchematicFormat;
 
 
 public class commandBankEconomy
@@ -240,6 +250,46 @@ public class commandBankEconomy
   			  }
             } else
             if (cmd.getName().equalsIgnoreCase("event") && args.length==2 && p.hasPermission("maintenance-mode-admin")) {
+			  if (args[0].equalsIgnoreCase("spawn_dungeon") && args[1].equalsIgnoreCase("boss")) {
+				//Empty the whole area.
+	  				double xoffset = Math.random()*10+15;
+	  				double zoffset = Math.random()*10+15;
+	  				if (Math.random()<=0.5) {
+	  					xoffset*=-1;
+	  				}
+	  				if (Math.random()<=0.5) {
+	  					zoffset*=-1;
+	  				}
+	  				for (int j=-15;j<16;j++) {
+	  					for (int y=0;y<10;y++) {
+		    					for (int k=-15;k<16;k++) {
+		    						Bukkit.getWorld("world").getBlockAt(p.getLocation().add(xoffset+j,y,zoffset+k)).setType(Material.AIR);	
+		    					}
+	  					}
+	  				}
+						Bukkit.getLogger().info("Spawned a new boss area.");
+						File file = new File("plugins/WorldEdit/schematics/boss.schematic");
+					    if (file.exists()) {
+					        try {
+					            com.sk89q.worldedit.Vector v = new com.sk89q.worldedit.Vector(p.getLocation().getX()+xoffset-8, p.getLocation().getY(), p.getLocation().getZ()+zoffset-8);
+					            World worldf = Bukkit.getWorld("world");
+					            BukkitWorld BWf = new BukkitWorld(worldf);
+					            EditSession es = new EditSession(BWf, 2000000);
+					            CuboidClipboard c1 = SchematicFormat.MCEDIT.load(file);
+					            c1.place(es, v, true);
+					            Bukkit.getWorld("world").getBlockAt(new Location(p.getWorld(),p.getLocation().getX()+xoffset, p.getLocation().getY()+2, p.getLocation().getZ()+zoffset)).setType(Material.COMMAND);
+					        } catch (DataException ex) {
+					            Bukkit.getLogger().warning("DataException while trying to create structure.");
+					        } catch (IOException ex) {
+					        	Bukkit.getLogger().warning("IOException while trying to create structure.");
+					        } catch (MaxChangedBlocksException ex) {
+					        	Bukkit.getLogger().warning("MaxChangedBlocksException while trying to create structure.");
+					        }
+					    } else {
+					    	Bukkit.getLogger().warning(("File does not exist."));
+					    }
+					    this.plugin.last_boss_dungeon_time=Bukkit.getWorld("world").getFullTime()+12000;
+				  }
 			  if (args[0].equalsIgnoreCase("fatal_survivor") && args[1].equalsIgnoreCase("reset")) {
 				  boolean survivor=false;
 				  this.plugin.explorers.clear();
@@ -864,7 +914,13 @@ public class commandBankEconomy
 	    		  for (int i=0;i<joblist.length;i++) {
 	    			  if (!joblist[i].equalsIgnoreCase("None")) {
 	    				  int mylv=this.plugin.getAccountsConfig().getInt(p.getServer().getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"lv");
-    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(p.getServer().getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"exp"))+"/"+Math.round(this.plugin.getJobExp(joblist[i], this.plugin.getAccountsConfig().getInt(p.getServer().getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"lv")))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
+
+	    				  if (mylv==40) {
+	    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(p.getServer().getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"exp"))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
+	    				  } else {
+	    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(p.getServer().getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"exp"))+"/"+Math.round(this.plugin.getJobExp(joblist[i], this.plugin.getAccountsConfig().getInt(p.getServer().getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"lv")))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
+	    				  }
+    					  
 	    				  if (joblist[i].equalsIgnoreCase("Explorer") && this.plugin.getJobLv(joblist[i], p.getServer().getPlayer(args[1]))>=10) {
 	    					  //Check to see if the buff is on cooldown for this player or not.
 	    					  boolean discovered=false;
@@ -895,7 +951,11 @@ public class commandBankEconomy
 		    		  for (int i=0;i<joblist.length;i++) {
 		    			  if (!joblist[i].equalsIgnoreCase("None")) {
 		    				  int mylv=this.plugin.getAccountsConfig().getInt(q.getName()+".jobs.job"+(i+1)+"lv");
-		    				  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(q.getName()+".jobs.job"+(i+1)+"exp"))+"/"+Math.round(this.plugin.getJobExp(joblist[i], this.plugin.getAccountsConfig().getInt(q.getName()+".jobs.job"+(i+1)+"lv")))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
+		    				  if (mylv==40) {
+		    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(q.getName()+".jobs.job"+(i+1)+"exp"))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
+		    				  } else {
+		    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(q.getName()+".jobs.job"+(i+1)+"exp"))+"/"+Math.round(this.plugin.getJobExp(joblist[i], this.plugin.getAccountsConfig().getInt(q.getName()+".jobs.job"+(i+1)+"lv")))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
+		    				  }
 		    			  }
 		    			  if (joblist[i].equalsIgnoreCase("Explorer") && this.plugin.getJobLv(joblist[i], q.getName())>=10) {
 	    					  //Check to see if the buff is on cooldown for this player or not.

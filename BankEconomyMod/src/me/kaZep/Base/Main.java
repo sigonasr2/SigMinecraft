@@ -440,6 +440,7 @@ public class Main extends JavaPlugin
     Digger_job.addData("BRICKS", 0.04, 8, 1);
     Digger_job.addData("GLASS", 0.015, 3, 2);
     Digger_job.addData("BRICK", 0.04, 8, 2);
+    Digger_job.addData("HARDENED CLAY", 0.04, 8, 2);
     Digger_job.setBuffData("Shovels used gain Efficiency +1 (Speed+30%)",
     		"Shovels have double the durability.", 
     		"Shovels used gain Efficiency +2 (Speed+60%), Shovels have triple the durability.", 
@@ -534,9 +535,9 @@ public class Main extends JavaPlugin
     Weaponsmith_job.addData("IRON SWORD", 0.375, 75, 0);
     Weaponsmith_job.addData("GOLD SWORD", 0.50, 100, 0);
     Weaponsmith_job.addData("DIAMOND SWORD", 3.60, 280, 0);
-    Weaponsmith_job.setBuffData("Materials used in crafting have a 10% chance of being preserved.",
+    Weaponsmith_job.setBuffData("Crafting Weaponsmith items have a 10% chance of preserving materials used.",
     		"Weapons crafted gain a free level 5 enchantment.", 
-    		"Materials used in crafting have a 25% chance of being preserved.", 
+    		"Crafting Weaponsmith items have a 25% chance of preserving materials used.", 
     		"Weapons crafted gain free level 25 enchantments. Materials used in crafting have a 50% chance of being preserved. Weapons crafted have a 30% chance of stacking (duplicated), and 30% chance for every extra addition to the weapon stack.");
 
     Blacksmith_job.setJobName("Blacksmith");
@@ -552,14 +553,17 @@ public class Main extends JavaPlugin
     Blacksmith_job.addData("LEATHER TUNIC", 0.20, 18, 0);
     Blacksmith_job.addData("IRON SHOVEL", 0.25, 18, 0);
     Blacksmith_job.addData("IRON HOE", 0.325, 38, 0);
+    Blacksmith_job.addData("IRON AXE", 0.35, 40, 0);
     Blacksmith_job.addData("WEAK IRON BOOTS", 0.375, 80, 0);
     Blacksmith_job.addData("IRON PICKAXE", 0.40, 58, 0);
     Blacksmith_job.addData("WEAK IRON HELMET", 0.50, 100, 0);
     Blacksmith_job.addData("GOLDEN SHOVEL", 0.625, 23, 0);
     Blacksmith_job.addData("GOLDEN HOE", 0.65, 65, 0);
+    Blacksmith_job.addData("GOLDEN AXE", 0.70, 70, 0);
     Blacksmith_job.addData("WEAK IRON LEGGINGS", 0.725, 140, 0);
     Blacksmith_job.addData("DIAMOND SHOVEL", 0.75, 90, 0);
     Blacksmith_job.addData("DIAMOND HOE", 0.8, 188, 0);
+    Blacksmith_job.addData("DIAMOND AXE", 0.81, 196, 0);
     Blacksmith_job.addData("WEAK GOLDEN BOOTS", 0.825, 120, 0);
     Blacksmith_job.addData("WEAK IRON CHESTPLATE", 0.875, 175, 0);
     Blacksmith_job.addData("WEAK GOLDEN HELMET", 0.925, 150, 0);
@@ -584,7 +588,7 @@ public class Main extends JavaPlugin
     Blacksmith_job.addData("DIAMOND CHESTPLATE", 1.50*10, 750*10, 0);
     Blacksmith_job.setBuffData("All crafted items are buffed with a Lv5 enchantment.",
     		"All crafted items are buffed with a Lv10 enchantment.", 
-    		"Crafting materials have a 30% chance of being preserved.", 
+    		"Crafting Blacksmith items have a 30% chance of preserving materials used.", 
     		"All crafted Blacksmith items stack between 2 and 5 of the same item, effectively multiplying the amount you craft. Items are buffed with a Lv20 enchantment and have a 50% chance to be enchanted with a level 30 enchantment.");
 
     Cook_job.setJobName("Cook");
@@ -633,30 +637,30 @@ public class Main extends JavaPlugin
     Enchanter_job.setJobName("Enchanter");
     Enchanter_job.setJobDescription("An enchanter's job is to enchant items in order to make them more powerful and useful for everyday tasks.");
     Enchanter_job.setAction(0, "ENCHANT");
-    Enchanter_job.setExp(30, 30, 3, 1.04);
-    Enchanter_job.addExtraData("Each level of enchantment multiplies your income and exp gain.");
-    Enchanter_job.addExtraData("Ex. If PROTECTION gives $0.04 and 2XP, PROTECTION III would give you $0.12 and 6XP.");
-    Enchanter_job.addData("PROTECTION", 0.04, 2, 0);
-    Enchanter_job.addData("SMITE", 0.05, 4, 0);
-    Enchanter_job.addData("FIRE PROTECTION", 0.05, 3, 0);
-    Enchanter_job.addData("BANE OF ARTHROPODS", 0.06, 4, 0);
-    Enchanter_job.addData("FEATHER FALLING", 0.07, 5, 0);
-    Enchanter_job.addData("SHARPNESS", 0.075, 7, 0);
-    Enchanter_job.addData("POWER", 0.075, 7, 0);
-    Enchanter_job.addData("EFFICIENCY", 0.075, 7, 0);
-    Enchanter_job.addData("BLAST PROTECTION", 0.10, 8, 0);
-    Enchanter_job.addData("THORNS", 0.10, 8, 0);
-    Enchanter_job.addData("KNOCKBACK", 0.10, 9, 0);
-    Enchanter_job.addData("PUNCH", 0.10, 9, 0);
-    Enchanter_job.addData("FIRE ASPECT", 0.11, 10, 0);
-    Enchanter_job.addData("FLAME", 0.11, 10, 0);
-    Enchanter_job.addData("AQUA AFFINITY", 0.125, 8, 0);
-    Enchanter_job.addData("RESPIRATION", 0.15, 10, 0);
-    Enchanter_job.addData("UNBREAKING", 0.175, 12, 0);
-    Enchanter_job.addData("INFINITY", 0.20, 20, 0);
-    Enchanter_job.addData("LOOTING", 0.20, 15, 0);
-    Enchanter_job.addData("FORTUNE", 0.225, 20, 0);
-    Enchanter_job.addData("SILK TOUCH", 0.25, 20, 0);
+    Enchanter_job.setExp(50, 40, 8, 1.08);
+    Enchanter_job.addExtraData("Each level of enchantment multiplies your income and exp gain exponentially.");
+    Enchanter_job.addExtraData("Ex. If PROTECTION gives $0.08 and 4XP, PROTECTION III would give you x9 exp and money: $0.72 and 36XP.");
+    Enchanter_job.addData("PROTECTION", 0.08, 4, 0);
+    Enchanter_job.addData("SMITE", 0.10, 8, 0);
+    Enchanter_job.addData("FIRE PROTECTION", 0.10, 6, 0);
+    Enchanter_job.addData("BANE OF ARTHROPODS", 0.12, 8, 0);
+    Enchanter_job.addData("FEATHER FALLING", 0.14, 10, 0);
+    Enchanter_job.addData("SHARPNESS", 0.15, 14, 0);
+    Enchanter_job.addData("POWER", 0.15, 14, 0);
+    Enchanter_job.addData("EFFICIENCY", 0.15, 14, 0);
+    Enchanter_job.addData("BLAST PROTECTION", 0.20, 16, 0);
+    Enchanter_job.addData("THORNS", 0.20, 16, 0);
+    Enchanter_job.addData("KNOCKBACK", 0.20, 18, 0);
+    Enchanter_job.addData("PUNCH", 0.20, 18, 0);
+    Enchanter_job.addData("FIRE ASPECT", 0.22, 20, 0);
+    Enchanter_job.addData("FLAME", 0.22, 20, 0);
+    Enchanter_job.addData("AQUA AFFINITY", 0.25, 16, 0);
+    Enchanter_job.addData("RESPIRATION", 0.30, 20, 0);
+    Enchanter_job.addData("UNBREAKING", 0.35, 24, 0);
+    Enchanter_job.addData("INFINITY", 0.40, 40, 0);
+    Enchanter_job.addData("LOOTING", 0.40, 30, 0);
+    Enchanter_job.addData("FORTUNE", 0.50, 40, 0);
+    Enchanter_job.addData("SILK TOUCH", 0.50, 40, 0);
     Enchanter_job.setBuffData("Whenever you gain experience, the amount you gain is doubled.",
     		"Enchantments consume 25% less of your exp. (Lv20 enchantment costs 15 levels) Enchantments gain an extra stat enchantment bonus.", 
     		"Enchantments are more potent. (Gain extra enchantments, bonus enchantments, and higher levels than normal.)", 
@@ -667,19 +671,19 @@ public class Main extends JavaPlugin
     Breeder_job.setAction(0, "BREED");
     Breeder_job.setAction(1, "DYE");
     Breeder_job.setAction(2, "SHEAR");
-    Breeder_job.setExp(70, 50, 5, 1.02);
-    Breeder_job.addExtraData("In areas where there are little to no animals, breeders get 10x the amount of money and xp.");
-    Breeder_job.addData("CHICKEN", 0.005, 1, 0);
-    Breeder_job.addData("PIG", 0.01, 2, 0);
-    Breeder_job.addData("SHEEP", 0.01, 2, 0);
-    Breeder_job.addData("COW", 0.015, 2, 0);
-    Breeder_job.addData("OCELOT", 0.02, 4, 0);
-    Breeder_job.addData("WOLF", 0.03, 5, 0);
-    Breeder_job.addData("MUSHROOM COW", 0.15, 20, 0);
-    Breeder_job.addData("HORSE", 1.20, 50, 0);
-    Breeder_job.addData("SHEEP", 0.01, 1, 1);
-    Breeder_job.addData("SHEEP", 0.001, 0.1, 2);
-    Breeder_job.addData("MUSHROOM COW", 0.005, 0.5, 2);
+    Breeder_job.setExp(70, 60, 8, 1.03);
+    Breeder_job.addExtraData("In areas where there are little to no animals, breeders get 20x the amount of money and xp.");
+    Breeder_job.addData("CHICKEN", 0.01, 2, 0);
+    Breeder_job.addData("PIG", 0.02, 4, 0);
+    Breeder_job.addData("SHEEP", 0.02, 4, 0);
+    Breeder_job.addData("COW", 0.03, 4, 0);
+    Breeder_job.addData("OCELOT", 0.04, 8, 0);
+    Breeder_job.addData("WOLF", 0.06, 10, 0);
+    Breeder_job.addData("MUSHROOM COW", 0.20, 16, 0);
+    Breeder_job.addData("HORSE", 0.30, 30, 0);
+    Breeder_job.addData("SHEEP", 0.02, 2, 1);
+    Breeder_job.addData("SHEEP", 0.002, 0.2, 2);
+    Breeder_job.addData("MUSHROOM COW", 0.005, 1, 2);
     Breeder_job.setBuffData("Nearby Sheep and Chickens reproduce wool and eggs at double the rate.",
     		"Breeding animals may yield twins and triplets half the time.", 
     		"Feeding animals will give you the item back half the time.", 
@@ -1090,14 +1094,15 @@ public void runTick() {
 										  enderdragon.setHealth(200);
 										  enderdragon.setRemoveWhenFarAway(false);
 										  //enderdragon.teleport(new Location(p.getWorld(),p.getLocation().getBlockX()+i,-250,p.getLocation().getBlockZ()+j));
-										  p.sendMessage(ChatColor.DARK_PURPLE+"You feel a dark presence nearby.");
+										  //p.sendMessage(ChatColor.DARK_PURPLE+"You feel a dark presence nearby.");
 										  zombie.setRemoveWhenFarAway(false);
 										  zombie.setMaxHealth(300);
 										  zombie.setHealth(300);
 										  zombie.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,999999,6));
 										  zombie.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,999999,0));
 										  zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,0));
-										  zombie.setTicksLived(0);
+										  zombie.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,999999,0));
+										  zombie.setTicksLived(1);
 										  //p.sendMessage("Command is: "+"npc create Boss --type EnderDragon --at "+(p.getLocation().getBlockX()+i)+":-50:"+(p.getLocation().getBlockZ()+j));
 										  Iterator<EnderDragon> e_list = Bukkit.getWorld("world").getEntitiesByClass(EnderDragon.class).iterator();
 										  boolean first=false;
@@ -2069,7 +2074,7 @@ public void checkJukeboxes() {
 	    						if (Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(xoffset+j,y,zoffset+k)).getType()!=Material.STONE && Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(xoffset+j,y,zoffset+k)).getType()!=Material.AIR) {
 	    							unmatched++;
 	    						}
-	    						if (Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(xoffset+j,y,zoffset+k)).getType()==Material.TORCH || Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(xoffset+j,y,zoffset+k)).getType()==Material.GLOWSTONE || Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(xoffset+j,y,zoffset+k)).getType()==Material.COMMAND) {
+	    						if (Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(xoffset+j,y,zoffset+k)).getType()==Material.TORCH || Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(xoffset+j,y,zoffset+k)).getType()==Material.GLOWSTONE || Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(xoffset+j,y,zoffset+k)).getType()==Material.COMMAND || Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(xoffset+j,y,zoffset+k)).getType()==Material.COBBLESTONE) {
 	    							notallowed=true;
 	    						}
 	    					}
@@ -2109,6 +2114,8 @@ public void checkJukeboxes() {
 	    					    } else {
 	    					    	Bukkit.getLogger().warning(("File does not exist."));
 	    					    }
+	    					    last_boss_dungeon_time=Bukkit.getWorld("world").getFullTime()+12000;
+	    					} else {
 	    					    last_boss_dungeon_time=Bukkit.getWorld("world").getFullTime()+12000;
 	    					}
     					}
@@ -3261,45 +3268,12 @@ public void payDay(int time)
 	}
 	
 	public void gainMoneyExp(String p,String job,double amount,double exp) {
-		String[] jobs = getJobs(p);
-		int slot=-1;
-		if (getConfig().getBoolean("halloween-enabled")) {
-			amount*=2;
-			exp*=2;
+		Player m = Bukkit.getPlayer(p);
+		if (m!=null) {
+			gainMoneyExp(m,job,amount,exp);
+		} else {
+			Bukkit.getLogger().severe("Could not find player "+p+"! Could not add in job experience!");
 		}
-		//Add to how much we've earned so far.
-		for (int i=0;i<SPEED_CONTROL.size();i++) {
-			if (SPEED_CONTROL.get(i).p.getName().equalsIgnoreCase(p)) {
-				SPEED_CONTROL.get(i).money_gained+=amount;
-				break;
-			}
-		}
-		JobsDataInfo[] Jobsinfo = {Woodcutter_job,Miner_job,Builder_job,Digger_job,Farmer_job,Hunter_job,Fisherman_job,Weaponsmith_job,Blacksmith_job,Cook_job,Brewer_job,Enchanter_job,Breeder_job,Explorer_job,Support_job};
-		for (int i=0;i<jobs.length;i++) {
-			if (job.equalsIgnoreCase(jobs[i])) {
-				slot=i;
-				break;
-			}
-		}
-		JobsDataInfo info = Jobsinfo[getJobSlot(job)];
-		economy.depositPlayer(p, amount*(1d+(info.moneymult*getAccountsConfig().getInt(p+".jobs.job"+(slot+1)+"lv"))));
-		if (getAccountsConfig().getDouble(p+".jobs.job"+(slot+1)+"exp")+exp>=0) {getAccountsConfig().set(p+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p+".jobs.job"+(slot+1)+"exp")+exp));} else {
-			getAccountsConfig().set(p+".jobs.job"+(slot+1)+"exp", Double.valueOf(0));
-		}
-		//Check for lv up.
-		if (getJobLv(job,p)<40 && getJobExp(job,getAccountsConfig().getInt(p+".jobs.job"+(slot+1)+"lv"))<=getAccountsConfig().getDouble(p+".jobs.job"+(slot+1)+"exp")) { //Make sure we can't go over level cap.
-			//Level up! Level up! YEAH!
-			getAccountsConfig().set(p+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p+".jobs.job"+(slot+1)+"exp")-getJobExp(job,getAccountsConfig().getInt(p+".jobs.job"+(slot+1)+"lv"))));
-			getAccountsConfig().set(p+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p+".jobs.job"+(slot+1)+"lv")+1));
-			Bukkit.broadcastMessage(p+" is now a Level "+getAccountsConfig().getInt(p+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
-			if (getJobTotalLvs(Bukkit.getPlayer(p))%5==0) {
-				Bukkit.broadcastMessage(ChatColor.GREEN+p+" has reached Level "+getJobTotalLvs(Bukkit.getPlayer(p))+"!");
-				if ((((getJobTotalLvs(Bukkit.getPlayer(p))/5+1)-getStatPointTotal(Bukkit.getPlayer(p))))>0) {
-					Bukkit.getPlayer(p).sendMessage(ChatColor.GOLD+"You have earned 1 stat point! You now have "+(((getJobTotalLvs(Bukkit.getPlayer(p))/5+1)-getStatPointTotal(Bukkit.getPlayer(p))))+" stat point"+((((getJobTotalLvs(Bukkit.getPlayer(p))/5+1)-getStatPointTotal(Bukkit.getPlayer(p))))==1?"":"s")+" to spend. "+ChatColor.ITALIC+ChatColor.BLUE+" Type /sp to spend them!");
-				}
-			}
-		}
-		saveAccountsConfig();
 	}
 	
 	public void setMoneyExp(Player p,String job,double newamount,double newexp) {
@@ -3345,14 +3319,16 @@ public void payDay(int time)
 		economy.depositPlayer(p.getName(), amount*(1d+(info.moneymult*getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv"))));
 		getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")+exp));
 		//Check for lv up.
-		if (getJobExp(job,getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv"))<=getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")) {
+		if (getJobLv(job,p)<40 && getJobExp(job,getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv"))<=getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")) {
 			//Level up! Level up! YEAH!
 			getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")-getJobExp(job,getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv"))));
 			getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv")+1));
 			Bukkit.broadcastMessage(p.getName()+" is now a Level "+getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
 			if (getJobTotalLvs(p)%5==0) {
 				Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+" has reached Level "+getJobTotalLvs(p)+"!");
-				p.sendMessage(ChatColor.GOLD+"You have earned 1 stat point! You now have "+(((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))+" stat point"+((((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))==1?"":"s")+" to spend. "+ChatColor.ITALIC+ChatColor.BLUE+" Type /sp to spend them!");
+				if ((((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))>0) {
+					p.sendMessage(ChatColor.GOLD+"You have earned 1 stat point! You now have "+(((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))+" stat point"+((((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))==1?"":"s")+" to spend. "+ChatColor.ITALIC+ChatColor.BLUE+" Type /sp to spend them!");
+				}
 			}
 		}
 		saveAccountsConfig();
@@ -3546,64 +3522,64 @@ public void payDay(int time)
 					  }
 				  }
 				  if (entry.getKey().getName()==Enchantment.PROTECTION_ENVIRONMENTAL.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.04*entry.getValue(),2*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.08*entry.getValue(),4*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.DAMAGE_UNDEAD.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.05*entry.getValue(),4*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),8*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.PROTECTION_FIRE.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.05*entry.getValue(),3*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),6*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.DAMAGE_ARTHROPODS.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.06*entry.getValue(),4*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.12*entry.getValue(),8*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.PROTECTION_FALL.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.07*entry.getValue(),5*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.14*entry.getValue(),10*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.DAMAGE_ALL.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.075*entry.getValue(),7*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.15*entry.getValue(),14*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.DIG_SPEED.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.075*entry.getValue(),7*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.15*entry.getValue(),14*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.PROTECTION_EXPLOSIONS.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),8*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),16*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.THORNS.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),8*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),16*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.KNOCKBACK.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),9*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),18*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.ARROW_KNOCKBACK.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),9*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),18*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.FIRE_ASPECT.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.11*entry.getValue(),10*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.22*entry.getValue(),20*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.ARROW_FIRE.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.11*entry.getValue(),10*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.22*entry.getValue(),20*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.WATER_WORKER.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.125*entry.getValue(),8*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.25*entry.getValue(),16*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.OXYGEN.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.15*entry.getValue(),10*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.30*entry.getValue(),20*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.DURABILITY.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.175*entry.getValue(),12*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.35*entry.getValue(),24*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.ARROW_INFINITE.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),20*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.40*entry.getValue(),40*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.LOOT_BONUS_MOBS.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),15*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.40*entry.getValue(),30*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.LOOT_BONUS_BLOCKS.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.225*entry.getValue(),20*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.50*entry.getValue(),40*entry.getValue());
 				  }
 				  if (entry.getKey().getName()==Enchantment.SILK_TOUCH.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.25*entry.getValue(),20*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.50*entry.getValue(),40*entry.getValue());
 				  }
 			  }
 		  }

@@ -55,6 +55,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.MushroomCow;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.entity.Pig;
@@ -435,75 +436,297 @@ public class PlayerListener
 	    p.updateInventory();
 	    p.sendMessage(ChatColor.LIGHT_PURPLE+"You feel a magical presence get inserted into your inventory.");
 	  }*/
+	  
+	  
 	  if (this.plugin.PlayerinJob(p, "Enchanter")) {
 		  if (this.plugin.getJobLv("Enchanter", p)>=10) {
 			  e.setExpLevelCost((int)(e.getExpLevelCost()*0.75));
+			  if (e.getItem().getType()==Material.BOW) {
+				  int enchants[] = {48,49,50,51};
+				  for (int j=0;j<enchants.length;j++) {
+					  if (Math.random()<1.0d/enchants.length) {
+						  //e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*10)+1);
+					  }
+				  }
+				  List<String> ourLore = new ArrayList<String>();
+				  if (Math.random()<=0.2) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+				  } else
+				  if (Math.random()<=0.2) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*3)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+				  } else
+				  if (Math.random()<=0.2) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Life Steal");
+				  } else
+				  if (Math.random()<=0.2) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+				  } else
+				  if (Math.random()<=0.2) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+1)+" "+ChatColor.BLUE+"Damage");
+				  }
+				  ItemMeta meta = e.getItem().getItemMeta();
+				  meta.setLore(ourLore);
+				  e.getItem().setItemMeta(meta);
+			  } else {
+				  if (e.getItem().getType().toString().toLowerCase().contains("sword")) {
+					  int enchants[] = {16,17,18,19,20,21,34};
+					  for (int j=0;j<enchants.length;j++) {
+						  if (Math.random()<1.0d/enchants.length) {
+							  //e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*10)+1);
+						  }
+					  }
+					  List<String> ourLore = new ArrayList<String>();
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*3)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Life Steal");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+1)+" "+ChatColor.BLUE+"Damage");
+					  }
+					  ItemMeta meta = e.getItem().getItemMeta();
+					  meta.setLore(ourLore);
+					  e.getItem().setItemMeta(meta);
+				  } else if (e.getItem().getType().toString().toLowerCase().contains("spade") ||
+						  e.getItem().getType().toString().toLowerCase().contains("axe") ||
+						  e.getItem().getType().toString().toLowerCase().contains("hoe") ||
+						  e.getItem().getType().toString().toLowerCase().contains("pickaxe")) {
+					  int enchants[] = {32,33,34,35};
+					  for (int j=0;j<enchants.length;j++) {
+						  if (Math.random()<1.0d/enchants.length) {
+							  //e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*10)+1);
+						  }
+					  }
+					  List<String> ourLore = new ArrayList<String>();
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*3)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Life Steal");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+1)+" "+ChatColor.BLUE+"Damage");
+					  }
+					  ItemMeta meta = e.getItem().getItemMeta();
+					  meta.setLore(ourLore);
+					  e.getItem().setItemMeta(meta);
+				  } else {
+					  int enchants[] = {0,1,2,3,4,5,6,7,34};
+					  for (int j=0;j<enchants.length;j++) {
+						  if (Math.random()<1.0d/enchants.length) {
+							  //e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*10)+1);
+						  }
+					  }
+					  List<String> ourLore = new ArrayList<String>();
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*4)+1)+" "+ChatColor.BLUE+"Health");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Damage Reduction");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+1)*10)+"% "+ChatColor.BLUE+"Durability");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Block Chance");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
+					  }
+					  ItemMeta meta = e.getItem().getItemMeta();
+					  meta.setLore(ourLore);
+					  e.getItem().setItemMeta(meta);
+				  }
+			  }
 		  }
 		  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
 			  if (this.plugin.getJobLv("Enchanter", p)>=20) {
 				  if (entry.getKey().getMaxLevel()<entry.getValue()) {
-					  entry.setValue(entry.getValue()+1);
+					  entry.setValue(entry.getValue()+((int)(Math.random()*2)+1));
+				  }
+			  }
+			  if (e.getItem().getType()==Material.BOW) {
+				  int enchants[] = {48,49,50,51};
+				  for (int j=0;j<enchants.length;j++) {
+					  if (Math.random()<1.0d/enchants.length) {
+						  e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+					  }
+				  }
+				  List<String> ourLore = new ArrayList<String>();
+				  if (Math.random()<=0.2) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+				  }
+				  if (Math.random()<=0.2) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+				  }
+				  if (Math.random()<=0.2) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
+				  }
+				  if (Math.random()<=0.2) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+				  }
+				  if (Math.random()<=0.2) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
+				  }
+				  ItemMeta meta = e.getItem().getItemMeta();
+				  meta.setLore(ourLore);
+				  e.getItem().setItemMeta(meta);
+			  } else {
+				  if (e.getItem().getType().toString().toLowerCase().contains("sword")) {
+					  int enchants[] = {16,17,18,19,20,21,34};
+					  for (int j=0;j<enchants.length;j++) {
+						  if (Math.random()<1.0d/enchants.length) {
+							  e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+						  }
+					  }
+					  List<String> ourLore = new ArrayList<String>();
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
+					  }
+					  ItemMeta meta = e.getItem().getItemMeta();
+					  meta.setLore(ourLore);
+					  e.getItem().setItemMeta(meta);
+				  } else if (e.getItem().getType().toString().toLowerCase().contains("spade") ||
+						  e.getItem().getType().toString().toLowerCase().contains("axe") ||
+						  e.getItem().getType().toString().toLowerCase().contains("hoe") ||
+						  e.getItem().getType().toString().toLowerCase().contains("pickaxe")) {
+					  int enchants[] = {32,33,34,35};
+					  for (int j=0;j<enchants.length;j++) {
+						  if (Math.random()<1.0d/enchants.length) {
+							  e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+						  }
+					  }
+					  List<String> ourLore = new ArrayList<String>();
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
+					  }
+					  ItemMeta meta = e.getItem().getItemMeta();
+					  meta.setLore(ourLore);
+					  e.getItem().setItemMeta(meta);
+				  } else {
+					  int enchants[] = {0,1,2,3,4,5,6,7,34};
+					  for (int j=0;j<enchants.length;j++) {
+						  if (Math.random()<1.0d/enchants.length) {
+							  e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+						  }
+					  }
+					  List<String> ourLore = new ArrayList<String>();
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Health");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Damage Reduction");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*100)+1)*10)+"% "+ChatColor.BLUE+"Durability");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Block Chance");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
+					  }
+					  ItemMeta meta = e.getItem().getItemMeta();
+					  meta.setLore(ourLore);
+					  e.getItem().setItemMeta(meta);
 				  }
 			  }
 			  if (entry.getKey().getName()==Enchantment.PROTECTION_ENVIRONMENTAL.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.04*entry.getValue(),2*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.08*entry.getValue(),4*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.DAMAGE_UNDEAD.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.05*entry.getValue(),4*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),8*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.PROTECTION_FIRE.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.05*entry.getValue(),3*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),6*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.DAMAGE_ARTHROPODS.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.06*entry.getValue(),4*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.12*entry.getValue(),8*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.PROTECTION_FALL.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.07*entry.getValue(),5*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.14*entry.getValue(),10*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.DAMAGE_ALL.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.075*entry.getValue(),7*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.15*entry.getValue(),14*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.DIG_SPEED.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.075*entry.getValue(),7*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.15*entry.getValue(),14*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.PROTECTION_EXPLOSIONS.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),8*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),16*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.THORNS.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),8*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),16*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.KNOCKBACK.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),9*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),18*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.ARROW_KNOCKBACK.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),9*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),18*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.FIRE_ASPECT.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.11*entry.getValue(),10*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.22*entry.getValue(),20*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.ARROW_FIRE.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.11*entry.getValue(),10*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.22*entry.getValue(),20*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.WATER_WORKER.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.125*entry.getValue(),8*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.25*entry.getValue(),16*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.OXYGEN.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.15*entry.getValue(),10*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.30*entry.getValue(),20*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.DURABILITY.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.175*entry.getValue(),12*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.35*entry.getValue(),24*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.ARROW_INFINITE.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),20*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.40*entry.getValue(),40*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.LOOT_BONUS_MOBS.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),15*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.40*entry.getValue(),30*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.LOOT_BONUS_BLOCKS.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.225*entry.getValue(),20*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.50*entry.getValue(),40*entry.getValue());
 			  }
 			  if (entry.getKey().getName()==Enchantment.SILK_TOUCH.getName()) {
-				  this.plugin.gainMoneyExp(p,"Enchanter",0.25*entry.getValue(),20*entry.getValue());
+				  this.plugin.gainMoneyExp(p,"Enchanter",0.50*entry.getValue(),40*entry.getValue());
 			  }
 		  }
 	  }
@@ -547,6 +770,9 @@ public class PlayerListener
 			  this.plugin.gainMoneyExp(owner,"Digger",0.015,3);
 		  }
 		  if (e.getResult().getType()==Material.BRICK) {
+			  this.plugin.gainMoneyExp(owner,"Digger",0.04,8);
+		  }
+		  if (e.getResult().getType()==Material.HARD_CLAY) {
 			  this.plugin.gainMoneyExp(owner,"Digger",0.04,8);
 		  }
 	  }
@@ -913,10 +1139,10 @@ public class PlayerListener
 	  Player p = e.getPlayer();
 	  if (this.plugin.PlayerinJob(p, "Breeder")) {
 		  if (e.getEntity().getType()==EntityType.SHEEP) {
-			  this.plugin.gainMoneyExp(p,"Breeder",0.001,0.1);
+			  this.plugin.gainMoneyExp(p,"Breeder",0.002,0.2);
 		  }
 		  if (e.getEntity().getType()==EntityType.MUSHROOM_COW) {
-			  this.plugin.gainMoneyExp(p,"Breeder",0.005,0.5);
+			  this.plugin.gainMoneyExp(p,"Breeder",0.005,1);
 		  }
 	  }
   }
@@ -939,7 +1165,7 @@ public class PlayerListener
 			  return;
 		  }
 		  if (this.plugin.PlayerinJob(p, "Breeder")) {
-			  this.plugin.gainMoneyExp(p,"Breeder",0.005,1);
+			  this.plugin.gainMoneyExp(p,"Breeder",0.02,2);
 		  }
 	  }
   }
@@ -1378,6 +1604,7 @@ public class PlayerListener
 	updateTopSPLEEFSigns();
    }
   
+  /*
   @EventHandler
   public void onPortalEnter(PlayerTeleportEvent e) {
 	  final Player p = e.getPlayer();
@@ -1406,7 +1633,7 @@ public class PlayerListener
 			  }
 		  }
 	  }
-  }
+  }*/
 
   @EventHandler
   public void onPlayerInteract(PlayerInteractEntityEvent ev) {
@@ -1485,16 +1712,18 @@ public class PlayerListener
 	  Entity entity = e.getEntity();
 	  if (entity.getWorld().getName().compareTo("world")==0) {
 		  boolean despawn=true;
-		  if (entity instanceof LivingEntity) {
+		  if (entity instanceof Monster) {
 			  LivingEntity test = (LivingEntity)entity;
 			  boolean block=false;
-			  for (int i=-2;i<3;i++) {
-				  for (int j=-2;j<3;j++) {
-					  for (int k=-2;k<3;k++) {
-						  if (Bukkit.getWorld("world").getBlockAt(test.getLocation().add(i,j,k)).getType()==Material.COMMAND) {
-							  block=true;
-							  Bukkit.getWorld("world").getBlockAt(test.getLocation().add(i,j,k)).setType(Material.COBBLESTONE);
-							  despawn=false;
+			  if (test.getCustomName()!=null && test.getCustomName().contains(ChatColor.DARK_PURPLE+"")) {
+				  for (int i=-2;i<3;i++) {
+					  for (int j=-2;j<3;j++) {
+						  for (int k=-2;k<3;k++) {
+							  if (Bukkit.getWorld("world").getBlockAt(test.getLocation().add(i,j,k)).getType()==Material.COMMAND) {
+								  block=true;
+								  Bukkit.getWorld("world").getBlockAt(test.getLocation().add(i,j,k)).setType(Material.COBBLESTONE);
+								  despawn=false;
+							  }
 						  }
 					  }
 				  }
@@ -1508,16 +1737,12 @@ public class PlayerListener
 					  }
 				  }
 			  }
-			  if (test.getCustomName()!=null && (test.getCustomName().contains("Happy")||test.getCustomName().contains("Halloween"))) {
-				  despawn=false;
-				  test.setRemoveWhenFarAway(false);
-			  }
-			  if (block || (test.getCustomName()!=null && (test.getCustomName().contains(""+ChatColor.DARK_PURPLE) || test.getType()==EntityType.ENDER_DRAGON))) {
+			  if (block || (test.getCustomName()!=null && (test.getCustomName().contains(ChatColor.DARK_PURPLE+"") || test.getType()==EntityType.ENDER_DRAGON))) {
 				  despawn=false;  //This is an epic boss and its healthbar. WE can't just despawn it.
 			  }
 		  }
 		  if (despawn) {
-			  if (this.plugin.getConfig().getBoolean("halloween-enabled") && Math.random()<=0.75) {
+			  if (this.plugin.getConfig().getBoolean("halloween-enabled") && Math.random()<=0.75 && entity instanceof Monster) {
 				  //Just despawn it right now.
 				  entity.remove();
 				  e.setCancelled(true);
@@ -1527,13 +1752,7 @@ public class PlayerListener
 			  double chancer=1.0d; //The percent chance a duplicated mob will form.
 			  double despawnchancer=0.0d; //The percent chance the mob will be forced to despawn. Decreasing natural spawning.
 			  EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
-			  boolean contains=false;
-			  for (int i=0;i<allowedtypes.length;i++) {
-				  if (entity.getType()==allowedtypes[i]) {
-					  contains=true;
-					  break;
-				  }
-			  }
+			  boolean contains=entity instanceof Monster;
 			  //Mobs have more health when they are farther away, to make the mobs harder in general.
 			  float groupmult=0.25f; //Change this to modify the global grouping multiplier.
 			  /*
@@ -1982,7 +2201,7 @@ public class PlayerListener
 										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
 									  } else {
 										  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
-										  enchanted.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
 										  l.getEquipment().setChestplate(enchanted);
 									  }
 									  if (Math.random()>=0.45) {
@@ -1990,7 +2209,7 @@ public class PlayerListener
 										  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
 										  } else {
 											  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
-											  enchanted.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
 											  l.getEquipment().setLeggings(enchanted);
 										  }
 										  if (Math.random()>=0.65) {
@@ -1998,7 +2217,7 @@ public class PlayerListener
 											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 											  } else {
 												  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
-												  enchanted.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
 												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 											  }
 											  if (Math.random()>=0.95) {
@@ -2006,7 +2225,84 @@ public class PlayerListener
 												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
 												  } else {
 													  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
-													  enchanted.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+												  }
+											  }
+										  }
+									  }
+								  }
+							  }
+						  } else {
+							  //Well dang, your party's huge and OP.
+							//Wear diamond armor almost always. Enchanted diamond pieces here and there.
+							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
+								  LivingEntity l = (LivingEntity) entity;
+								  if (entity.getType()==EntityType.ZOMBIE) {
+									  if (Math.random()<=0.80) {
+										  if (Math.random()<=0.75) {
+											  ItemStack enchanted = new ItemStack(Material.DIAMOND_SWORD);
+											  enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
+											  if (Math.random()<=0.5) {
+												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
+											  } else {
+												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*5.0d)+1);
+											  }
+											  l.getEquipment().setItemInHand(enchanted);
+										  } else {
+											  ItemStack enchanted = new ItemStack(Material.GOLD_SWORD);
+											  enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
+											  if (Math.random()<=0.5) {
+												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
+											  } else {
+												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*5.0d)+1);
+											  }
+											  l.getEquipment().setItemInHand(enchanted);
+										  }
+									  }
+								  }
+								  if (Math.random()>=0.25) {
+									  if (Math.random()<=0.75) {
+										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+									  } else {
+										  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
+										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*6.0d)+1);
+										  if (Math.random()<=0.5) {
+											  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
+										  }
+										  l.getEquipment().setChestplate(enchanted);
+									  }
+									  if (Math.random()>=0.45) {
+										  if (Math.random()<=0.75) {
+										  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+										  } else {
+											  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
+											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*6.0d)+1);
+											  if (Math.random()<=0.5) {
+												  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
+											  }
+											  l.getEquipment().setLeggings(enchanted);
+										  }
+										  if (Math.random()>=0.65) {
+											  if (Math.random()<=0.75) {
+											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+											  } else {
+												  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
+												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*6.0d)+1);
+												  if (Math.random()<=0.5) {
+													  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
+												  }
+												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+											  }
+											  if (Math.random()>=0.95) {
+												  if (Math.random()<=0.75) {
+												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+												  } else {
+													  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
+													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*6.0d)+1);
+													  if (Math.random()<=0.5) {
+														  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
+													  }
 													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
 												  }
 											  }
@@ -2078,7 +2374,7 @@ public class PlayerListener
 				  }
 			  }
 			  EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
-			  boolean contains=false;
+			  boolean contains=entity instanceof Monster
 			  for (int i=0;i<allowedtypes.length;i++) {
 				  if (entity.getType()==allowedtypes[i]) {
 					  contains=true;
@@ -2266,7 +2562,7 @@ public class PlayerListener
 				  }
 				  //p.sendMessage("There were "+countamount+" "+e.getEntity().getType());
 				  if (countamount<4) {
-					  mult=10;
+					  mult=20;
 				  } else {
 					  mult=1;
 				  }
@@ -2274,7 +2570,7 @@ public class PlayerListener
 					  p.sendMessage("You started a new "+ChatColor.GREEN+e.getEntity().getType()+ChatColor.WHITE+" family out here!");
 				  }
 				  if (e.getEntity().getType()==EntityType.CHICKEN) {
-					  this.plugin.gainMoneyExp(p,"Breeder",0.005*mult,1*mult);
+					  this.plugin.gainMoneyExp(p,"Breeder",0.01*mult,2*mult);
 					  if (this.plugin.getJobLv("Breeder", p)>=10) {
 						  if (Math.random()<=0.25 && countamount<50) {
 						  Chicken newent = (Chicken)Bukkit.getWorld("world").spawnEntity(e.getLocation(), EntityType.CHICKEN);
@@ -2289,7 +2585,7 @@ public class PlayerListener
 					  }
 				  }
 				  if (e.getEntity().getType()==EntityType.PIG) {
-					  this.plugin.gainMoneyExp(p,"Breeder",0.01*mult,2*mult);
+					  this.plugin.gainMoneyExp(p,"Breeder",0.02*mult,4*mult);
 					  if (this.plugin.getJobLv("Breeder", p)>=10) {
 						  if (Math.random()<=0.25 && countamount<50) {
 						  Pig newent = (Pig)Bukkit.getWorld("world").spawnEntity(e.getLocation(), EntityType.PIG);
@@ -2304,7 +2600,7 @@ public class PlayerListener
 					  }
 				  }
 				  if (e.getEntity().getType()==EntityType.SHEEP) {
-					  this.plugin.gainMoneyExp(p,"Breeder",0.01*mult,2*mult);
+					  this.plugin.gainMoneyExp(p,"Breeder",0.02*mult,4*mult);
 					  if (this.plugin.getJobLv("Breeder", p)>=10) {
 						  if (Math.random()<=0.25 && countamount<50) {
 						  Sheep newent = (Sheep)Bukkit.getWorld("world").spawnEntity(e.getLocation(), EntityType.SHEEP);
@@ -2322,7 +2618,7 @@ public class PlayerListener
 					  }
 				  }
 				  if (e.getEntity().getType()==EntityType.COW) {
-					  this.plugin.gainMoneyExp(p,"Breeder",0.015*mult,2*mult);
+					  this.plugin.gainMoneyExp(p,"Breeder",0.03*mult,4*mult);
 					  if (this.plugin.getJobLv("Breeder", p)>=10) {
 						  if (Math.random()<=0.25 && countamount<50) {
 						  Cow newent = (Cow)Bukkit.getWorld("world").spawnEntity(e.getLocation(), EntityType.COW);
@@ -2337,7 +2633,7 @@ public class PlayerListener
 					  }
 				  }
 				  if (e.getEntity().getType()==EntityType.OCELOT) {
-					  this.plugin.gainMoneyExp(p,"Breeder",0.02*mult,4*mult);
+					  this.plugin.gainMoneyExp(p,"Breeder",0.04*mult,8*mult);
 					  if (this.plugin.getJobLv("Breeder", p)>=10) {
 						  if (Math.random()<=0.25 && countamount<50) {
 						  Ocelot newent = (Ocelot)Bukkit.getWorld("world").spawnEntity(e.getLocation(), EntityType.OCELOT);
@@ -2358,7 +2654,7 @@ public class PlayerListener
 					  }
 				  }
 				  if (e.getEntity().getType()==EntityType.WOLF) {
-					  this.plugin.gainMoneyExp(p,"Breeder",0.03*mult,5*mult);
+					  this.plugin.gainMoneyExp(p,"Breeder",0.06*mult,10*mult);
 					  if (this.plugin.getJobLv("Breeder", p)>=10) {
 						  if (Math.random()<=0.25 && countamount<50) {
 						  Wolf newent = (Wolf)Bukkit.getWorld("world").spawnEntity(e.getLocation(), EntityType.WOLF);
@@ -2379,7 +2675,7 @@ public class PlayerListener
 					  }
 				  }
 				  if (e.getEntity().getType()==EntityType.MUSHROOM_COW) {
-					  this.plugin.gainMoneyExp(p,"Breeder",0.15*mult,20*mult);
+					  this.plugin.gainMoneyExp(p,"Breeder",0.20*mult,16*mult);
 					  if (this.plugin.getJobLv("Breeder", p)>=10) {
 						  if (Math.random()<=0.25 && countamount<50) {
 						  MushroomCow newent = (MushroomCow)Bukkit.getWorld("world").spawnEntity(e.getLocation(), EntityType.MUSHROOM_COW);
@@ -2394,7 +2690,7 @@ public class PlayerListener
 					  }
 				  }
 				  if (e.getEntity().getType()==EntityType.HORSE) {
-					  this.plugin.gainMoneyExp(p,"Breeder",1.20*mult,50*mult);
+					  this.plugin.gainMoneyExp(p,"Breeder",0.30*mult,30*mult);
 					  if (this.plugin.getJobLv("Breeder", p)>=10) {
 						  if (Math.random()<=0.25 && countamount<50) {
 						  Horse newent = (Horse)Bukkit.getWorld("world").spawnEntity(e.getLocation(), EntityType.HORSE);
@@ -2421,6 +2717,10 @@ public class PlayerListener
 	  //p.sendMessage("Name is: "+p.getItemInHand().getItemMeta().getDisplayName());
 	  int myData=this.plugin.getPlayerDataSlot(p);
 	  if (p!=null) {
+		  if (e.getBlock().getType()==Material.COMMAND) {
+			  e.setCancelled(true);
+			  return;
+		  }
 		  if (e.getBlock().getType()==Material.STONE && p.getLocation().getY()<=50) {
 			  //We are mining underground.
 			  //Check if we need to spawn Charge Zombie II's.
@@ -3571,7 +3871,7 @@ public class PlayerListener
 		  if (result.getResult().getType()==Material.DIAMOND_SWORD) {
 			  crafteditem=true;
 		  }
-		  if (this.plugin.getJobLv("Weaponsmith", p)>=20) {
+		  if (this.plugin.getJobLv("Weaponsmith", p)>=20 && crafteditem) {
 			  ItemStack[] crafteditems = result.getMatrix();
 			  if (e.getClick()==ClickType.SHIFT_RIGHT || e.getClick()==ClickType.SHIFT_LEFT) {
 				  int lowestamt=9999;
@@ -3607,7 +3907,7 @@ public class PlayerListener
 				  }
 			  }
 		  } else
-		  if (this.plugin.getJobLv("Weaponsmith", p)>=5) {
+		  if (this.plugin.getJobLv("Weaponsmith", p)>=5 && crafteditem) {
 			  ItemStack[] crafteditems = result.getMatrix();
 			  if (e.getClick()==ClickType.SHIFT_RIGHT || e.getClick()==ClickType.SHIFT_LEFT) {
 				  int lowestamt=9999;
@@ -3644,13 +3944,16 @@ public class PlayerListener
 			  }
 		  }
 		  if (this.plugin.getJobLv("Weaponsmith", p)>=10 && crafteditem) {
-			  Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-			  ItemStack resulting = this.plugin.EnchantItem(result.getResult(),5,p);
-			  result.setResult(resulting);
+			  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
+			  if (e.getClick()!=ClickType.SHIFT_RIGHT && e.getClick()!=ClickType.SHIFT_LEFT) {
+				  ItemStack resulting = this.plugin.EnchantItem(result.getResult(),5,p);
+				  result.setResult(resulting);
+			  }
 		  }
 	  }
 	  if (this.plugin.PlayerinJob(p,"Blacksmith")) {
 		  boolean crafteditem=false;
+		  /*
 		  if (result.getResult().getType()==Material.STONE_HOE) {
 			  //this.plugin.gainMoneyExp(p,"Blacksmith",0.04,7);
 			  crafteditem=true;
@@ -3662,7 +3965,7 @@ public class PlayerListener
 		  if (result.getResult().getType()==Material.STONE_PICKAXE) {
 			  //this.plugin.gainMoneyExp(p,"Blacksmith",0.075,15);
 			  crafteditem=true;
-		  }
+		  }*/
 		  if (result.getResult().getType()==Material.LEATHER_BOOTS) {
 			  //this.plugin.gainMoneyExp(p,"Blacksmith",0.125,8);
 			  crafteditem=true;
@@ -3680,6 +3983,10 @@ public class PlayerListener
 			  crafteditem=true;
 		  }
 		  if (result.getResult().getType()==Material.IRON_SPADE) {
+			  //this.plugin.gainMoneyExp(p,"Blacksmith",0.25,18);
+			  crafteditem=true;
+		  }
+		  if (result.getResult().getType()==Material.IRON_AXE) {
 			  //this.plugin.gainMoneyExp(p,"Blacksmith",0.25,18);
 			  crafteditem=true;
 		  }
@@ -3711,6 +4018,10 @@ public class PlayerListener
 			  //this.plugin.gainMoneyExp(p,"Blacksmith",0.625,55);
 			  crafteditem=true;
 		  }
+		  if (result.getResult().getType()==Material.GOLD_AXE) {
+			  //this.plugin.gainMoneyExp(p,"Blacksmith",0.625,55);
+			  crafteditem=true;
+		  }
 		  if (result.getResult().getType()==Material.GOLD_HOE) {
 			  //this.plugin.gainMoneyExp(p,"Blacksmith",0.65,60);
 			  crafteditem=true;
@@ -3724,6 +4035,10 @@ public class PlayerListener
 			  crafteditem=true;
 		  }
 		  if (result.getResult().getType()==Material.DIAMOND_SPADE) {
+			  //this.plugin.gainMoneyExp(p,"Blacksmith",0.75,65);
+			  crafteditem=true;
+		  }
+		  if (result.getResult().getType()==Material.DIAMOND_AXE) {
 			  //this.plugin.gainMoneyExp(p,"Blacksmith",0.75,65);
 			  crafteditem=true;
 		  }
@@ -3809,15 +4124,19 @@ public class PlayerListener
 		  }
 		  if (this.plugin.getJobLv("Blacksmith", p)>=5 && crafteditem) {
 			  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-			  ItemStack resulting = this.plugin.EnchantItem(result.getResult(),5,p);
-			  result.setResult(resulting);
+			  if (e.getClick()!=ClickType.SHIFT_RIGHT && e.getClick()!=ClickType.SHIFT_LEFT) {
+				  ItemStack resulting = this.plugin.EnchantItem(result.getResult(),5,p);
+				  result.setResult(resulting);
+			  }
 		  }
 		  if (this.plugin.getJobLv("Blacksmith", p)>=10 && crafteditem) {
 			  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-			  ItemStack resulting = this.plugin.EnchantItem(result.getResult(),10,p);
-			  result.setResult(resulting);
+			  if (e.getClick()!=ClickType.SHIFT_RIGHT && e.getClick()!=ClickType.SHIFT_LEFT) {
+				  ItemStack resulting = this.plugin.EnchantItem(result.getResult(),10,p);
+				  result.setResult(resulting);
+			  }
 		  }
-		  if (this.plugin.getJobLv("Blacksmith", p)>=20) {
+		  if (this.plugin.getJobLv("Blacksmith", p)>=20 && crafteditem) {
 			  ItemStack[] crafteditems = result.getMatrix();
 			  if (e.getClick()==ClickType.SHIFT_RIGHT || e.getClick()==ClickType.SHIFT_LEFT) {
 				  int lowestamt=9999;
@@ -5500,13 +5819,7 @@ public ItemStack getGoodie() {
 		  }
 	  }
 	  EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
-	  boolean contains=false;
-	  for (int k=0;k<allowedtypes.length;k++) {
-		  if (e.getEntity().getType()==allowedtypes[k]) {
-			  contains=true;
-			  break;
-		  }
-	  }
+	  boolean contains=e.getEntity() instanceof Monster;
 	  if (contains) {
 		  LivingEntity l = (LivingEntity)e.getEntity();
 		  if ((l.getCustomName()==null || !l.getCustomName().contains(""+ChatColor.DARK_PURPLE)) && l.getType()!=EntityType.ENDER_DRAGON) {
@@ -5593,8 +5906,17 @@ public ItemStack getGoodie() {
   @EventHandler
   public void onEnemyHit(EntityDamageByEntityEvent e) {
 	  if (e.getEntity() instanceof LivingEntity) {
-		  LivingEntity l = (LivingEntity)e.getEntity();
+		  final LivingEntity l = (LivingEntity)e.getEntity();
 		  if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.DARK_PURPLE+"")) {
+			  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+	                @Override
+	                public void run() {
+	                    //Multiplying by a number lower than 1 will reduce knockback
+	                    //Multiplying by a number greater than 1 will increase knockback
+	                    Vector knockback = l.getVelocity().multiply(0.1f);
+	                    l.setVelocity(knockback);
+	                }
+	            }, 1L);
 			  if (l.getHealth()>=1) {
 				  LivingEntity enderdragon = (LivingEntity)Bukkit.getWorld("world").spawnEntity(new Location(l.getWorld(),l.getLocation().getBlockX(),-250,l.getLocation().getBlockZ()),EntityType.ENDER_DRAGON);
 				  enderdragon.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
@@ -5692,6 +6014,9 @@ public ItemStack getGoodie() {
 				for (int i=-20;i<21;i++) {
 					for (int j=-20;j<21;j++) {
 						for (int k=-20;k<21;k++) {
+							if (Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).getType()==Material.COMMAND) {
+								Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).setType(Material.COBBLESTONE);
+							}
 							if (Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).getType()==Material.TORCH || Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).getType()==Material.GLOWSTONE) {
 								Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).breakNaturally();
 							}
@@ -8234,6 +8559,10 @@ public ItemStack getGoodie() {
 			  this.plugin.gainMoneyExp(p,"Blacksmith",0.325*amount,38*amount);
 			  crafteditem=true;
 		  }
+		  if (item.getType()==Material.IRON_AXE) {
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.35*amount,40*amount);
+			  crafteditem=true;
+		  }
 		  if (item.getType()==Material.IRON_BOOTS) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
@@ -8262,6 +8591,10 @@ public ItemStack getGoodie() {
 			  this.plugin.gainMoneyExp(p,"Blacksmith",0.65*amount,65*amount);
 			  crafteditem=true;
 		  }
+		  if (item.getType()==Material.GOLD_AXE) {
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.70*amount,70*amount);
+			  crafteditem=true;
+		  }
 		  if (item.getType()==Material.IRON_LEGGINGS) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
@@ -8276,6 +8609,10 @@ public ItemStack getGoodie() {
 		  }
 		  if (item.getType()==Material.DIAMOND_HOE) {
 			  this.plugin.gainMoneyExp(p,"Blacksmith",0.80*amount,188*amount);
+			  crafteditem=true;
+		  }
+		  if (item.getType()==Material.DIAMOND_AXE) {
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.81*amount,196*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.GOLD_BOOTS) {
@@ -8569,19 +8906,22 @@ public ItemStack getGoodie() {
             					if (PlayerinJob((Player)player,"Weaponsmith")) {
             					  if (getJobLv("Weaponsmith", player.getName())>=10 && validItem_Weaponsmith(post)) {
             						  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-            						  ItemStack resulting = EnchantItem(post,5,(Player)player);
+            						  ItemStack clone = post.clone();
+            						  ItemStack resulting = EnchantItem(clone,5,(Player)player);
             						  player.getInventory().setItem(i, resulting);
             					  }
             					}	
             					if (PlayerinJob((Player)player,"Blacksmith")) {
               					  if (getJobLv("Blacksmith", player.getName())>=10 && validItem_Blacksmith(post)) {
               						  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-              						  ItemStack resulting = EnchantItem(post,10,(Player)player);
+            						  ItemStack clone = post.clone();
+            						  ItemStack resulting = EnchantItem(clone,10,(Player)player);
               						  player.getInventory().setItem(i, resulting);
               					  } else
               					  if (getJobLv("Blacksmith", player.getName())>=5 && validItem_Blacksmith(post)) {
               						  //Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-              						  ItemStack resulting = EnchantItem(post,5,(Player)player);
+            						  ItemStack clone = post.clone();
+            						  ItemStack resulting = EnchantItem(clone,5,(Player)player);
               						  player.getInventory().setItem(i, resulting);
               					  }
               					}
@@ -9855,10 +10195,12 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
 		  e.setCancelled(true);
 	  } else 
 	  {
-		  Player[] playerlist = Bukkit.getOnlinePlayers();
-		  for (int i=0;i<playerlist.length;i++) {
-			  if (playerlist[i]!=e.getPlayer()) {
-				  playerlist[i].playSound(playerlist[i].getLocation(), Sound.NOTE_STICKS, 0.6f, 0.85f);
+		  if (e.getMessage().replaceAll("[0-9.]","").length()>0) {
+			  Player[] playerlist = Bukkit.getOnlinePlayers();
+			  for (int i=0;i<playerlist.length;i++) {
+				  if (playerlist[i]!=e.getPlayer()) {
+					  playerlist[i].playSound(playerlist[i].getLocation(), Sound.NOTE_STICKS, 0.6f, 0.85f);
+				  }
 			  }
 		  }
 		  String f="";
