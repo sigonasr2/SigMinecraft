@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,6 +24,7 @@ import me.kaZep.Commands.commandBankEconomy;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.DyeColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -47,6 +49,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
@@ -147,6 +150,7 @@ public class Main extends JavaPlugin
   public List<PlayerData> playerdata_list = null;
   public List<InvisibilityData> ninjavisible_list = null;
   public List<ReviveInventory> revive_inventory_list = null;
+  public List<Chunk> chunk_queue_list = null;
   public DamageAPI DMGCALC = null;
   
 
@@ -234,6 +238,7 @@ public class Main extends JavaPlugin
     playerdata_list = new ArrayList<PlayerData>();
     ninjavisible_list = new ArrayList<InvisibilityData>();
     revive_inventory_list = new ArrayList<ReviveInventory>();
+    chunk_queue_list = new ArrayList<Chunk>();
     
     //Add Recipes for new Block armor crafting.
     ShapedRecipe iron_helmet = new ShapedRecipe(new ItemStack(Material.IRON_HELMET));
@@ -640,6 +645,8 @@ public class Main extends JavaPlugin
     Enchanter_job.setExp(50, 40, 8, 1.08);
     Enchanter_job.addExtraData("Each level of enchantment multiplies your income and exp gain exponentially.");
     Enchanter_job.addExtraData("Ex. If PROTECTION gives $0.08 and 4XP, PROTECTION III would give you x9 exp and money: $0.72 and 36XP.");
+    Enchanter_job.addExtraData("");
+    Enchanter_job.addExtraData("Enchanters also gain some exp and income if job buffs automatically enchant items, such as the Weaponsmith/Blacksmith job. Note this is a very small amount and does not give as much as enchanting an item of your own.");
     Enchanter_job.addData("PROTECTION", 0.08, 4, 0);
     Enchanter_job.addData("SMITE", 0.10, 8, 0);
     Enchanter_job.addData("FIRE PROTECTION", 0.10, 6, 0);
@@ -934,6 +941,7 @@ public void runTick() {
 				  REVIVE_EFFECT--;
 				  //Bukkit.getPlayer("sigonasr2").sendMessage(REVIVE_EFFECT+"");
 			  }
+			  List<UUID> lineofsight_check = new ArrayList<UUID>();
 			  for (int zx=0;zx<Bukkit.getOnlinePlayers().length;zx++) {
 			  Player p = Bukkit.getOnlinePlayers()[zx];
 			  //p.sendMessage("That's item slot #"+p.getInventory().getHeldItemSlot());
@@ -1122,23 +1130,261 @@ public void runTick() {
 					  }
 				  }
 				  if (Bukkit.getWorld("world").getFullTime()%20==0) {
+			    	for (int d=0;d<chunk_queue_list.size();d++) {
+			    		if (!chunk_queue_list.get(d).isLoaded()) {
+			    			chunk_queue_list.remove(0);
+			    		} else {
+			    			break;
+			    		}
+			    	}
+			    	if (chunk_queue_list.size()>0 && chunk_queue_list.get(0).isLoaded() && chunk_queue_list.get(0).getWorld().getName().equalsIgnoreCase("world")) {
+			    		//Load up this chunk if it's loaded and check things.
+			    		//Attempt to load up the custom chunk.
+						List<String> debugmessages = new ArrayList<String>();
+						FileConfiguration customchunk = reloadChunksConfig(chunk_queue_list.get(0).getX(), chunk_queue_list.get(0).getZ());
+						if (!customchunk.contains("animal-reset2")) {
+							customchunk.set("animal-reset2", Long.valueOf(Bukkit.getWorld("world").getFullTime()+17280000));
+							Chunk c = chunk_queue_list.get(0);
+							Random r = new Random();
+							  for (int x=0;x<16;x++) {
+								  for (int z=0;z<16;z++) {
+									  if (r.nextDouble()<=0.000244140625) {
+										  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,Bukkit.getWorld("world").getHighestBlockYAt(x+c.getX()*16, z+c.getZ()*16),z+c.getZ()*16);
+										  if (b.getType()!=Material.WATER && b.getType()!=Material.ICE && b.getType()!=Material.LAVA && !b.getBiome().name().equalsIgnoreCase("ocean") && !b.getBiome().name().equalsIgnoreCase("river")) {
+											  if (b.getType()==Material.SNOW || b.getType()==Material.DIRT || b.getType()==Material.SAND || b.getType()==Material.LEAVES || b.getType()==Material.GRASS || b.getType()==Material.GRAVEL || b.getType()==Material.STONE || b.getType()==Material.COBBLESTONE || b.getType()==Material.MYCEL || b.getType()==Material.BROWN_MUSHROOM || b.getType()==Material.RED_MUSHROOM) {
+												  if (b.getBiome().name().equalsIgnoreCase("plains")) {
+													  //Best place for things to spawn. Any mob type can spawn here.
+													  //Choose a mob type randomly.
+													  EntityType[] mobs = {EntityType.COW,EntityType.HORSE,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
+													  int i=(int)(Math.random()*4)+2;
+													  EntityType selected = mobs[(int)(mobs.length*Math.random())];
+													  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
+													  debugmessages.add("  Spawned: "+i+" "+selected.getName());
+													  while (i>0) {
+														  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
+														  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
+														  i--;
+													  }
+												  } else {
+													  if (b.getBiome().name().equalsIgnoreCase("forest")) {
+														  //Wolves can still spawn here. Horses cannot.
+														  //Choose a mob type randomly.
+														  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
+														  int i=(int)(Math.random()*4)+2;
+														  EntityType selected = mobs[(int)(mobs.length*Math.random())];
+														  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
+														  debugmessages.add("  Spawned: "+i+" "+selected.getName());
+														  while (i>0) {
+															  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
+															  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
+															  i--;
+														  }
+													  }else {
+														  if (b.getBiome().name().equalsIgnoreCase("jungle")) {
+															  //Chance to spawn ocelots here.
+															  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.OCELOT};
+															  int i=(int)(Math.random()*4)+2;
+															  EntityType selected = mobs[(int)(mobs.length*Math.random())];
+															  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
+															  debugmessages.add("  Spawned: "+i+" "+selected.getName());
+															  while (i>0) {
+																  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
+																  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
+																  i--;
+															  }
+														  }else {
+															  //Choose a mob type randomly.
+															  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN};
+															  int i=(int)(Math.random()*4)+2;
+															  EntityType selected = mobs[(int)(mobs.length*Math.random())];
+															  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
+															  debugmessages.add("  Spawned: "+i+" "+selected.getName());
+															  while (i>0) {
+																  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
+																  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
+																  i--;
+															  }
+														  }
+													  }
+												  }
+											  }
+										  }
+									  }
+									  ////Bukkit.getLogger().info("Biome here is "+b.getBiome().name());
+								  }
+							  }
+						} else {
+							//Check the value and regenerate if necessary.
+							if (Bukkit.getWorld("world").getFullTime()>customchunk.getLong("animal-reset2")) {
+								customchunk.set("animal-reset2", Long.valueOf(Bukkit.getWorld("world").getFullTime()+17280000));
+								Chunk c = chunk_queue_list.get(0);
+								Random r = new Random();
+								  for (int x=0;x<16;x++) {
+									  for (int z=0;z<16;z++) {
+										  if (r.nextDouble()<=0.000244140625) {
+											  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,Bukkit.getWorld("world").getHighestBlockYAt(x+c.getX()*16, z+c.getZ()*16),z+c.getZ()*16);
+											  if (b.getType()!=Material.WATER && b.getType()!=Material.ICE && b.getType()!=Material.LAVA && !b.getBiome().name().equalsIgnoreCase("ocean") && !b.getBiome().name().equalsIgnoreCase("river")) {
+												  if (b.getType()==Material.SNOW || b.getType()==Material.DIRT || b.getType()==Material.SAND || b.getType()==Material.LEAVES || b.getType()==Material.GRASS || b.getType()==Material.GRAVEL || b.getType()==Material.STONE || b.getType()==Material.COBBLESTONE || b.getType()==Material.MYCEL || b.getType()==Material.BROWN_MUSHROOM || b.getType()==Material.RED_MUSHROOM) {
+													  if (b.getBiome().name().equalsIgnoreCase("plains")) {
+														  //Best place for things to spawn. Any mob type can spawn here.
+														  //Choose a mob type randomly.
+														  EntityType[] mobs = {EntityType.COW,EntityType.HORSE,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
+														  int i=(int)(Math.random()*4)+2;
+														  EntityType selected = mobs[(int)(mobs.length*Math.random())];
+														  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
+														  debugmessages.add("  Spawned: "+i+" "+selected.getName());
+														  while (i>0) {
+															  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
+															  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
+															  i--;
+														  }
+													  } else {
+														  if (b.getBiome().name().equalsIgnoreCase("forest")) {
+															  //Wolves can still spawn here. Horses cannot.
+															  //Choose a mob type randomly.
+															  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
+															  int i=(int)(Math.random()*4)+2;
+															  EntityType selected = mobs[(int)(mobs.length*Math.random())];
+															  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
+															  debugmessages.add("  Spawned: "+i+" "+selected.getName());
+															  while (i>0) {
+																  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
+																  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
+																  i--;
+															  }
+														  }else {
+															  if (b.getBiome().name().equalsIgnoreCase("jungle")) {
+																  //Chance to spawn ocelots here.
+																  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.OCELOT};
+																  int i=(int)(Math.random()*4)+2;
+																  EntityType selected = mobs[(int)(mobs.length*Math.random())];
+																  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
+																  debugmessages.add("  Spawned: "+i+" "+selected.getName());
+																  while (i>0) {
+																	  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
+																	  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
+																	  i--;
+																  }
+															  }else {
+																  //Choose a mob type randomly.
+																  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN};
+																  int i=(int)(Math.random()*4)+2;
+																  EntityType selected = mobs[(int)(mobs.length*Math.random())];
+																  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
+																  debugmessages.add("  Spawned: "+i+" "+selected.getName());
+																  while (i>0) {
+																	  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
+																	  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
+																	  i--;
+																  }
+															  }
+														  }
+													  }
+												  }
+											  }
+										  }
+										  ////Bukkit.getLogger().info("Biome here is "+b.getBiome().name());
+									  }
+								  }
+							}
+						}
+						if (!customchunk.contains("diamond-generate")) {
+							customchunk.set("diamond-generate", Boolean.valueOf(true));
+							Chunk c = chunk_queue_list.get(0);
+							  int adddiamond=0;
+							  for (int x=0;x<16;x++) {
+								  for (int y=5;y<25;y++) {
+									  for (int z=0;z<16;z++) {
+										  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,y,z+c.getZ()*16);
+										  if (b!=null && b.getType()==Material.STONE) {
+											  if (Math.random()<=0.000625) {
+												  int i=(int)(Math.random()*8.0d)+1;
+												  while (i>0) {
+													  Block d = c.getBlock(x+(int)(Math.random()*i)-(int)(Math.random()*i), y+(int)(Math.random()*i)-(int)(Math.random()*i), z+(int)(Math.random()*i)-(int)(Math.random()*i));
+													  adddiamond++;
+													  b.setType(Material.DIAMOND_ORE);
+													  i--;
+												  }
+												  //Make a patch between 1 and 8.
+											  }
+										  }
+									  }
+								  }
+							  }
+							////Bukkit.getLogger().info("Generated "+adddiamond+" new diamonds for chunk "+e.getChunk().getX()+","+e.getChunk().getZ());
+							if (adddiamond>0) {
+							  debugmessages.add("  Added "+adddiamond+" diamond"+((adddiamond!=1)?"s":"")+".");
+							}
+						}
+						if (!customchunk.contains("limit-ore-generation")) {
+							customchunk.set("limit-ore-generation", Boolean.valueOf(true));
+							Chunk c = chunk_queue_list.get(0);
+							  int removeore=0,totalore=0,newore=0;
+							  for (int x=0;x<16;x++) {
+								  for (int y=5;y<96;y++) {
+									  for (int z=0;z<16;z++) {
+										  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,y,z+c.getZ()*16);
+										  if (b!=null && (b.getType()==Material.COAL_ORE ||
+												  b.getType()==Material.IRON_ORE ||
+												  b.getType()==Material.GOLD_ORE ||
+												  b.getType()==Material.REDSTONE_ORE ||
+												  b.getType()==Material.LAPIS_ORE ||
+												  b.getType()==Material.DIAMOND_ORE)) {
+											  if (Math.random()<=0.60) {
+												  removeore++;
+												  b.setType(Material.STONE);
+												  //Make a patch between 1 and 8.
+											  }
+											  totalore++;
+										  }
+									  }
+								  }
+							  }
+							  for (int x=0;x<16;x++) {
+								  for (int y=5;y<96;y++) {
+									  for (int z=0;z<16;z++) {
+										  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,y,z+c.getZ()*16);
+										  if (b!=null && (b.getType()==Material.COAL_ORE ||
+												  b.getType()==Material.IRON_ORE ||
+												  b.getType()==Material.GOLD_ORE ||
+												  b.getType()==Material.REDSTONE_ORE ||
+												  b.getType()==Material.LAPIS_ORE ||
+												  b.getType()==Material.DIAMOND_ORE)) {
+											  newore++;
+										  }
+									  }
+								  }
+							  }
+								////Bukkit.getLogger().info("Removed "+removeore+"/"+totalore+" ore for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+". There are now "+newore+" ores left.");
+							  debugmessages.add("  Removed: "+removeore+"/"+totalore+" ores.");
+						}
+						saveChunksConfig(customchunk, chunk_queue_list.get(0).getX(), chunk_queue_list.get(0).getZ());
+						  if (debugmessages.size()>0) {
+							  for (int i=0;i<debugmessages.size();i++) {
+								  //Bukkit.getLogger().info(debugmessages.get(i));
+							  }
+							  //Bukkit.getLogger().info(new String(new char[("Chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+" ("+e.getChunk().getX()*16+","+e.getChunk().getZ()*16+")").length()]).replace("\0", "="));
+							  //Bukkit.getLogger().info("Chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+" ("+e.getChunk().getX()*16+","+e.getChunk().getZ()*16+")");
+						  }
+			    	}
+			    	
+			    	
 					  List<Entity> nearby = p.getNearbyEntities(20, 12, 20);
 					  //List<Entity> nearby2 = p.getNearbyEntities(10, 6, 10);
 					  for (int i=0;i<nearby.size();i++) {
-						  EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
-						  boolean contains=false;
-						  for (int k=0;k<allowedtypes.length;k++) {
-							  if (nearby.get(i).getType()==allowedtypes[k]) {
-								  contains=true;
-								  break;
-							  }
-						  }
+						  //EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
+						  boolean contains=nearby.get(i) instanceof Monster;
 						  if (contains) {
 							  LivingEntity l = (LivingEntity)nearby.get(i);
 							  if (l.getCustomName()!=null && l.hasLineOfSight(p)) {
-								  l.setCustomNameVisible(true);
+									 if (!lineofsight_check.contains(l.getUniqueId())) {
+										 l.setCustomNameVisible(true);
+										 lineofsight_check.add(l.getUniqueId());
+									 }
 							  } else {
-								  l.setCustomNameVisible(false);
+								 if (!lineofsight_check.contains(l.getUniqueId())) {
+									 l.setCustomNameVisible(false);
+								 }
 							  }
 						  }
 						  int heightmodifier=0;
@@ -1975,6 +2221,40 @@ public String healthbar(double curHP,double maxHP) {
 	  return bar;
 }
 
+public String healthbar(double curHP,double maxHP,int hunger) {
+	  //█ ▌
+	  int bits=(int)(Math.ceil(curHP/maxHP*10));
+	  String bar=" ";
+	  if (hunger==20) {
+		  if (bits>6) {
+			  bar+=ChatColor.GREEN+"";
+		  } else
+		  if (bits>3) {
+			  bar+=ChatColor.YELLOW+"";
+		  } else
+		  {
+			  bar+=ChatColor.RED+"";
+		  }
+	  } else {
+		  if (bits>6) {
+			  bar+=ChatColor.DARK_GREEN+"";
+		  } else
+		  if (bits>3) {
+			  bar+=ChatColor.GOLD+"";
+		  } else
+		  {
+			  bar+=ChatColor.DARK_RED+"";
+		  }
+	  }
+	  for (int i=0;i<bits/2;i++) {
+		  bar+="█";
+	  }
+	  if (bits%2!=0) {
+		  bar+="▌";
+	  }
+	  return bar;
+}
+
 
 @SuppressWarnings("deprecation")
 public void checkJukeboxes() {
@@ -2521,7 +2801,7 @@ public void checkJukeboxes() {
 	                	}
 	                }
     			}
-    			list[i].getScoreboard().getTeam(list[i].getName()).setSuffix(healthbar(list[i].getHealth(),list[i].getMaxHealth()));
+    			list[i].getScoreboard().getTeam(list[i].getName()).setSuffix(healthbar(list[i].getHealth(),list[i].getMaxHealth(),list[i].getFoodLevel()));
     		}
           LOGGING_UPDATE_COUNTS++; //3
 	  		  for (int i=0;i<supportmoblist.size();i++) {
@@ -3414,8 +3694,11 @@ public void payDay(int time)
 		}
 		return 0;
 	}
-	
 	public ItemStack EnchantItem(ItemStack item,int lv,Player p) {
+		return EnchantItem(item,lv,p,false);
+	}
+	
+	public ItemStack EnchantItem(ItemStack item,int lv,Player p, boolean fromAuto) {
 		boolean protection=false; //Set to true when a protection enchantment has been given.
 		boolean silktouch=false; //Set to true if silk touch OR fortune is set. Only one of these can be there.
 		boolean enhanceddmg=false; //Set to true if a damage increasing enchantment has been given.
@@ -3521,65 +3804,98 @@ public void payDay(int time)
 						  entry.setValue(entry.getValue()+1);
 					  }
 				  }
+				  double mult=1.0d;
+				  if (fromAuto) {
+					  if (!item.getType().toString().toLowerCase().contains("leggings") && !item.getType().toString().toLowerCase().contains("helmet") && !item.getType().toString().toLowerCase().contains("chestplate") && !item.getType().toString().toLowerCase().contains("boots")) {
+						  if (item.getType().toString().toLowerCase().contains("spade")) {
+							  mult=0.015d;
+						  } else
+						  if (item.getType().toString().toLowerCase().contains("hoe")) {
+							  mult=0.03d;
+						  } else
+						  if (item.getType().toString().toLowerCase().contains("sword")) {
+							  mult=0.03d;
+						  } else
+						  if (item.getType().toString().toLowerCase().contains("pickaxe")) {
+							  mult=0.045d;
+						  }
+					  } else {
+						  if (item.hasItemMeta() && item.getItemMeta().getLore()!=null) {
+							  List<String> thelore = item.getItemMeta().getLore();
+							  for (int i=0;i<thelore.size();i++) {
+								  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+									  //This is a weak piece.
+									  mult=0.10d;
+								  }
+							  }
+						  }
+					  }
+					  if (item.getType().toString().toLowerCase().contains("iron")) {
+						  mult/=4;
+					  } else
+					  if (item.getType().toString().toLowerCase().contains("gold")) {
+						  mult/=2;
+					  }
+				  }
 				  if (entry.getKey().getName()==Enchantment.PROTECTION_ENVIRONMENTAL.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.08*entry.getValue(),4*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.08*entry.getValue()*mult,4*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.DAMAGE_UNDEAD.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),8*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.10*entry.getValue()*mult,8*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.PROTECTION_FIRE.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),6*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.10*entry.getValue()*mult,6*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.DAMAGE_ARTHROPODS.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.12*entry.getValue(),8*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.12*entry.getValue()*mult,8*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.PROTECTION_FALL.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.14*entry.getValue(),10*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.14*entry.getValue()*mult,10*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.DAMAGE_ALL.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.15*entry.getValue(),14*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.15*entry.getValue()*mult,14*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.DIG_SPEED.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.15*entry.getValue(),14*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.15*entry.getValue()*mult,14*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.PROTECTION_EXPLOSIONS.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),16*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue()*mult,16*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.THORNS.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),16*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue()*mult,16*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.KNOCKBACK.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),18*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue()*mult,18*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.ARROW_KNOCKBACK.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),18*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.20*entry.getValue()*mult,18*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.FIRE_ASPECT.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.22*entry.getValue(),20*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.22*entry.getValue()*mult,20*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.ARROW_FIRE.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.22*entry.getValue(),20*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.22*entry.getValue()*mult,20*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.WATER_WORKER.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.25*entry.getValue(),16*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.25*entry.getValue()*mult,16*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.OXYGEN.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.30*entry.getValue(),20*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.30*entry.getValue()*mult,20*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.DURABILITY.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.35*entry.getValue(),24*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.35*entry.getValue()*mult,24*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.ARROW_INFINITE.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.40*entry.getValue(),40*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.40*entry.getValue()*mult,40*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.LOOT_BONUS_MOBS.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.40*entry.getValue(),30*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.40*entry.getValue()*mult,30*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.LOOT_BONUS_BLOCKS.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.50*entry.getValue(),40*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.50*entry.getValue()*mult,40*entry.getValue()*mult);
 				  }
 				  if (entry.getKey().getName()==Enchantment.SILK_TOUCH.getName()) {
-					  gainMoneyExp(p,"Enchanter",0.50*entry.getValue(),40*entry.getValue());
+					  gainMoneyExp(p,"Enchanter",0.50*entry.getValue()*mult,40*entry.getValue()*mult);
 				  }
 			  }
 		  }
@@ -4066,6 +4382,29 @@ public void payDay(int time)
         	return true;
     	}
 		Bukkit.broadcastMessage(ChatColor.RED+"[SEVERE]An internal error occurred, triggered by "+p.getName()+".");
+    	return false;
+    }
+    
+    public boolean inventoryFull(Player p){
+    	//Returns if the player's inventory is full(true) or not(false).
+    	boolean full=true;
+    	for (int i=0;i<p.getInventory().getContents().length;i++) {
+    		if (p.getInventory().getContents()[i]==null || p.getInventory().getContents()[i].getType()==Material.AIR) {
+    			full=false;
+    			break;
+    		}
+    	}
+    	return full;
+    }
+    
+    public boolean isBroken(ItemStack i) {
+    	if (i!=null && i.hasItemMeta() && i.getItemMeta().getLore()!=null) {
+    		for (int j=0;j<i.getItemMeta().getLore().size();j++) {
+    			if (i.getItemMeta().getLore().get(j).contains("Will be repaired @ ")) {
+    				return true;
+    			}
+    		}
+    	}
     	return false;
     }
     

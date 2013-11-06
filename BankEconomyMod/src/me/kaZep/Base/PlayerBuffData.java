@@ -117,7 +117,7 @@ public class PlayerBuffData {
 			//Check player equipment to see if an item could possibly have a health buff.
 			for (int i=0;i<p.getEquipment().getArmorContents().length;i++) {
 				//Bukkit.getLogger().info("Got to 1.");
-				if (p.getEquipment().getArmorContents()[i]!=null && p.getEquipment().getArmorContents()[i].getItemMeta()!=null && p.getEquipment().getArmorContents()[i].getItemMeta().getLore()!=null) {
+				if (p.getEquipment().getArmorContents()[i]!=null && !this.plugin.isBroken(p.getEquipment().getArmorContents()[i]) && p.getEquipment().getArmorContents()[i].getItemMeta()!=null && p.getEquipment().getArmorContents()[i].getItemMeta().getLore()!=null) {
 					//Bukkit.getLogger().info("Got to 2.");
 					for (int j=0;j<p.getEquipment().getArmorContents()[i].getItemMeta().getLore().size();j++) {
 						//Bukkit.getLogger().info("Got to 3.");

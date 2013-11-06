@@ -449,6 +449,16 @@ public class PlayerListener
 					  }
 				  }
 				  List<String> ourLore = new ArrayList<String>();
+				  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
+					  List<String> thelore = e.getItem().getItemMeta().getLore();
+					  for (int i=0;i<thelore.size();i++) {
+						  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+							  //This is a weak piece.
+							  ourLore.add(thelore.get(i));
+							  break;
+						  }
+					  }
+				  }
 				  if (Math.random()<=0.2) {
 					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
 				  } else
@@ -476,6 +486,16 @@ public class PlayerListener
 						  }
 					  }
 					  List<String> ourLore = new ArrayList<String>();
+					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
+						  List<String> thelore = e.getItem().getItemMeta().getLore();
+						  for (int i=0;i<thelore.size();i++) {
+							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								  //This is a weak piece.
+								  ourLore.add(thelore.get(i));
+								  break;
+							  }
+						  }
+					  }
 					  if (Math.random()<=0.2) {
 						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
 					  } else
@@ -505,6 +525,16 @@ public class PlayerListener
 						  }
 					  }
 					  List<String> ourLore = new ArrayList<String>();
+					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
+						  List<String> thelore = e.getItem().getItemMeta().getLore();
+						  for (int i=0;i<thelore.size();i++) {
+							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								  //This is a weak piece.
+								  ourLore.add(thelore.get(i));
+								  break;
+							  }
+						  }
+					  }
 					  if (Math.random()<=0.2) {
 						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
 					  } else
@@ -531,6 +561,16 @@ public class PlayerListener
 						  }
 					  }
 					  List<String> ourLore = new ArrayList<String>();
+					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
+						  List<String> thelore = e.getItem().getItemMeta().getLore();
+						  for (int i=0;i<thelore.size();i++) {
+							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								  //This is a weak piece.
+								  ourLore.add(thelore.get(i));
+								  break;
+							  }
+						  }
+					  }
 					  if (Math.random()<=0.2) {
 						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*4)+1)+" "+ChatColor.BLUE+"Health");
 					  } else
@@ -566,6 +606,16 @@ public class PlayerListener
 					  }
 				  }
 				  List<String> ourLore = new ArrayList<String>();
+				  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
+					  List<String> thelore = e.getItem().getItemMeta().getLore();
+					  for (int i=0;i<thelore.size();i++) {
+						  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+							  //This is a weak piece.
+							  ourLore.add(thelore.get(i));
+							  break;
+						  }
+					  }
+				  }
 				  if (Math.random()<=0.2) {
 					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
 				  }
@@ -589,10 +639,21 @@ public class PlayerListener
 					  int enchants[] = {16,17,18,19,20,21,34};
 					  for (int j=0;j<enchants.length;j++) {
 						  if (Math.random()<1.0d/enchants.length) {
+							  
 							  e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
 						  }
 					  }
 					  List<String> ourLore = new ArrayList<String>();
+					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
+						  List<String> thelore = e.getItem().getItemMeta().getLore();
+						  for (int i=0;i<thelore.size();i++) {
+							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								  //This is a weak piece.
+								  ourLore.add(thelore.get(i));
+								  break;
+							  }
+						  }
+					  }
 					  if (Math.random()<=0.2) {
 						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
 					  }
@@ -618,10 +679,29 @@ public class PlayerListener
 					  int enchants[] = {32,33,34,35};
 					  for (int j=0;j<enchants.length;j++) {
 						  if (Math.random()<1.0d/enchants.length) {
-							  e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+							  if (enchants[j]==33) {
+								  if (e.getItem().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)==0) {
+									  e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+								  }
+							  }
+							  if (enchants[j]==35) {
+								  if (e.getItem().getEnchantmentLevel(Enchantment.SILK_TOUCH)==0) {
+									  e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+								  }
+							  }
 						  }
 					  }
 					  List<String> ourLore = new ArrayList<String>();
+					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
+						  List<String> thelore = e.getItem().getItemMeta().getLore();
+						  for (int i=0;i<thelore.size();i++) {
+							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								  //This is a weak piece.
+								  ourLore.add(thelore.get(i));
+								  break;
+							  }
+						  }
+					  }
 					  if (Math.random()<=0.2) {
 						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
 					  }
@@ -648,6 +728,16 @@ public class PlayerListener
 						  }
 					  }
 					  List<String> ourLore = new ArrayList<String>();
+					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
+						  List<String> thelore = e.getItem().getItemMeta().getLore();
+						  for (int i=0;i<thelore.size();i++) {
+							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								  //This is a weak piece.
+								  ourLore.add(thelore.get(i));
+								  break;
+							  }
+						  }
+					  }
 					  if (Math.random()<=0.2) {
 						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Health");
 					  }
@@ -1283,7 +1373,7 @@ public class PlayerListener
 	if (p.hasPermission("group.administrators")) {
 		tempteam.setPrefix(ChatColor.LIGHT_PURPLE+"");
 	}
-    tempteam.setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+    tempteam.setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
     tempteam.addPlayer(p.getPlayer());
     if (this.plugin.getConfig().getBoolean("maintenance-mode") && !p.hasPermission("maintenance-mode")) {
     	p.kickPlayer("Sorry, the server is currently under "+ChatColor.GREEN+" Maintenance Mode.");
@@ -3239,7 +3329,7 @@ public class PlayerListener
 	  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 	      @Override
 	      public void run() {
-	    	  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+	    	  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 	      }
 	  	},5);
 	  if (e.getItem().getType()==Material.POTION) {
@@ -3293,7 +3383,7 @@ public class PlayerListener
 						  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 						      @Override
 						      public void run() {
-						    	  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+						    	  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 						      }
 						  	},5);
 						  if (p!=shooter) {
@@ -3331,7 +3421,7 @@ public class PlayerListener
 											  if (p.getHealth()/p.getMaxHealth()<=0.30) {
 												  this.plugin.gainMoneyExp(shooter,"Support",2.40,120);
 												  //shooter.sendMessage("This is a big heal.");
-												  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+												  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 											  }
 											  //this.plugin.gainMoneyExp(shooter,"Support",0.30,14);
 											  if (p.getHealth()+12>p.getMaxHealth()) {
@@ -3420,7 +3510,7 @@ public class PlayerListener
 												  p.setHealth(p.getHealth()+12);
 											  }
 											  //shooter.sendMessage("This is a heal.");
-											  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+											  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 										  }
 									  }
 								  }
@@ -3439,7 +3529,7 @@ public class PlayerListener
 						  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 						      @Override
 						      public void run() {
-						    	  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+						    	  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 						      }
 						  	},5);
 						  try {
@@ -5184,7 +5274,13 @@ public ItemStack getGoodie() {
   public void onFoodLevelChange(FoodLevelChangeEvent e) {
 	  //Check for nearby support.
 	  if (e.getEntity().getType()==EntityType.PLAYER) {
-		  HumanEntity p = (HumanEntity)e.getEntity();
+		  final Player p = (Player)e.getEntity();
+		  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+		      @Override
+		      public void run() {
+		    	  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+		      }
+		  	},5);
 		  if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat9")>0) {
 			  if (Math.random()<=this.plugin.getStatBonus(8, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat9"))/100.0d) {
 				  e.setFoodLevel(e.getFoodLevel()+1);
@@ -5359,234 +5455,9 @@ public ItemStack getGoodie() {
 		    }
 		    this.plugin.cleaned=true;
 		}
-		  if (!e.isNewChunk()) { //Make sure this chunk is an existing one.
-			//Attempt to load up the custom chunk.
-			List<String> debugmessages = new ArrayList<String>();
-			FileConfiguration customchunk = this.plugin.reloadChunksConfig(e.getChunk().getX(), e.getChunk().getZ());
-			if (!customchunk.contains("animal-reset2")) {
-				customchunk.set("animal-reset2", Long.valueOf(Bukkit.getWorld("world").getFullTime()+17280000));
-				Chunk c = e.getChunk();
-				Random r = new Random();
-				  for (int x=0;x<16;x++) {
-					  for (int z=0;z<16;z++) {
-						  if (r.nextDouble()<=0.000244140625) {
-							  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,Bukkit.getWorld("world").getHighestBlockYAt(x+c.getX()*16, z+c.getZ()*16),z+c.getZ()*16);
-							  if (b.getType()!=Material.WATER && b.getType()!=Material.ICE && b.getType()!=Material.LAVA && !b.getBiome().name().equalsIgnoreCase("ocean") && !b.getBiome().name().equalsIgnoreCase("river")) {
-								  if (b.getType()==Material.SNOW || b.getType()==Material.DIRT || b.getType()==Material.SAND || b.getType()==Material.LEAVES || b.getType()==Material.GRASS || b.getType()==Material.GRAVEL || b.getType()==Material.STONE || b.getType()==Material.COBBLESTONE || b.getType()==Material.MYCEL || b.getType()==Material.BROWN_MUSHROOM || b.getType()==Material.RED_MUSHROOM) {
-									  if (b.getBiome().name().equalsIgnoreCase("plains")) {
-										  //Best place for things to spawn. Any mob type can spawn here.
-										  //Choose a mob type randomly.
-										  EntityType[] mobs = {EntityType.COW,EntityType.HORSE,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
-										  int i=(int)(Math.random()*4)+2;
-										  EntityType selected = mobs[(int)(mobs.length*Math.random())];
-										  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
-										  debugmessages.add("  Spawned: "+i+" "+selected.getName());
-										  while (i>0) {
-											  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
-											  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
-											  i--;
-										  }
-									  } else {
-										  if (b.getBiome().name().equalsIgnoreCase("forest")) {
-											  //Wolves can still spawn here. Horses cannot.
-											  //Choose a mob type randomly.
-											  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
-											  int i=(int)(Math.random()*4)+2;
-											  EntityType selected = mobs[(int)(mobs.length*Math.random())];
-											  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
-											  debugmessages.add("  Spawned: "+i+" "+selected.getName());
-											  while (i>0) {
-												  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
-												  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
-												  i--;
-											  }
-										  }else {
-											  if (b.getBiome().name().equalsIgnoreCase("jungle")) {
-												  //Chance to spawn ocelots here.
-												  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.OCELOT};
-												  int i=(int)(Math.random()*4)+2;
-												  EntityType selected = mobs[(int)(mobs.length*Math.random())];
-												  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
-												  debugmessages.add("  Spawned: "+i+" "+selected.getName());
-												  while (i>0) {
-													  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
-													  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
-													  i--;
-												  }
-											  }else {
-												  //Choose a mob type randomly.
-												  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN};
-												  int i=(int)(Math.random()*4)+2;
-												  EntityType selected = mobs[(int)(mobs.length*Math.random())];
-												  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
-												  debugmessages.add("  Spawned: "+i+" "+selected.getName());
-												  while (i>0) {
-													  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
-													  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
-													  i--;
-												  }
-											  }
-										  }
-									  }
-								  }
-							  }
-						  }
-						  ////Bukkit.getLogger().info("Biome here is "+b.getBiome().name());
-					  }
-				  }
-			} else {
-				//Check the value and regenerate if necessary.
-				if (Bukkit.getWorld("world").getFullTime()>customchunk.getLong("animal-reset2")) {
-					customchunk.set("animal-reset2", Long.valueOf(Bukkit.getWorld("world").getFullTime()+17280000));
-					Chunk c = e.getChunk();
-					Random r = new Random();
-					  for (int x=0;x<16;x++) {
-						  for (int z=0;z<16;z++) {
-							  if (r.nextDouble()<=0.000244140625) {
-								  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,Bukkit.getWorld("world").getHighestBlockYAt(x+c.getX()*16, z+c.getZ()*16),z+c.getZ()*16);
-								  if (b.getType()!=Material.WATER && b.getType()!=Material.ICE && b.getType()!=Material.LAVA && !b.getBiome().name().equalsIgnoreCase("ocean") && !b.getBiome().name().equalsIgnoreCase("river")) {
-									  if (b.getType()==Material.SNOW || b.getType()==Material.DIRT || b.getType()==Material.SAND || b.getType()==Material.LEAVES || b.getType()==Material.GRASS || b.getType()==Material.GRAVEL || b.getType()==Material.STONE || b.getType()==Material.COBBLESTONE || b.getType()==Material.MYCEL || b.getType()==Material.BROWN_MUSHROOM || b.getType()==Material.RED_MUSHROOM) {
-										  if (b.getBiome().name().equalsIgnoreCase("plains")) {
-											  //Best place for things to spawn. Any mob type can spawn here.
-											  //Choose a mob type randomly.
-											  EntityType[] mobs = {EntityType.COW,EntityType.HORSE,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
-											  int i=(int)(Math.random()*4)+2;
-											  EntityType selected = mobs[(int)(mobs.length*Math.random())];
-											  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
-											  debugmessages.add("  Spawned: "+i+" "+selected.getName());
-											  while (i>0) {
-												  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
-												  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
-												  i--;
-											  }
-										  } else {
-											  if (b.getBiome().name().equalsIgnoreCase("forest")) {
-												  //Wolves can still spawn here. Horses cannot.
-												  //Choose a mob type randomly.
-												  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
-												  int i=(int)(Math.random()*4)+2;
-												  EntityType selected = mobs[(int)(mobs.length*Math.random())];
-												  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
-												  debugmessages.add("  Spawned: "+i+" "+selected.getName());
-												  while (i>0) {
-													  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
-													  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
-													  i--;
-												  }
-											  }else {
-												  if (b.getBiome().name().equalsIgnoreCase("jungle")) {
-													  //Chance to spawn ocelots here.
-													  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.OCELOT};
-													  int i=(int)(Math.random()*4)+2;
-													  EntityType selected = mobs[(int)(mobs.length*Math.random())];
-													  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
-													  debugmessages.add("  Spawned: "+i+" "+selected.getName());
-													  while (i>0) {
-														  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
-														  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
-														  i--;
-													  }
-												  }else {
-													  //Choose a mob type randomly.
-													  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN};
-													  int i=(int)(Math.random()*4)+2;
-													  EntityType selected = mobs[(int)(mobs.length*Math.random())];
-													  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
-													  debugmessages.add("  Spawned: "+i+" "+selected.getName());
-													  while (i>0) {
-														  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
-														  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
-														  i--;
-													  }
-												  }
-											  }
-										  }
-									  }
-								  }
-							  }
-							  ////Bukkit.getLogger().info("Biome here is "+b.getBiome().name());
-						  }
-					  }
-				}
-			}
-			if (!customchunk.contains("diamond-generate")) {
-				customchunk.set("diamond-generate", Boolean.valueOf(true));
-				Chunk c = e.getChunk();
-				  int adddiamond=0;
-				  for (int x=0;x<16;x++) {
-					  for (int y=5;y<25;y++) {
-						  for (int z=0;z<16;z++) {
-							  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,y,z+c.getZ()*16);
-							  if (b!=null && b.getType()==Material.STONE) {
-								  if (Math.random()<=0.000625) {
-									  int i=(int)(Math.random()*8.0d)+1;
-									  while (i>0) {
-										  Block d = c.getBlock(x+(int)(Math.random()*i)-(int)(Math.random()*i), y+(int)(Math.random()*i)-(int)(Math.random()*i), z+(int)(Math.random()*i)-(int)(Math.random()*i));
-										  adddiamond++;
-										  b.setType(Material.DIAMOND_ORE);
-										  i--;
-									  }
-									  //Make a patch between 1 and 8.
-								  }
-							  }
-						  }
-					  }
-				  }
-				////Bukkit.getLogger().info("Generated "+adddiamond+" new diamonds for chunk "+e.getChunk().getX()+","+e.getChunk().getZ());
-				if (adddiamond>0) {
-				  debugmessages.add("  Added "+adddiamond+" diamond"+((adddiamond!=1)?"s":"")+".");
-				}
-			}
-			if (!customchunk.contains("limit-ore-generation")) {
-				customchunk.set("limit-ore-generation", Boolean.valueOf(true));
-				Chunk c = e.getChunk();
-				  int removeore=0,totalore=0,newore=0;
-				  for (int x=0;x<16;x++) {
-					  for (int y=5;y<96;y++) {
-						  for (int z=0;z<16;z++) {
-							  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,y,z+c.getZ()*16);
-							  if (b!=null && (b.getType()==Material.COAL_ORE ||
-									  b.getType()==Material.IRON_ORE ||
-									  b.getType()==Material.GOLD_ORE ||
-									  b.getType()==Material.REDSTONE_ORE ||
-									  b.getType()==Material.LAPIS_ORE ||
-									  b.getType()==Material.DIAMOND_ORE)) {
-								  if (Math.random()<=0.60) {
-									  removeore++;
-									  b.setType(Material.STONE);
-									  //Make a patch between 1 and 8.
-								  }
-								  totalore++;
-							  }
-						  }
-					  }
-				  }
-				  for (int x=0;x<16;x++) {
-					  for (int y=5;y<96;y++) {
-						  for (int z=0;z<16;z++) {
-							  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,y,z+c.getZ()*16);
-							  if (b!=null && (b.getType()==Material.COAL_ORE ||
-									  b.getType()==Material.IRON_ORE ||
-									  b.getType()==Material.GOLD_ORE ||
-									  b.getType()==Material.REDSTONE_ORE ||
-									  b.getType()==Material.LAPIS_ORE ||
-									  b.getType()==Material.DIAMOND_ORE)) {
-								  newore++;
-							  }
-						  }
-					  }
-				  }
-					////Bukkit.getLogger().info("Removed "+removeore+"/"+totalore+" ore for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+". There are now "+newore+" ores left.");
-				  debugmessages.add("  Removed: "+removeore+"/"+totalore+" ores.");
-			}
-			this.plugin.saveChunksConfig(customchunk, e.getChunk().getX(), e.getChunk().getZ());
-			  if (debugmessages.size()>0) {
-				  for (int i=0;i<debugmessages.size();i++) {
-					  //Bukkit.getLogger().info(debugmessages.get(i));
-				  }
-				  //Bukkit.getLogger().info(new String(new char[("Chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+" ("+e.getChunk().getX()*16+","+e.getChunk().getZ()*16+")").length()]).replace("\0", "="));
-				  //Bukkit.getLogger().info("Chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+" ("+e.getChunk().getX()*16+","+e.getChunk().getZ()*16+")");
-			  }
+		  this.plugin.chunk_queue_list.add(e.getChunk());
+		  if (this.plugin.chunk_queue_list.size()>640) {
+			  this.plugin.chunk_queue_list.remove(0);
 		  }
 	  }
   
@@ -5760,7 +5631,7 @@ public ItemStack getGoodie() {
 		  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 		      @Override
 		      public void run() {
-		    	  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+		    	  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 		      }
 		  	},5);
 		  //p.sendMessage("Your Health: "+p.getHealth()+", Damage: "+e.getDamage()+", Actual: "+this.plugin.DMGCALC.getDamage(p, e.getDamage(), DamageCause.ENTITY_ATTACK));
@@ -5879,7 +5750,7 @@ public ItemStack getGoodie() {
   public void onRegainHealth(EntityRegainHealthEvent e) {
 	  if (e.getEntity().getType()==EntityType.PLAYER) {
 		  Player p = (Player)e.getEntity();
-		  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+		  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 		  	try {
 				Iterator<PotionEffect> effects = p.getActivePotionEffects().iterator();
 					//Figure out potion effects when player joins.
@@ -6042,7 +5913,7 @@ public ItemStack getGoodie() {
 	  ////Bukkit.getLogger().info("Made it through 1.");
 	  if (e.getEntity().getType()==EntityType.PLAYER) {
 		  Player p = (Player)e.getEntity();
-		  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+		  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 		  int slot=0;
 		  for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
 			  if (this.plugin.SPEED_CONTROL.get(i).p.getName().equals(p.getName())) {
@@ -6050,25 +5921,39 @@ public ItemStack getGoodie() {
 				  break;
 			  }
 		  }
-		  ////Bukkit.getLogger().info("Made it through 2.");
+		  List<Integer>blocks = new ArrayList<Integer>(); //Corresponds to helmet, chestplate, leggings, and boots.
 		  //Found the slot. Check armor values.
 		  double block_chance=0,speed_boost_chance=0;
 		  if (p.getEquipment().getBoots()!=null) {
 			  ItemStack item = p.getEquipment().getBoots();
+			  if (this.plugin.isBroken(item)) {
+				  //Add it either to our inventory, or drop on the ground.
+				  if (this.plugin.inventoryFull(p)) {
+					  //Drop it on the ground.
+					  p.sendMessage(ChatColor.LIGHT_PURPLE+"Dropped "+item.getItemMeta().getDisplayName()+ChatColor.LIGHT_PURPLE+" on the ground since there is no room in your inventory.");
+					  p.getWorld().dropItemNaturally(p.getLocation(), item);
+				  } else {
+					  p.getInventory().addItem(item);
+				  }
+				  
+				  //Remove it from the slot.
+				  p.getEquipment().setBoots(new ItemStack(Material.AIR));
+			  } else
 			  if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
 				  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Block Chance")) {
 						  if (block_chance==0) {
 							  block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 						  } else {
-							  block_chance+=block_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+							  block_chance+=(75-block_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
 						  }
+						  blocks.add(3);
 					  }
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Speed Boost Chance")) {
 						  if (speed_boost_chance==0) {
 							  speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 						  } else {
-							  speed_boost_chance+=speed_boost_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
+							  speed_boost_chance+=(100-speed_boost_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
 						  }
 					  }
 				  }
@@ -6089,7 +5974,7 @@ public ItemStack getGoodie() {
 					  //Bukkit.getLogger().info("Made it through 2.1.4.");
 					  double extradurability=0;
 					  //See if we can increase the chances of keeping this item's durability.
-					  if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
+					  if (!this.plugin.isBroken(item) && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
 						  //Bukkit.getLogger().info("Made it through 2.1.5.");
 						  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 							  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Durability")) {
@@ -6102,7 +5987,7 @@ public ItemStack getGoodie() {
 						  }
 						  //Bukkit.getLogger().info("Made it through 2.1.6.");
 					  }
-					  if (Math.random()<=0.76+extradurability) {
+					  if (extradurability>0 && Math.random()<=0.76+extradurability) {
 						  item.setDurability((short)(item.getDurability()-1));
 						  ////Bukkit.getLogger().info("Armor durability now "+item.getDurability());
 					  }
@@ -6118,20 +6003,34 @@ public ItemStack getGoodie() {
 		  //Bukkit.getLogger().info("Made it through 2.1.");
 		  if (p.getEquipment().getChestplate()!=null) {
 			  ItemStack item = p.getEquipment().getChestplate();
+			  if (this.plugin.isBroken(item)) {
+				  //Add it either to our inventory, or drop on the ground.
+				  if (this.plugin.inventoryFull(p)) {
+					  //Drop it on the ground.
+					  p.sendMessage(ChatColor.LIGHT_PURPLE+"Dropped "+item.getItemMeta().getDisplayName()+ChatColor.LIGHT_PURPLE+" on the ground since there is no room in your inventory.");
+					  p.getWorld().dropItemNaturally(p.getLocation(), item);
+				  } else {
+					  p.getInventory().addItem(item);
+				  }
+				  
+				  //Remove it from the slot.
+				  p.getEquipment().setChestplate(new ItemStack(Material.AIR));
+			  } else
 			  if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
 				  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Block Chance")) {
 						  if (block_chance==0) {
 							  block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 						  } else {
-							  block_chance+=block_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+							  block_chance+=(75-block_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
 						  }
+						  blocks.add(1);
 					  }
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Speed Boost Chance")) {
 						  if (speed_boost_chance==0) {
 							  speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 						  } else {
-							  speed_boost_chance+=speed_boost_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
+							  speed_boost_chance+=(100-speed_boost_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
 						  }
 					  }
 				  }
@@ -6148,7 +6047,7 @@ public ItemStack getGoodie() {
 				  if (this.plugin.SPEED_CONTROL.get(slot).chestplate_durability<item.getDurability()) {
 					  double extradurability=0;
 					  //See if we can increase the chances of keeping this item's durability.
-					  if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
+					  if (!this.plugin.isBroken(item) && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
 						  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 							  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Durability")) {
 								  if (this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))>100) {
@@ -6159,7 +6058,7 @@ public ItemStack getGoodie() {
 							  }
 						  }	
 					  }
-					  if (Math.random()<=0.76+extradurability) {
+					  if (extradurability>0 && Math.random()<=0.76+extradurability) {
 						  item.setDurability((short)(item.getDurability()-1));
 						  ////Bukkit.getLogger().info("Armor durability now "+item.getDurability());
 					  }
@@ -6172,20 +6071,34 @@ public ItemStack getGoodie() {
 		  //Bukkit.getLogger().info("Made it through 2.2.");
 		  if (p.getEquipment().getLeggings()!=null) {
 			  ItemStack item = p.getEquipment().getLeggings();
+			  if (this.plugin.isBroken(item)) {
+				  //Add it either to our inventory, or drop on the ground.
+				  if (this.plugin.inventoryFull(p)) {
+					  //Drop it on the ground.
+					  p.sendMessage(ChatColor.LIGHT_PURPLE+"Dropped "+item.getItemMeta().getDisplayName()+ChatColor.LIGHT_PURPLE+" on the ground since there is no room in your inventory.");
+					  p.getWorld().dropItemNaturally(p.getLocation(), item);
+				  } else {
+					  p.getInventory().addItem(item);
+				  }
+				  
+				  //Remove it from the slot.
+				  p.getEquipment().setLeggings(new ItemStack(Material.AIR));
+			  } else
 			  if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
 				  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Block Chance")) {
 						  if (block_chance==0) {
 							  block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 						  } else {
-							  block_chance+=block_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+							  block_chance+=(75-block_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
 						  }
+						  blocks.add(2);
 					  }
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Speed Boost Chance")) {
 						  if (speed_boost_chance==0) {
 							  speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 						  } else {
-							  speed_boost_chance+=speed_boost_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
+							  speed_boost_chance+=(100-speed_boost_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
 						  }
 					  }
 				  }
@@ -6202,7 +6115,7 @@ public ItemStack getGoodie() {
 				  if (this.plugin.SPEED_CONTROL.get(slot).leggings_durability<item.getDurability()) {
 					  double extradurability=0;
 					  //See if we can increase the chances of keeping this item's durability.
-					  if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
+					  if (!this.plugin.isBroken(item) && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
 						  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 							  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Durability")) {
 								  if (this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))>100) {
@@ -6213,7 +6126,7 @@ public ItemStack getGoodie() {
 							  }
 						  }
 					  }
-					  if (Math.random()<=0.76+extradurability) {
+					  if (extradurability>0 && Math.random()<=0.76+extradurability) {
 						  item.setDurability((short)(item.getDurability()-1));
 						  ////Bukkit.getLogger().info("Armor durability now "+item.getDurability());
 					  }
@@ -6226,20 +6139,34 @@ public ItemStack getGoodie() {
 		  //Bukkit.getLogger().info("Made it through 2.3");
 		  if (p.getEquipment().getHelmet()!=null) {
 			  ItemStack item = p.getEquipment().getHelmet();
+			  if (this.plugin.isBroken(item)) {
+				  //Add it either to our inventory, or drop on the ground.
+				  if (this.plugin.inventoryFull(p)) {
+					  //Drop it on the ground.
+					  p.sendMessage(ChatColor.LIGHT_PURPLE+"Dropped "+item.getItemMeta().getDisplayName()+ChatColor.LIGHT_PURPLE+" on the ground since there is no room in your inventory.");
+					  p.getWorld().dropItemNaturally(p.getLocation(), item);
+				  } else {
+					  p.getInventory().addItem(item);
+				  }
+				  
+				  //Remove it from the slot.
+				  p.getEquipment().setHelmet(new ItemStack(Material.AIR));
+			  } else
 			  if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
 				  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Block Chance")) {
 						  if (block_chance==0) {
 							  block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 						  } else {
-							  block_chance+=block_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+							  block_chance+=(75-block_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
 						  }
+						  blocks.add(0);
 					  }
 					  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Speed Boost Chance")) {
 						  if (speed_boost_chance==0) {
 							  speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 						  } else {
-							  speed_boost_chance+=speed_boost_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
+							  speed_boost_chance+=(100-speed_boost_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
 						  }
 					  }
 				  }
@@ -6256,7 +6183,7 @@ public ItemStack getGoodie() {
 				  if (this.plugin.SPEED_CONTROL.get(slot).helmet_durability<item.getDurability()) {
 					  double extradurability=0;
 					  //See if we can increase the chances of keeping this item's durability.
-					  if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
+					  if (!this.plugin.isBroken(item) && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
 						  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 							  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Durability")) {
 								  if (this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))>100) {
@@ -6267,7 +6194,7 @@ public ItemStack getGoodie() {
 							  }
 						  }
 					  }
-					  if (Math.random()<=0.76+extradurability) {
+					  if (extradurability>0 && Math.random()<=0.76+extradurability) {
 						  item.setDurability((short)(item.getDurability()-1));
 						  ////Bukkit.getLogger().info("Armor durability now "+item.getDurability());
 					  }
@@ -6280,7 +6207,7 @@ public ItemStack getGoodie() {
 		  //Bukkit.getLogger().info("Made it through 3.");
 		  //This is the player getting hit.
 			for (int i=0;i<p.getEquipment().getArmorContents().length;i++) {
-				if (p.getEquipment().getArmorContents()[i]!=null && p.getEquipment().getArmorContents()[i].getItemMeta()!=null && p.getEquipment().getArmorContents()[i].getItemMeta().getLore()!=null) {
+				if (p.getEquipment().getArmorContents()[i]!=null && !this.plugin.isBroken(p.getEquipment().getArmorContents()[i]) && p.getEquipment().getArmorContents()[i].getItemMeta()!=null && p.getEquipment().getArmorContents()[i].getItemMeta().getLore()!=null) {
 					for (int j=0;j<p.getEquipment().getArmorContents()[i].getItemMeta().getLore().size();j++) {
 						if (this.plugin.containsEnchantment(p.getEquipment().getArmorContents()[i].getItemMeta().getLore().get(j), "Damage Reduction")) {
 							e.setDamage(e.getDamage()*(1-(this.plugin.getEnchantmentNumb(p.getEquipment().getArmorContents()[i].getItemMeta().getLore().get(j))/100.0d)));
@@ -6308,6 +6235,22 @@ public ItemStack getGoodie() {
 			}
 			if (Math.random()<=block_chance/100.0d) {
 				e.setDamage(0);
+				//Choose a random set to mark off.
+				int armor = blocks.get((int)(Math.random()*blocks.size()));
+				switch (armor) {
+					case 0:{
+						p.getInventory().getHelmet().setDurability((short)(p.getInventory().getHelmet().getDurability()+1));
+					}break;
+					case 1:{
+						p.getInventory().getChestplate().setDurability((short)(p.getInventory().getChestplate().getDurability()+1));
+					}break;
+					case 2:{
+						p.getInventory().getLeggings().setDurability((short)(p.getInventory().getLeggings().getDurability()+1));
+					}break;
+					case 3:{
+						p.getInventory().getBoots().setDurability((short)(p.getInventory().getBoots().getDurability()+1));
+					}break;
+				}
 				e.setCancelled(true);
 			}
 			  //Bukkit.getLogger().info("Made it through 4.");
@@ -6386,7 +6329,7 @@ public ItemStack getGoodie() {
 	  if (e.getEntity().getType()==EntityType.PLAYER && e.getDamager().getType()==EntityType.ZOMBIE) {
 		  LivingEntity enemy = (LivingEntity)e.getDamager();
 		  Player p = (Player)e.getEntity();
-		  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+		  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 		  double throughdmg=0;
 		  double maxdmg=0;
 		  if (enemy.getCustomName()!=null && (enemy.getCustomName().compareTo(ChatColor.YELLOW+"Charge Zombie")==0 || enemy.getCustomName().compareTo(ChatColor.DARK_PURPLE+"Charge Zombie III")==0)) {
@@ -6505,9 +6448,8 @@ public ItemStack getGoodie() {
 				  if (p.getItemInHand().hasItemMeta() && p.getItemInHand().getItemMeta().getDisplayName()!=null && p.getItemInHand().getItemMeta().getDisplayName().contains(ChatColor.DARK_GRAY+"[BROKEN]")) {
 					  e.setDamage(0);
 					  e.setCancelled(true);
-					  return;
 				  }
-				  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+				  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 				  //p.sendMessage("No Damage Ticks: "+f.getNoDamageTicks());
 				  ItemStack item = p.getItemInHand();
 				  double critical_chance=0,armor_pen=0,life_steal=0,attack_speed=0,dmg=0;
@@ -6517,7 +6459,7 @@ public ItemStack getGoodie() {
 							  if (critical_chance==0) {
 								  critical_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 							  } else {
-								  critical_chance+=critical_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+								  critical_chance+=(100-critical_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
 							  }
 						  }
 						  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Armor Penetration")) {
@@ -6527,14 +6469,14 @@ public ItemStack getGoodie() {
 							  if (life_steal==0) {
 								  life_steal+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 							  } else {
-								  life_steal+=life_steal*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+								  life_steal+=(100-life_steal)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
 							  }
 						  }
 						  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Attack Speed")) {
 							  if (attack_speed==0) {
 								  attack_speed+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 							  } else {
-								  attack_speed+=attack_speed*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+								  attack_speed+=(100-attack_speed)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
 							  }
 						  }
 						  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Damage")) {
@@ -6590,7 +6532,7 @@ public ItemStack getGoodie() {
 					  }
 				  }
 				  if (attack_speed>0) {
-					  f.setNoDamageTicks(f.getNoDamageTicks()-(int)(f.getNoDamageTicks()*(attack_speed/100.0d)));
+					  f.setNoDamageTicks(f.getNoDamageTicks()-(int)(f.getNoDamageTicks()*(attack_speed/100.0d/4)));
 				  }
 				  if (dmg>0) {
 					  e.setDamage(e.getDamage()+dmg);
@@ -6671,7 +6613,7 @@ public ItemStack getGoodie() {
 			  } else {
 				  if (((Projectile)e.getDamager()).getShooter()!=null && ((Projectile)e.getDamager()).getShooter().getType()==EntityType.PLAYER) {
 					  Player p = (Player)((Projectile)e.getDamager()).getShooter();
-					  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+					  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 					  ItemStack item = p.getItemInHand();
 					  double critical_chance=0,armor_pen=0,life_steal=0,attack_speed=0,dmg=0;
 					  if (item.getType()==Material.BOW && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) { //Make sure we are using a ranged weapon.
@@ -6680,7 +6622,7 @@ public ItemStack getGoodie() {
 								  if (critical_chance==0) {
 									  critical_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 								  } else {
-									  critical_chance+=critical_chance*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+									  critical_chance+=(100-critical_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
 								  }
 							  }
 							  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Armor Penetration")) {
@@ -6690,14 +6632,14 @@ public ItemStack getGoodie() {
 								  if (life_steal==0) {
 									  life_steal+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 								  } else {
-									  life_steal+=life_steal*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+									  life_steal+=(100-life_steal)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
 								  }
 							  }
 							  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Attack Speed")) {
 								  if (attack_speed==0) {
 									  attack_speed+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 								  } else {
-									  attack_speed+=attack_speed*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
+									  attack_speed+=(100-attack_speed)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
 								  }
 							  }
 							  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Damage")) {
@@ -6753,7 +6695,7 @@ public ItemStack getGoodie() {
 						  }
 					  }
 					  if (attack_speed>0) {
-						  f.setNoDamageTicks(f.getNoDamageTicks()-(int)(f.getNoDamageTicks()*(attack_speed/100.0d)));
+						  f.setNoDamageTicks(f.getNoDamageTicks()-(int)(f.getNoDamageTicks()*(attack_speed/100.0d/4)));
 					  }
 					  if (dmg>0) {
 						  e.setDamage(e.getDamage()+dmg);
@@ -6854,7 +6796,7 @@ public ItemStack getGoodie() {
 		  }
 		  if (f.getKiller()!=null && f.getKiller().getType()==EntityType.PLAYER) {
 			  Player p = f.getKiller();
-			  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+			  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 			  //p.sendMessage(f.getType()+" is mad at you.");
 			  //if (p.getName().equalsIgnoreCase("sigonasr2")) {p.sendMessage("You are the killer of "+f.getCustomName()+".");}
 			  if (this.plugin.PlayerinJob(p, "Hunter")) {
@@ -7499,8 +7441,8 @@ public ItemStack getGoodie() {
 
   @EventHandler
   public void onItemBreak(PlayerItemBreakEvent e) {
-	  Player p = e.getPlayer();
-	  ItemStack i = e.getBrokenItem();
+	  final Player p = e.getPlayer();
+	  final ItemStack i = e.getBrokenItem();
 	  if (i.getItemMeta()!=null && i.getItemMeta().hasDisplayName() && i.getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
 		  i.setDurability((short)0);
 		  p.getInventory().addItem(i);
@@ -7511,21 +7453,23 @@ public ItemStack getGoodie() {
 		  for (int j=0;j<i.getItemMeta().getLore().size();j++) {
 			  if (i.getItemMeta().getLore().get(j).contains(ChatColor.YELLOW+"[Halloween]")) {
 				  is_halloween=true;
+				  //p.sendMessage("Is a halloween item.");
 			  }
 			  finallore.add(i.getItemMeta().getLore().get(j));
 		  }
 		  if (is_halloween) {
-			  e.getBrokenItem().setType(Material.SULPHUR);
-			  
-			  ItemMeta meta = e.getBrokenItem().getItemMeta();
+			  i.setDurability((short)0);
+			  i.setType(Material.SULPHUR);
+			  i.setAmount(1);
+			  ItemMeta meta = i.getItemMeta();
 			  meta.setDisplayName(ChatColor.DARK_GRAY+"[BROKEN] "+meta.getDisplayName());
 			  finallore.add("");
-			  finallore.add("Will be repaired @"+(Bukkit.getWorld("world").getFullTime()+12096000));
+			  finallore.add("Will be repaired @ "+(Bukkit.getWorld("world").getFullTime()+12096000));
 			  meta.setLore(finallore);
-			  e.getBrokenItem().setItemMeta(meta);
-			  p.getInventory().addItem(e.getBrokenItem());
+			  //p.sendMessage("Meta is set.");
+			  i.setItemMeta(meta);
+			  p.updateInventory();
 		  }
-		  return;
 	  }
   }
   
@@ -7908,212 +7852,212 @@ public ItemStack getGoodie() {
 		return space;
 	}
 	
-  public void giveLegendaryItem(Player p) {
-	  String prefix = "";
-	  String suffix = "";
-	  int type=(int)(Math.random()*6);
-	  //int type=5; //TESTING.
-	  List<String> enchants1 = new ArrayList<String>();
-	  List<String> enchants2 = new ArrayList<String>();
-	  ItemStack finalitem = null;
-	  if (type==0) {
-		  finalitem=new ItemStack(Material.DIAMOND_HELMET);
-		  enchants1.add("Protective");
-		  enchants1.add("Fire-Proof");
-		  enchants1.add("Blast Resistant");
-		  enchants1.add("Untouchable");
-		  enchants1.add("Breathing");
-		  enchants1.add("Working");
-		  enchants1.add("Unbreaking");
-		  enchants1.add("Thorny");
-		  enchants2.add("Life");
-		  enchants2.add("Resistance");
-		  enchants2.add("Durability");
-		  enchants2.add("Protection");
-	  }
-	  if (type==1) {
-		  finalitem=new ItemStack(Material.DIAMOND_CHESTPLATE);
-		  enchants1.add("Protective");
-		  enchants1.add("Fire-Proof");
-		  enchants1.add("Blast Resistant");
-		  enchants1.add("Untouchable");
-		  enchants1.add("Unbreaking");
-		  enchants1.add("Thorny");
-		  enchants2.add("Life");
-		  enchants2.add("Resistance");
-		  enchants2.add("Durability");
-		  enchants2.add("Protection");
-	  }
-	  if (type==2) {
-		  finalitem=new ItemStack(Material.DIAMOND_LEGGINGS);
-		  enchants1.add("Protective");
-		  enchants1.add("Fire-Proof");
-		  enchants1.add("Blast Resistant");
-		  enchants1.add("Untouchable");
-		  enchants1.add("Unbreaking");
-		  enchants1.add("Thorny");
-		  enchants2.add("Life");
-		  enchants2.add("Resistance");
-		  enchants2.add("Durability");
-		  enchants2.add("Protection");
-	  }
-	  if (type==3) {
-		  finalitem=new ItemStack(Material.DIAMOND_BOOTS);
-		  enchants1.add("Protective");
-		  enchants1.add("Fire-Proof");
-		  enchants1.add("Blast Resistant");
-		  enchants1.add("Untouchable");
-		  enchants1.add("Lightweight");
-		  enchants1.add("Unbreaking");
-		  enchants1.add("Thorny");
-		  enchants2.add("Life");
-		  enchants2.add("Resistance");
-		  enchants2.add("Durability");
-		  enchants2.add("Protection");
-	  }
-	  if (type==4) {
-		  finalitem=new ItemStack(Material.BOW);
-		  enchants1.add("Power");
-		  enchants1.add("Punch");
-		  enchants1.add("Flaming");
-		  enchants1.add("Infinite");
-		  enchants1.add("Unbreaking");
-		  enchants2.add("Smiting");
-		  enchants2.add("Penetration");
-		  enchants2.add("Draining");
-		  enchants2.add("Fury");
-		  enchants2.add("Power");
-	  }
-	  if (type==5) {
-		  finalitem=new ItemStack(Material.DIAMOND_SWORD);
-		  enchants1.add("Damaging");
-		  enchants1.add("Knockback");
-		  enchants1.add("Undead");
-		  enchants1.add("Baning");
-		  enchants1.add("Fiery");
-		  enchants1.add("Greedy");
-		  enchants1.add("Unbreaking");
-		  enchants2.add("Smiting");
-		  enchants2.add("Penetration");
-		  enchants2.add("Draining");
-		  enchants2.add("Fury");
-		  enchants2.add("Power");
-	  }
-	  prefix = enchants1.get((int)(Math.random()*enchants1.size()));
-	  suffix = enchants2.get((int)(Math.random()*enchants2.size()));
-	  if (prefix.equalsIgnoreCase("Protective")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Fire-Proof")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Blast Resistant")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Untouchable")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Breathing")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.OXYGEN, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Working")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.WATER_WORKER, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Unbreaking")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Thorny")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.THORNS, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Untouchable")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Lightweight")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Power")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Damaging")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Knockback")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.KNOCKBACK, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Punch")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Flaming")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Infinite")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Undead")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.DAMAGE_UNDEAD, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Baning")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.DAMAGE_ARTHROPODS, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Fiery")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 10);
-	  }
-	  if (prefix.equalsIgnoreCase("Greedy")) {
-		  finalitem.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 10);
-	  }
-	  ItemMeta meta = finalitem.getItemMeta();
-	  meta.setDisplayName(ChatColor.GOLD+""+ChatColor.BOLD+prefix+" "+convertToItemName(finalitem.getType().name())+" of "+suffix);
-	  List<String> setLore = new ArrayList<String>();
-	  if (suffix.equalsIgnoreCase("Life")) {
-		  setLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+10)+" "+ChatColor.BLUE+"Health");
-	  }
-	  if (suffix.equalsIgnoreCase("Resistance")) {
-		  setLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*70)+20)+"% "+ChatColor.BLUE+"Damage Reduction");
-	  }
-	  if (suffix.equalsIgnoreCase("Durability")) {
-		  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*200)+50)*10)+"% "+ChatColor.BLUE+"Durability");
-	  }
-	  if (suffix.equalsIgnoreCase("Protection")) {
-		  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+10))+"% "+ChatColor.BLUE+"Block Chance");
-	  }
-	  if (suffix.equalsIgnoreCase("Smiting")) {
-		  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+10))+"% "+ChatColor.BLUE+"Critical Chance");
-	  }
-	  if (suffix.equalsIgnoreCase("Penetration")) {
-		  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*20)+5))+" "+ChatColor.BLUE+"Armor Penetration");
-	  }
-	  if (suffix.equalsIgnoreCase("Draining")) {
-		  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*30)+20))+"% "+ChatColor.BLUE+"Life Steal");
-	  }
-	  if (suffix.equalsIgnoreCase("Fury")) {
-		  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+10))+"% "+ChatColor.BLUE+"Attack Speed");
-	  }
-	  if (suffix.equalsIgnoreCase("Power")) {
-		  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*10)+5))+" "+ChatColor.BLUE+"Damage");
-	  }
-	  setLore.add("");
-	  setLore.add(ChatColor.YELLOW+"[Halloween]");
-	  setLore.add("This item was created during the Halloween");
-	  setLore.add("event. When this item breaks, it simply turns");
-	  setLore.add("into a \"broken\" state and has a recharge time");
-	  setLore.add("of 1 week. The item will be fully restored after");
-	  setLore.add("a week of cooldown.");
-	  meta.setLore(setLore);
-	  finalitem.setItemMeta(meta);
-	  //finalitem.setDurability((short)1560); //TESTING.
-	  boolean full=true;
-	  for (int i=0;i<p.getInventory().getContents().length;i++) {
-		  if (p.getInventory().getContents()[i]==null) {
-			  full=false;
-			  break;
+	  public void giveLegendaryItem(Player p) {
+		  String prefix = "";
+		  String suffix = "";
+		  int type=(int)(Math.random()*6);
+		  //int type=5; //TESTING.
+		  List<String> enchants1 = new ArrayList<String>();
+		  List<String> enchants2 = new ArrayList<String>();
+		  ItemStack finalitem = null;
+		  if (type==0) {
+			  finalitem=new ItemStack(Material.DIAMOND_HELMET);
+			  enchants1.add("Protective");
+			  enchants1.add("Fire-Proof");
+			  enchants1.add("Blast Resistant");
+			  enchants1.add("Untouchable");
+			  enchants1.add("Breathing");
+			  enchants1.add("Working");
+			  enchants1.add("Unbreaking");
+			  enchants1.add("Thorny");
+			  enchants2.add("Life");
+			  enchants2.add("Resistance");
+			  enchants2.add("Durability");
+			  enchants2.add("Protection");
+		  }
+		  if (type==1) {
+			  finalitem=new ItemStack(Material.DIAMOND_CHESTPLATE);
+			  enchants1.add("Protective");
+			  enchants1.add("Fire-Proof");
+			  enchants1.add("Blast Resistant");
+			  enchants1.add("Untouchable");
+			  enchants1.add("Unbreaking");
+			  enchants1.add("Thorny");
+			  enchants2.add("Life");
+			  enchants2.add("Resistance");
+			  enchants2.add("Durability");
+			  enchants2.add("Protection");
+		  }
+		  if (type==2) {
+			  finalitem=new ItemStack(Material.DIAMOND_LEGGINGS);
+			  enchants1.add("Protective");
+			  enchants1.add("Fire-Proof");
+			  enchants1.add("Blast Resistant");
+			  enchants1.add("Untouchable");
+			  enchants1.add("Unbreaking");
+			  enchants1.add("Thorny");
+			  enchants2.add("Life");
+			  enchants2.add("Resistance");
+			  enchants2.add("Durability");
+			  enchants2.add("Protection");
+		  }
+		  if (type==3) {
+			  finalitem=new ItemStack(Material.DIAMOND_BOOTS);
+			  enchants1.add("Protective");
+			  enchants1.add("Fire-Proof");
+			  enchants1.add("Blast Resistant");
+			  enchants1.add("Untouchable");
+			  enchants1.add("Lightweight");
+			  enchants1.add("Unbreaking");
+			  enchants1.add("Thorny");
+			  enchants2.add("Life");
+			  enchants2.add("Resistance");
+			  enchants2.add("Durability");
+			  enchants2.add("Protection");
+		  }
+		  if (type==4) {
+			  finalitem=new ItemStack(Material.BOW);
+			  enchants1.add("Power");
+			  enchants1.add("Punch");
+			  enchants1.add("Flaming");
+			  enchants1.add("Infinite");
+			  enchants1.add("Unbreaking");
+			  enchants2.add("Smiting");
+			  enchants2.add("Penetration");
+			  enchants2.add("Draining");
+			  enchants2.add("Fury");
+			  enchants2.add("Power");
+		  }
+		  if (type==5) {
+			  finalitem=new ItemStack(Material.DIAMOND_SWORD);
+			  enchants1.add("Damaging");
+			  enchants1.add("Knockback");
+			  enchants1.add("Undead");
+			  enchants1.add("Baning");
+			  enchants1.add("Fiery");
+			  enchants1.add("Greedy");
+			  enchants1.add("Unbreaking");
+			  enchants2.add("Smiting");
+			  enchants2.add("Penetration");
+			  enchants2.add("Draining");
+			  enchants2.add("Fury");
+			  enchants2.add("Power");
+		  }
+		  prefix = enchants1.get((int)(Math.random()*enchants1.size()));
+		  suffix = enchants2.get((int)(Math.random()*enchants2.size()));
+		  if (prefix.equalsIgnoreCase("Protective")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Fire-Proof")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Blast Resistant")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Untouchable")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Breathing")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.OXYGEN, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Working")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.WATER_WORKER, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Unbreaking")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Thorny")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.THORNS, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Untouchable")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Lightweight")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Power")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Damaging")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Knockback")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.KNOCKBACK, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Punch")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Flaming")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Infinite")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Undead")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.DAMAGE_UNDEAD, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Baning")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.DAMAGE_ARTHROPODS, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Fiery")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 10);
+		  }
+		  if (prefix.equalsIgnoreCase("Greedy")) {
+			  finalitem.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 10);
+		  }
+		  ItemMeta meta = finalitem.getItemMeta();
+		  meta.setDisplayName(ChatColor.GOLD+""+ChatColor.BOLD+prefix+" "+convertToItemName(finalitem.getType().name())+" of "+suffix);
+		  List<String> setLore = new ArrayList<String>();
+		  if (suffix.equalsIgnoreCase("Life")) {
+			  setLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+10)+" "+ChatColor.BLUE+"Health");
+		  }
+		  if (suffix.equalsIgnoreCase("Resistance")) {
+			  setLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*70)+20)+"% "+ChatColor.BLUE+"Damage Reduction");
+		  }
+		  if (suffix.equalsIgnoreCase("Durability")) {
+			  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*200)+50)*10)+"% "+ChatColor.BLUE+"Durability");
+		  }
+		  if (suffix.equalsIgnoreCase("Protection")) {
+			  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+10))+"% "+ChatColor.BLUE+"Block Chance");
+		  }
+		  if (suffix.equalsIgnoreCase("Smiting")) {
+			  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+10))+"% "+ChatColor.BLUE+"Critical Chance");
+		  }
+		  if (suffix.equalsIgnoreCase("Penetration")) {
+			  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*20)+5))+" "+ChatColor.BLUE+"Armor Penetration");
+		  }
+		  if (suffix.equalsIgnoreCase("Draining")) {
+			  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*30)+20))+"% "+ChatColor.BLUE+"Life Steal");
+		  }
+		  if (suffix.equalsIgnoreCase("Fury")) {
+			  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+10))+"% "+ChatColor.BLUE+"Attack Speed");
+		  }
+		  if (suffix.equalsIgnoreCase("Power")) {
+			  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*10)+5))+" "+ChatColor.BLUE+"Damage");
+		  }
+		  setLore.add("");
+		  setLore.add(ChatColor.YELLOW+"[Halloween]");
+		  setLore.add("This item was created during the Halloween");
+		  setLore.add("event. When this item breaks, it simply turns");
+		  setLore.add("into a \"broken\" state and has a recharge time");
+		  setLore.add("of 1 week. The item will be fully restored after");
+		  setLore.add("a week of cooldown.");
+		  meta.setLore(setLore);
+		  finalitem.setItemMeta(meta);
+		  //finalitem.setDurability((short)1560); //TESTING.
+		  boolean full=true;
+		  for (int i=0;i<p.getInventory().getContents().length;i++) {
+			  if (p.getInventory().getContents()[i]==null) {
+				  full=false;
+				  break;
+			  }
+		  }
+		  if (!full) {
+			  p.getInventory().addItem(finalitem);
+		  } else {
+			  p.getWorld().dropItemNaturally(p.getLocation(), finalitem); //Drop item on the ground if our inventory is full. That way we don't lose it.
 		  }
 	  }
-	  if (!full) {
-		  p.getInventory().addItem(finalitem);
-	  } else {
-		  p.getWorld().dropItemNaturally(p.getLocation(), finalitem); //Drop item on the ground if our inventory is full. That way we don't lose it.
-	  }
-  }
   
   @EventHandler
   public void onInventoryClickEvent(InventoryClickEvent event) {
@@ -8124,6 +8068,31 @@ public ItemStack getGoodie() {
 	  }
 	  if (p.hasPermission("group.administrators")) {
 		  p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.DARK_PURPLE+"");
+	  }
+	  if (event.getSlot() != -999) {
+		  ItemStack item = event.getCurrentItem();
+	      if (event.getInventory().getType() == InventoryType.ANVIL)
+	      {
+	          if (item != null && item.hasItemMeta()) {
+	            String tempname = "";
+	
+	            if (item.getItemMeta()
+	              .hasDisplayName()) {
+	              tempname = item.getItemMeta()
+	                .getDisplayName();
+	            }
+	
+	            if (!tempname.equals(event
+	                    .getInventory().getItem(0)
+	                    .getItemMeta()
+	                    .getDisplayName()) && event
+	                    .getInventory().getItem(0)
+	                    .getItemMeta()
+	                    .getDisplayName().contains("§")) {
+	              item.setItemMeta(event.getInventory().getItem(0).getItemMeta());
+	            }
+	          }
+		  }
 	  }
 	  if (event.getCursor()!=null) {
 		  //Regardless of the inventory, if we try to put it inside a chest, got to try to insert it in there.
@@ -8863,7 +8832,7 @@ public ItemStack getGoodie() {
 	
 	
 	public ItemStack EnchantItem(ItemStack item,int lv, Player p) {
-		return this.plugin.EnchantItem(item, lv, p);
+		return this.plugin.EnchantItem(item, lv, p, true);
 	}
 	 
 	// HACK! The API doesn't allow us to easily determine the resulting number of
@@ -9900,7 +9869,7 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
 	  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
       @Override
       public void run() {
-    	  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+    	  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
       }
   	},20);
   }

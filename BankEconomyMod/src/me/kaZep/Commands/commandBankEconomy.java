@@ -84,6 +84,244 @@ public class commandBankEconomy
   {
     this.plugin = plugin;
   }
+  
+
+public String convertToItemName(String val) {
+	val=val.replace('_', ' ');
+	char[] mod = val.toCharArray();
+	  boolean first=false;
+	  for (int i=0;i<mod.length;i++) {
+		  if (!first) {
+			  if (mod[i]>='a'&&mod[i]<='z') {
+				  mod[i]-=32;
+				  first=true;
+			  } else 
+				  if (i==0) {
+					  if (mod[i]>='A'&&mod[i]<='Z') {
+						  first=true;
+					  }
+				  } else {
+					  if (mod[i]>='A'&&mod[i]<='Z'&&(mod[i-1]<'A'||mod[i-1]>'Z')) {
+						  first=true;
+					  }
+				  }
+		  } else {
+			  if (mod[i-1]!=' ') {
+				  if (mod[i]>='A'&&mod[i]<='Z') {
+					  mod[i]+=32;
+				  }
+			  }
+		  }
+	  }
+	  return String.valueOf(mod);
+}
+  
+  public void giveLegendaryItem(Player p) {
+	  String prefix = "";
+	  String suffix = "";
+	  int type=(int)(Math.random()*6);
+	  //int type=5; //TESTING.
+	  List<String> enchants1 = new ArrayList<String>();
+	  List<String> enchants2 = new ArrayList<String>();
+	  ItemStack finalitem = null;
+	  if (type==0) {
+		  finalitem=new ItemStack(Material.DIAMOND_HELMET);
+		  enchants1.add("Protective");
+		  enchants1.add("Fire-Proof");
+		  enchants1.add("Blast Resistant");
+		  enchants1.add("Untouchable");
+		  enchants1.add("Breathing");
+		  enchants1.add("Working");
+		  enchants1.add("Unbreaking");
+		  enchants1.add("Thorny");
+		  enchants2.add("Life");
+		  enchants2.add("Resistance");
+		  enchants2.add("Durability");
+		  enchants2.add("Protection");
+	  }
+	  if (type==1) {
+		  finalitem=new ItemStack(Material.DIAMOND_CHESTPLATE);
+		  enchants1.add("Protective");
+		  enchants1.add("Fire-Proof");
+		  enchants1.add("Blast Resistant");
+		  enchants1.add("Untouchable");
+		  enchants1.add("Unbreaking");
+		  enchants1.add("Thorny");
+		  enchants2.add("Life");
+		  enchants2.add("Resistance");
+		  enchants2.add("Durability");
+		  enchants2.add("Protection");
+	  }
+	  if (type==2) {
+		  finalitem=new ItemStack(Material.DIAMOND_LEGGINGS);
+		  enchants1.add("Protective");
+		  enchants1.add("Fire-Proof");
+		  enchants1.add("Blast Resistant");
+		  enchants1.add("Untouchable");
+		  enchants1.add("Unbreaking");
+		  enchants1.add("Thorny");
+		  enchants2.add("Life");
+		  enchants2.add("Resistance");
+		  enchants2.add("Durability");
+		  enchants2.add("Protection");
+	  }
+	  if (type==3) {
+		  finalitem=new ItemStack(Material.DIAMOND_BOOTS);
+		  enchants1.add("Protective");
+		  enchants1.add("Fire-Proof");
+		  enchants1.add("Blast Resistant");
+		  enchants1.add("Untouchable");
+		  enchants1.add("Lightweight");
+		  enchants1.add("Unbreaking");
+		  enchants1.add("Thorny");
+		  enchants2.add("Life");
+		  enchants2.add("Resistance");
+		  enchants2.add("Durability");
+		  enchants2.add("Protection");
+	  }
+	  if (type==4) {
+		  finalitem=new ItemStack(Material.BOW);
+		  enchants1.add("Power");
+		  enchants1.add("Punch");
+		  enchants1.add("Flaming");
+		  enchants1.add("Infinite");
+		  enchants1.add("Unbreaking");
+		  enchants2.add("Smiting");
+		  enchants2.add("Penetration");
+		  enchants2.add("Draining");
+		  enchants2.add("Fury");
+		  enchants2.add("Power");
+	  }
+	  if (type==5) {
+		  finalitem=new ItemStack(Material.DIAMOND_SWORD);
+		  enchants1.add("Damaging");
+		  enchants1.add("Knockback");
+		  enchants1.add("Undead");
+		  enchants1.add("Baning");
+		  enchants1.add("Fiery");
+		  enchants1.add("Greedy");
+		  enchants1.add("Unbreaking");
+		  enchants2.add("Smiting");
+		  enchants2.add("Penetration");
+		  enchants2.add("Draining");
+		  enchants2.add("Fury");
+		  enchants2.add("Power");
+	  }
+	  prefix = enchants1.get((int)(Math.random()*enchants1.size()));
+	  suffix = enchants2.get((int)(Math.random()*enchants2.size()));
+	  if (prefix.equalsIgnoreCase("Protective")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Fire-Proof")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Blast Resistant")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Untouchable")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Breathing")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.OXYGEN, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Working")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.WATER_WORKER, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Unbreaking")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Thorny")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.THORNS, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Untouchable")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Lightweight")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Power")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Damaging")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Knockback")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.KNOCKBACK, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Punch")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Flaming")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Infinite")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Undead")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.DAMAGE_UNDEAD, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Baning")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.DAMAGE_ARTHROPODS, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Fiery")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 10);
+	  }
+	  if (prefix.equalsIgnoreCase("Greedy")) {
+		  finalitem.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 10);
+	  }
+	  ItemMeta meta = finalitem.getItemMeta();
+	  meta.setDisplayName(ChatColor.GOLD+""+ChatColor.BOLD+prefix+" "+convertToItemName(finalitem.getType().name())+" of "+suffix);
+	  List<String> setLore = new ArrayList<String>();
+	  if (suffix.equalsIgnoreCase("Life")) {
+		  setLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+10)+" "+ChatColor.BLUE+"Health");
+	  }
+	  if (suffix.equalsIgnoreCase("Resistance")) {
+		  setLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*70)+20)+"% "+ChatColor.BLUE+"Damage Reduction");
+	  }
+	  if (suffix.equalsIgnoreCase("Durability")) {
+		  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*200)+50)*10)+"% "+ChatColor.BLUE+"Durability");
+	  }
+	  if (suffix.equalsIgnoreCase("Protection")) {
+		  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+10))+"% "+ChatColor.BLUE+"Block Chance");
+	  }
+	  if (suffix.equalsIgnoreCase("Smiting")) {
+		  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+10))+"% "+ChatColor.BLUE+"Critical Chance");
+	  }
+	  if (suffix.equalsIgnoreCase("Penetration")) {
+		  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*20)+5))+" "+ChatColor.BLUE+"Armor Penetration");
+	  }
+	  if (suffix.equalsIgnoreCase("Draining")) {
+		  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*30)+20))+"% "+ChatColor.BLUE+"Life Steal");
+	  }
+	  if (suffix.equalsIgnoreCase("Fury")) {
+		  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+10))+"% "+ChatColor.BLUE+"Attack Speed");
+	  }
+	  if (suffix.equalsIgnoreCase("Power")) {
+		  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*10)+5))+" "+ChatColor.BLUE+"Damage");
+	  }
+	  setLore.add("");
+	  setLore.add(ChatColor.YELLOW+"[Halloween]");
+	  setLore.add("This item was created during the Halloween");
+	  setLore.add("event. When this item breaks, it simply turns");
+	  setLore.add("into a \"broken\" state and has a recharge time");
+	  setLore.add("of 1 week. The item will be fully restored after");
+	  setLore.add("a week of cooldown.");
+	  meta.setLore(setLore);
+	  finalitem.setItemMeta(meta);
+	  //finalitem.setDurability((short)1560); //TESTING.
+	  boolean full=true;
+	  for (int i=0;i<p.getInventory().getContents().length;i++) {
+		  if (p.getInventory().getContents()[i]==null) {
+			  full=false;
+			  break;
+		  }
+	  }
+	  if (!full) {
+		  p.getInventory().addItem(finalitem);
+	  } else {
+		  p.getWorld().dropItemNaturally(p.getLocation(), finalitem); //Drop item on the ground if our inventory is full. That way we don't lose it.
+	  }
+  }
 
   public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
   {
@@ -317,6 +555,20 @@ public class commandBankEconomy
 	  					  item.setItemMeta(meta);
 	  					  p.getInventory().addItem(item);
   					  }
+  				  }
+  				  this.plugin.saveConfig();
+  			  }
+  			  if (args[0].equalsIgnoreCase("halloween") && args[1].equalsIgnoreCase("legendary_item")) {
+  				  if (this.plugin.getConfig().getBoolean("halloween-enabled")) {
+					  giveLegendaryItem(p);
+  				  }
+  				  this.plugin.saveConfig();
+  			  }
+  			  if (args[0].equalsIgnoreCase("halloween") && args[1].equalsIgnoreCase("break")) {
+  				  if (this.plugin.getConfig().getBoolean("halloween-enabled")) {
+					  if (p.getItemInHand()!=null) {
+						  p.getItemInHand().setDurability((short)9000);
+					  }
   				  }
   				  this.plugin.saveConfig();
   			  }
