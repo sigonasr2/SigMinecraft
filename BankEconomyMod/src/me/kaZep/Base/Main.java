@@ -642,7 +642,7 @@ public class Main extends JavaPlugin
     Enchanter_job.setJobName("Enchanter");
     Enchanter_job.setJobDescription("An enchanter's job is to enchant items in order to make them more powerful and useful for everyday tasks.");
     Enchanter_job.setAction(0, "ENCHANT");
-    Enchanter_job.setExp(50, 40, 8, 1.08);
+    Enchanter_job.setExp(90, 50, 15, 1.08);
     Enchanter_job.addExtraData("Each level of enchantment multiplies your income and exp gain exponentially.");
     Enchanter_job.addExtraData("Ex. If PROTECTION gives $0.08 and 4XP, PROTECTION III would give you x9 exp and money: $0.72 and 36XP.");
     Enchanter_job.addExtraData("");

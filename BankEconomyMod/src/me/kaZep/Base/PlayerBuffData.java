@@ -11,6 +11,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -149,9 +150,9 @@ public class PlayerBuffData {
 			  } catch (ConcurrentModificationException ex_e) {
 				  Bukkit.getLogger().warning("Potion Effect Collection not accessible while finalizing player speed.");
 			  }
-			if (/*!hasabsorption && */this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat4")>0) {
+			if (!hasabsorption && this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat4")>0) {
 				p.removePotionEffect(PotionEffectType.ABSORPTION);
-				p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION,3610,this.plugin.getStatBonus(3, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat4")/3)/4-1));
+				p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION,3590,this.plugin.getStatBonus(3, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat4")/3)/4-1));
 				//p.sendMessage("Absorption level is "+(this.plugin.getStatBonus(3, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat4")/4)/4-1));
 			}
 			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat2")>0) {
