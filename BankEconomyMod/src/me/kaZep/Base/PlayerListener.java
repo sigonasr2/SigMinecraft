@@ -1613,6 +1613,18 @@ public class PlayerListener
 			        book.setItemMeta(bookdata);
 			        p.getInventory().addItem(book);
 		    	}
+		    	if (!this.plugin.getAccountsConfig().contains(p.getName() + ".join.halloween_vote_signs")) {
+		    	      this.plugin.getAccountsConfig().set(p.getName() + ".join.halloween_vote_signs", Boolean.valueOf(true));
+		    	      this.plugin.saveAccountsConfig();
+		    		ItemStack sign = new ItemStack(Material.SIGN,2);
+		    		ItemMeta meta = sign.getItemMeta();
+		    		meta.setDisplayName(ChatColor.BLUE+p.getName());
+		    		sign.setItemMeta(meta);
+			        p.getInventory().addItem(sign);
+			        p.sendMessage("You have received 2 vote signs. Go vote at the Pumpkin Patch for the best pumpkin! (Note that voting for yourself does not count. Please vote the best of the others' pumpkins.)");
+		    	} else {
+		    		p.sendMessage("You do not have enough room in your inventory to receive Pumpkin vote signs. Clear some of your inventory and then rejoin.");
+		    	}
 	    	}
 	    	if (!this.plugin.getAccountsConfig().contains(p.getName() + ".halloween.chest1")) {
 	    	      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest1", Boolean.valueOf(false));
@@ -1625,10 +1637,16 @@ public class PlayerListener
 	    	      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest8", Boolean.valueOf(false));
 	    	      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest9", Boolean.valueOf(false));
 	    	      this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest10", Boolean.valueOf(false));
+	    	      this.plugin.saveAccountsConfig();
 	    	}
 	    	if (!this.plugin.getAccountsConfig().contains(p.getName() + ".jobs.ultimate")) {
 	    		this.plugin.getAccountsConfig().set(p.getName() + ".jobs.ultimate", String.valueOf("None"));
 	    		this.plugin.getAccountsConfig().set(p.getName() + ".jobs.ultimatesealed", Boolean.valueOf(false));
+	    	      this.plugin.saveAccountsConfig();
+	    	}
+	    	if (!this.plugin.getAccountsConfig().contains(p.getName() + ".halloween.wand")) {
+	    		this.plugin.getAccountsConfig().set(p.getName() + ".halloween.wand", Long.valueOf(Bukkit.getWorld("world").getFullTime()));
+	    	      this.plugin.saveAccountsConfig();
 	    	}
     	}
     	//Check if this player has unallocated stat points.
@@ -1729,34 +1747,115 @@ public class PlayerListener
   @EventHandler
   public void onPlayerInteract(PlayerInteractEntityEvent ev) {
       Entity theAnimal = ev.getRightClicked();
-      if (theAnimal.getType() == EntityType.WOLF) {
-        Wolf dog = (Wolf)theAnimal;
-        DyeColor dogcolor = dog.getCollarColor();
-        Player p = ev.getPlayer();
-        if (dog.getOwner() == null) {
-          return;
-        }
-        if (p != dog.getOwner()) {
-          return;
-        }
-        if (!dog.isAngry()) {
-          //Switch state of wolf.
-          //dog.setSitting(!dog.isSitting());
-          return;
-        }
-        ev.setCancelled(true);
-        double oldhealth = dog.getHealth();
-        dog.setSitting(true);
-        dog.remove();
-        Location wolfloc = dog.getLocation();
-        World world = Bukkit.getWorld("world");
-        Entity newAnimal = world.spawnEntity(wolfloc, EntityType.WOLF);
-        Wolf newdog = (Wolf)newAnimal;
-        newdog.setOwner(p);
-        newdog.setHealth(oldhealth);
-        newdog.setSitting(true);
-        newdog.setCollarColor(dogcolor);
-        p.sendMessage(ChatColor.GREEN + "This dog is now happy!");
+      if (ev.getPlayer().getItemInHand().getType()==Material.getMaterial(127)) {
+    	  if (this.plugin.getAccountsConfig().getLong(ev.getPlayer().getName()+".halloween.wand")<Bukkit.getWorld("world").getFullTime())
+    	  if (theAnimal.getType()!=EntityType.PLAYER) {
+		      if (theAnimal instanceof LivingEntity) {
+		    	  LivingEntity l = (LivingEntity)theAnimal;
+		    	  if (l.getCustomName()==null) {
+		    		  //This is not a boss. Convert it to something else.
+		    		  Location oldloc = theAnimal.getLocation();
+		    		  EntityType newtype = null;
+		    		  theAnimal.remove();
+		    		  EntityType types[] = {EntityType.ZOMBIE,
+		    				  EntityType.BAT,
+		    				  EntityType.CHICKEN,
+		    				  EntityType.COW,
+		    				  EntityType.CREEPER,
+		    				  EntityType.ENDERMAN,
+		    				  EntityType.GIANT,
+		    				  EntityType.HORSE,
+		    				  EntityType.IRON_GOLEM,
+		    				  EntityType.MINECART,
+		    				  EntityType.MUSHROOM_COW,
+		    				  EntityType.OCELOT,
+		    				  EntityType.PIG,
+		    				  EntityType.PIG_ZOMBIE,
+		    				  EntityType.SHEEP,
+		    				  EntityType.SILVERFISH,
+		    				  EntityType.SKELETON,
+		    				  EntityType.SNOWMAN,
+		    				  EntityType.SPIDER,
+		    				  EntityType.SQUID,
+		    				  EntityType.VILLAGER,
+		    				  EntityType.WITCH,
+		    				  EntityType.WOLF};
+			  	        World world = Bukkit.getWorld("world");
+				        Entity newAnimal = world.spawnEntity(oldloc, types[(int)(Math.random()*types.length)]);
+				        if (newAnimal instanceof LivingEntity) {
+				        	LivingEntity l2 = (LivingEntity)newAnimal;
+				        	l2.setCustomName(ChatColor.DARK_AQUA+"Polymorphed Creature");
+				        }
+				        this.plugin.getAccountsConfig().set(ev.getPlayer().getName()+".halloween.wand",Long.valueOf(Bukkit.getWorld("world").getFullTime()+1200));
+		    	  } else {
+		    		  if (!l.getCustomName().contains(ChatColor.DARK_PURPLE+"")) {
+			    		  //This is not a boss. Convert it to something else.
+			    		  Location oldloc = theAnimal.getLocation();
+			    		  EntityType newtype = null;
+			    		  theAnimal.remove();
+			    		  EntityType types[] = {EntityType.ZOMBIE,
+			    				  EntityType.BAT,
+			    				  EntityType.CHICKEN,
+			    				  EntityType.COW,
+			    				  EntityType.CREEPER,
+			    				  EntityType.ENDERMAN,
+			    				  EntityType.GIANT,
+			    				  EntityType.HORSE,
+			    				  EntityType.IRON_GOLEM,
+			    				  EntityType.MUSHROOM_COW,
+			    				  EntityType.OCELOT,
+			    				  EntityType.PIG,
+			    				  EntityType.PIG_ZOMBIE,
+			    				  EntityType.SHEEP,
+			    				  EntityType.SILVERFISH,
+			    				  EntityType.SKELETON,
+			    				  EntityType.SPIDER,
+			    				  EntityType.SQUID,
+			    				  EntityType.VILLAGER,
+			    				  EntityType.WITCH,
+			    				  EntityType.WOLF};
+				  	        World world = Bukkit.getWorld("world");
+					        Entity newAnimal = world.spawnEntity(oldloc, types[(int)(Math.random()*types.length)]);
+					        if (newAnimal instanceof LivingEntity) {
+					        	LivingEntity l2 = (LivingEntity)newAnimal;
+					        	l2.setCustomName(ChatColor.DARK_AQUA+"Polymorphed Creature");
+					        }
+					        this.plugin.getAccountsConfig().set(ev.getPlayer().getName()+".halloween.wand",Long.valueOf(Bukkit.getWorld("world").getFullTime()+1200));
+		    		  }
+		    	  }
+		      }
+    	  }
+      } else {
+    	  //Make sure we're not polymporphin, otherwise do other things in here.
+	      if (theAnimal.getType() == EntityType.WOLF) {
+	        Wolf dog = (Wolf)theAnimal;
+	        DyeColor dogcolor = dog.getCollarColor();
+	        Player p = ev.getPlayer();
+	        if (dog.getOwner() == null) {
+	          return;
+	        }
+	        if (p != dog.getOwner()) {
+	          return;
+	        }
+	        if (!dog.isAngry()) {
+	          //Switch state of wolf.
+	          //dog.setSitting(!dog.isSitting());
+	          return;
+	        }
+	        ev.setCancelled(true);
+	        double oldhealth = dog.getHealth();
+	        dog.setSitting(true);
+	        dog.remove();
+	        Location wolfloc = dog.getLocation();
+	        World world = Bukkit.getWorld("world");
+	        Entity newAnimal = world.spawnEntity(wolfloc, EntityType.WOLF);
+	        Wolf newdog = (Wolf)newAnimal;
+	        newdog.setOwner(p);
+	        newdog.setHealth(oldhealth);
+	        newdog.setSitting(true);
+	        newdog.setCollarColor(dogcolor);
+	        p.sendMessage(ChatColor.GREEN + "This dog is now happy!");
+	      }
       }
   }
   
@@ -1806,7 +1905,7 @@ public class PlayerListener
 		  if (entity instanceof Monster) {
 			  LivingEntity test = (LivingEntity)entity;
 			  boolean block=false;
-			  if (test.getCustomName()!=null && test.getCustomName().contains(ChatColor.DARK_PURPLE+"")) {
+			  if (test.getCustomName()!=null && (test.getCustomName().contains(ChatColor.DARK_PURPLE+"") || test.getCustomName().contains(ChatColor.DARK_AQUA+"Polymorphed Creature"))) {
 				  for (int i=-2;i<3;i++) {
 					  for (int j=-2;j<3;j++) {
 						  for (int k=-2;k<3;k++) {
@@ -2045,23 +2144,29 @@ public class PlayerListener
 					  }
 				  }
 			  }
-			  if (Bukkit.getWorld("world").getHighestBlockYAt(entity.getLocation())>=96) {
-				  //This is a tall world.
-				  if (entity.getLocation().getBlockY()>104) {
-					  despawnchancer*=(Math.random()*3.0d)+1;
+			  if (!this.plugin.harrowing_night) {
+				  if (Bukkit.getWorld("world").getHighestBlockYAt(entity.getLocation())>=96) {
+					  //This is a tall world.
+					  if (entity.getLocation().getBlockY()>104) {
+						  despawnchancer*=(Math.random()*3.0d)+1;
+					  } else {
+						  for (int i=104-entity.getLocation().getBlockY();i>0;i--) {
+							  despawnchancer/=1.0175d;
+						  }
+					  }
 				  } else {
-					  for (int i=104-entity.getLocation().getBlockY();i>0;i--) {
-						  despawnchancer/=1.0175d;
+					  //This is a short world.
+					  if (entity.getLocation().getBlockY()>52) {
+						  despawnchancer*=(Math.random()*3.0d)+1;
+					  } else {
+						  for (int i=52-entity.getLocation().getBlockY();i>0;i--) {
+							  despawnchancer/=1.025d;
+						  }
 					  }
 				  }
 			  } else {
-				  //This is a short world.
-				  if (entity.getLocation().getBlockY()>52) {
-					  despawnchancer*=(Math.random()*3.0d)+1;
-				  } else {
-					  for (int i=52-entity.getLocation().getBlockY();i>0;i--) {
-						  despawnchancer/=1.025d;
-					  }
+				  for (int i=52;i>0;i--) {
+					  despawnchancer/=1.025d;
 				  }
 			  }
 			  //if (e.getSpawnReason()!=SpawnReason.NATURAL) { //If it's a natural spawn, we gotta do it. Ignore our checking stuff.
@@ -5538,24 +5643,8 @@ public ItemStack getGoodie() {
 		  if (this.plugin.getAccountsConfig().getBoolean("halloween-enabled")) {
 			  e.setDroppedExp(e.getDroppedExp()*2);
 		  }
-		  Player p = null;
-		  for (int i=0;i<this.plugin.hitmoblist.size();i++) {
-			  for (int j=0;j<this.plugin.hitmoblist.get(i).id.size();j++) {
-				  if (this.plugin.hitmoblist.get(i).id.contains(e.getEntity().getUniqueId())) {
-					  //This is the player that killed. Also identify them.
-					  p = this.plugin.hitmoblist.get(i).p;
-					  //Bukkit.getPlayer("sigonasr2").sendMessage("Found: "+e.getEntity().getUniqueId().toString());
-					  //this.plugin.gainMoneyExp(this.plugin.hitmoblist.get(i).p,"Support",0.025,3);
-					  this.plugin.hitmoblist.get(i).id.remove(e.getEntity().getUniqueId());
-					  this.plugin.hitmoblist.get(i).p.giveExp(e.getDroppedExp());
-					  if (e.getDroppedExp()!=0) {
-						  p.playSound(p.getLocation(), Sound.ORB_PICKUP, 0.9f, 1f);
-					  }
-					  break;
-				  }
-			  }
-		  }
-		  if (p!=null) {
+		  if (f.getKiller()!=null && f.getKiller().getType()==EntityType.PLAYER) {
+			  Player p = f.getKiller();
 			  for (int x=-10;x<10;x++) {
 				  for (int y=-3;y<3;y++) {
 					  for (int z=-10;z<10;z++) {
@@ -5586,7 +5675,7 @@ public ItemStack getGoodie() {
 						  if (this.plugin.supportmoblist.get(i).id.contains(e.getEntity().getUniqueId())) {
 							  //Award the support player.
 							  //Bukkit.getPlayer("sigonasr2").sendMessage("Found: "+e.getEntity().getUniqueId().toString());
-							  this.plugin.gainMoneyExp(this.plugin.supportmoblist.get(i).p,"Support",0.05,6);
+							  this.plugin.gainMoneyExp(this.plugin.supportmoblist.get(i).p,"Support",0.025,3);
 							  this.plugin.supportmoblist.get(i).id.remove(e.getEntity().getUniqueId());
 							  this.plugin.supportmoblist.get(i).p.giveExp(e.getDroppedExp()/2);
 							  if (e.getDroppedExp()/2!=0) {
@@ -5678,53 +5767,6 @@ public ItemStack getGoodie() {
 					  }
 				  }
 			  }
-		  } else {
-			  //We're going to see if a player killed it themselves then.
-			  Player pp = null;
-			  for (int i=0;i<this.plugin.hitmoblist.size();i++) {
-				  for (int j=0;j<this.plugin.hitmoblist.get(i).id.size();j++) {
-					  if (this.plugin.hitmoblist.get(i).id.contains(e.getEntity().getUniqueId())) {
-						  //This is the player that killed. Also identify them.
-						  pp = this.plugin.hitmoblist.get(i).p;
-						  //Bukkit.getPlayer("sigonasr2").sendMessage("Found: "+e.getEntity().getUniqueId().toString());
-						  //this.plugin.gainMoneyExp(this.plugin.hitmoblist.get(i).p,"Support",0.025,3);
-						  this.plugin.hitmoblist.get(i).id.remove(e.getEntity().getUniqueId());
-						  this.plugin.hitmoblist.get(i).p.giveExp(e.getDroppedExp());
-						  if (e.getDroppedExp()!=0) {
-							  pp.playSound(p.getLocation(), Sound.ORB_PICKUP, 0.9f, 1f);
-						  }
-						  break;
-					  }
-				  }
-			  }
-			  
-			  //Check other players and give them assist experience.
-
-			  for (int i=0;i<this.plugin.hitmoblist.size();i++) {
-				  for (int j=0;j<this.plugin.hitmoblist.get(i).id.size();j++) {
-					  if (this.plugin.hitmoblist.get(i).id.contains(e.getEntity().getUniqueId()) && this.plugin.hitmoblist.get(i).p!=pp) {
-						  //This is the player that killed. Also identify them.
-						  Player tempp = this.plugin.hitmoblist.get(i).p;
-						  if (this.plugin.PlayerinJob(tempp, "Support")) {
-						  //Bukkit.getPlayer("sigonasr2").sendMessage("Found: "+e.getEntity().getUniqueId().toString());
-						  //this.plugin.gainMoneyExp(this.plugin.hitmoblist.get(i).p,"Support",0.025,3);
-							  this.plugin.hitmoblist.get(i).id.remove(e.getEntity().getUniqueId());
-							  this.plugin.hitmoblist.get(i).p.giveExp(e.getDroppedExp()/4);
-							  if (e.getDroppedExp()/4!=0) {
-								  tempp.playSound(p.getLocation(), Sound.ORB_PICKUP, 0.4f, 0.6f);
-							  }
-						  } else {
-							  this.plugin.hitmoblist.get(i).id.remove(e.getEntity().getUniqueId());
-							  this.plugin.hitmoblist.get(i).p.giveExp(e.getDroppedExp()/2);
-							  if (e.getDroppedExp()/2!=0) {
-								  tempp.playSound(p.getLocation(), Sound.ORB_PICKUP, 0.4f, 0.6f);
-							  }
-						  }
-						  break;
-					  }
-				  }
-			  }
-			  
 		  }
 		  e.setDroppedExp(0);
 		  /*
@@ -6024,70 +6066,72 @@ public ItemStack getGoodie() {
 				  }
 			  }
 		  }
-		  for (int m=0;m<p.getInventory().getContents().length;m++) {
-			  if (p.getInventory().getContents()[m]!=null && p.getInventory().getContents()[m].getType()==Material.PUMPKIN_PIE) { 
-				  //First see if it's a magical pumpkin pie.
-				  if (p.getInventory().getContents()[m].getItemMeta().getLore()!=null) {
-					  //It has lore! See if we can get the number of pumpkin pies from it.
-					  int pies=0;
-					  List<String> data = p.getInventory().getContents()[m].getItemMeta().getLore();
-					  //newlore.add("Requires "+((int)(Math.random()*1000)+100)+" Pumpkin Pie in inventory");
-					  ItemStack magic_pie = null;
-					  for (int i=0;i<data.size();i++) {
-						  if (data.get(i).contains("Requires ") && data.get(i).contains(" Pumpkin Pie in inventory")) {
-							  pies = Integer.valueOf((data.get(i).replace("Requires ", "")).replace(" Pumpkin Pie in inventory", ""));
-							  Bukkit.getLogger().info("Found the magic pie. Amount required is "+pies);
-							  magic_pie=p.getInventory().getContents()[m].clone();
-							  break;
+		  if (this.plugin.getConfig().getBoolean("halloween-enabled")) {
+			  for (int m=0;m<p.getInventory().getContents().length;m++) {
+				  if (p.getInventory().getContents()[m]!=null && p.getInventory().getContents()[m].getType()==Material.PUMPKIN_PIE) { 
+					  //First see if it's a magical pumpkin pie.
+					  if (p.getInventory().getContents()[m].getItemMeta().getLore()!=null) {
+						  //It has lore! See if we can get the number of pumpkin pies from it.
+						  int pies=0;
+						  List<String> data = p.getInventory().getContents()[m].getItemMeta().getLore();
+						  //newlore.add("Requires "+((int)(Math.random()*1000)+100)+" Pumpkin Pie in inventory");
+						  ItemStack magic_pie = null;
+						  for (int i=0;i<data.size();i++) {
+							  if (data.get(i).contains("Requires ") && data.get(i).contains(" Pumpkin Pie in inventory")) {
+								  pies = Integer.valueOf((data.get(i).replace("Requires ", "")).replace(" Pumpkin Pie in inventory", ""));
+								  Bukkit.getLogger().info("Found the magic pie. Amount required is "+pies);
+								  magic_pie=p.getInventory().getContents()[m].clone();
+								  break;
+							  }
 						  }
-					  }
-					  //Now count all pumpkin pies in inventory. If they are greater than the amount in the inventory (and are not special pies), remove them.
-					  int piecount=0;
-					  ItemStack ideal_pie = null;
-					  for (int i=0;i<p.getInventory().getContents().length;i++) {
-						  if (p.getInventory().getContents()[i]!=null && p.getInventory().getContents()[i].getType()==Material.PUMPKIN_PIE && p.getInventory().getContents()[i].getItemMeta().getLore()==null) {
-							 piecount+=p.getInventory().getContents()[i].getAmount(); 
-							 ideal_pie = p.getInventory().getContents()[i].clone();
-						  }
-					  }
-					  Bukkit.getLogger().info("We have "+piecount+" pies.");
-					  if (ideal_pie!=null && magic_pie!=null && piecount>=pies) {
-						  p.getInventory().remove(magic_pie);
-						  //Check to see if there are any pies we need to keep for later.
-						  List<ItemStack> items = new ArrayList<ItemStack>();
+						  //Now count all pumpkin pies in inventory. If they are greater than the amount in the inventory (and are not special pies), remove them.
+						  int piecount=0;
+						  ItemStack ideal_pie = null;
 						  for (int i=0;i<p.getInventory().getContents().length;i++) {
-							  if (p.getInventory().getContents()[i]!=null) {
-								  if (p.getInventory().getContents()[i].getType()==Material.PUMPKIN_PIE &&
-										  p.getInventory().getContents()[i].hasItemMeta() &&
-										  p.getInventory().getContents()[i].getItemMeta().getLore()!=null) {
-									  //This is a special pie. Must keep.
-									  items.add(p.getInventory().getContents()[i]);
+							  if (p.getInventory().getContents()[i]!=null && p.getInventory().getContents()[i].getType()==Material.PUMPKIN_PIE && p.getInventory().getContents()[i].getItemMeta().getLore()==null) {
+								 piecount+=p.getInventory().getContents()[i].getAmount(); 
+								 ideal_pie = p.getInventory().getContents()[i].clone();
+							  }
+						  }
+						  Bukkit.getLogger().info("We have "+piecount+" pies.");
+						  if (ideal_pie!=null && magic_pie!=null && piecount>=pies) {
+							  p.getInventory().remove(magic_pie);
+							  //Check to see if there are any pies we need to keep for later.
+							  List<ItemStack> items = new ArrayList<ItemStack>();
+							  for (int i=0;i<p.getInventory().getContents().length;i++) {
+								  if (p.getInventory().getContents()[i]!=null) {
+									  if (p.getInventory().getContents()[i].getType()==Material.PUMPKIN_PIE &&
+											  p.getInventory().getContents()[i].hasItemMeta() &&
+											  p.getInventory().getContents()[i].getItemMeta().getLore()!=null) {
+										  //This is a special pie. Must keep.
+										  items.add(p.getInventory().getContents()[i]);
+									  }
 								  }
 							  }
-						  }
-						  for (int i=0;i<pies;i++) {
-							  p.getInventory().remove(Material.PUMPKIN_PIE);
-							  //Remove the pies. Remove the magic pie.
-						  }
-						  
-						  int amountleft = piecount-pies;
-						  while (amountleft>0) {
-							  if (amountleft>=64) {
-								  p.getInventory().addItem(new ItemStack(Material.PUMPKIN_PIE,64));
-								  amountleft-=64;
-							  } else {
-								  p.getInventory().addItem(new ItemStack(Material.PUMPKIN_PIE,1));
-								  amountleft--;
+							  for (int i=0;i<pies;i++) {
+								  p.getInventory().remove(Material.PUMPKIN_PIE);
+								  //Remove the pies. Remove the magic pie.
 							  }
+							  
+							  int amountleft = piecount-pies;
+							  while (amountleft>0) {
+								  if (amountleft>=64) {
+									  p.getInventory().addItem(new ItemStack(Material.PUMPKIN_PIE,64));
+									  amountleft-=64;
+								  } else {
+									  p.getInventory().addItem(new ItemStack(Material.PUMPKIN_PIE,1));
+									  amountleft--;
+								  }
+							  }
+							  for (int i=0;i<items.size();i++) {
+								  p.getInventory().addItem(items.get(i));
+							  }
+							  //Give a legendary armor/weapon here.
+							  //Bukkit.getLogger().info("LEGENDARY!");
+							  giveLegendaryItem(p);
+							  p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION,1728000,0));
+							  p.updateInventory();
 						  }
-						  for (int i=0;i<items.size();i++) {
-							  p.getInventory().addItem(items.get(i));
-						  }
-						  //Give a legendary armor/weapon here.
-						  //Bukkit.getLogger().info("LEGENDARY!");
-						  giveLegendaryItem(p);
-						  p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION,1728000,0));
-						  p.updateInventory();
 					  }
 				  }
 			  }
@@ -8085,7 +8129,7 @@ public ItemStack getGoodie() {
 		  i.setDurability((short)0);
 		  p.getInventory().addItem(i);
 	  }
-	  if (i.hasItemMeta() && i.getItemMeta().getLore()!=null) {
+	  if (i.hasItemMeta() && i.getItemMeta().hasLore()) {
 		  boolean is_halloween=false;
 		  List<String> finallore = new ArrayList<String>();
 		  for (int j=0;j<i.getItemMeta().getLore().size();j++) {
@@ -8106,6 +8150,11 @@ public ItemStack getGoodie() {
 			  meta.setLore(finallore);
 			  //p.sendMessage("Meta is set.");
 			  i.setItemMeta(meta);
+			  if (this.plugin.inventoryFull(p)) {
+				  //Drop it on the ground since our inventory is full.
+				  p.sendMessage(ChatColor.LIGHT_PURPLE+"Dropped "+i.getItemMeta().getDisplayName()+ChatColor.LIGHT_PURPLE+" on the ground since there is no room in your inventory.");
+				  p.getWorld().dropItemNaturally(p.getLocation(), i);
+			  }
 			  p.updateInventory();
 		  }
 	  }
@@ -10856,6 +10905,11 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
     	boolean largechest=false;
 		boolean smallchest=false;
 		int identifier=-1;
+		if (p.getItemInHand()!=null && (p.getItemInHand().getType()==Material.getMaterial(127))) {
+			p.updateInventory();
+			e.setCancelled(true);
+			return;
+		}
 		if (p.getItemInHand()!=null && (p.getItemInHand().getType()==Material.CHEST || p.getItemInHand().getType()==Material.TRAPPED_CHEST)) {
 		  if (p.getItemInHand().getItemMeta().getLore()!=null) {
 			//Check to see if the Lore contains anything.

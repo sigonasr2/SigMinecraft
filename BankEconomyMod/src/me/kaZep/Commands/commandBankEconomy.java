@@ -13,6 +13,7 @@ import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -322,6 +323,8 @@ public String convertToItemName(String val) {
 		  p.getWorld().dropItemNaturally(p.getLocation(), finalitem); //Drop item on the ground if our inventory is full. That way we don't lose it.
 	  }
   }
+  
+  
 
   public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
   {
@@ -488,6 +491,537 @@ public String convertToItemName(String val) {
   			  }
             } else
             if (cmd.getName().equalsIgnoreCase("event") && args.length==2 && p.hasPermission("maintenance-mode-admin")) {
+  			  if (args[0].equalsIgnoreCase("halloween") && args[1].equalsIgnoreCase("end")) {
+  				  p.sendMessage(ChatColor.GRAY+"Ending Harrowing night... Did you make sure it was night time? If not, type this command again after /time night instead.");
+  				  this.plugin.harrowing_night=true;
+				  this.plugin.getConfig().set("halloween-enabled", Boolean.valueOf(false));
+				  p.sendMessage("Halloween event disabled.");
+				  Bukkit.broadcastMessage(ChatColor.GRAY+"Ending 'The Harrowing' Event...");
+				  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+				      @Override
+				      public void run() {
+				    	  Bukkit.broadcastMessage(" Thanks for playing and sticking with us through this event!");
+				      }
+				  	},20);
+				  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+				      @Override
+				      public void run() {
+				    	  Bukkit.broadcastMessage(ChatColor.GOLD+" Please make 3 slots of room in your inventory now if you do not have room. We are giving prizes....");
+				      }
+				  	},100);
+				  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+				      @Override
+				      public void run() {
+				    	  Bukkit.broadcastMessage(ChatColor.GREEN+" You each have received an extra Harrowing item, a bonus extra item, and a special Polymorph Wand for participating in this event! I have also given you appropriate buffs.");
+				    	  for (int i=0;i<Bukkit.getOnlinePlayers().length;i++) {
+				    		  Player p = Bukkit.getOnlinePlayers()[i];
+				    			  String prefix = "";
+				    			  String suffix = "";
+				    			  int type=(int)(Math.random()*6);
+				    			  //int type=5; //TESTING.
+				    			  List<String> enchants1 = new ArrayList<String>();
+				    			  List<String> enchants2 = new ArrayList<String>();
+				    			  ItemStack finalitem = null;
+				    			  if (type==0) {
+				    				  finalitem=new ItemStack(Material.DIAMOND_HELMET);
+				    				  enchants1.add("Protective");
+				    				  enchants1.add("Fire-Proof");
+				    				  enchants1.add("Blast Resistant");
+				    				  enchants1.add("Untouchable");
+				    				  enchants1.add("Breathing");
+				    				  enchants1.add("Working");
+				    				  enchants1.add("Unbreaking");
+				    				  enchants1.add("Thorny");
+				    				  enchants2.add("Life");
+				    				  enchants2.add("Resistance");
+				    				  enchants2.add("Durability");
+				    				  enchants2.add("Protection");
+				    			  }
+				    			  if (type==1) {
+				    				  finalitem=new ItemStack(Material.DIAMOND_CHESTPLATE);
+				    				  enchants1.add("Protective");
+				    				  enchants1.add("Fire-Proof");
+				    				  enchants1.add("Blast Resistant");
+				    				  enchants1.add("Untouchable");
+				    				  enchants1.add("Unbreaking");
+				    				  enchants1.add("Thorny");
+				    				  enchants2.add("Life");
+				    				  enchants2.add("Resistance");
+				    				  enchants2.add("Durability");
+				    				  enchants2.add("Protection");
+				    			  }
+				    			  if (type==2) {
+				    				  finalitem=new ItemStack(Material.DIAMOND_LEGGINGS);
+				    				  enchants1.add("Protective");
+				    				  enchants1.add("Fire-Proof");
+				    				  enchants1.add("Blast Resistant");
+				    				  enchants1.add("Untouchable");
+				    				  enchants1.add("Unbreaking");
+				    				  enchants1.add("Thorny");
+				    				  enchants2.add("Life");
+				    				  enchants2.add("Resistance");
+				    				  enchants2.add("Durability");
+				    				  enchants2.add("Protection");
+				    			  }
+				    			  if (type==3) {
+				    				  finalitem=new ItemStack(Material.DIAMOND_BOOTS);
+				    				  enchants1.add("Protective");
+				    				  enchants1.add("Fire-Proof");
+				    				  enchants1.add("Blast Resistant");
+				    				  enchants1.add("Untouchable");
+				    				  enchants1.add("Lightweight");
+				    				  enchants1.add("Unbreaking");
+				    				  enchants1.add("Thorny");
+				    				  enchants2.add("Life");
+				    				  enchants2.add("Resistance");
+				    				  enchants2.add("Durability");
+				    				  enchants2.add("Protection");
+				    			  }
+				    			  if (type==4) {
+				    				  finalitem=new ItemStack(Material.BOW);
+				    				  enchants1.add("Power");
+				    				  enchants1.add("Punch");
+				    				  enchants1.add("Flaming");
+				    				  enchants1.add("Infinite");
+				    				  enchants1.add("Unbreaking");
+				    				  enchants2.add("Smiting");
+				    				  enchants2.add("Penetration");
+				    				  enchants2.add("Draining");
+				    				  enchants2.add("Fury");
+				    				  enchants2.add("Power");
+				    			  }
+				    			  if (type==5) {
+				    				  finalitem=new ItemStack(Material.DIAMOND_SWORD);
+				    				  enchants1.add("Damaging");
+				    				  enchants1.add("Knockback");
+				    				  enchants1.add("Undead");
+				    				  enchants1.add("Baning");
+				    				  enchants1.add("Fiery");
+				    				  enchants1.add("Greedy");
+				    				  enchants1.add("Unbreaking");
+				    				  enchants2.add("Smiting");
+				    				  enchants2.add("Penetration");
+				    				  enchants2.add("Draining");
+				    				  enchants2.add("Fury");
+				    				  enchants2.add("Power");
+				    			  }
+				    			  prefix = enchants1.get((int)(Math.random()*enchants1.size()));
+				    			  suffix = enchants2.get((int)(Math.random()*enchants2.size()));
+				    			  if (prefix.equalsIgnoreCase("Protective")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Fire-Proof")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Blast Resistant")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Untouchable")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Breathing")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.OXYGEN, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Working")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.WATER_WORKER, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Unbreaking")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Thorny")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.THORNS, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Untouchable")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Lightweight")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Power")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Damaging")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Knockback")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.KNOCKBACK, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Punch")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Flaming")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Infinite")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Undead")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.DAMAGE_UNDEAD, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Baning")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.DAMAGE_ARTHROPODS, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Fiery")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 10);
+				    			  }
+				    			  if (prefix.equalsIgnoreCase("Greedy")) {
+				    				  finalitem.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 10);
+				    			  }
+				    			  ItemMeta meta = finalitem.getItemMeta();
+				    			  meta.setDisplayName(ChatColor.GOLD+""+ChatColor.BOLD+prefix+" "+convertToItemName(finalitem.getType().name())+" of "+suffix);
+				    			  List<String> setLore = new ArrayList<String>();
+				    			  if (suffix.equalsIgnoreCase("Life")) {
+				    				  setLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+10)+" "+ChatColor.BLUE+"Health");
+				    			  }
+				    			  if (suffix.equalsIgnoreCase("Resistance")) {
+				    				  setLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*70)+20)+"% "+ChatColor.BLUE+"Damage Reduction");
+				    			  }
+				    			  if (suffix.equalsIgnoreCase("Durability")) {
+				    				  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*200)+50)*10)+"% "+ChatColor.BLUE+"Durability");
+				    			  }
+				    			  if (suffix.equalsIgnoreCase("Protection")) {
+				    				  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+10))+"% "+ChatColor.BLUE+"Block Chance");
+				    			  }
+				    			  if (suffix.equalsIgnoreCase("Smiting")) {
+				    				  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+10))+"% "+ChatColor.BLUE+"Critical Chance");
+				    			  }
+				    			  if (suffix.equalsIgnoreCase("Penetration")) {
+				    				  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*20)+5))+" "+ChatColor.BLUE+"Armor Penetration");
+				    			  }
+				    			  if (suffix.equalsIgnoreCase("Draining")) {
+				    				  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*30)+20))+"% "+ChatColor.BLUE+"Life Steal");
+				    			  }
+				    			  if (suffix.equalsIgnoreCase("Fury")) {
+				    				  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+10))+"% "+ChatColor.BLUE+"Attack Speed");
+				    			  }
+				    			  if (suffix.equalsIgnoreCase("Power")) {
+				    				  setLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*10)+5))+" "+ChatColor.BLUE+"Damage");
+				    			  }
+				    			  setLore.add("");
+				    			  setLore.add(ChatColor.YELLOW+"[Halloween]");
+				    			  setLore.add("This item was created during the Halloween");
+				    			  setLore.add("event. When this item breaks, it simply turns");
+				    			  setLore.add("into a \"broken\" state and has a recharge time");
+				    			  setLore.add("of 1 week. The item will be fully restored after");
+				    			  setLore.add("a week of cooldown.");
+				    			  meta.setLore(setLore);
+				    			  finalitem.setItemMeta(meta);
+				    			  //finalitem.setDurability((short)1560); //TESTING.
+				    			  boolean full=true;
+				    			  for (int j=0;j<p.getInventory().getContents().length;j++) {
+				    				  if (p.getInventory().getContents()[j]==null) {
+				    					  full=false;
+				    					  break;
+				    				  }
+				    			  }
+				    			  if (!full) {
+				    				  p.getInventory().addItem(finalitem);
+				    			  } else {
+				    				  p.getWorld().dropItemNaturally(p.getLocation(), finalitem); //Drop item on the ground if our inventory is full. That way we don't lose it.
+				    			  }
+				    			  ItemStack item = null;
+				    					  //Add a weapon/armor piece.
+				    					  int rand = (int)(Math.random()*5);
+				    					  String type1 = "DIAMOND";
+				    					  String type2 = "";
+				    					  int rarity=2; //0 = Normal, 1 = Rare, 2 = Legendary
+				    					  if (rand!=0 && rand!=3) {
+				    						  rand = (int)(Math.random()*9);
+				    						  type2 = "";
+				    						  switch (rand) {
+				    							  case 0: {
+				    								  type2 = "HELMET";
+				    							  }break;
+				    							  case 1: {
+				    								  type2 = "CHESTPLATE";
+				    							  }break;
+				    							  case 2: {
+				    								  type2 = "LEGGINGS";
+				    							  }break;
+				    							  case 3: {
+				    								  type2 = "BOOTS";
+				    							  }break;
+				    							  case 4: {
+				    								  type2 = "SWORD";
+				    							  }break;
+				    							  case 5: {
+				    								  type2 = "BOOTS";
+				    							  }break;
+				    							  case 6: {
+				    								  type2 = "LEGGINGS";
+				    							  }break;
+				    							  case 7: {
+				    								  type2 = "CHESTPLATE";
+				    							  }break;
+				    							  case 8: {
+				    								  type2 = "HELMET";
+				    							  }break;
+				    						  }  
+				    					  } else {
+				    						  rand = (int)(Math.random()*5);
+				    						  type2 = "";
+				    						  switch (rand) {
+				    							  case 0: {
+				    								  type2 = "HELMET";
+				    							  }break;
+				    							  case 1: {
+				    								  type2 = "CHESTPLATE";
+				    							  }break;
+				    							  case 2: {
+				    								  type2 = "LEGGINGS";
+				    							  }break;
+				    							  case 3: {
+				    								  type2 = "BOOTS";
+				    							  }break;
+				    							  case 4: {
+				    								  type2 = "SWORD";
+				    							  }break;
+				    						  }  
+				    					  }
+				    					  double chance_increase=0;
+				    					  if (rarity>0) {
+				    						  chance_increase=1.5d;
+				    					  }
+				    					  if (type2.equalsIgnoreCase("BOW")) {
+				    						  item = new ItemStack(Material.BOW);
+				    						  int enchants[] = {48,49,50,51};
+				    						  for (int j=0;j<enchants.length;j++) {
+				    							  if (Math.random()*chance_increase<1.0d/enchants.length) {
+				    								  if (rarity==2) {
+				    									  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*10)+1);
+				    								  } else {
+				    									  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*6)+1);
+				    								  }
+				    							  }
+				    						  }
+				    						  List<String> ourLore = new ArrayList<String>();
+				    						  if (Math.random()<=0.2) {
+				    							  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+				    						  }
+				    						  if (Math.random()<=0.2) {
+				    							  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*3)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+				    						  }
+				    						  if (Math.random()<=0.2) {
+				    							  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Life Steal");
+				    						  }
+				    						  if (Math.random()<=0.2) {
+				    							  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+				    						  }
+				    						  if (Math.random()<=0.2) {
+				    							  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+1)+" "+ChatColor.BLUE+"Damage");
+				    						  }
+				    						  ItemMeta meta1 = item.getItemMeta();
+				    						  meta1.setLore(ourLore);
+				    						  item.setItemMeta(meta1);
+				    					  } else {
+				    						  item = new ItemStack(Material.getMaterial(type1+"_"+type2));
+				    						  if (type2.equalsIgnoreCase("SWORD")) {
+				    							  int enchants[] = {16,17,18,19,20,21,34};
+				    							  for (int j=0;j<enchants.length;j++) {
+				    								  if (Math.random()*chance_increase<1.0d/enchants.length) {
+				    									  if (rarity==2) {
+				    										  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*10)+1);
+				    									  } else {
+				    										  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*6)+1);
+				    									  }
+				    								  }
+				    							  }
+				    							  List<String> ourLore = new ArrayList<String>();
+				    							  if (Math.random()<=0.2) {
+				    								  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+				    							  }
+				    							  if (Math.random()<=0.2) {
+				    								  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*3)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+				    							  }
+				    							  if (Math.random()<=0.2) {
+				    								  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Life Steal");
+				    							  }
+				    							  if (Math.random()<=0.2) {
+				    								  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+				    							  }
+				    							  if (Math.random()<=0.2) {
+				    								  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+1)+" "+ChatColor.BLUE+"Damage");
+				    							  }
+				    							  ItemMeta meta1 = item.getItemMeta();
+				    							  meta1.setLore(ourLore);
+				    							  item.setItemMeta(meta1);
+				    						  } else if (type2.equalsIgnoreCase("SPADE") || type2.equalsIgnoreCase("PICKAXE") || type2.equalsIgnoreCase("HOE") || type2.equalsIgnoreCase("AXE")) {
+				    							  int enchants[] = {32,33,34,35};
+				    							  for (int j=0;j<enchants.length;j++) {
+				    								  if (Math.random()<1.0d/enchants.length) {
+				    									  if (Math.random()<1.0d/enchants.length) {
+				    										  if (Math.random()*chance_increase<1.0d/enchants.length) {
+				    											  if (rarity==2) {
+				    												  if (enchants[j]==33) {
+				    													  if (item.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)==0) {
+				    														  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*10)+1);
+				    													  }
+				    												  }
+				    												  if (enchants[j]==35) {
+				    													  if (item.getEnchantmentLevel(Enchantment.SILK_TOUCH)==0) {
+				    														  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*10)+1);
+				    													  }
+				    												  }
+				    											  } else {
+				    												  if (enchants[j]==33) {
+				    													  if (item.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)==0) {
+				    														  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*6)+1);
+				    													  }
+				    												  }
+				    												  if (enchants[j]==35) {
+				    													  if (item.getEnchantmentLevel(Enchantment.SILK_TOUCH)==0) {
+				    														  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*6)+1);
+				    													  }
+				    												  }
+				    											  }
+				    										  }
+				    									  }
+				    								  }
+				    							  }
+				    							  List<String> ourLore = new ArrayList<String>();
+				    							  if (Math.random()<=0.2) {
+				    								  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+				    							  }
+				    							  if (Math.random()<=0.2) {
+				    								  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*3)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+				    							  }
+				    							  if (Math.random()<=0.2) {
+				    								  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Life Steal");
+				    							  }
+				    							  if (Math.random()<=0.2) {
+				    								  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+				    							  }
+				    							  if (Math.random()<=0.2) {
+				    								  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+1)+" "+ChatColor.BLUE+"Damage");
+				    							  }
+				    							  ItemMeta meta1 = item.getItemMeta();
+				    							  meta1.setLore(ourLore);
+				    							  item.setItemMeta(meta1);
+				    						  } else {
+				    							  int enchants[] = {0,1,2,3,4,5,6,7,34};
+				    							  for (int j=0;j<enchants.length;j++) {
+				    								  if (Math.random()<1.0d/enchants.length) {
+				    									  if (rarity==2) {
+				    										  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*10)+1);
+				    									  } else {
+				    										  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*6)+1);
+				    									  }
+				    								  }
+				    							  }
+				    							  List<String> ourLore = new ArrayList<String>();
+				    							  if (rarity==2) { 
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*16)+1)+" "+ChatColor.BLUE+"Health");
+				    								  } else
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Damage Reduction");
+				    								  } else
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*200)+1)*10)+"% "+ChatColor.BLUE+"Durability");
+				    								  } else
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Block Chance");
+				    								  } else
+				    								  {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
+				    								  }
+				    							  } else 
+				    							  if (rarity==1) {
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*8)+1)+" "+ChatColor.BLUE+"Health");
+				    								  } else
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Damage Reduction");
+				    								  } else
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*100)+1)*10)+"% "+ChatColor.BLUE+"Durability");
+				    								  } else
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Block Chance");
+				    								  } else
+				    								  {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
+				    								  }
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*8)+1)+" "+ChatColor.BLUE+"Health");
+				    								  } else
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Damage Reduction");
+				    								  } else
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*100)+1)*10)+"% "+ChatColor.BLUE+"Durability");
+				    								  } else
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Block Chance");
+				    								  } else
+				    								  {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
+				    								  }
+				    							  } else {
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*4)+1)+" "+ChatColor.BLUE+"Health");
+				    								  }
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Damage Reduction");
+				    								  }
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+1)*10)+"% "+ChatColor.BLUE+"Durability");
+				    								  }
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Block Chance");
+				    								  }
+				    								  if (Math.random()<=0.2) {
+				    									  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
+				    								  }
+				    							  }
+				    							  ItemMeta meta1 = item.getItemMeta();
+				    							  meta1.setLore(ourLore);
+				    							  if (rarity==1) {
+				    								  meta1.setDisplayName(ChatColor.BLUE+"Rare "+item.getType().name().replace("_", " "));
+				    							  }
+				    							  if (rarity==2) {
+				    								  meta1.setDisplayName(ChatColor.YELLOW+""+ChatColor.BOLD+"Legendary "+item.getType().name().replace("_", " "));
+				    							  }
+				    							  item.setItemMeta(meta1);
+				    						  }
+				    					  }
+				    				  
+				    				p.getInventory().addItem(item);
+				    				ItemStack wand = new ItemStack(Material.getMaterial(127));
+				    				ItemMeta wand_meta = wand.getItemMeta();
+				    				wand_meta.setDisplayName(ChatColor.RED+"P"+
+				    						ChatColor.GOLD+"o"+ChatColor.YELLOW+"l"+
+				    						ChatColor.GREEN+"y"+ChatColor.BLUE+"m"+
+				    						ChatColor.LIGHT_PURPLE+"o"+ChatColor.DARK_RED+"r"
+				    						+ChatColor.DARK_GREEN+"p"+ChatColor.DARK_PURPLE+"h"+ChatColor.RESET+" Wand");
+				    				List<String> newLore = new ArrayList<String>();
+				    				newLore.add("A "+ChatColor.YELLOW+"[Halloween]"+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" item received as a reward");
+				    				newLore.add("for participating in the event. This item can");
+				    				newLore.add("turn a creature into another creature.");
+				    				newLore.add("Can be used once a minute.");
+				    				wand_meta.setLore(newLore);
+				    				wand.setItemMeta(wand_meta);
+				    				p.getInventory().addItem(wand);
+				    	  }
+				      }
+				  	},400);
+				  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+				      @Override
+				      public void run() {
+				    	  Bukkit.broadcastMessage(ChatColor.GOLD+""+ChatColor.BOLD+"");
+				    	  Bukkit.broadcastMessage(ChatColor.GOLD+""+ChatColor.BOLD+"Again, thank you for participating, and everyone have a great night!");
+				      }
+				  	},600);
+				  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+				      @Override
+				      public void run() {
+				    	  Bukkit.broadcastMessage(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"  And so the Harrowing ends....");
+				      }
+				  	},700);
+				  Bukkit.getWorld("world").setDifficulty(Difficulty.HARD);
+				  this.plugin.harrowing_night=true;
+  				  this.plugin.saveConfig();
+  			  }
 			  if (args[0].equalsIgnoreCase("spawn_dungeon") && args[1].equalsIgnoreCase("boss")) {
 				//Empty the whole area.
 	  				double xoffset = Math.random()*10+15;

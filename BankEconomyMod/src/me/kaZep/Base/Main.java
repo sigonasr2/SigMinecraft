@@ -106,6 +106,7 @@ public class Main extends JavaPlugin
   public long check_nether_time=0;
   public long check_lights_time=0;
   public long check_spleef_game=0;
+  public boolean harrowing_night=false;
   
   public int REVIVE_EFFECT=0; 
   public Location REVIVE_EFFECT_LOC; 
@@ -2853,7 +2854,16 @@ public void checkJukeboxes() {
 			    				  //Bukkit.getPlayer("sigonasr2").sendMessage("Entered 2.");
 		    					  if (p2!=p) {
 				    				  if (supportlv>=20) {
-				    					  if (!p2.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
+				    					  int get_resistance_level=-1;
+				    					  Iterator<PotionEffect> effects = p2.getActivePotionEffects().iterator();
+				    					  while (effects.hasNext()) {
+				    						  PotionEffect pot = effects.next();
+				    						  if (pot.getType()==PotionEffectType.DAMAGE_RESISTANCE) {
+				    							  get_resistance_level=pot.getAmplifier();
+				    							  break;
+				    						  }
+				    					  }
+				    					  if (get_resistance_level<1) {
 				    	    				  //Bukkit.getPlayer("sigonasr2").sendMessage("Entered 4.");
 				    						  p2.sendMessage(ChatColor.YELLOW+"[Aura]"+ChatColor.ITALIC+"Damage reduction buff (40%) from Support "+ChatColor.DARK_RED+p.getName());
 				    						  p2.sendMessage(ChatColor.YELLOW+"[Aura]"+ChatColor.ITALIC+"Food Exhaustion buff (50% less food consumption) from Support "+ChatColor.DARK_RED+p.getName());
@@ -2866,7 +2876,16 @@ public void checkJukeboxes() {
 				    				  if (supportlv>=5) {
 					    				  //Bukkit.getPlayer("sigonasr2").sendMessage("Entered 3.");
 				    					  //Give them a resistance buff.
-				    					  if (!p2.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
+				    					  int get_resistance_level=-1;
+				    					  Iterator<PotionEffect> effects = p2.getActivePotionEffects().iterator();
+				    					  while (effects.hasNext()) {
+				    						  PotionEffect pot = effects.next();
+				    						  if (pot.getType()==PotionEffectType.DAMAGE_RESISTANCE) {
+				    							  get_resistance_level=pot.getAmplifier();
+				    							  break;
+				    						  }
+				    					  }
+				    					  if (get_resistance_level<0) {
 				    	    				  //Bukkit.getPlayer("sigonasr2").sendMessage("Entered 4.");
 				    						  p2.sendMessage(ChatColor.YELLOW+"[Aura]"+ChatColor.ITALIC+"Damage reduction buff (20%) from Support "+ChatColor.DARK_RED+p.getName());
 				    						  p2.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 601, 0, false));
@@ -3219,7 +3238,11 @@ public void updateTime() {
     				  last_world_time+=2;
     				  raisecount++;
     			  }
-				  Bukkit.getWorld("world").setFullTime(Bukkit.getWorld("world").getFullTime()-raisecount);
+    			  if (!harrowing_night) {
+    				  Bukkit.getWorld("world").setFullTime(Bukkit.getWorld("world").getFullTime()-raisecount);
+    			  } else {
+    				  Bukkit.getWorld("world").setFullTime(last_world_time);
+    			  }
     			  /*
     			  if (Bukkit.getWorld("world").getFullTime()-last_world_time+hold_diff>=2) {
     				  last_world_time = Bukkit.getWorld("world").getFullTime()+((Bukkit.getWorld("world").getFullTime()-last_world_time+(hold_diff/2))/2);
