@@ -1440,18 +1440,18 @@ public void runTick() {
 										  l.setCustomName(ChatColor.GOLD+"Venomous Spider II");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()*2);
+										  l.setMaxHealth(l.getMaxHealth()*1.5);
 									  } else
 									  if (Math.random()<=0.35) {
 										  l.setCustomName(ChatColor.YELLOW+"Snaring Spider");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()*2);
+										  l.setMaxHealth(l.getMaxHealth()*1.5);
 									  } else {
 										  l.setCustomName(ChatColor.GOLD+"Snaring Spider II");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()*4);
+										  l.setMaxHealth(l.getMaxHealth()*2);
 									  }
 									  l.setHealth(l.getMaxHealth());
 								  }
@@ -1486,14 +1486,14 @@ public void runTick() {
 										  l.setCustomName(ChatColor.YELLOW+"Charge Zombie");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()+20);
+										  l.setMaxHealth(l.getMaxHealth()+5);
 									  } else {
 										  l.setCustomName(ChatColor.GOLD+"Charge Zombie II");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()+60);
+										  l.setMaxHealth(l.getMaxHealth()+20);
 									  }
-									  l.setHealth(l.getMaxHealth());
+									  l.setHealth(l.getMaxHealth()*0.95d);
 								  } else {
 									  if (Math.random()<=0.10+((heightmodifier-l.getLocation().getY())*0.01d)) {
 										  if (Math.random()<=0.25) {
@@ -1509,7 +1509,8 @@ public void runTick() {
 											  l.getEquipment().setHelmet(new ItemStack(Material.AIR));
 											  Zombie g = (Zombie)l;
 											  g.setBaby(true);
-											  l.setMaxHealth(l.getMaxHealth()+20);
+											  //l.setMaxHealth(l.getMaxHealth()+20);
+											  l.setHealth(l.getMaxHealth()*0.65d);
 										  }
 									  }
 								  }
@@ -2858,9 +2859,12 @@ public void checkJukeboxes() {
 				    					  Iterator<PotionEffect> effects = p2.getActivePotionEffects().iterator();
 				    					  while (effects.hasNext()) {
 				    						  PotionEffect pot = effects.next();
-				    						  if (pot.getType()==PotionEffectType.DAMAGE_RESISTANCE) {
+				    						  if (pot.getType().getName().equalsIgnoreCase(PotionEffectType.DAMAGE_RESISTANCE.getName())) {
 				    							  get_resistance_level=pot.getAmplifier();
+				    							  //Bukkit.broadcastMessage("Got REsistance of "+pot.getAmplifier());
 				    							  break;
+				    						  } else {
+				    							  //Bukkit.broadcastMessage("Got buff of "+pot.getType());
 				    						  }
 				    					  }
 				    					  if (get_resistance_level<1) {
@@ -2880,9 +2884,12 @@ public void checkJukeboxes() {
 				    					  Iterator<PotionEffect> effects = p2.getActivePotionEffects().iterator();
 				    					  while (effects.hasNext()) {
 				    						  PotionEffect pot = effects.next();
-				    						  if (pot.getType()==PotionEffectType.DAMAGE_RESISTANCE) {
+				    						  if (pot.getType().getName().equalsIgnoreCase(PotionEffectType.DAMAGE_RESISTANCE.getName())) {
 				    							  get_resistance_level=pot.getAmplifier();
+				    							  //Bukkit.broadcastMessage("Got REsistance of "+pot.getAmplifier());
 				    							  break;
+				    						  } else {
+				    							  //Bukkit.broadcastMessage("Got buff of "+pot.getType());
 				    						  }
 				    					  }
 				    					  if (get_resistance_level<0) {
@@ -3238,11 +3245,7 @@ public void updateTime() {
     				  last_world_time+=2;
     				  raisecount++;
     			  }
-    			  if (!harrowing_night) {
-    				  Bukkit.getWorld("world").setFullTime(Bukkit.getWorld("world").getFullTime()-raisecount);
-    			  } else {
-    				  Bukkit.getWorld("world").setFullTime(last_world_time);
-    			  }
+    			Bukkit.getWorld("world").setFullTime(Bukkit.getWorld("world").getFullTime()-raisecount);
     			  /*
     			  if (Bukkit.getWorld("world").getFullTime()-last_world_time+hold_diff>=2) {
     				  last_world_time = Bukkit.getWorld("world").getFullTime()+((Bukkit.getWorld("world").getFullTime()-last_world_time+(hold_diff/2))/2);
@@ -3621,6 +3624,10 @@ public void payDay(int time)
 		JobsDataInfo info = Jobsinfo[getJobSlot(job)];
 		economy.depositPlayer(p.getName(), amount*(1d+(info.moneymult*getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv"))));
 		getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")+exp));
+		if (getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")<0) {
+			//It can't be negative.
+			getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"exp", Double.valueOf(0.0));
+		}
 		//Check for lv up.
 		if (getJobLv(job,p)<40 && getJobExp(job,getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv"))<=getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")) {
 			//Level up! Level up! YEAH!
@@ -3635,6 +3642,51 @@ public void payDay(int time)
 			}
 		}
 		saveAccountsConfig();
+	}
+	
+	public void levelUpJob(Player p, String job) {
+		//If they have a job token, then do this. Otherwise they are not allowed.
+		boolean has_job_token=false;
+		ItemStack j = new ItemStack(Material.getMaterial(34));
+		  ItemMeta meta = j.getItemMeta();
+		  meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Job Boost Card");
+		  List<String> lore = new ArrayList<String>();
+		  lore.add("Use /jobs boost <jobname> to instantly level up");
+		  lore.add("that job with this card!");
+		  meta.setLore(lore);
+		  j.setItemMeta(meta);
+		if (p.getInventory().containsAtLeast(j, 1)) {
+			String[] jobs = getJobs(p);
+			int slot=-1;
+			JobsDataInfo[] Jobsinfo = {Woodcutter_job,Miner_job,Builder_job,Digger_job,Farmer_job,Hunter_job,Fisherman_job,Weaponsmith_job,Blacksmith_job,Cook_job,Brewer_job,Enchanter_job,Breeder_job,Explorer_job,Support_job};
+			for (int i=0;i<jobs.length;i++) {
+				if (job.equalsIgnoreCase(jobs[i])) {
+					slot=i;
+					break;
+				}
+			}
+			if (slot!=-1) {
+				JobsDataInfo info = Jobsinfo[getJobSlot(job)];
+				if (getJobLv(job,p)<40) {
+				getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv")+1));
+				Bukkit.broadcastMessage(p.getName()+" is now a Level "+getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
+				if (getJobTotalLvs(p)%5==0) {
+					Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+" has reached Level "+getJobTotalLvs(p)+"!");
+					if ((((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))>0) {
+						p.sendMessage(ChatColor.GOLD+"You have earned 1 stat point! You now have "+(((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))+" stat point"+((((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))==1?"":"s")+" to spend. "+ChatColor.ITALIC+ChatColor.BLUE+" Type /sp to spend them!");
+					}
+				}
+				saveAccountsConfig();
+				p.getInventory().removeItem(j);
+				} else {
+		    		p.sendMessage(ChatColor.GOLD+"You can't level this job. It is already at max level.");
+				}
+			} else {
+	    		p.sendMessage(ChatColor.GOLD+"Sorry, that is not a valid job!");
+			}
+		} else {
+    		p.sendMessage(ChatColor.GOLD+"Sorry, you cannot do this!");
+		}
 	}
 	
 	public void gainMoney(Player p,String job,double amount) {

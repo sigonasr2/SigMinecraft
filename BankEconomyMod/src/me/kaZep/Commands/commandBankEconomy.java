@@ -30,6 +30,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
@@ -491,6 +493,21 @@ public String convertToItemName(String val) {
   			  }
             } else
             if (cmd.getName().equalsIgnoreCase("event") && args.length==2 && p.hasPermission("maintenance-mode-admin")) {
+			  if (args[0].equalsIgnoreCase("halloween_reward")) {
+				  Bukkit.broadcastMessage(args[1]+" has won the Pumpkin Patch contest due to popular vote! "+ChatColor.BOLD+"Congratulations!");
+				  Player f = Bukkit.getPlayer(args[1]);
+				  f.sendMessage("You have received $800 in holding money, and 5 Job Boost cards!");
+				  this.plugin.economy.depositPlayer(args[1], 800);
+				  ItemStack i = new ItemStack(Material.getMaterial(34),5);
+				  ItemMeta meta = i.getItemMeta();
+				  meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Job Boost Card");
+				  List<String> lore = new ArrayList<String>();
+				  lore.add("Use /jobs boost <jobname> to instantly level up");
+				  lore.add("that job with this card!");
+				  meta.setLore(lore);
+				  i.setItemMeta(meta);
+				  f.getInventory().addItem(i);
+			  }
   			  if (args[0].equalsIgnoreCase("halloween") && args[1].equalsIgnoreCase("end")) {
   				  p.sendMessage(ChatColor.GRAY+"Ending Harrowing night... Did you make sure it was night time? If not, type this command again after /time night instead.");
   				  this.plugin.harrowing_night=true;
@@ -844,6 +861,12 @@ public String convertToItemName(String val) {
 				    							  }
 				    							  ItemMeta meta1 = item.getItemMeta();
 				    							  meta1.setLore(ourLore);
+				    							  if (rarity==1) {
+				    								  meta.setDisplayName(ChatColor.BLUE+"Rare "+convertToItemName(item.getType().name().replace("_", " ")));
+				    							  }
+				    							  if (rarity==2) {
+				    								  meta.setDisplayName(ChatColor.YELLOW+""+ChatColor.BOLD+"Legendary "+convertToItemName(item.getType().name().replace("_", " ")));
+				    							  }
 				    							  item.setItemMeta(meta1);
 				    						  } else if (type2.equalsIgnoreCase("SPADE") || type2.equalsIgnoreCase("PICKAXE") || type2.equalsIgnoreCase("HOE") || type2.equalsIgnoreCase("AXE")) {
 				    							  int enchants[] = {32,33,34,35};
@@ -896,6 +919,12 @@ public String convertToItemName(String val) {
 				    							  }
 				    							  ItemMeta meta1 = item.getItemMeta();
 				    							  meta1.setLore(ourLore);
+				    							  if (rarity==1) {
+				    								  meta.setDisplayName(ChatColor.BLUE+"Rare "+convertToItemName(item.getType().name().replace("_", " ")));
+				    							  }
+				    							  if (rarity==2) {
+				    								  meta.setDisplayName(ChatColor.YELLOW+""+ChatColor.BOLD+"Legendary "+convertToItemName(item.getType().name().replace("_", " ")));
+				    							  }
 				    							  item.setItemMeta(meta1);
 				    						  } else {
 				    							  int enchants[] = {0,1,2,3,4,5,6,7,34};
@@ -977,10 +1006,10 @@ public String convertToItemName(String val) {
 				    							  ItemMeta meta1 = item.getItemMeta();
 				    							  meta1.setLore(ourLore);
 				    							  if (rarity==1) {
-				    								  meta1.setDisplayName(ChatColor.BLUE+"Rare "+item.getType().name().replace("_", " "));
+				    								  meta.setDisplayName(ChatColor.BLUE+"Rare "+convertToItemName(item.getType().name().replace("_", " ")));
 				    							  }
 				    							  if (rarity==2) {
-				    								  meta1.setDisplayName(ChatColor.YELLOW+""+ChatColor.BOLD+"Legendary "+item.getType().name().replace("_", " "));
+				    								  meta.setDisplayName(ChatColor.YELLOW+""+ChatColor.BOLD+"Legendary "+convertToItemName(item.getType().name().replace("_", " ")));
 				    							  }
 				    							  item.setItemMeta(meta1);
 				    						  }
@@ -1002,6 +1031,9 @@ public String convertToItemName(String val) {
 				    				wand_meta.setLore(newLore);
 				    				wand.setItemMeta(wand_meta);
 				    				p.getInventory().addItem(wand);
+				    				p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,1728000,1));
+				    				p.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,1728000,1));
+				    				p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,1728000,0));
 				    	  }
 				      }
 				  	},400);
@@ -1395,7 +1427,7 @@ public String convertToItemName(String val) {
           double deathZ = this.plugin.getAccountsConfig().getDouble(p.getName() + ".deathpointZ");
           String deathWorld = this.plugin.getAccountsConfig().getString(p.getName() + ".deathworld");
     	  //p.sendMessage("Got 1.");
-          if (this.plugin.getAccountsConfig().getBoolean(p.getName() + ".revived")==false && p.getPlayerTime()-this.plugin.getAccountsConfig().getDouble(p.getName() + ".revivetime")<12000) {
+          if (this.plugin.getAccountsConfig().getBoolean(p.getName() + ".revived")==false && p.getPlayerTime()-this.plugin.getAccountsConfig().getLong(p.getName() + ".revivetime")<12000) {
         	  double mincost = this.plugin.getConfig().getDouble("revive-cost-rate");
         	  //p.sendMessage("Got 2.");
         	  if (p.getBedSpawnLocation()!=null) {
@@ -1412,7 +1444,7 @@ public String convertToItemName(String val) {
 	          if (mymoney>=finalcost) {
 	        	  this.plugin.getAccountsConfig().set(p.getName() + ".revived", Boolean.valueOf(true));
 	        	  this.plugin.getAccountsConfig().set(p.getName() + ".money", mymoney-finalcost);
-	        	  this.plugin.getAccountsConfig().set(p.getName() + ".revivetime", Double.valueOf(0.0d));
+	        	  this.plugin.getAccountsConfig().set(p.getName() + ".revivetime", Long.valueOf(0));
 	        	  this.plugin.saveAccountsConfig();
 	        	  //p.sendMessage("Got 4.");
 	        	  p.sendMessage("You spent $"+df.format(finalcost)+" to revive. New Bank Balance: $"+ChatColor.YELLOW+df.format(mymoney-finalcost));
@@ -1479,7 +1511,7 @@ public String convertToItemName(String val) {
 			            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName() + ".money");
 			            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
 			            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
-			            	finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
+			            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
 			            	if (mymoney>=finalcost) {
 			            		//Allow teleport to occur.
 			  	        	  this.plugin.getAccountsConfig().set(p.getName() + ".money", mymoney-finalcost);
@@ -1504,7 +1536,7 @@ public String convertToItemName(String val) {
 			            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName() + ".money");
 			            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
 			            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
-			            	finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
+			            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
 			            	if (mymoney>=finalcost) {
 			            		//Allow teleport to occur.
 						        p.sendMessage("Teleporting to "+ChatColor.GREEN+target.getName()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". Type the command again to teleport.");
@@ -1533,7 +1565,7 @@ public String convertToItemName(String val) {
 		            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName() + ".money");
 		            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
 		            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
-		            	finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
+		            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
 		            	if (mymoney>=finalcost) {
 		            		//Allow teleport to occur.
 					        p.sendMessage("Teleporting to "+ChatColor.GREEN+target.getName()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". Type the command again to teleport.");
@@ -1565,6 +1597,10 @@ public String convertToItemName(String val) {
 		  //Attempt to join the job.
     	  this.plugin.setUltimate(p,args[1]);
       } else
+          if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 2 && args[0].equalsIgnoreCase("boost")) {
+    		  //Attempt to level up the job.
+        	  this.plugin.levelUpJob(p,args[1]);
+          } else
       if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 2 && args[0].equalsIgnoreCase("join")) {
 		  //Attempt to join the job.
     	  this.plugin.joinJob(p,args[1]);
