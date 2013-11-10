@@ -268,7 +268,7 @@ public class PlayerListener
   
   @EventHandler
   public void onServerListPing(ServerListPingEvent e) {
-	  e.setMaxPlayers(15);
+	  e.setMaxPlayers(16);
 	  if (this.plugin.getConfig().getBoolean("maintenance-mode")) {
 		  e.setMotd(ChatColor.RED+"Currently in Maintenance Mode.");
 	  } else {
@@ -1866,10 +1866,14 @@ public class PlayerListener
 	      }
       }
   }
+
+  public double Warning(LivingEntity l,int id) {
+	  return this.plugin.Warning(l, id);
+  }
   
   public double Warning(double hp,int id) {
 	  if (hp>65) {
-		  Bukkit.broadcastMessage("HP too high for ID "+id+". HP was "+hp);
+		  Bukkit.broadcastMessage("PlayerListener: HP too high for ID "+id+". HP was "+hp);
 	  }
 	  return hp;
   }
@@ -1919,8 +1923,11 @@ public class PlayerListener
 		  boolean despawn=true;
 		  if (entity instanceof Monster) {
 			  LivingEntity test = (LivingEntity)entity;
-			  test.setMaxHealth(10);
-			  test.setHealth(Warning(test.getMaxHealth(),1));
+			  /*test.setMaxHealth(10);
+			  Warning(test,1);
+			  if (test!=null && test.isValid()) {
+				  test.setHealth(test.getMaxHealth());
+			  }*/
 			  boolean block=false;
 			  if (test.getCustomName()!=null && (test.getCustomName().contains(ChatColor.DARK_PURPLE+"") || test.getCustomName().contains(ChatColor.DARK_AQUA+"Polymorphed Creature"))) {
 				  for (int i=-2;i<3;i++) {
@@ -1933,13 +1940,6 @@ public class PlayerListener
 							  }
 						  }
 					  }
-				  }
-			  }
-			  if (test.getCustomName()!=null && !test.getCustomName().contains(ChatColor.DARK_PURPLE+"") && !test.getCustomName().contains(ChatColor.DARK_AQUA+"Polymorphed Creature")) {
-				  if (test.getMaxHealth()>50) {
-					  Bukkit.getPlayer("sigonasr2").sendMessage("Mob had "+test.getMaxHealth()+" health. Lowering to max cap of 50.");
-					  test.setMaxHealth(50);
-					  test.setHealth(Warning(test.getMaxHealth(),2));
 				  }
 			  }
 			  List<Entity> entities = Bukkit.getWorld("world").getEntities();
@@ -1969,8 +1969,14 @@ public class PlayerListener
 			  boolean contains=entity instanceof Monster;
 			  if (contains) {
 				  Monster m = (Monster)entity;
-				  m.setMaxHealth(Warning(m.getMaxHealth()*1.15d,3)); //Increase all mobs' HP by 15%.
-				  m.setHealth(Warning(m.getMaxHealth(),4));
+				  Warning(m,3);
+				  if (m!=null && m.isValid()) {
+					  m.setMaxHealth(m.getMaxHealth()*1.15d); //Increase all mobs' HP by 15%.
+					  Warning(m,4);
+					  if (m!=null && m.isValid()) {
+						  m.setHealth(m.getMaxHealth());
+					  }
+				  }
 			  }
 			  //Mobs have more health when they are farther away, to make the mobs harder in general.
 			  float groupmult=0.25f; //Change this to modify the global grouping multiplier.
@@ -6156,7 +6162,7 @@ public ItemStack getGoodie() {
 	  }
   }
   
-  public void FatalSurvivor(Player p) {
+  final public void FatalSurvivor(Player p) {
 	  p.setHealth(p.getMaxHealth());
 	  p.sendMessage("You used your "+ChatColor.YELLOW+"Lv10 Fatal Survivor"+ChatColor.WHITE+" buff. Your health has been restored."+ChatColor.AQUA+" It will be recharged in one hour.");
 	  Bukkit.broadcastMessage(ChatColor.YELLOW+p.getName()+ChatColor.WHITE+" has died...and revived through sheer willpower!");
@@ -6211,18 +6217,14 @@ public ItemStack getGoodie() {
 				  eve.data2=p.getLevel();
 				  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
 				  this.plugin.explorers.add(eve);
-				  if (!survivor && p.getHealth()-actualdmg<=0) {
-					  e.setDamage(0);
-					  FatalSurvivor(p); //Run fatal survivor. They lived!
-				  } else {
-					  /*if (p.getHealth()-actualdmg<=0) {
-						  PersistentExplorerList ev = new PersistentExplorerList(p.getName());
-						  ev.event=1;
-						  ev.data=p.getExp();
-						  ev.data2=p.getLevel();
-						  this.plugin.explorers.add(ev);
-					  }*/
-				  }
+				  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+				      @Override
+				      public void run() {
+					      if (p.getHealth()<=0) {
+					    	  FatalSurvivor(p);
+					      }
+				      }
+				  	},1);
 			  }
 		  }
 		  //e.getCause()==DamageCause.
@@ -6235,6 +6237,9 @@ public ItemStack getGoodie() {
 				      DecimalFormat df2 = new DecimalFormat("#0");
 				      if (player_starthp-p.getHealth()>=0.5) {
 				    	  p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(player_starthp-p.getHealth())+" damage from "+ChatColor.WHITE+f.getCause().toString()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((player_starthp-p.getHealth())/p.getMaxHealth())*100)+"%)");
+				      }
+				      if (p.getHealth()<=0) {
+				    	  FatalSurvivor(p);
 				      }
 			      }
 			  	},1);
@@ -6283,8 +6288,21 @@ public ItemStack getGoodie() {
 				  }
 			  }
 		  }
-		  if (e.getRemaining()==0) {
-			  p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+String.valueOf(mod)+".");
+		  boolean same=false;
+		  for (int i=0;i<e.getPlayer().getInventory().getContents().length;i++) {
+			  if (hasSameItem(e.getItem().getItemStack(),e.getPlayer().getInventory().getContents()[i])) {
+				  same=true;
+				  break;
+			  }
+		  }
+		  if (this.plugin.inventoryFull(e.getPlayer())) {
+			  if (e.getRemaining()==0 && same) {
+				  p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+String.valueOf(mod)+".");
+			  }  
+		  } else {
+			  if (e.getRemaining()==0) {
+				  p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+String.valueOf(mod)+".");
+			  }
 		  }
 	  }
   }
@@ -6346,64 +6364,10 @@ public ItemStack getGoodie() {
   
   @EventHandler
   public void onEnemyHit(EntityDamageByEntityEvent e) {
-	  if (e.getDamager() instanceof Monster) {
-		  //e.setDamage(e.getDamage()*1.45d); //Damage of ALL mobs multiplied by x1.45.
-		  Monster m = (Monster)e.getDamager();
-		  if (m.getType()!=EntityType.ENDER_DRAGON && m.getType()!=EntityType.WITHER) {
-			  if (m.getCustomName()==null) {
-				  if (m.getMaxHealth()>65) {
-					  Bukkit.broadcastMessage("This mob had too much HP. HP: "+m.getMaxHealth());
-					  m.setMaxHealth(65); //65 HP cap.
-					  m.setHealth(65);
-					  m.setCustomName("Super Mob");
-					  m.setCustomNameVisible(true);
-					  Bukkit.broadcastMessage("This mob had too much HP. Lowered to "+m.getHealth()+"/"+m.getMaxHealth());
-				  }
-			  } else {
-				  if (!m.getCustomName().contains(ChatColor.DARK_PURPLE+"")) { //Make sure it's not a boss.
-					  if (m.getMaxHealth()>65) {
-						  Bukkit.broadcastMessage("This mob had too much HP. HP: "+m.getMaxHealth());
-						  m.setMaxHealth(65); //65 HP cap.
-						  m.setHealth(65);
-						  m.setCustomName("Super Mob");
-						  m.setCustomNameVisible(true);
-						  Bukkit.broadcastMessage("This mob had too much HP. Lowered to "+m.getHealth()+"/"+m.getMaxHealth());
-					  }
-				  }
-			  }
-		  }
-	  }
 	  if (e.getEntity() instanceof LivingEntity) {
-		  if (e.getDamager() instanceof Monster) {
-			  //e.setDamage(e.getDamage()*1.45d); //Damage of ALL mobs multiplied by x1.65.
-			  Monster m = (Monster)e.getDamager();
-			  if (m.getType()!=EntityType.ENDER_DRAGON && m.getType()!=EntityType.WITHER) {
-				  if (m.getCustomName()==null) {
-					  if (m.getMaxHealth()>65) {
-						  Bukkit.broadcastMessage("This mob had too much HP. HP: "+m.getMaxHealth());
-						  m.setMaxHealth(65); //65 HP cap.
-						  //m.setHealth(65);
-						  m.setCustomName("Super Mob");
-						  m.setCustomNameVisible(true);
-						  Bukkit.broadcastMessage("This mob had too much HP. Lowered to "+m.getHealth()+"/"+m.getMaxHealth());
-					  }
-				  } else {
-					  if (!m.getCustomName().contains(ChatColor.DARK_PURPLE+"")) { //Make sure it's not a boss.
-						  if (m.getMaxHealth()>65) {
-							  Bukkit.broadcastMessage("This mob had too much HP. HP: "+m.getMaxHealth());
-							  m.setMaxHealth(65); //65 HP cap.
-							  m.setHealth(65);
-							  m.setCustomName("Super Mob");
-							  m.setCustomNameVisible(true);
-							  Bukkit.broadcastMessage("This mob had too much HP. Lowered to "+m.getHealth()+"/"+m.getMaxHealth());
-						  }
-					  }
-				  }
-			  }
-		  }
 		  final LivingEntity l = (LivingEntity)e.getEntity();
 		  if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.DARK_PURPLE+"")) {
-			  Bukkit.getPlayer("sigonasr2").sendMessage("Entered Boss Entity hit loop.");
+			  //Bukkit.getPlayer("sigonasr2").sendMessage("Entered Boss Entity hit loop.");
 			  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 	                @Override
 	                public void run() {
@@ -6543,6 +6507,15 @@ public ItemStack getGoodie() {
 	  }
 	  if (e.getEntity().getType()==EntityType.PLAYER) {
 		  final Player p = (Player)e.getEntity();
+		  List<Entity> nearby = p.getNearbyEntities(10, 10, 10);
+		  for (int i=0;i<nearby.size();i++) {
+			  if (nearby.get(i).getType()==EntityType.PLAYER && this.plugin.PlayerinJob((Player)nearby.get(i), "Support") && this.plugin.getJobLv("Support", (Player)nearby.get(i))>=20) {
+				  //A support with the Lv20 buff is detected. If health is less than 8, take half damage.
+				  if (p.getHealth()<=8) {
+					  e.setDamage(e.getDamage()/2.0d);
+				  }
+			  }
+		  }
 		  if (e.getDamager() instanceof LivingEntity) {
 			  final double player_starthp = p.getHealth();
 			  final LivingEntity l = (LivingEntity)e.getDamager();
@@ -6557,6 +6530,9 @@ public ItemStack getGoodie() {
 				    	  p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(player_starthp-p.getHealth())+" damage from "+l.getCustomName()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((player_starthp-p.getHealth())/p.getMaxHealth())*100)+"%)");
 				      } else {
 				    	  p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(player_starthp-p.getHealth())+" damage from "+ChatColor.WHITE+l.getType()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((player_starthp-p.getHealth())/p.getMaxHealth())*100)+"%)");
+				      }
+				      if (p.getHealth()<=0) {
+				    	  FatalSurvivor(p);
 				      }
 			      }
 				

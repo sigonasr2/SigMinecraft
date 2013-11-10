@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import me.kaZep.Base.Dungeon;
 import me.kaZep.Base.Main;
 import net.milkbowl.vault.economy.Economy;
 
@@ -1143,7 +1142,7 @@ public String convertToItemName(String val) {
   			  }
             } else
             if (cmd.getName().equalsIgnoreCase("dungeon") && p.hasPermission("maintenance-mode-admin") && args.length==1) {
-          	  Dungeon x = new Dungeon(new Location(Bukkit.getWorld("world"),-8990,0,-4),new Location(Bukkit.getWorld("world"),50,255,50),Integer.valueOf(args[0]));
+          	  //Dungeon x = new Dungeon(new Location(Bukkit.getWorld("world"),-8990,0,-4),new Location(Bukkit.getWorld("world"),50,255,50),Integer.valueOf(args[0]));
             } else
         	if (cmd.getName().equalsIgnoreCase("transfer") && args.length==1) {
   			  p.sendMessage("Usage: "+ChatColor.RED+"/transfer name money"+ChatColor.WHITE+" - Transfer money to a player.");
