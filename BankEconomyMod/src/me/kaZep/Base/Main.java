@@ -179,6 +179,13 @@ public class Main extends JavaPlugin
 
   String pluginPrefix = "§2[BankEconomy]";
 
+  public double Warning(double hp,int id) {
+	  if (hp>65) {
+		  Bukkit.broadcastMessage("Main: HP too high for ID "+id+". HP was "+hp);
+	  }
+	  return hp;
+  }
+  
   public void onEnable()
   {
     getServer().getPluginManager().registerEvents(this.pl, this);
@@ -1415,26 +1422,26 @@ public void runTick() {
 										  l.setCustomName(ChatColor.YELLOW+"Explosive Creeper");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()*1.25d);
+										  l.setMaxHealth(Warning(l.getMaxHealth()*1.25d,1));
 									  } else
 									  if (Math.random()<=0.15) {
 										  l.setCustomName(ChatColor.GOLD+"Explosive Creeper II");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()*1.75d);
+										  l.setMaxHealth(Warning(l.getMaxHealth()*1.75d,2));
 									  } else
 									  if (Math.random()<=0.35) {
 										  l.setCustomName(ChatColor.YELLOW+"Destructive Creeper");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()*1.25d);
+										  l.setMaxHealth(Warning(l.getMaxHealth()*1.25d,3));
 									  } else {
 										  l.setCustomName(ChatColor.GOLD+"Destructive Creeper II");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()*1.75d);
+										  l.setMaxHealth(Warning(l.getMaxHealth()*1.75d,4));
 									  }
-									  l.setHealth(l.getMaxHealth());
+									  l.setHealth(Warning(l.getMaxHealth(),20));
 								  }
 								  l.setTicksLived(6400);
 							  }
@@ -1447,26 +1454,26 @@ public void runTick() {
 										  l.setCustomName(ChatColor.YELLOW+"Venomous Spider");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth());
+										  l.setMaxHealth(Warning(l.getMaxHealth(),5));
 									  } else
 									  if (Math.random()<=0.15) {
 										  l.setCustomName(ChatColor.GOLD+"Venomous Spider II");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()*1.5);
+										  l.setMaxHealth(Warning(l.getMaxHealth()*1.5,6));
 									  } else
 									  if (Math.random()<=0.35) {
 										  l.setCustomName(ChatColor.YELLOW+"Snaring Spider");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()*1.5);
+										  l.setMaxHealth(Warning(l.getMaxHealth()*1.5,7));
 									  } else {
 										  l.setCustomName(ChatColor.GOLD+"Snaring Spider II");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()*2);
+										  l.setMaxHealth(Warning(l.getMaxHealth()*2,8));
 									  }
-									  l.setHealth(l.getMaxHealth());
+									  l.setHealth(Warning(l.getMaxHealth(),21));
 								  }
 								  l.setTicksLived(6400);
 							  }
@@ -1479,14 +1486,14 @@ public void runTick() {
 										  l.setCustomName(ChatColor.YELLOW+"Sniper");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()/2);
+										  l.setMaxHealth(Warning(l.getMaxHealth()/2,9));
 									  } else {
 										  l.setCustomName(ChatColor.GOLD+"Sniper II");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()/4);
+										  l.setMaxHealth(Warning(l.getMaxHealth()/4,10));
 									  }
-									  l.setHealth(l.getMaxHealth());
+									  l.setHealth(Warning(l.getMaxHealth(),11));
 								  }
 								  l.setTicksLived(6400);
 							  }
@@ -1499,14 +1506,14 @@ public void runTick() {
 										  l.setCustomName(ChatColor.YELLOW+"Charge Zombie");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()+5);
+										  l.setMaxHealth(Warning(l.getMaxHealth()+5,12));
 									  } else {
 										  l.setCustomName(ChatColor.GOLD+"Charge Zombie II");
 										  l.setCustomNameVisible(false);
 										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(l.getMaxHealth()+20);
+										  l.setMaxHealth(Warning(l.getMaxHealth()+20,13));
 									  }
-									  l.setHealth(l.getMaxHealth());
+									  l.setHealth(Warning(l.getMaxHealth(),23));
 								  } else {
 									  if (Math.random()<=0.10+((heightmodifier-l.getLocation().getY())*0.01d)) {
 										  if (Math.random()<=0.25) {
@@ -1522,8 +1529,8 @@ public void runTick() {
 											  l.getEquipment().setHelmet(new ItemStack(Material.AIR));
 											  Zombie g = (Zombie)l;
 											  g.setBaby(true);
-											  l.setMaxHealth(l.getMaxHealth()*0.65d);
-											  l.setHealth(l.getMaxHealth());
+											  l.setMaxHealth(Warning(l.getMaxHealth()*0.65d,14));
+											  l.setHealth(Warning(l.getMaxHealth(),15));
 										  }
 									  }
 								  }

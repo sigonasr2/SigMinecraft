@@ -1859,12 +1859,19 @@ public class PlayerListener
 	        Entity newAnimal = world.spawnEntity(wolfloc, EntityType.WOLF);
 	        Wolf newdog = (Wolf)newAnimal;
 	        newdog.setOwner(p);
-	        newdog.setHealth(oldhealth);
+	        newdog.setHealth(Warning(oldhealth,21));
 	        newdog.setSitting(true);
 	        newdog.setCollarColor(dogcolor);
 	        p.sendMessage(ChatColor.GREEN + "This dog is now happy!");
 	      }
       }
+  }
+  
+  public double Warning(double hp,int id) {
+	  if (hp>65) {
+		  Bukkit.broadcastMessage("HP too high for ID "+id+". HP was "+hp);
+	  }
+	  return hp;
   }
   
   @EventHandler
@@ -1913,7 +1920,7 @@ public class PlayerListener
 		  if (entity instanceof Monster) {
 			  LivingEntity test = (LivingEntity)entity;
 			  test.setMaxHealth(10);
-			  test.setHealth(test.getMaxHealth());
+			  test.setHealth(Warning(test.getMaxHealth(),1));
 			  boolean block=false;
 			  if (test.getCustomName()!=null && (test.getCustomName().contains(ChatColor.DARK_PURPLE+"") || test.getCustomName().contains(ChatColor.DARK_AQUA+"Polymorphed Creature"))) {
 				  for (int i=-2;i<3;i++) {
@@ -1932,7 +1939,7 @@ public class PlayerListener
 				  if (test.getMaxHealth()>50) {
 					  Bukkit.getPlayer("sigonasr2").sendMessage("Mob had "+test.getMaxHealth()+" health. Lowering to max cap of 50.");
 					  test.setMaxHealth(50);
-					  test.setHealth(test.getMaxHealth());
+					  test.setHealth(Warning(test.getMaxHealth(),2));
 				  }
 			  }
 			  List<Entity> entities = Bukkit.getWorld("world").getEntities();
@@ -1962,8 +1969,8 @@ public class PlayerListener
 			  boolean contains=entity instanceof Monster;
 			  if (contains) {
 				  Monster m = (Monster)entity;
-				  m.setMaxHealth(m.getMaxHealth()*1.15d); //Increase all mobs' HP by 15%.
-				  m.setHealth(m.getMaxHealth());
+				  m.setMaxHealth(Warning(m.getMaxHealth()*1.15d,3)); //Increase all mobs' HP by 15%.
+				  m.setHealth(Warning(m.getMaxHealth(),4));
 			  }
 			  //Mobs have more health when they are farther away, to make the mobs harder in general.
 			  float groupmult=0.25f; //Change this to modify the global grouping multiplier.
@@ -3053,8 +3060,8 @@ public class PlayerListener
 	  if (entity.getWorld().getName().compareTo("world_the_end")==0) {
 		  if (entity.getType()==EntityType.ENDER_DRAGON) {
 			  LivingEntity l = (LivingEntity)entity;
-			  l.setMaxHealth(l.getMaxHealth()*4);
-			  l.setHealth(l.getMaxHealth());
+			  l.setMaxHealth(Warning(l.getMaxHealth()*4,5));
+			  l.setHealth(Warning(l.getMaxHealth(),6));
 		  }
 	  }
 	  if (entity.getType()==EntityType.EXPERIENCE_ORB) {
@@ -6411,7 +6418,7 @@ public ItemStack getGoodie() {
 				  enderdragon.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
 				  enderdragon.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,127,999999));
 				  enderdragon.setMaxHealth(200);
-				  enderdragon.setHealth(l.getHealth()/l.getMaxHealth()*200);
+				  enderdragon.setHealth(Warning(l.getHealth()/l.getMaxHealth()*200,7));
 				  enderdragon.setNoDamageTicks(999999);
 				  enderdragon.setRemoveWhenFarAway(false);
 			  }
@@ -6448,8 +6455,8 @@ public ItemStack getGoodie() {
 									  //This is a player.
 									  Player g = (Player)nearbylist.get(k);
 									  extramobs+=this.plugin.getJobTotalLvs(g)/20;
-									  l.setMaxHealth(l.getMaxHealth()+this.plugin.getJobTotalLvs(g)+50);
-									  l.setHealth(l.getMaxHealth());
+									  l.setMaxHealth(Warning(l.getMaxHealth()+this.plugin.getJobTotalLvs(g)+50,8));
+									  l.setHealth(Warning(l.getMaxHealth(),9));
 						  			////Bukkit.getLogger().info("Mob maxgroup increased to "+maxgroup+" down here.");
 								  }
 							  }
@@ -7258,7 +7265,7 @@ public ItemStack getGoodie() {
 					//This means some piercing can be done.
 					//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4));
 					if (f.getHealth()-(normaldmg+armor_pen)>0) {
-						f.setHealth(f.getHealth()-(normaldmg+armor_pen));
+						f.setHealth(Warning(f.getHealth()-(normaldmg+armor_pen),13));
 						if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
 							if (f.getCustomName()!=null) {
 								//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(normaldmg+armor_pen)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
@@ -7272,7 +7279,7 @@ public ItemStack getGoodie() {
 				} else {
 					//This means piercing would do extra damage. Just subtract throughdmg.
 					if (f.getHealth()-throughdmg>0) {
-						f.setHealth(f.getHealth()-throughdmg);
+						f.setHealth(Warning(f.getHealth()-throughdmg,14));
 						if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
 							if (f.getCustomName()!=null) {
 								//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
@@ -7295,7 +7302,7 @@ public ItemStack getGoodie() {
 						//This means some piercing can be done.
 						//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4));
 						if (f.getHealth()-(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4))>0) {
-							f.setHealth(f.getHealth()-(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4)));
+							f.setHealth(Warning(f.getHealth()-(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4)),15));
 							if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
 								if (f.getCustomName()!=null) {
 									//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4))+" damage to "+convertToItemName(f.getCustomName())+".");
@@ -7309,7 +7316,7 @@ public ItemStack getGoodie() {
 					} else {
 						//This means piercing would do extra damage. Just subtract throughdmg.
 						if (f.getHealth()-throughdmg>0) {
-							f.setHealth(f.getHealth()-throughdmg);
+							f.setHealth(Warning(f.getHealth()-throughdmg,16));
 							if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
 								if (f.getCustomName()!=null) {
 									//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
@@ -7456,7 +7463,7 @@ public ItemStack getGoodie() {
 						//This means some piercing can be done.
 						//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4));
 						if (f.getHealth()-(normaldmg+armor_pen)>0) {
-							f.setHealth(f.getHealth()-(normaldmg+armor_pen));
+							f.setHealth(Warning(f.getHealth()-(normaldmg+armor_pen),17));
 							if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
 								if (f.getCustomName()!=null) {
 									//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(normaldmg+armor_pen)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
@@ -7470,7 +7477,7 @@ public ItemStack getGoodie() {
 					} else {
 						//This means piercing would do extra damage. Just subtract throughdmg.
 						if (f.getHealth()-throughdmg>0) {
-							f.setHealth(f.getHealth()-throughdmg);
+							f.setHealth(Warning(f.getHealth()-throughdmg,18));
 							if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
 								if (f.getCustomName()!=null) {
 									//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
@@ -7492,7 +7499,7 @@ public ItemStack getGoodie() {
 							//This means some piercing can be done.
 							//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4));
 							if (f.getHealth()-(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4))>0) {
-								f.setHealth(f.getHealth()-(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4)));
+								f.setHealth(Warning(f.getHealth()-(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4)),19));
 								if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
 									if (f.getCustomName()!=null) {
 										//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4))+" damage to "+convertToItemName(f.getCustomName())+".");
@@ -7506,7 +7513,7 @@ public ItemStack getGoodie() {
 						} else {
 							//This means piercing would do extra damage. Just subtract throughdmg.
 							if (f.getHealth()-throughdmg>0) {
-								f.setHealth(f.getHealth()-throughdmg);
+								f.setHealth(Warning(f.getHealth()-throughdmg,20));
 								if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
 									if (f.getCustomName()!=null) {
 										//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
