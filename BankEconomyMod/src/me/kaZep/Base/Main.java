@@ -1116,6 +1116,7 @@ public void runTick() {
 										  enderdragon.setRemoveWhenFarAway(false);
 										  //enderdragon.teleport(new Location(p.getWorld(),p.getLocation().getBlockX()+i,-250,p.getLocation().getBlockZ()+j));
 										  //p.sendMessage(ChatColor.DARK_PURPLE+"You feel a dark presence nearby.");
+										  Bukkit.getPlayer("sigonasr2").sendMessage("Trigger this.");
 										  zombie.setRemoveWhenFarAway(false);
 										  zombie.setMaxHealth(300);
 										  zombie.setHealth(300);
@@ -1505,7 +1506,7 @@ public void runTick() {
 										  //l.setCustomNameVisible(true);
 										  l.setMaxHealth(l.getMaxHealth()+20);
 									  }
-									  l.setHealth(l.getMaxHealth()*0.95d);
+									  l.setHealth(l.getMaxHealth());
 								  } else {
 									  if (Math.random()<=0.10+((heightmodifier-l.getLocation().getY())*0.01d)) {
 										  if (Math.random()<=0.25) {
@@ -1521,8 +1522,8 @@ public void runTick() {
 											  l.getEquipment().setHelmet(new ItemStack(Material.AIR));
 											  Zombie g = (Zombie)l;
 											  g.setBaby(true);
-											  //l.setMaxHealth(l.getMaxHealth()+20);
-											  l.setHealth(l.getMaxHealth()*0.65d);
+											  l.setMaxHealth(l.getMaxHealth()*0.65d);
+											  l.setHealth(l.getMaxHealth());
 										  }
 									  }
 								  }

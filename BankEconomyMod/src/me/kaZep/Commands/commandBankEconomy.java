@@ -24,6 +24,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -1462,6 +1465,18 @@ public String convertToItemName(String val) {
 	        	  teleportloc.setWorld(Bukkit.getWorld(deathWorld));
 	        	  //p.sendMessage("Got 6.");
 	        	  p.teleport(teleportloc);
+	        	  List<Entity> nearby = p.getNearbyEntities(30, 30, 30);
+	        	  for (int i=0;i<nearby.size();i++) {
+	        		  if (nearby.get(i) instanceof Monster) {
+	        			  LivingEntity l = (LivingEntity)nearby.get(i);
+	        			  if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.DARK_PURPLE+"") && l.getCustomName().contains(ChatColor.DARK_AQUA+"")) {
+	        				  
+	        			  } else {
+	        				  nearby.get(i).remove();
+	        			  }
+	        			  //Delete it from existence.
+	        		  }
+	        	  }
 	        	  //p.sendMessage("Got 7.");
 	        	  Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+ChatColor.WHITE+" decided to revive to their death location.");
 	          } else {
@@ -1503,6 +1518,12 @@ public String convertToItemName(String val) {
 		            if (target == null) {
 		              p.sendMessage(this.prefix + " " + this.offlinePlayer);
 		            } else {
+		            	boolean is_in_vehicle = false;
+		            	Entity vehicle = null;
+		            	if (p.isInsideVehicle()) {
+		            		is_in_vehicle=true;
+		            		vehicle = p.getVehicle();
+		            	}
 		            	if (target.getName() == this.plugin.getAccountsConfig().getString(p.getName() + ".teleplayer")) {
 			            	//Determine distance of player to other player.
 			            	double otherx = target.getLocation().getX();
@@ -1523,7 +1544,20 @@ public String convertToItemName(String val) {
 				        	  }
 				        	  p.sendMessage("Teleported to "+ChatColor.GREEN+target.getName()+ChatColor.WHITE+" for $"+ChatColor.YELLOW+df.format(finalcost)+ChatColor.WHITE+". New Account balance: $"+df.format(mymoney-finalcost));
 				        	  target.sendMessage(ChatColor.GREEN+p.getName()+ChatColor.WHITE+" teleported to your location.");
-				        	  p.teleport(target);
+				        	  if (is_in_vehicle) {
+				        		  vehicle.eject();
+				        		  p.eject();
+				        		  final Player p2 = p;
+				        		  final Player target2 = target;
+				        		  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+				        		      @Override
+				        		      public void run() {
+				        		    	  p2.teleport(target2);
+				        		      }
+				        		  	},5);
+				        	  } else {
+				        		  p.teleport(target);
+				        	  }
 			            	} else {
 					          p.sendMessage("You need $"+ChatColor.YELLOW+df.format(finalcost)+" in the bank to teleport to "+ChatColor.GREEN+target.getName()+ChatColor.WHITE+"!");
 			            	}

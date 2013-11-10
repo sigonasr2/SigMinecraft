@@ -1912,6 +1912,8 @@ public class PlayerListener
 		  boolean despawn=true;
 		  if (entity instanceof Monster) {
 			  LivingEntity test = (LivingEntity)entity;
+			  test.setMaxHealth(10);
+			  test.setHealth(test.getMaxHealth());
 			  boolean block=false;
 			  if (test.getCustomName()!=null && (test.getCustomName().contains(ChatColor.DARK_PURPLE+"") || test.getCustomName().contains(ChatColor.DARK_AQUA+"Polymorphed Creature"))) {
 				  for (int i=-2;i<3;i++) {
@@ -2753,7 +2755,7 @@ public class PlayerListener
 								//Wear diamond armor almost always. Enchanted diamond pieces here and there.
 								  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
 									  LivingEntity l = (LivingEntity) entity;
-									  l.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,999999,1));
+									  //l.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,999999,1));
 									  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,1));
 									  l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,999999,0));
 									  l.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,0));
@@ -6343,14 +6345,22 @@ public ItemStack getGoodie() {
 		  if (m.getType()!=EntityType.ENDER_DRAGON && m.getType()!=EntityType.WITHER) {
 			  if (m.getCustomName()==null) {
 				  if (m.getMaxHealth()>65) {
+					  Bukkit.broadcastMessage("This mob had too much HP. HP: "+m.getMaxHealth());
 					  m.setMaxHealth(65); //65 HP cap.
-					  m.setHealth(m.getMaxHealth());
+					  m.setHealth(65);
+					  m.setCustomName("Super Mob");
+					  m.setCustomNameVisible(true);
+					  Bukkit.broadcastMessage("This mob had too much HP. Lowered to "+m.getHealth()+"/"+m.getMaxHealth());
 				  }
 			  } else {
 				  if (!m.getCustomName().contains(ChatColor.DARK_PURPLE+"")) { //Make sure it's not a boss.
 					  if (m.getMaxHealth()>65) {
+						  Bukkit.broadcastMessage("This mob had too much HP. HP: "+m.getMaxHealth());
 						  m.setMaxHealth(65); //65 HP cap.
-						  m.setHealth(m.getMaxHealth());
+						  m.setHealth(65);
+						  m.setCustomName("Super Mob");
+						  m.setCustomNameVisible(true);
+						  Bukkit.broadcastMessage("This mob had too much HP. Lowered to "+m.getHealth()+"/"+m.getMaxHealth());
 					  }
 				  }
 			  }
@@ -6363,14 +6373,22 @@ public ItemStack getGoodie() {
 			  if (m.getType()!=EntityType.ENDER_DRAGON && m.getType()!=EntityType.WITHER) {
 				  if (m.getCustomName()==null) {
 					  if (m.getMaxHealth()>65) {
+						  Bukkit.broadcastMessage("This mob had too much HP. HP: "+m.getMaxHealth());
 						  m.setMaxHealth(65); //65 HP cap.
-						  m.setHealth(m.getMaxHealth());
+						  //m.setHealth(65);
+						  m.setCustomName("Super Mob");
+						  m.setCustomNameVisible(true);
+						  Bukkit.broadcastMessage("This mob had too much HP. Lowered to "+m.getHealth()+"/"+m.getMaxHealth());
 					  }
 				  } else {
 					  if (!m.getCustomName().contains(ChatColor.DARK_PURPLE+"")) { //Make sure it's not a boss.
 						  if (m.getMaxHealth()>65) {
+							  Bukkit.broadcastMessage("This mob had too much HP. HP: "+m.getMaxHealth());
 							  m.setMaxHealth(65); //65 HP cap.
-							  m.setHealth(m.getMaxHealth());
+							  m.setHealth(65);
+							  m.setCustomName("Super Mob");
+							  m.setCustomNameVisible(true);
+							  Bukkit.broadcastMessage("This mob had too much HP. Lowered to "+m.getHealth()+"/"+m.getMaxHealth());
 						  }
 					  }
 				  }
@@ -6378,6 +6396,7 @@ public ItemStack getGoodie() {
 		  }
 		  final LivingEntity l = (LivingEntity)e.getEntity();
 		  if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.DARK_PURPLE+"")) {
+			  Bukkit.getPlayer("sigonasr2").sendMessage("Entered Boss Entity hit loop.");
 			  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 	                @Override
 	                public void run() {
@@ -10629,25 +10648,6 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
 				  //This is an explorer in the explorer data.
 				  this.plugin.explorerlist.get(i).wedied=true;
 			  }
-		  }
-	  }
-	  List<Entity> nearby = p.getNearbyEntities(30, 30, 30);
-	  for (int i=0;i<nearby.size();i++) {
-		  if (nearby.get(i).getType()==EntityType.ZOMBIE ||
-				  nearby.get(i).getType()==EntityType.SPIDER ||
-				  nearby.get(i).getType()==EntityType.SKELETON ||
-				  nearby.get(i).getType()==EntityType.CREEPER ||
-				  nearby.get(i).getType()==EntityType.PIG_ZOMBIE ||
-				  nearby.get(i).getType()==EntityType.ENDERMAN ||
-				  nearby.get(i).getType()==EntityType.GHAST ||
-				  nearby.get(i).getType()==EntityType.MAGMA_CUBE) {
-			  LivingEntity l = (LivingEntity)nearby.get(i);
-			  if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.DARK_PURPLE+"")) {
-				  
-			  } else {
-				  nearby.get(i).remove();
-			  }
-			  //Delete it from existence.
 		  }
 	  }
 	  if (!this.plugin.PlayerinJob(p, "Explorer") || (this.plugin.PlayerinJob(p, "Explorer") && this.plugin.getJobLv("Explorer", p)<20)) {
