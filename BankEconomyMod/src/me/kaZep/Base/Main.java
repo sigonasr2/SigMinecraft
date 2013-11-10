@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -112,6 +113,8 @@ public class Main extends JavaPlugin
   public Location REVIVE_EFFECT_LOC; 
   public int BOSS_DEFEAT=0; 
   public Location BOSS_DEFEAT_LOC;
+  public int POLYMORPH=0; 
+  public Location POLYMORPH_LOC;
   
   public int LOGGING_UPDATE_COUNTS=-1;
   public int MAX_LOGGING_COUNT=12;
@@ -153,6 +156,7 @@ public class Main extends JavaPlugin
   public List<ReviveInventory> revive_inventory_list = null;
   public List<Chunk> chunk_queue_list = null;
   public DamageAPI DMGCALC = null;
+  public long lastMessage = 0;
   
 
   public FileWriter outputStream = null;
@@ -879,6 +883,14 @@ public void runTick() {
 			}
 		    //Put your code here...
 			//Bukkit.getPlayer("sigonasr2").sendMessage("Server Tick "+Bukkit.getWorld("world").getFullTime());
+			  if (POLYMORPH>0) {
+				  Bukkit.getWorld("world").playEffect(new Location(POLYMORPH_LOC.getWorld(),POLYMORPH_LOC.getX()+(Math.random()-Math.random())*2,POLYMORPH_LOC.getY()+(Math.random())*2+2,POLYMORPH_LOC.getZ()+(Math.random()-Math.random())*2), Effect.STEP_SOUND, Material.EMERALD_BLOCK);
+				  Bukkit.getWorld("world").playEffect(new Location(POLYMORPH_LOC.getWorld(),POLYMORPH_LOC.getX()+(Math.random()-Math.random())*2,POLYMORPH_LOC.getY()+(Math.random())*2+2,POLYMORPH_LOC.getZ()+(Math.random()-Math.random())*2), Effect.STEP_SOUND, Material.WATER);
+				  if (POLYMORPH==1) {
+					  Bukkit.getWorld("world").playEffect(new Location(POLYMORPH_LOC.getWorld(),POLYMORPH_LOC.getX()+(Math.random()-Math.random())*2,POLYMORPH_LOC.getY()+(Math.random())*2+2,POLYMORPH_LOC.getZ()+(Math.random()-Math.random())*2), Effect.POTION_BREAK, 0);
+				  }
+				  POLYMORPH--;
+			  }
 			  if (BOSS_DEFEAT>0) {
 				  if (BOSS_DEFEAT%4==0) {
 					  Bukkit.getWorld("world").playEffect(BOSS_DEFEAT_LOC.add(Math.random()*5-Math.random()*5, BOSS_DEFEAT/20, Math.random()*5-Math.random()*5), Effect.SMOKE, 0);
