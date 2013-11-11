@@ -1233,6 +1233,7 @@ public class PlayerListener
 			  this.plugin.gainMoneyExp(p,"Breeder",0.002,0.2);
 		  }
 		  if (e.getEntity().getType()==EntityType.MUSHROOM_COW) {
+			  Bukkit.getWorld("world").spawnEntity(EntityType.COW);
 			  this.plugin.gainMoneyExp(p,"Breeder",0.005,1);
 		  }
 	  }
