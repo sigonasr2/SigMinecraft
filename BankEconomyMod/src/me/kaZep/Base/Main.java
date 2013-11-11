@@ -1569,7 +1569,7 @@ public void runTick() {
 									  }
 									  if (doit) {
 										  //Bukkit.getPlayer("sigonasr2").sendMessage("Charge Zombie!");
-										  if (l.getCustomName().compareTo(ChatColor.DARK_PURPLE+"Charge Zombie III")==0) {
+										  if (l.getCustomName().compareTo(ChatColor.DARK_PURPLE+"Charge Zombie III")==0 && !l.isDead()) {
 											  /*//OLD CHARGE ZOMBIE BEHAVIOR. Charge Zombie II now does this weak block destruction.
 											  for (int k=-1;k<2;k++) {
 												  for (int j=-1;j<2;j++) {

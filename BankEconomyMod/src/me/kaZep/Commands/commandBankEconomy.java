@@ -17,7 +17,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
+import org.bukkit.SkullType;
 import org.bukkit.World;
+import org.bukkit.block.Skull;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -32,6 +34,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -495,6 +498,14 @@ public String convertToItemName(String val) {
   			  }
             } else
             if (cmd.getName().equalsIgnoreCase("event") && args.length==2 && p.hasPermission("maintenance-mode-admin")) {
+  			  if (args[0].equalsIgnoreCase("head")) {
+  				  ItemStack m = new ItemStack(Material.SKULL_ITEM, 64, (short)SkullType.PLAYER.ordinal());
+      				SkullMeta skullMeta = (SkullMeta) m.getItemMeta();
+      		        skullMeta.setOwner(args[1]);
+      		        skullMeta.setDisplayName(ChatColor.RESET + args[1]+"'s Head");
+      		        m.setItemMeta(skullMeta);
+      		        p.getInventory().addItem(m);
+  			  }
 			  if (args[0].equalsIgnoreCase("halloween_reward")) {
 				  Bukkit.broadcastMessage(args[1]+" has won the Pumpkin Patch contest due to popular vote! "+ChatColor.BOLD+"Congratulations!");
 				  Player f = Bukkit.getPlayer(args[1]);
@@ -1477,7 +1488,7 @@ public String convertToItemName(String val) {
 	        		  }
 	        	  }
 	        	  //p.sendMessage("Got 7.");
-	        	  Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+ChatColor.WHITE+" decided to revive to their death location.");
+	        	  Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+ChatColor.WHITE+" decided to revive.");
 	          } else {
 	        	  p.sendMessage("You cannot revive. You need to have $"+df.format(finalcost)+" to do so.");
 	          }
@@ -1761,27 +1772,27 @@ public String convertToItemName(String val) {
     	  } else {
     		  //Look for that player. First just see if they are online.
     		  boolean found=false;
-    		  if (p.getServer().getPlayer(args[1])!=null) {
+    		  if (Bukkit.getPlayer(args[1])!=null) {
 				  //This is the player. Show job stats.
 	    		  p.sendMessage("");
-	    		  p.sendMessage(p.getServer().getPlayer(args[1]).getName()+"'s jobs:");
-	    		  String[] joblist=this.plugin.getJobs(p.getServer().getPlayer(args[1]));
+	    		  p.sendMessage(Bukkit.getPlayer(args[1]).getName()+"'s jobs:");
+	    		  String[] joblist=this.plugin.getJobs(Bukkit.getPlayer(args[1]));
 	    		  for (int i=0;i<joblist.length;i++) {
 	    			  if (!joblist[i].equalsIgnoreCase("None")) {
-	    				  int mylv=this.plugin.getAccountsConfig().getInt(p.getServer().getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"lv");
+	    				  int mylv=this.plugin.getAccountsConfig().getInt(Bukkit.getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"lv");
 
 	    				  if (mylv==40) {
-	    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(p.getServer().getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"exp"))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
+	    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(Bukkit.getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"exp"))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
 	    				  } else {
-	    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(p.getServer().getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"exp"))+"/"+Math.round(this.plugin.getJobExp(joblist[i], this.plugin.getAccountsConfig().getInt(p.getServer().getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"lv")))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
+	    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(Bukkit.getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"exp"))+"/"+Math.round(this.plugin.getJobExp(joblist[i], this.plugin.getAccountsConfig().getInt(Bukkit.getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"lv")))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
 	    				  }
     					  
-	    				  if (joblist[i].equalsIgnoreCase("Explorer") && this.plugin.getJobLv(joblist[i], p.getServer().getPlayer(args[1]))>=10) {
+	    				  if (joblist[i].equalsIgnoreCase("Explorer") && this.plugin.getJobLv(joblist[i], Bukkit.getPlayer(args[1]))>=10) {
 	    					  //Check to see if the buff is on cooldown for this player or not.
 	    					  boolean discovered=false;
 	    					  long timeleft=0;
 	    					  for (int j=0;j<this.plugin.explorers.size();j++) {
-	    						  if (this.plugin.explorers.get(j).name.compareToIgnoreCase(p.getServer().getPlayer(args[1]).getName())==0 && this.plugin.explorers.get(j).event==0) {
+	    						  if (this.plugin.explorers.get(j).name.compareToIgnoreCase(Bukkit.getPlayer(args[1]).getName())==0 && this.plugin.explorers.get(j).event==0) {
 	    							  discovered=true;
 	    							  timeleft=this.plugin.explorers.get(j).expiretime-Bukkit.getWorld("world").getFullTime();
 	    						  }
@@ -1796,7 +1807,6 @@ public String convertToItemName(String val) {
     		  }
     		  if (!found) {
 	    		  OfflinePlayer q = Bukkit.getOfflinePlayer(args[1]);
-	    		  
 	    		  //Try a search in the config directly.
 	    		  if (this.plugin.getAccountsConfig().contains(q.getName())) {
 	    			  //This player seems to exist. Check out their stats.

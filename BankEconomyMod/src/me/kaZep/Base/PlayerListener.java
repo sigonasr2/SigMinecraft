@@ -6217,6 +6217,7 @@ public ItemStack getGoodie() {
 				  eve.data2=p.getLevel();
 				  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
 				  this.plugin.explorers.add(eve);
+				  if (!survivor) {
 				  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 				      @Override
 				      public void run() {
@@ -6225,11 +6226,13 @@ public ItemStack getGoodie() {
 					      }
 				      }
 				  	},1);
+				  }
 			  }
 		  }
 		  //e.getCause()==DamageCause.
 		  final double player_starthp = p.getHealth();
 		  if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify5") && e.getCause()!=DamageCause.ENTITY_ATTACK && e.getCause()!=DamageCause.ENTITY_EXPLOSION && e.getDamage()!=0) {
+			  final Main plugin = this.plugin;
 			  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 			      @Override
 			      public void run() {
@@ -6238,9 +6241,29 @@ public ItemStack getGoodie() {
 				      if (player_starthp-p.getHealth()>=0.5) {
 				    	  p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(player_starthp-p.getHealth())+" damage from "+ChatColor.WHITE+f.getCause().toString()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((player_starthp-p.getHealth())/p.getMaxHealth())*100)+"%)");
 				      }
-				      if (p.getHealth()<=0) {
-				    	  FatalSurvivor(p);
-				      }
+					  if (plugin.PlayerinJob(p, "Explorer")) {
+						  if (plugin.getJobLv("Explorer", p)>=10) {
+							  //Check to see if our "fatal s	urvivor" effect is available.
+							  boolean survivor=false;
+							  for (int i=0;i<plugin.explorers.size();i++) {
+								  if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName())==0) {
+									  survivor=true;
+									  break;
+								  }
+							  }
+							  PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+							  eve.event=1;
+							  eve.data=p.getExp();
+							  eve.data2=p.getLevel();
+							  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
+							  plugin.explorers.add(eve);
+							  if (!survivor) {
+						      if (p.getHealth()<=0) {
+						    	  FatalSurvivor(p);
+						      }
+							  }
+						  }
+					  }
 			      }
 			  	},1);
 		  }
@@ -6531,9 +6554,29 @@ public ItemStack getGoodie() {
 				      } else {
 				    	  p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(player_starthp-p.getHealth())+" damage from "+ChatColor.WHITE+l.getType()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((player_starthp-p.getHealth())/p.getMaxHealth())*100)+"%)");
 				      }
-				      if (p.getHealth()<=0) {
-				    	  FatalSurvivor(p);
-				      }
+					  if (plugin.PlayerinJob(p, "Explorer")) {
+						  if (plugin.getJobLv("Explorer", p)>=10) {
+							  //Check to see if our "fatal s	urvivor" effect is available.
+							  boolean survivor=false;
+							  for (int i=0;i<plugin.explorers.size();i++) {
+								  if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName())==0) {
+									  survivor=true;
+									  break;
+								  }
+							  }
+							  PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+							  eve.event=1;
+							  eve.data=p.getExp();
+							  eve.data2=p.getLevel();
+							  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
+							  plugin.explorers.add(eve);
+							  if (!survivor) {
+						      if (p.getHealth()<=0) {
+						    	  FatalSurvivor(p);
+						      }
+							  }
+						  }
+					  }
 			      }
 				
 			  	},1);
@@ -7019,7 +7062,30 @@ public ItemStack getGoodie() {
 					  }
 				  } else {
 						e.setDamage(0);
-						FatalSurvivor(p); //Player died. Instead run fatal survivor.
+						final Player p2 = p;
+						  if (plugin.PlayerinJob(p, "Explorer")) {
+							  if (plugin.getJobLv("Explorer", p)>=10) {
+								  //Check to see if our "fatal s	urvivor" effect is available.
+								  boolean survivor=false;
+								  for (int i=0;i<plugin.explorers.size();i++) {
+									  if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName())==0) {
+										  survivor=true;
+										  break;
+									  }
+								  }
+								  PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+								  eve.event=1;
+								  eve.data=p.getExp();
+								  eve.data2=p.getLevel();
+								  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
+								  plugin.explorers.add(eve);
+								  if (!survivor) {
+							      if (p2.getHealth()<=0) {
+							    	  FatalSurvivor(p2);
+							      }
+								  }
+							  }
+						  }
 				  }
 			  } else {
 				  if (p.getHealth()-e.getDamage()/2>0) {
@@ -7029,7 +7095,35 @@ public ItemStack getGoodie() {
 					  }
 				  } else {
 						e.setDamage(0);
-						FatalSurvivor(p); //Player died. Instead run fatal survivor.
+						final Player p2 = p;
+						  if (plugin.PlayerinJob(p, "Explorer")) {
+							  if (plugin.getJobLv("Explorer", p)>=10) {
+								  //Check to see if our "fatal s	urvivor" effect is available.
+								  boolean survivor=false;
+								  for (int i=0;i<plugin.explorers.size();i++) {
+									  if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName())==0) {
+										  survivor=true;
+										  break;
+									  }
+								  }
+								  PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+								  eve.event=1;
+								  eve.data=p.getExp();
+								  eve.data2=p.getLevel();
+								  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
+								  plugin.explorers.add(eve);
+								  if (!survivor) {
+								  Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+								      @Override
+								      public void run() {
+									      if (p2.getHealth()<=0) {
+									    	  FatalSurvivor(p2);
+									      }
+								      }
+								  	},1);
+								  }
+							  }
+						  }
 				  }
 			  }
 			  e.setDamage(0);
@@ -7063,7 +7157,35 @@ public ItemStack getGoodie() {
 					  }
 				  } else {
 						e.setDamage(0);
-						FatalSurvivor(p); //Player died. Instead run fatal survivor.
+						final Player p2 = p;
+						  if (plugin.PlayerinJob(p, "Explorer")) {
+							  if (plugin.getJobLv("Explorer", p)>=10) {
+								  //Check to see if our "fatal s	urvivor" effect is available.
+								  boolean survivor=false;
+								  for (int i=0;i<plugin.explorers.size();i++) {
+									  if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName())==0) {
+										  survivor=true;
+										  break;
+									  }
+								  }
+								  PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+								  eve.event=1;
+								  eve.data=p.getExp();
+								  eve.data2=p.getLevel();
+								  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
+								  plugin.explorers.add(eve);
+								  if (!survivor) {
+								  Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+								      @Override
+								      public void run() {
+									      if (p2.getHealth()<=0) {
+									    	  FatalSurvivor(p2);
+									      }
+								      }
+								  	},1);
+								  }
+							  }
+						  }
 				  }
 			  } else {
 				  if (p.getHealth()-e.getDamage()>0) {
@@ -7073,7 +7195,35 @@ public ItemStack getGoodie() {
 					  }
 				  } else {
 						e.setDamage(0);
-						FatalSurvivor(p); //Player died. Instead run fatal survivor.
+						final Player p2 = p;
+						  if (plugin.PlayerinJob(p, "Explorer")) {
+							  if (plugin.getJobLv("Explorer", p)>=10) {
+								  //Check to see if our "fatal s	urvivor" effect is available.
+								  boolean survivor=false;
+								  for (int i=0;i<plugin.explorers.size();i++) {
+									  if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName())==0) {
+										  survivor=true;
+										  break;
+									  }
+								  }
+								  PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+								  eve.event=1;
+								  eve.data=p.getExp();
+								  eve.data2=p.getLevel();
+								  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
+								  plugin.explorers.add(eve);
+								  if (!survivor) {
+								  Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+								      @Override
+								      public void run() {
+									      if (p2.getHealth()<=0) {
+									    	  FatalSurvivor(p2);
+									      }
+								      }
+								  	},1);
+								  }
+							  }
+						  }
 				  }
 			  }
 			  for (int k=-2;k<3;k++) {
