@@ -7127,22 +7127,24 @@ public ItemStack getGoodie() {
 				  }
 			  }
 			  e.setDamage(0);
-			  for (int k=-1;k<2;k++) {
-				  for (int j=-1;j<2;j++) {
-					  Location checkloc = enemy.getLocation().add(k,1,j);
-					  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-					  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-						  bl.breakNaturally();
-					  }
-					  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-					  checkloc = enemy.getLocation().add(k,2,j);
-					  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-						  bl.breakNaturally();
-					  }
-					  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-					  checkloc = enemy.getLocation().add(k,0,j);
-					  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-						  bl.breakNaturally();
+			  if (!enemy.isDead()) {
+				  for (int k=-1;k<2;k++) {
+					  for (int j=-1;j<2;j++) {
+						  Location checkloc = enemy.getLocation().add(k,1,j);
+						  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+						  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+							  bl.breakNaturally();
+						  }
+						  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+						  checkloc = enemy.getLocation().add(k,2,j);
+						  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+							  bl.breakNaturally();
+						  }
+						  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+						  checkloc = enemy.getLocation().add(k,0,j);
+						  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+							  bl.breakNaturally();
+						  }
 					  }
 				  }
 			  }
@@ -7226,22 +7228,24 @@ public ItemStack getGoodie() {
 						  }
 				  }
 			  }
-			  for (int k=-2;k<3;k++) {
-				  for (int j=-2;j<3;j++) {
-					  Location checkloc = enemy.getLocation().add(k,1,j);
-					  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-					  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-						  bl.breakNaturally();
-					  }
-					  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-					  checkloc = enemy.getLocation().add(k,2,j);
-					  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-						  bl.breakNaturally();
-					  }
-					  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-					  checkloc = enemy.getLocation().add(k,0,j);
-					  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-						  bl.breakNaturally();
+			  if (!enemy.isDead()) {
+				  for (int k=-2;k<3;k++) {
+					  for (int j=-2;j<3;j++) {
+						  Location checkloc = enemy.getLocation().add(k,1,j);
+						  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+						  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+							  bl.breakNaturally();
+						  }
+						  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+						  checkloc = enemy.getLocation().add(k,2,j);
+						  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+							  bl.breakNaturally();
+						  }
+						  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+						  checkloc = enemy.getLocation().add(k,0,j);
+						  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+							  bl.breakNaturally();
+						  }
 					  }
 				  }
 			  }
