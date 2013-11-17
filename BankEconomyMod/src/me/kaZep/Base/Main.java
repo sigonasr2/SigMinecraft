@@ -289,11 +289,86 @@ public class Main extends JavaPlugin
     Sarayn_recycling_center.addChest(new Location(Bukkit.getWorld("world"), 1541, 57, 154));
     recycling_center_list.add(Sarayn_recycling_center);
     
+    //Add Recipe for melon slice crafting.
+    ShapedRecipe melon_slice = new ShapedRecipe(new ItemStack(Material.MELON, 8));
+    melon_slice.shape("a");
+    melon_slice.setIngredient('a', Material.MELON_BLOCK);
+    Bukkit.addRecipe(melon_slice);
+
+    //Add wood slab recombining recipes.
+    ShapedRecipe oak_planks = new ShapedRecipe(new ItemStack(Material.WOOD, 1, (short) 0));
+    oak_planks.shape("aa");
+    oak_planks.setIngredient('a', new ItemStack(Material.WOOD_STEP, 1, (short) 0).getData());
+    Bukkit.addRecipe(oak_planks);
+    ShapedRecipe spruce_planks = new ShapedRecipe(new ItemStack(Material.WOOD, 1, (short) 1));
+    spruce_planks.shape("aa");
+    spruce_planks.setIngredient('a', new ItemStack(Material.WOOD_STEP, 1, (short) 1).getData());
+    Bukkit.addRecipe(spruce_planks);
+    ShapedRecipe birch_planks = new ShapedRecipe(new ItemStack(Material.WOOD, 1, (short) 2));
+    birch_planks.shape("aa");
+    birch_planks.setIngredient('a', new ItemStack(Material.WOOD_STEP, 1, (short) 2).getData());
+    Bukkit.addRecipe(birch_planks);
+    ShapedRecipe jungle_planks = new ShapedRecipe(new ItemStack(Material.WOOD, 1, (short) 3));
+    jungle_planks.shape("aa");
+    jungle_planks.setIngredient('a', new ItemStack(Material.WOOD_STEP, 1, (short) 3).getData());
+    Bukkit.addRecipe(jungle_planks);
+    
+    //Add non-wood slab recombining recipes.
+    ShapedRecipe stone = new ShapedRecipe(new ItemStack(Material.STONE, 1));
+    stone.shape("aa");
+    stone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 0).getData());
+    Bukkit.addRecipe(stone);
+    ShapedRecipe sandstone = new ShapedRecipe(new ItemStack(Material.SANDSTONE, 1));
+    sandstone.shape("aa");
+    sandstone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 1).getData());
+    Bukkit.addRecipe(sandstone);
+    ShapedRecipe cobblestone = new ShapedRecipe(new ItemStack(Material.COBBLESTONE, 1));
+    cobblestone.shape("aa");
+    cobblestone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 3).getData());
+    Bukkit.addRecipe(cobblestone);
+    ShapedRecipe bricks = new ShapedRecipe(new ItemStack(Material.BRICK, 1));
+    bricks.shape("aa");
+    bricks.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 4).getData());
+    Bukkit.addRecipe(bricks);
+    ShapedRecipe stone_bricks = new ShapedRecipe(new ItemStack(Material.SMOOTH_BRICK, 1));
+    stone_bricks.shape("aa");
+    stone_bricks.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 5).getData());
+    Bukkit.addRecipe(stone_bricks);
+    ShapedRecipe nether_bricks = new ShapedRecipe(new ItemStack(Material.NETHER_BRICK, 1));
+    nether_bricks.shape("aa");
+    nether_bricks.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 6).getData());
+    Bukkit.addRecipe(nether_bricks);
+    ShapedRecipe nether_quartz = new ShapedRecipe(new ItemStack(Material.QUARTZ_BLOCK, 1));
+    nether_quartz.shape("aa");
+    nether_quartz.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 7).getData());
+    Bukkit.addRecipe(nether_quartz);    
+
+    //Add Recipes for chain armor crafting.
+    ShapedRecipe chain_helmet = new ShapedRecipe(new ItemStack(Material.CHAINMAIL_HELMET));
+    chain_helmet.shape("aaa","b b");
+    chain_helmet.setIngredient('a', Material.IRON_BLOCK);
+    chain_helmet.setIngredient('b', Material.IRON_INGOT);
+    Bukkit.addRecipe(chain_helmet);
+    
+    ShapedRecipe chain_chestplate = new ShapedRecipe(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
+    chain_chestplate.shape("b b","aba","aaa");
+    chain_chestplate.setIngredient('a', Material.IRON_BLOCK);
+    chain_chestplate.setIngredient('b', Material.IRON_INGOT);
+    Bukkit.addRecipe(chain_chestplate);
+    
+    ShapedRecipe chain_leggings = new ShapedRecipe(new ItemStack(Material.CHAINMAIL_LEGGINGS));
+    chain_leggings.shape("bbb","a a","a a");
+    chain_leggings.setIngredient('a', Material.IRON_BLOCK);
+    chain_leggings.setIngredient('b', Material.IRON_INGOT);
+    Bukkit.addRecipe(chain_leggings);
+    
+    ShapedRecipe chain_boots = new ShapedRecipe(new ItemStack(Material.CHAINMAIL_BOOTS));
+    chain_boots.shape("b a","b a");
+    chain_boots.setIngredient('a', Material.IRON_BLOCK);
+    chain_boots.setIngredient('a', Material.IRON_INGOT);
+    Bukkit.addRecipe(chain_boots);
+    
     //Add Recipes for new Block armor crafting.
-    ShapedRecipe Melons = new ShapedRecipe(new ItemStack(Material.MELON, 8));
-    Melons.shape("a");
-    Melons.setIngredient('a', Material.MELON_BLOCK);
-    Bukkit.addRecipe(Melons);
     ShapedRecipe iron_helmet = new ShapedRecipe(new ItemStack(Material.IRON_HELMET));
     iron_helmet.shape("aaa","a a");
     iron_helmet.setIngredient('a', Material.IRON_BLOCK);
@@ -342,6 +417,19 @@ public class Main extends JavaPlugin
     diamond_boots.shape("a a","a a");
     diamond_boots.setIngredient('a', Material.DIAMOND_BLOCK);
     Bukkit.addRecipe(diamond_boots);
+    
+    // Add Recipe for fireproof Wooden Slab
+    ItemStack slab = new ItemStack(Material.STEP, 3, (short) 2);
+    ItemMeta slab_name = slab.getItemMeta();
+    slab_name.setDisplayName(ChatColor.RESET+"Fireproof Wood Slab");
+    slab.setItemMeta(slab_name);
+    ShapedRecipe fireproof_wood_slab = new ShapedRecipe(slab);
+    fireproof_wood_slab.shape(" a ","bbb");
+    fireproof_wood_slab.setIngredient('a', Material.SLIME_BALL);
+    fireproof_wood_slab.setIngredient('b', Material.WOOD_STEP);
+    Bukkit.addRecipe(fireproof_wood_slab);
+    
+    // Add Recipes for Item cube crafting.
     ItemStack temp = new ItemStack(Material.CHEST);
     ItemMeta tempmeta = temp.getItemMeta();
     tempmeta.setDisplayName(ChatColor.YELLOW+"Item Cube");
@@ -374,6 +462,23 @@ public class Main extends JavaPlugin
     item_cube.setIngredient('a', Material.ENDER_CHEST);
     item_cube.setIngredient('b', Material.HOPPER);
     item_cube.setIngredient('c', Material.DIAMOND_BLOCK);
+    Bukkit.addRecipe(item_cube);
+    temp = new ItemStack(Material.ENDER_CHEST);
+    tempmeta = temp.getItemMeta();
+    tempmeta.setDisplayName(ChatColor.BLUE+"Ender Item Cube");
+    templore = new ArrayList<String>();
+    templore.add(ChatColor.AQUA+"Contains 27 item slots.");
+    templore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"Click on an item and then");
+    templore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"click the Item Cube to store");
+    templore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"it inside. Right-Click the");
+    templore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"Item Cube to view its contents.");
+    tempmeta.setLore(templore);
+    temp.setItemMeta(tempmeta);
+    item_cube = new ShapedRecipe(temp);
+    item_cube.shape("cac","aba","cac");
+    item_cube.setIngredient('a', Material.ENDER_CHEST);
+    item_cube.setIngredient('b', Material.HOPPER);
+    item_cube.setIngredient('c', Material.EMERALD_BLOCK);
     Bukkit.addRecipe(item_cube);
     
     DMGCALC = new DamageAPI();
@@ -518,7 +623,7 @@ public class Main extends JavaPlugin
     Farmer_job.addData("POTATO", 0.015, 3, 0);
     Farmer_job.addData("NETHER WART", 0.015, 3, 0);
     //Farmer_job.addData("PUMPKIN SEEDS", 0.02, 4, 0);
-    //Farmer_job.addData("PUMPKIN", 0.04, 8, 0);
+    Farmer_job.addData("PUMPKIN", 0.04, 8, 0);
     Farmer_job.addData("MELON", 0.05, 10, 0);
     Farmer_job.addData("SEEDS", 0.0025, 1, 1);
     Farmer_job.addData("PUMPKIN SEEDS", 0.005, 2, 1);
@@ -632,6 +737,10 @@ public class Main extends JavaPlugin
     Blacksmith_job.addData("WEAK DIAMOND HELMET", 1.15, 480, 0);
     Blacksmith_job.addData("WEAK DIAMOND LEGGINGS", 1.325, 660, 0);
     Blacksmith_job.addData("WEAK DIAMOND CHESTPLATE", 1.50, 750, 0);
+    Blacksmith_job.addData("CHAIN BOOTS", 0.375*5, 80*5, 0);
+    Blacksmith_job.addData("CHAIN HELMET", 0.50*5, 100*5, 0);
+    Blacksmith_job.addData("CHAIN LEGGINGS", 0.725*5, 140*5, 0);
+    Blacksmith_job.addData("CHAIN CHESTPLATE", 0.875*5, 175*5, 0);
     Blacksmith_job.addData("IRON BOOTS", 0.375*10, 80*10, 0);
     Blacksmith_job.addData("IRON HELMET", 0.50*10, 100*10, 0);
     Blacksmith_job.addData("IRON LEGGINGS", 0.725*10, 140*10, 0);
@@ -2800,6 +2909,16 @@ public void checkJukeboxes() {
 	                				}
 	                			}
 	                		}
+	                		if (items[j].getType()==Material.ENDER_CHEST) {
+	                			if (items[j].hasItemMeta() && items[j].getItemMeta().getLore()!=null) {
+	                				List<String> loredata = items[j].getItemMeta().getLore();
+	                				for (int m=0;m<loredata.size();m++) {
+	                					if (loredata.get(m).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
+	                						value+=10*items[j].getAmount();
+	                					}
+	                				}
+	                			}
+	                		}
 	                		if (items[j].getType()==Material.COAL) {
 	                			value+=0.001d*items[j].getAmount();
 	                		} else 
@@ -3880,10 +3999,13 @@ public void payDay(int time)
 		if (item.getType()==Material.IRON_AXE) {enchant_data=ENCHANTMENT_DATA.iron_axe;} else
 		if (item.getType()==Material.GOLD_SPADE) {enchant_data=ENCHANTMENT_DATA.golden_shovel;} else
 		if (item.getType()==Material.GOLD_AXE) {enchant_data=ENCHANTMENT_DATA.golden_axe;} else
+		if (item.getType()==Material.CHAINMAIL_HELMET) {enchant_data=ENCHANTMENT_DATA.chain_helmet;} else
+		if (item.getType()==Material.CHAINMAIL_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.chain_chestplate;} else
+		if (item.getType()==Material.CHAINMAIL_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.chain_leggings;} else
+		if (item.getType()==Material.CHAINMAIL_BOOTS) {enchant_data=ENCHANTMENT_DATA.chain_boots;} else
 		if (item.getType()==Material.IRON_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.iron_leggings;} else
 		if (item.getType()==Material.DIAMOND_SPADE) {enchant_data=ENCHANTMENT_DATA.diamond_shovel;} else
 		if (item.getType()==Material.GOLD_BOOTS) {enchant_data=ENCHANTMENT_DATA.golden_boots;} else
-		if (item.getType()==Material.IRON_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.iron_chestplate;} else
 		if (item.getType()==Material.GOLD_HELMET) {enchant_data=ENCHANTMENT_DATA.golden_helmet;} else
 		if (item.getType()==Material.IRON_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.iron_chestplate;} else
 		if (item.getType()==Material.DIAMOND_PICKAXE) {enchant_data=ENCHANTMENT_DATA.diamond_pickaxe;} else

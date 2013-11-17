@@ -3647,10 +3647,10 @@ public class PlayerListener
 			  }
 			  /*if (e.getBlock().getType()==Material.PUMPKIN) {
 				  this.plugin.gainMoneyExp(p,"Farmer",0.00,1);
-			  }*/
+			  }
 			  if (e.getBlock().getType()==Material.MELON_BLOCK) {
 				  this.plugin.gainMoneyExp(p,"Farmer",0.10,10);
-			  }
+			  }*/
 		  }
 		  boolean hasfortune;
 		  hasfortune = (p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)>0)?true:false;
@@ -4119,9 +4119,41 @@ public class PlayerListener
   @EventHandler
   public void onItemPrepareCraft(PrepareItemCraftEvent e) {
 	  CraftingInventory result = e.getInventory();
+	  
+	  // Disable melon crafting recipe
 	  if (result.getResult().getType()==Material.MELON_BLOCK) {
 		  result.setResult(new ItemStack(Material.AIR));
 	  }
+	  
+	  // Increase stairs recipe efficiency
+	  if (result.getResult().getType()==Material.WOOD_STAIRS) {
+		  result.setResult(new ItemStack(Material.WOOD_STAIRS, 8));
+	  }
+	  if (result.getResult().getType()==Material.BIRCH_WOOD_STAIRS) {
+		  result.setResult(new ItemStack(Material.BIRCH_WOOD_STAIRS, 8));
+	  }
+	  if (result.getResult().getType()==Material.SPRUCE_WOOD_STAIRS) {
+		  result.setResult(new ItemStack(Material.SPRUCE_WOOD_STAIRS, 8));
+	  }
+	  if (result.getResult().getType()==Material.JUNGLE_WOOD_STAIRS) {
+		  result.setResult(new ItemStack(Material.JUNGLE_WOOD_STAIRS, 8));
+	  }
+	  if (result.getResult().getType()==Material.BRICK_STAIRS) {
+		  result.setResult(new ItemStack(Material.BRICK_STAIRS, 8));
+	  }
+	  if (result.getResult().getType()==Material.NETHER_BRICK_STAIRS) {
+		  result.setResult(new ItemStack(Material.NETHER_BRICK_STAIRS, 8));
+	  }
+	  if (result.getResult().getType()==Material.QUARTZ_STAIRS) {
+		  result.setResult(new ItemStack(Material.QUARTZ_STAIRS, 8));
+	  }
+	  if (result.getResult().getType()==Material.SANDSTONE_STAIRS) {
+		  result.setResult(new ItemStack(Material.SANDSTONE_STAIRS, 8));
+	  }
+	  if (result.getResult().getType()==Material.SMOOTH_STAIRS) {
+		  result.setResult(new ItemStack(Material.SMOOTH_STAIRS, 8));
+	  }	  
+	  
 	  if (result.getResult().getType()==Material.IRON_HELMET ||
 			  result.getResult().getType()==Material.IRON_CHESTPLATE ||
 			  result.getResult().getType()==Material.IRON_LEGGINGS ||
@@ -6588,7 +6620,6 @@ public ItemStack getGoodie() {
 	  p.setFireTicks(0);
 	  p.setFoodLevel(20);
 	  p.setRemainingAir(p.getMaximumAir());
-	  p.updateInventory(); //An attempt to fix inventory desyncs.
 	  this.plugin.REVIVE_EFFECT=90;
 	  this.plugin.REVIVE_EFFECT_LOC = p.getLocation();
 	  PersistentExplorerList ev = new PersistentExplorerList(p.getName());
@@ -6601,7 +6632,6 @@ public ItemStack getGoodie() {
 	  final EntityDamageEvent f = e;
 	  if (e.getEntity().getType()==EntityType.PLAYER) {
 		  final Player p = (Player)e.getEntity();
-		  //Bukkit.broadcastMessage("Player Damaged: "+p.getHealth()+" HP, -"+p.getLastDamageCause().getDamage()+" damage");
 		  if (e.getCause()==DamageCause.ENTITY_EXPLOSION || e.getCause()==DamageCause.BLOCK_EXPLOSION) {
 			  e.setDamage(e.getDamage()*2);
 		  }
@@ -8295,7 +8325,7 @@ public ItemStack getGoodie() {
 	  if (e.getItemInHand().hasItemMeta() && e.getItemInHand().getItemMeta().getLore()!=null) {
 		  //Check the Lore.
 		  for (int i=0;i<e.getItemInHand().getItemMeta().getLore().size();i++) {
-			  if (e.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.") || e.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
+			  if (e.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.") || e.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.") || e.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
 				  e.setCancelled(true);
 				  p.updateInventory();
 				  //The intent is to open the inventory.
@@ -9581,10 +9611,11 @@ public ItemStack getGoodie() {
 	  if (event.getCursor()!=null) {
 		  //Regardless of the inventory, if we try to put it inside a chest, got to try to insert it in there.
   		  if (event.getCurrentItem()!=null) {
-			  if (event.getCursor()!=null && event.getCursor().getType()!=Material.AIR && (event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST) && event.getClick()==ClickType.LEFT) {
+			  if (event.getCursor()!=null && event.getCursor().getType()!=Material.AIR && (event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST) && event.getClick()==ClickType.LEFT) {
 				  //We have to attempt to insert the item in the Item Cube.
 				boolean largechest=false;
 				boolean smallchest=false;
+				boolean enderchest=false;
 				int identifier=-1;
 				  if (event.getCurrentItem().getItemMeta().getLore()!=null) {
 					//Check to see if the Lore contains anything.
@@ -9594,6 +9625,9 @@ public ItemStack getGoodie() {
 						}
 						if (event.getCurrentItem().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
 							largechest=true;
+						}
+						if (event.getCurrentItem().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
+							enderchest=true;
 						}
 						if (event.getCurrentItem().getItemMeta().getLore().get(i).contains("ID#")) {
 							identifier=Integer.valueOf(event.getCurrentItem().getItemMeta().getLore().get(i).replace("ID#", ""));
@@ -9617,6 +9651,11 @@ public ItemStack getGoodie() {
 						newlore.add("ID#"+identifier);
 						meta.setLore(newlore);
 						event.getCurrentItem().setItemMeta(meta);
+						
+							if (enderchest) {
+								event.getCurrentItem().setAmount(2);
+							}
+							
 					}
 					if (smallchest) {
 						FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
@@ -9749,15 +9788,83 @@ public ItemStack getGoodie() {
 						}
 						this.plugin.saveItemCubeConfig(f, identifier);
 					}
+					if (enderchest) {
+						FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
+						if (!f.contains("created")) {
+							for (int i=0;i<27;i++) {
+								f.set("item-"+i, new ItemStack(Material.AIR));
+							}
+							f.set("item-0", event.getCursor());
+							event.getCursor().setType(Material.AIR);
+							f.set("created", Boolean.valueOf(true));
+						} else {
+							//If it does exist already, we need to add it to that inventory.
+							//Try to find a blank slot in there.
+							//List<ItemStack> items = new ArrayList<ItemStack>();
+							//We need to see if we have the inventory opened already...If so we have to add it to THAT one.
+							Inventory thisinven=Bukkit.createInventory(event.getWhoClicked(), 27, "Item Cube #"+identifier);
+							boolean changeinven=false;
+							if (event.getInventory().getTitle().contains("Item Cube") && event.getInventory().getTitle().length()>0) {
+								if (Integer.valueOf(event.getInventory().getTitle().substring(event.getInventory().getTitle().indexOf("#")).replace("#", ""))==identifier) {
+									thisinven=event.getInventory();
+									changeinven=true;
+								}
+							}
+							if (!changeinven) {
+								for (int i=0;i<27;i++) {
+									//items.add(f.getItemStack("item-"+i));
+									if (f.contains("item-"+i)) {
+										thisinven.addItem(f.getItemStack("item-"+i));
+									}
+								}
+							}
+							int countinven = countSpace(thisinven,event.getCursor());
+							if (countinven>=event.getCursor().getAmount()) {
+								//We can simply add it in no problem.
+								thisinven.addItem(event.getCursor());
+								  for (int i=0;i<thisinven.getContents().length;i++) {
+									  f.set("item-"+i, thisinven.getItem(i));
+								  }
+								  event.setCursor(new ItemStack(Material.AIR));
+									this.plugin.saveItemCubeConfig(f, identifier);
+									//Cancel the event here too.
+									event.setCancelled(true);
+									return;
+							} else 
+							if (countinven>0) {
+								//We can at least fit a few.
+								int fit = event.getCursor().getAmount()-countinven;
+								//Leave behind this many.
+								ItemStack thisitem = event.getCursor(), thisitem2 = event.getCursor();
+								thisitem.setAmount(fit);
+								event.setCursor(thisitem);
+								//Bukkit.getPlayer("sigonasr2").sendMessage("Cursor gets "+thisitem.getAmount());
+								thisitem2.setAmount(countinven);
+								thisinven.addItem(thisitem2);
+								//Bukkit.getPlayer("sigonasr2").sendMessage("Item Cube gets "+thisitem2.getAmount());
+								  for (int i=0;i<thisinven.getContents().length;i++) {
+									  f.set("item-"+i, thisinven.getItem(i));
+								  }
+									this.plugin.saveItemCubeConfig(f, identifier);
+									p.updateInventory();
+							}
+							else {
+								//Well, we can't do anything, just treat it as an item swap.
+								this.plugin.saveItemCubeConfig(f, identifier);
+							}
+						}
+						this.plugin.saveItemCubeConfig(f, identifier);
+					}
 				  }
 			  }
 		  }
 	  }
 	  if (event.getInventory().getType()==InventoryType.CRAFTING /*|| event.getInventory().getType()==InventoryType.CHEST*//*Buggy for some reason. We can't open chests in chests.*/) {
 		  if (event.getCurrentItem()!=null) {
-			  if ((event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST) && event.getClick()==ClickType.RIGHT) {
+			  if ((event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST) && event.getClick()==ClickType.RIGHT) {
 				boolean largechest=false;
 				boolean smallchest=false;
+				boolean enderchest=false;
 				int identifier=-1;
 				  if (event.getCurrentItem().getItemMeta().getLore()!=null) {
 					//Check to see if the Lore contains anything.
@@ -9767,6 +9874,9 @@ public ItemStack getGoodie() {
 						}
 						if (event.getCurrentItem().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
 							largechest=true;
+						}
+						if (event.getCurrentItem().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
+							enderchest=true;
 						}
 						if (event.getCurrentItem().getItemMeta().getLore().get(i).contains("ID#")) {
 							identifier=Integer.valueOf(event.getCurrentItem().getItemMeta().getLore().get(i).replace("ID#", ""));
@@ -9790,6 +9900,10 @@ public ItemStack getGoodie() {
 						newlore.add("ID#"+identifier);
 						meta.setLore(newlore);
 						event.getCurrentItem().setItemMeta(meta);
+						
+						if (enderchest) {
+							event.getCurrentItem().setAmount(2);
+						}
 					}
 					Inventory screen = null;
 					if (smallchest) {
@@ -9824,6 +9938,22 @@ public ItemStack getGoodie() {
 						}
 						this.plugin.saveItemCubeConfig(f, identifier);
 					}
+					if (enderchest) {
+						FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
+						if (!f.contains("created")) {
+							for (int i=0;i<27;i++) {
+								f.set("item-"+i, new ItemStack(Material.AIR));
+							}
+							f.set("created", Boolean.valueOf(true));
+						}
+						//List<ItemStack> items = new ArrayList<ItemStack>();
+						screen=Bukkit.createInventory(event.getWhoClicked(), 27, "Ender Item Cube #"+identifier);
+						for (int i=0;i<27;i++) {
+							//items.add(f.getItemStack("item-"+i));
+							screen.setItem(i, f.getItemStack("item-"+i));
+						}
+						this.plugin.saveItemCubeConfig(f, identifier);
+					}
 					if (screen!=null) {
 						event.getWhoClicked().closeInventory();
 						event.getWhoClicked().openInventory(screen);
@@ -9837,7 +9967,7 @@ public ItemStack getGoodie() {
 	  if (event.getInventory().getType()==InventoryType.CHEST && !event.getInventory().getName().equalsIgnoreCase("Notification Options")) {
 		  //If we click a chest, make sure it's not the same ID chest.
 		  if (event.getCurrentItem()!=null) {
-			  if ((event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST)) {
+			  if ((event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST)) {
 					int identifier=-1;
 				  if (event.getCurrentItem().getItemMeta().getLore()!=null) {
 					//Check to see if the Lore contains anything.
@@ -10016,6 +10146,22 @@ public ItemStack getGoodie() {
 			  this.plugin.gainMoneyExp(p,"Blacksmith",0.35*amount,40*amount);
 			  crafteditem=true;
 		  }
+		  if (item.getType()==Material.CHAINMAIL_BOOTS) {
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.375*0.5*amount,80*0.5*amount);
+			  crafteditem=true;
+		  }
+		  if (item.getType()==Material.CHAINMAIL_HELMET) {
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.50*0.5*amount,100*0.5*amount);
+			  crafteditem=true;
+		  }
+		  if (item.getType()==Material.CHAINMAIL_LEGGINGS) {
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.725*0.5*amount,140*0.5*amount);
+			  crafteditem=true;
+		  }
+		  if (item.getType()==Material.CHAINMAIL_CHESTPLATE) {
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.875*0.5*amount,175*0.5*amount);
+			  crafteditem=true;
+		  }
 		  if (item.getType()==Material.IRON_BOOTS) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
@@ -10142,6 +10288,23 @@ public ItemStack getGoodie() {
 				  mult=10;
 			  }
 			  this.plugin.gainMoneyExp(p,"Blacksmith",1.50*mult*amount,750*mult*amount);
+			  crafteditem=true;
+		  }
+	  }
+	  /*if (e.getBlock().getType()==Material.PUMPKIN) {
+	  this.plugin.gainMoneyExp(p,"Farmer",0.00,1);
+  }
+  if (e.getBlock().getType()==Material.MELON_BLOCK) {
+	  this.plugin.gainMoneyExp(p,"Farmer",0.10,10);
+  }*/
+	  if (this.plugin.PlayerinJob(p,"Farmer")) {
+		  boolean crafteditem=false;
+		  if (item.getType()==Material.MELON) {
+			  this.plugin.gainMoneyExp(p,"Farmer",0.10,10);
+			  crafteditem=true;
+		  }
+		  if (item.getType()==Material.PUMPKIN_SEEDS) {
+			  this.plugin.gainMoneyExp(p,"Farmer",0.04,8);
 			  crafteditem=true;
 		  }
 	  }
@@ -11318,109 +11481,71 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
   
   @EventHandler
   public void onPlayerDeath(PlayerDeathEvent e) {
-	  //Delay this for 5 ticks. See if Fatal Survivor kicked in in time. (Or you got healed).
-	  //Bukkit.broadcastMessage("Player Death: "+e.getEntity().getHealth()+" HP, Last Damage: -"+e.getEntity().getLastDamage()+" from "+e.getEntity().getLastDamageCause());
-	  //If we have Fatal Survivor, use the force! Otherwise, uh, you're dead.
-
-	  final Player p = e.getEntity();
+	  Player p = e.getEntity();
 	  e.setDeathMessage(e.getDeathMessage().replace(p.getScoreboard().getTeam(p.getName()).getPrefix()+p.getName()+p.getScoreboard().getTeam(p.getName()).getSuffix(),p.getName()));
 	  p.getScoreboard().getTeam(p.getName()).setSuffix("");
-	  boolean survivor=false;
-	  if (this.plugin.PlayerinJob(p, "Explorer")) {
-		  if (this.plugin.getJobLv("Explorer", p)>=10) {
-			  //Check to see if our "fatal s	urvivor" effect is available.
-			  for (int i=0;i<this.plugin.explorers.size();i++) {
-				  if (this.plugin.explorers.get(i).event==0 && this.plugin.explorers.get(i).name.compareTo(p.getName())==0) {
-					  survivor=true;
-					  break;
-				  }
-			  }
-			  PersistentExplorerList eve = new PersistentExplorerList(p.getName());
-			  eve.event=1;
-			  eve.data=p.getExp();
-			  eve.data2=p.getLevel();
-			  eve.expiretime=Main.SERVER_TICK_TIME+1200;
-			  this.plugin.explorers.add(eve);
-			  if (!survivor) {
-				  final List<ItemStack> drops = e.getDrops();
-				  e.getDrops().clear();
-				  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
-				      @Override
-				      public void run() {
-						  for (int i=0;i<drops.size();i++) {
-							  p.getInventory().addItem(drops.get(i));
-						  }
-				      }
-				  },1);
-				  FatalSurvivor(p);
+	  for (int i=0;i<this.plugin.explorerlist.size();i++) {
+		  if (Bukkit.getPlayer(this.plugin.explorerlist.get(i).player)!=null) {
+			  Player p2 =Bukkit.getPlayer(this.plugin.explorerlist.get(i).player);
+			  if (p.equals(p2)) {
+				  //This is an explorer in the explorer data.
+				  this.plugin.explorerlist.get(i).wedied=true;
 			  }
 		  }
 	  }
-	  if (survivor || !this.plugin.PlayerinJob(p, "Explorer"))  {
-		  //You are dead buddy.
-		  for (int i=0;i<plugin.explorerlist.size();i++) {
-			  if (Bukkit.getPlayer(plugin.explorerlist.get(i).player)!=null) {
-				  Player p2 =Bukkit.getPlayer(plugin.explorerlist.get(i).player);
-				  if (p.equals(p2)) {
-					  //This is an explorer in the explorer data.
-					  plugin.explorerlist.get(i).wedied=true;
-				  }
-			  }
-		  }
-		  if (!plugin.PlayerinJob(p, "Explorer") || (plugin.PlayerinJob(p, "Explorer") && plugin.getJobLv("Explorer", p)<20)) {
-			  double balance = Main.economy.getBalance(p.getName());
-			  double lose = plugin.getConfig().getDouble("losemoney.LoseAmount");
-			  double loseAmount = Main.economy.getBalance(p.getName()) / 100.0D * lose;
-			  String message = "You lost $%amount because you died.";
-		      DecimalFormat df = new DecimalFormat("#0.00");
-		      loseAmount = Double.parseDouble(df.format(loseAmount));
-		      if (Main.economy.has(p.getName(), loseAmount)) {
-		        plugin.getLogger().info("Player " + p.getName() + "'s getting withdrawed with " + loseAmount + "$");
-		        Main.economy.withdrawPlayer(p.getName(), loseAmount);
-		        message = message.replaceAll("%amount", String.valueOf(loseAmount));
-		      } else {
-		        plugin.getLogger().info("Player " + p.getName() + "'s getting withdrawed with " + balance + "$");
-		        Main.economy.withdrawPlayer(p.getName(), balance);
-		        message = message.replaceAll("%amount", String.valueOf(balance));
-		      }
-		      p.sendMessage(message);
-		  }
-		  if (plugin.PlayerinJob(p,"Explorer")) {
-			  PersistentExplorerList eve = new PersistentExplorerList(p.getName());
-			  eve.event=2;
-			  eve.expiretime=Main.SERVER_TICK_TIME+3600;
-			  plugin.explorers.add(eve);
-		  }
+	  if (!this.plugin.PlayerinJob(p, "Explorer") || (this.plugin.PlayerinJob(p, "Explorer") && this.plugin.getJobLv("Explorer", p)<20)) {
+		  double balance = Main.economy.getBalance(p.getName());
+		  double lose = this.plugin.getConfig().getDouble("losemoney.LoseAmount");
+		  double loseAmount = Main.economy.getBalance(p.getName()) / 100.0D * lose;
+		  String message = "You lost $%amount because you died.";
 	      DecimalFormat df = new DecimalFormat("#0.00");
-	      double deathX = p.getLocation().getX();
-	      double deathY = p.getLocation().getY();
-	      double deathZ = p.getLocation().getZ();
-	      String deathWorld = p.getLocation().getWorld().getName();
-		  plugin.getAccountsConfig().set(p.getName() + ".deathpointX",Double.valueOf(deathX));
-		  plugin.getAccountsConfig().set(p.getName() + ".deathpointY",Double.valueOf(deathY));
-		  plugin.getAccountsConfig().set(p.getName() + ".deathpointZ",Double.valueOf(deathZ));
-		  plugin.getAccountsConfig().set(p.getName() + ".deathworld",String.valueOf(deathWorld));
-		  plugin.getAccountsConfig().set(p.getName() + ".revived",Boolean.valueOf(false));
-		  plugin.getAccountsConfig().set(p.getName() + ".revivetime",Long.valueOf(Main.SERVER_TICK_TIME));
-	      plugin.saveAccountsConfig();
-	      double mincost = plugin.getConfig().getDouble("revive-cost-rate");
-	      if (p.getBedSpawnLocation()!=null) {
-	    	  mincost *= Math.abs(p.getBedSpawnLocation().getX()-deathX)+Math.abs(p.getBedSpawnLocation().getY()-deathY)+Math.abs(p.getBedSpawnLocation().getZ()-deathZ);
+	      loseAmount = Double.parseDouble(df.format(loseAmount));
+	      if (Main.economy.has(p.getName(), loseAmount)) {
+	        this.plugin.getLogger().info("Player " + p.getName() + "'s getting withdrawed with " + loseAmount + "$");
+	        Main.economy.withdrawPlayer(p.getName(), loseAmount);
+	        message = message.replaceAll("%amount", String.valueOf(loseAmount));
 	      } else {
-	    	  mincost *= Math.abs(Bukkit.getWorld("world").getSpawnLocation().getX()-deathX)+Math.abs(Bukkit.getWorld("world").getSpawnLocation().getY()-deathY)+Math.abs(Bukkit.getWorld("world").getSpawnLocation().getZ()-deathZ);
+	        this.plugin.getLogger().info("Player " + p.getName() + "'s getting withdrawed with " + balance + "$");
+	        Main.economy.withdrawPlayer(p.getName(), balance);
+	        message = message.replaceAll("%amount", String.valueOf(balance));
 	      }
-	      double mymoney = plugin.getAccountsConfig().getDouble(p.getName() + ".money");
-	      double finalcost = (mincost*plugin.getConfig().getDouble("revive-cost-rate")) + (mymoney*plugin.getConfig().getDouble("revive-cost-tax"));
-	      if (plugin.PlayerinJob(p, "Explorer") && plugin.getJobLv("Explorer", p)>=20) {
-	    	  finalcost*=0.25;
-	      }
-	      if (mymoney>=mincost) {
-	    	  p.sendMessage("You died. It will cost you $"+df.format(finalcost)+" to revive. To revive, type /revive me.");
-	      } else {
-	    	  p.sendMessage("You died. You do not have enough money in your bank to revive.");
-	    	  p.sendMessage("Cost: $"+df.format(finalcost)+". If you want to revive, type "+ChatColor.AQUA+"/revive me"+ChatColor.WHITE+" when you have enough.");
-	      }
+	      p.sendMessage(message);
 	  }
+	  if (this.plugin.PlayerinJob(p,"Explorer")) {
+		  PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+		  eve.event=2;
+		  eve.expiretime=Main.SERVER_TICK_TIME+3600;
+		  this.plugin.explorers.add(eve);
+	  }
+      DecimalFormat df = new DecimalFormat("#0.00");
+      double deathX = p.getLocation().getX();
+      double deathY = p.getLocation().getY();
+      double deathZ = p.getLocation().getZ();
+      String deathWorld = p.getLocation().getWorld().getName();
+	  this.plugin.getAccountsConfig().set(p.getName() + ".deathpointX",Double.valueOf(deathX));
+	  this.plugin.getAccountsConfig().set(p.getName() + ".deathpointY",Double.valueOf(deathY));
+	  this.plugin.getAccountsConfig().set(p.getName() + ".deathpointZ",Double.valueOf(deathZ));
+	  this.plugin.getAccountsConfig().set(p.getName() + ".deathworld",String.valueOf(deathWorld));
+	  this.plugin.getAccountsConfig().set(p.getName() + ".revived",Boolean.valueOf(false));
+	  this.plugin.getAccountsConfig().set(p.getName() + ".revivetime",Long.valueOf(Main.SERVER_TICK_TIME));
+      this.plugin.saveAccountsConfig();
+      double mincost = this.plugin.getConfig().getDouble("revive-cost-rate");
+      if (p.getBedSpawnLocation()!=null) {
+    	  mincost *= Math.abs(p.getBedSpawnLocation().getX()-deathX)+Math.abs(p.getBedSpawnLocation().getY()-deathY)+Math.abs(p.getBedSpawnLocation().getZ()-deathZ);
+      } else {
+    	  mincost *= Math.abs(Bukkit.getWorld("world").getSpawnLocation().getX()-deathX)+Math.abs(Bukkit.getWorld("world").getSpawnLocation().getY()-deathY)+Math.abs(Bukkit.getWorld("world").getSpawnLocation().getZ()-deathZ);
+      }
+      double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName() + ".money");
+      double finalcost = (mincost*this.plugin.getConfig().getDouble("revive-cost-rate")) + (mymoney*this.plugin.getConfig().getDouble("revive-cost-tax"));
+      if (this.plugin.PlayerinJob(p, "Explorer") && this.plugin.getJobLv("Explorer", p)>=20) {
+    	  finalcost*=0.25;
+      }
+      if (mymoney>=mincost) {
+    	  p.sendMessage("You died. It will cost you $"+df.format(finalcost)+" to revive. To revive, type /revive me.");
+      } else {
+    	  p.sendMessage("You died. You do not have enough money in your bank to revive.");
+    	  p.sendMessage("Cost: $"+df.format(finalcost)+". If you want to revive, type "+ChatColor.AQUA+"/revive me"+ChatColor.WHITE+" when you have enough.");
+      }
   }
 
   @EventHandler
@@ -11693,14 +11818,15 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
     }
     if (e.getAction()==Action.RIGHT_CLICK_AIR) {
     	boolean largechest=false;
-		boolean smallchest=false;
-		int identifier=-1;
+    	boolean smallchest=false;
+    	boolean enderchest=false;
+				int identifier=-1;
 		if (p.getItemInHand()!=null && (p.getItemInHand().getType()==Material.getMaterial(127))) {
 			p.updateInventory();
 			e.setCancelled(true);
 			return;
 		}
-		if (p.getItemInHand()!=null && (p.getItemInHand().getType()==Material.CHEST || p.getItemInHand().getType()==Material.TRAPPED_CHEST)) {
+		if (p.getItemInHand()!=null && (p.getItemInHand().getType()==Material.CHEST || p.getItemInHand().getType()==Material.TRAPPED_CHEST || p.getItemInHand().getType()==Material.ENDER_CHEST)) {
 		  if (p.getItemInHand().getItemMeta().getLore()!=null) {
 			//Check to see if the Lore contains anything.
 			for (int i=0;i<p.getItemInHand().getItemMeta().getLore().size();i++) {
@@ -11709,6 +11835,9 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
 				}
 				if (p.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
 					largechest=true;
+				}
+				if (p.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
+					enderchest=true;
 				}
 				if (p.getItemInHand().getItemMeta().getLore().get(i).contains("ID#")) {
 					identifier=Integer.valueOf(p.getItemInHand().getItemMeta().getLore().get(i).replace("ID#", ""));
@@ -11732,6 +11861,10 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
 				newlore.add("ID#"+identifier);
 				meta.setLore(newlore);
 				p.getItemInHand().setItemMeta(meta);
+				
+				if (enderchest) {
+					p.getItemInHand().setAmount(2);
+				}
 			}
 			Inventory screen = null;
 			if (smallchest) {
@@ -11761,6 +11894,22 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
 				//List<ItemStack> items = new ArrayList<ItemStack>();
 				screen=Bukkit.createInventory(p, 54, "Large Item Cube #"+identifier);
 				for (int i=0;i<54;i++) {
+					//items.add(f.getItemStack("item-"+i));
+					screen.setItem(i, f.getItemStack("item-"+i));
+				}
+				this.plugin.saveItemCubeConfig(f, identifier);
+			}
+			if (enderchest) {
+				FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
+				if (!f.contains("created")) {
+					for (int i=0;i<27;i++) {
+						f.set("item-"+i, new ItemStack(Material.AIR));
+					}
+					f.set("created", Boolean.valueOf(true));
+				}
+				//List<ItemStack> items = new ArrayList<ItemStack>();
+				screen=Bukkit.createInventory(p, 27, "Ender Item Cube #"+identifier);
+				for (int i=0;i<27;i++) {
 					//items.add(f.getItemStack("item-"+i));
 					screen.setItem(i, f.getItemStack("item-"+i));
 				}
