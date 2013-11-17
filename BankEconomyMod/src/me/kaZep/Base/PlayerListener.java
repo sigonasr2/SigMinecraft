@@ -9610,17 +9610,20 @@ public ItemStack getGoodie() {
 	          }
 		  }
 	  }
+	  if (isViewingEnderCube(p)) {
+		  //If we are viewing an ender cube, every single click should prompt an update for all viewers of it. In case it does something.
+		  ItemCube_updateSameEnderCube(getViewingEnderCubeID(p),p);
+	  }
 	  if (event.getCursor()!=null) {
 		  //Regardless of the inventory, if we try to put it inside a chest, got to try to insert it in there.
   		  if (event.getCurrentItem()!=null) {
 			  if (event.getCursor()!=null && event.getSlotType()!=SlotType.RESULT && event.getCursor().getType()!=Material.AIR && (event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST) && event.getClick()==ClickType.LEFT) {
 				event.setCursor(insertIntoItemCube(p, event.getCurrentItem(), event.getCursor()));
+				p.updateInventory();
+				event.setCancelled(true);
+				return;
 			  }
 		  }
-	  }
-	  if (isViewingEnderCube(p)) {
-		  //If we are viewing an ender cube, every single click should prompt an update for all viewers of it. In case it does something.
-		  ItemCube_updateSameEnderCube(getViewingEnderCubeID(p),p);
 	  }
 	  if (event.getInventory().getType()==InventoryType.CRAFTING /*|| event.getInventory().getType()==InventoryType.CHEST*//*Buggy for some reason. We can't open chests in chests.*/) {
 		  if (event.getCurrentItem()!=null) {
@@ -11789,7 +11792,7 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
     		}
     	}
     }
-    if (e.getAction()==Action.RIGHT_CLICK_AIR) {
+    if (e.getAction()==Action.RIGHT_CLICK_AIR || (e.getAction()==Action.RIGHT_CLICK_BLOCK && p.isSneaking())) {
     	boolean largechest=false;
     	boolean smallchest=false;
     	boolean enderchest=false;
