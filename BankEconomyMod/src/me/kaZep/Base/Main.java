@@ -320,27 +320,27 @@ public class Main extends JavaPlugin
     Bukkit.addRecipe(stone);
     ShapedRecipe sandstone = new ShapedRecipe(new ItemStack(Material.SANDSTONE, 1));
     sandstone.shape("aa");
-    stone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 1).getData());
+    sandstone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 1).getData());
     Bukkit.addRecipe(sandstone);
     ShapedRecipe cobblestone = new ShapedRecipe(new ItemStack(Material.COBBLESTONE, 1));
     cobblestone.shape("aa");
-    stone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 3).getData());
+    cobblestone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 3).getData());
     Bukkit.addRecipe(cobblestone);
     ShapedRecipe bricks = new ShapedRecipe(new ItemStack(Material.BRICK, 1));
     bricks.shape("aa");
-    stone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 4).getData());
+    bricks.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 4).getData());
     Bukkit.addRecipe(bricks);
     ShapedRecipe stone_bricks = new ShapedRecipe(new ItemStack(Material.SMOOTH_BRICK, 1));
     stone_bricks.shape("aa");
-    stone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 5).getData());
+    stone_bricks.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 5).getData());
     Bukkit.addRecipe(stone_bricks);
     ShapedRecipe nether_bricks = new ShapedRecipe(new ItemStack(Material.NETHER_BRICK, 1));
     nether_bricks.shape("aa");
-    stone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 6).getData());
+    nether_bricks.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 6).getData());
     Bukkit.addRecipe(nether_bricks);
     ShapedRecipe nether_quartz = new ShapedRecipe(new ItemStack(Material.QUARTZ, 1));
     nether_quartz.shape("aa");
-    stone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 7).getData());
+    nether_quartz.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 7).getData());
     Bukkit.addRecipe(nether_quartz);    
     
     //Add Recipes for new Block armor crafting.
@@ -515,7 +515,7 @@ public class Main extends JavaPlugin
     Builder_job.addData("STONE BRICK", 0.04, 8, 0);
     Builder_job.addData("GLASS", 0.04, 8, 0);
     Builder_job.addData("QUARTZ SLAB", 0.05, 9, 0);
-    Builder_job.addData("nether_bricks SLAB", 0.05, 9, 0);
+    Builder_job.addData("BRICKS SLAB", 0.05, 9, 0);
     Builder_job.addData("GLOWSTONE", 0.05, 10, 0);
     Builder_job.addData("HARDENED CLAY", 0.05, 10, 0);
     Builder_job.addData("STAINED CLAY", 0.05, 10, 0);
@@ -545,7 +545,7 @@ public class Main extends JavaPlugin
     Digger_job.addData("SANDSTONE", 0.02, 6, 1);
     Digger_job.addData("SMOOTH SANDSTONE", 0.02, 6, 1);
     Digger_job.addData("CHISELED SANDSTONE", 0.025, 7, 1);
-    Digger_job.addData("nether_bricks", 0.04, 8, 1);
+    Digger_job.addData("BRICKS", 0.04, 8, 1);
     Digger_job.addData("GLASS", 0.015, 3, 2);
     Digger_job.addData("BRICK", 0.04, 8, 2);
     Digger_job.addData("HARDENED CLAY", 0.04, 8, 2);
