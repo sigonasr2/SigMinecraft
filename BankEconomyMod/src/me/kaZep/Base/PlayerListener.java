@@ -6600,6 +6600,7 @@ public ItemStack getGoodie() {
 	  final EntityDamageEvent f = e;
 	  if (e.getEntity().getType()==EntityType.PLAYER) {
 		  final Player p = (Player)e.getEntity();
+		  Bukkit.broadcastMessage("Player Damaged: "+p.getHealth()+" HP");
 		  if (e.getCause()==DamageCause.ENTITY_EXPLOSION || e.getCause()==DamageCause.BLOCK_EXPLOSION) {
 			  e.setDamage(e.getDamage()*2);
 		  }
@@ -11318,6 +11319,7 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
   public void onPlayerDeath(PlayerDeathEvent e) {
 	  //Delay this for 5 ticks. See if Fatal Survivor kicked in in time. (Or you got healed).
 	  final PlayerDeathEvent e2 = e;
+	  Bukkit.broadcastMessage("Player Death: "+e2.getEntity().getHealth()+" HP, Last Damage: -"+e2.getEntity().getLastDamage()+" from "+e2.getEntity().getLastDamageCause());
 	  final Main plugin = this.plugin;
 	  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 	      @Override
