@@ -11316,71 +11316,79 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
   
   @EventHandler
   public void onPlayerDeath(PlayerDeathEvent e) {
-	  Player p = e.getEntity();
-	  e.setDeathMessage(e.getDeathMessage().replace(p.getScoreboard().getTeam(p.getName()).getPrefix()+p.getName()+p.getScoreboard().getTeam(p.getName()).getSuffix(),p.getName()));
-	  p.getScoreboard().getTeam(p.getName()).setSuffix("");
-	  for (int i=0;i<this.plugin.explorerlist.size();i++) {
-		  if (Bukkit.getPlayer(this.plugin.explorerlist.get(i).player)!=null) {
-			  Player p2 =Bukkit.getPlayer(this.plugin.explorerlist.get(i).player);
-			  if (p.equals(p2)) {
-				  //This is an explorer in the explorer data.
-				  this.plugin.explorerlist.get(i).wedied=true;
+	  //Delay this for 5 ticks. See if Fatal Survivor kicked in in time. (Or you got healed).
+	  final PlayerDeathEvent e2 = e;
+	  final Main plugin = this.plugin;
+	  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+	      @Override
+	      public void run() {
+			  Player p = e2.getEntity();
+			  e2.setDeathMessage(e2.getDeathMessage().replace(p.getScoreboard().getTeam(p.getName()).getPrefix()+p.getName()+p.getScoreboard().getTeam(p.getName()).getSuffix(),p.getName()));
+			  p.getScoreboard().getTeam(p.getName()).setSuffix("");
+			  for (int i=0;i<plugin.explorerlist.size();i++) {
+				  if (Bukkit.getPlayer(plugin.explorerlist.get(i).player)!=null) {
+					  Player p2 =Bukkit.getPlayer(plugin.explorerlist.get(i).player);
+					  if (p.equals(p2)) {
+						  //This is an explorer in the explorer data.
+						  plugin.explorerlist.get(i).wedied=true;
+					  }
+				  }
 			  }
-		  }
-	  }
-	  if (!this.plugin.PlayerinJob(p, "Explorer") || (this.plugin.PlayerinJob(p, "Explorer") && this.plugin.getJobLv("Explorer", p)<20)) {
-		  double balance = Main.economy.getBalance(p.getName());
-		  double lose = this.plugin.getConfig().getDouble("losemoney.LoseAmount");
-		  double loseAmount = Main.economy.getBalance(p.getName()) / 100.0D * lose;
-		  String message = "You lost $%amount because you died.";
-	      DecimalFormat df = new DecimalFormat("#0.00");
-	      loseAmount = Double.parseDouble(df.format(loseAmount));
-	      if (Main.economy.has(p.getName(), loseAmount)) {
-	        this.plugin.getLogger().info("Player " + p.getName() + "'s getting withdrawed with " + loseAmount + "$");
-	        Main.economy.withdrawPlayer(p.getName(), loseAmount);
-	        message = message.replaceAll("%amount", String.valueOf(loseAmount));
-	      } else {
-	        this.plugin.getLogger().info("Player " + p.getName() + "'s getting withdrawed with " + balance + "$");
-	        Main.economy.withdrawPlayer(p.getName(), balance);
-	        message = message.replaceAll("%amount", String.valueOf(balance));
+			  if (!plugin.PlayerinJob(p, "Explorer") || (plugin.PlayerinJob(p, "Explorer") && plugin.getJobLv("Explorer", p)<20)) {
+				  double balance = Main.economy.getBalance(p.getName());
+				  double lose = plugin.getConfig().getDouble("losemoney.LoseAmount");
+				  double loseAmount = Main.economy.getBalance(p.getName()) / 100.0D * lose;
+				  String message = "You lost $%amount because you died.";
+			      DecimalFormat df = new DecimalFormat("#0.00");
+			      loseAmount = Double.parseDouble(df.format(loseAmount));
+			      if (Main.economy.has(p.getName(), loseAmount)) {
+			        plugin.getLogger().info("Player " + p.getName() + "'s getting withdrawed with " + loseAmount + "$");
+			        Main.economy.withdrawPlayer(p.getName(), loseAmount);
+			        message = message.replaceAll("%amount", String.valueOf(loseAmount));
+			      } else {
+			        plugin.getLogger().info("Player " + p.getName() + "'s getting withdrawed with " + balance + "$");
+			        Main.economy.withdrawPlayer(p.getName(), balance);
+			        message = message.replaceAll("%amount", String.valueOf(balance));
+			      }
+			      p.sendMessage(message);
+			  }
+			  if (plugin.PlayerinJob(p,"Explorer")) {
+				  PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+				  eve.event=2;
+				  eve.expiretime=Main.SERVER_TICK_TIME+3600;
+				  plugin.explorers.add(eve);
+			  }
+		      DecimalFormat df = new DecimalFormat("#0.00");
+		      double deathX = p.getLocation().getX();
+		      double deathY = p.getLocation().getY();
+		      double deathZ = p.getLocation().getZ();
+		      String deathWorld = p.getLocation().getWorld().getName();
+			  plugin.getAccountsConfig().set(p.getName() + ".deathpointX",Double.valueOf(deathX));
+			  plugin.getAccountsConfig().set(p.getName() + ".deathpointY",Double.valueOf(deathY));
+			  plugin.getAccountsConfig().set(p.getName() + ".deathpointZ",Double.valueOf(deathZ));
+			  plugin.getAccountsConfig().set(p.getName() + ".deathworld",String.valueOf(deathWorld));
+			  plugin.getAccountsConfig().set(p.getName() + ".revived",Boolean.valueOf(false));
+			  plugin.getAccountsConfig().set(p.getName() + ".revivetime",Long.valueOf(Main.SERVER_TICK_TIME));
+		      plugin.saveAccountsConfig();
+		      double mincost = plugin.getConfig().getDouble("revive-cost-rate");
+		      if (p.getBedSpawnLocation()!=null) {
+		    	  mincost *= Math.abs(p.getBedSpawnLocation().getX()-deathX)+Math.abs(p.getBedSpawnLocation().getY()-deathY)+Math.abs(p.getBedSpawnLocation().getZ()-deathZ);
+		      } else {
+		    	  mincost *= Math.abs(Bukkit.getWorld("world").getSpawnLocation().getX()-deathX)+Math.abs(Bukkit.getWorld("world").getSpawnLocation().getY()-deathY)+Math.abs(Bukkit.getWorld("world").getSpawnLocation().getZ()-deathZ);
+		      }
+		      double mymoney = plugin.getAccountsConfig().getDouble(p.getName() + ".money");
+		      double finalcost = (mincost*plugin.getConfig().getDouble("revive-cost-rate")) + (mymoney*plugin.getConfig().getDouble("revive-cost-tax"));
+		      if (plugin.PlayerinJob(p, "Explorer") && plugin.getJobLv("Explorer", p)>=20) {
+		    	  finalcost*=0.25;
+		      }
+		      if (mymoney>=mincost) {
+		    	  p.sendMessage("You died. It will cost you $"+df.format(finalcost)+" to revive2. To revive, type /revive me2.");
+		      } else {
+		    	  p.sendMessage("You died. You do not have enough money in your bank to revive2.");
+		    	  p.sendMessage("Cost: $"+df.format(finalcost)+". If you want to revive, type "+ChatColor.AQUA+"/revive me"+ChatColor.WHITE+" when you have enough.");
+		      }
 	      }
-	      p.sendMessage(message);
-	  }
-	  if (this.plugin.PlayerinJob(p,"Explorer")) {
-		  PersistentExplorerList eve = new PersistentExplorerList(p.getName());
-		  eve.event=2;
-		  eve.expiretime=Main.SERVER_TICK_TIME+3600;
-		  this.plugin.explorers.add(eve);
-	  }
-      DecimalFormat df = new DecimalFormat("#0.00");
-      double deathX = p.getLocation().getX();
-      double deathY = p.getLocation().getY();
-      double deathZ = p.getLocation().getZ();
-      String deathWorld = p.getLocation().getWorld().getName();
-	  this.plugin.getAccountsConfig().set(p.getName() + ".deathpointX",Double.valueOf(deathX));
-	  this.plugin.getAccountsConfig().set(p.getName() + ".deathpointY",Double.valueOf(deathY));
-	  this.plugin.getAccountsConfig().set(p.getName() + ".deathpointZ",Double.valueOf(deathZ));
-	  this.plugin.getAccountsConfig().set(p.getName() + ".deathworld",String.valueOf(deathWorld));
-	  this.plugin.getAccountsConfig().set(p.getName() + ".revived",Boolean.valueOf(false));
-	  this.plugin.getAccountsConfig().set(p.getName() + ".revivetime",Long.valueOf(Main.SERVER_TICK_TIME));
-      this.plugin.saveAccountsConfig();
-      double mincost = this.plugin.getConfig().getDouble("revive-cost-rate");
-      if (p.getBedSpawnLocation()!=null) {
-    	  mincost *= Math.abs(p.getBedSpawnLocation().getX()-deathX)+Math.abs(p.getBedSpawnLocation().getY()-deathY)+Math.abs(p.getBedSpawnLocation().getZ()-deathZ);
-      } else {
-    	  mincost *= Math.abs(Bukkit.getWorld("world").getSpawnLocation().getX()-deathX)+Math.abs(Bukkit.getWorld("world").getSpawnLocation().getY()-deathY)+Math.abs(Bukkit.getWorld("world").getSpawnLocation().getZ()-deathZ);
-      }
-      double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName() + ".money");
-      double finalcost = (mincost*this.plugin.getConfig().getDouble("revive-cost-rate")) + (mymoney*this.plugin.getConfig().getDouble("revive-cost-tax"));
-      if (this.plugin.PlayerinJob(p, "Explorer") && this.plugin.getJobLv("Explorer", p)>=20) {
-    	  finalcost*=0.25;
-      }
-      if (mymoney>=mincost) {
-    	  p.sendMessage("You died. It will cost you $"+df.format(finalcost)+" to revive. To revive, type /revive me.");
-      } else {
-    	  p.sendMessage("You died. You do not have enough money in your bank to revive.");
-    	  p.sendMessage("Cost: $"+df.format(finalcost)+". If you want to revive, type "+ChatColor.AQUA+"/revive me"+ChatColor.WHITE+" when you have enough.");
-      }
+	  },5);
   }
 
   @EventHandler
