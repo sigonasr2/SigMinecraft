@@ -6588,6 +6588,7 @@ public ItemStack getGoodie() {
 	  p.setFireTicks(0);
 	  p.setFoodLevel(20);
 	  p.setRemainingAir(p.getMaximumAir());
+	  p.updateInventory(); //An attempt to fix inventory desyncs.
 	  this.plugin.REVIVE_EFFECT=90;
 	  this.plugin.REVIVE_EFFECT_LOC = p.getLocation();
 	  PersistentExplorerList ev = new PersistentExplorerList(p.getName());
@@ -11321,7 +11322,7 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
 	  //Bukkit.broadcastMessage("Player Death: "+e.getEntity().getHealth()+" HP, Last Damage: -"+e.getEntity().getLastDamage()+" from "+e.getEntity().getLastDamageCause());
 	  //If we have Fatal Survivor, use the force! Otherwise, uh, you're dead.
 
-	  Player p = e.getEntity();
+	  final Player p = e.getEntity();
 	  e.setDeathMessage(e.getDeathMessage().replace(p.getScoreboard().getTeam(p.getName()).getPrefix()+p.getName()+p.getScoreboard().getTeam(p.getName()).getSuffix(),p.getName()));
 	  p.getScoreboard().getTeam(p.getName()).setSuffix("");
 	  boolean survivor=false;
@@ -11341,6 +11342,16 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
 			  eve.expiretime=Main.SERVER_TICK_TIME+1200;
 			  this.plugin.explorers.add(eve);
 			  if (!survivor) {
+				  final List<ItemStack> drops = e.getDrops();
+				  e.getDrops().clear();
+				  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+				      @Override
+				      public void run() {
+						  for (int i=0;i<drops.size();i++) {
+							  p.getInventory().addItem(drops.get(i));
+						  }
+				      }
+				  },1);
 				  FatalSurvivor(p);
 			  }
 		  }
