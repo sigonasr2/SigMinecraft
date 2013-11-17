@@ -289,11 +289,61 @@ public class Main extends JavaPlugin
     Sarayn_recycling_center.addChest(new Location(Bukkit.getWorld("world"), 1541, 57, 154));
     recycling_center_list.add(Sarayn_recycling_center);
     
+    //Add Recipe for melon slice crafting.
+    ShapedRecipe melon_slice = new ShapedRecipe(new ItemStack(Material.MELON, 8));
+    melon_slice.shape("a");
+    melon_slice.setIngredient('a', Material.MELON_BLOCK);
+    Bukkit.addRecipe(melon_slice);
+
+    //Add wood slab recombining recipes.
+    ShapedRecipe oak_planks = new ShapedRecipe(new ItemStack(Material.WOOD, 1, (short) 0));
+    oak_planks.shape("aa");
+    oak_planks.setIngredient('a', new ItemStack(Material.WOOD_STEP, 1, (short) 0).getData());
+    Bukkit.addRecipe(oak_planks);
+    ShapedRecipe spruce_planks = new ShapedRecipe(new ItemStack(Material.WOOD, 1, (short) 1));
+    spruce_planks.shape("aa");
+    spruce_planks.setIngredient('a', new ItemStack(Material.WOOD_STEP, 1, (short) 1).getData());
+    Bukkit.addRecipe(spruce_planks);
+    ShapedRecipe birch_planks = new ShapedRecipe(new ItemStack(Material.WOOD, 1, (short) 2));
+    birch_planks.shape("aa");
+    birch_planks.setIngredient('a', new ItemStack(Material.WOOD_STEP, 1, (short) 2).getData());
+    Bukkit.addRecipe(birch_planks);
+    ShapedRecipe jungle_planks = new ShapedRecipe(new ItemStack(Material.WOOD, 1, (short) 3));
+    jungle_planks.shape("aa");
+    jungle_planks.setIngredient('a', new ItemStack(Material.WOOD_STEP, 1, (short) 3).getData());
+    Bukkit.addRecipe(jungle_planks);
+    
+    //Add non-wood slab recombining recipes.
+    ShapedRecipe stone = new ShapedRecipe(new ItemStack(Material.STONE, 1));
+    stone.shape("aa");
+    stone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 0).getData());
+    Bukkit.addRecipe(stone);
+    ShapedRecipe sandstone = new ShapedRecipe(new ItemStack(Material.SANDSTONE, 1));
+    sandstone.shape("aa");
+    stone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 1).getData());
+    Bukkit.addRecipe(sandstone);
+    ShapedRecipe cobblestone = new ShapedRecipe(new ItemStack(Material.COBBLESTONE, 1));
+    cobblestone.shape("aa");
+    stone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 3).getData());
+    Bukkit.addRecipe(cobblestone);
+    ShapedRecipe bricks = new ShapedRecipe(new ItemStack(Material.BRICK, 1));
+    bricks.shape("aa");
+    stone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 4).getData());
+    Bukkit.addRecipe(bricks);
+    ShapedRecipe stone_bricks = new ShapedRecipe(new ItemStack(Material.SMOOTH_BRICK, 1));
+    stone_bricks.shape("aa");
+    stone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 5).getData());
+    Bukkit.addRecipe(stone_bricks);
+    ShapedRecipe nether_bricks = new ShapedRecipe(new ItemStack(Material.NETHER_BRICK, 1));
+    nether_bricks.shape("aa");
+    stone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 6).getData());
+    Bukkit.addRecipe(nether_bricks);
+    ShapedRecipe nether_quartz = new ShapedRecipe(new ItemStack(Material.QUARTZ, 1));
+    nether_quartz.shape("aa");
+    stone.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 7).getData());
+    Bukkit.addRecipe(nether_quartz);    
+    
     //Add Recipes for new Block armor crafting.
-    ShapedRecipe Melons = new ShapedRecipe(new ItemStack(Material.MELON, 8));
-    Melons.shape("a");
-    Melons.setIngredient('a', Material.MELON_BLOCK);
-    Bukkit.addRecipe(Melons);
     ShapedRecipe iron_helmet = new ShapedRecipe(new ItemStack(Material.IRON_HELMET));
     iron_helmet.shape("aaa","a a");
     iron_helmet.setIngredient('a', Material.IRON_BLOCK);
@@ -465,7 +515,7 @@ public class Main extends JavaPlugin
     Builder_job.addData("STONE BRICK", 0.04, 8, 0);
     Builder_job.addData("GLASS", 0.04, 8, 0);
     Builder_job.addData("QUARTZ SLAB", 0.05, 9, 0);
-    Builder_job.addData("BRICKS SLAB", 0.05, 9, 0);
+    Builder_job.addData("nether_bricks SLAB", 0.05, 9, 0);
     Builder_job.addData("GLOWSTONE", 0.05, 10, 0);
     Builder_job.addData("HARDENED CLAY", 0.05, 10, 0);
     Builder_job.addData("STAINED CLAY", 0.05, 10, 0);
@@ -495,7 +545,7 @@ public class Main extends JavaPlugin
     Digger_job.addData("SANDSTONE", 0.02, 6, 1);
     Digger_job.addData("SMOOTH SANDSTONE", 0.02, 6, 1);
     Digger_job.addData("CHISELED SANDSTONE", 0.025, 7, 1);
-    Digger_job.addData("BRICKS", 0.04, 8, 1);
+    Digger_job.addData("nether_bricks", 0.04, 8, 1);
     Digger_job.addData("GLASS", 0.015, 3, 2);
     Digger_job.addData("BRICK", 0.04, 8, 2);
     Digger_job.addData("HARDENED CLAY", 0.04, 8, 2);
