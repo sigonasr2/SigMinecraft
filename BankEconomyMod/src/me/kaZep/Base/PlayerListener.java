@@ -10147,23 +10147,19 @@ public ItemStack getGoodie() {
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.CHAINMAIL_BOOTS) {
-			  int mult=0.5;
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.375*mult*amount,80*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.375*0.5*amount,80*0.5*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.CHAINMAIL_HELMET) {
-			  int mult=0.5;
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.50*mult*amount,100*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.50*0.5*amount,100*0.5*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.CHAINMAIL_LEGGINGS) {
-			  int mult=0.5;
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.725*mult*amount,140*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.725*0.5*amount,140*0.5*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.CHAINMAIL_CHESTPLATE) {
-			  int mult=0.5;
-			  this.plugin.gainMoneyExp(p,"Blacksmith",0.875*mult*amount,175*mult*amount);
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.875*0.5*amount,175*0.5*amount);
 			  crafteditem=true;
 		  }
 		  if (item.getType()==Material.IRON_BOOTS) {
