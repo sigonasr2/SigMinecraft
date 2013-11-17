@@ -6600,7 +6600,7 @@ public ItemStack getGoodie() {
 	  final EntityDamageEvent f = e;
 	  if (e.getEntity().getType()==EntityType.PLAYER) {
 		  final Player p = (Player)e.getEntity();
-		  Bukkit.broadcastMessage("Player Damaged: "+p.getHealth()+" HP");
+		  Bukkit.broadcastMessage("Player Damaged: "+p.getHealth()+" HP, -"+p.getLastDamageCause().getDamage()+" damage from "+p.getLastDamageCause().getEntity().getType());
 		  if (e.getCause()==DamageCause.ENTITY_EXPLOSION || e.getCause()==DamageCause.BLOCK_EXPLOSION) {
 			  e.setDamage(e.getDamage()*2);
 		  }
