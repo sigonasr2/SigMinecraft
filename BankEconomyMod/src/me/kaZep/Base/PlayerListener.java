@@ -205,6 +205,8 @@ public class PlayerListener
     this.plugin = plugin;
   }
   
+  enum Cube { SMALL, LARGE, ENDER }
+  
   public void updateTopSPLEEFSigns() {
 	  String name[] = {"","",""};
 	  int rating[] = {-9999,-9999,-9999}, wins[] = {0,0,0}, losses[] = {0,0,0};
@@ -9612,355 +9614,20 @@ public ItemStack getGoodie() {
 		  //Regardless of the inventory, if we try to put it inside a chest, got to try to insert it in there.
   		  if (event.getCurrentItem()!=null) {
 			  if (event.getCursor()!=null && event.getCursor().getType()!=Material.AIR && (event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST) && event.getClick()==ClickType.LEFT) {
-				  //We have to attempt to insert the item in the Item Cube.
-				boolean largechest=false;
-				boolean smallchest=false;
-				boolean enderchest=false;
-				int identifier=-1;
-				  if (event.getCurrentItem().getItemMeta().getLore()!=null) {
-					//Check to see if the Lore contains anything.
-					for (int i=0;i<event.getCurrentItem().getItemMeta().getLore().size();i++) {
-						if (event.getCurrentItem().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.")) {
-							smallchest=true;
-						}
-						if (event.getCurrentItem().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
-							largechest=true;
-						}
-						if (event.getCurrentItem().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
-							enderchest=true;
-						}
-						if (event.getCurrentItem().getItemMeta().getLore().get(i).contains("ID#")) {
-							identifier=Integer.valueOf(event.getCurrentItem().getItemMeta().getLore().get(i).replace("ID#", ""));
-						}
-					}
-					if (identifier==-1) {
-						//This doesn't have an identifier yet. Create a new one.
-						identifier=this.plugin.getConfig().getInt("item-cube-numb");
-						this.plugin.getConfig().set("item-cube-numb", Integer.valueOf(identifier+1));
-						this.plugin.saveConfig();
-						//See if this chest is stacked. If so, set the amount to 1, and drop a side inventory of Item Cubes.
-						if (event.getCurrentItem().getAmount()>1) {
-							ItemStack newitem = event.getCurrentItem().clone();
-							newitem.setAmount(event.getCurrentItem().getAmount()-1);
-							event.getCurrentItem().setAmount(1);
-							//Drop the rest on the ground.
-							p.getWorld().dropItemNaturally(p.getLocation(), newitem);
-						}
-						ItemMeta meta = event.getCurrentItem().getItemMeta();
-						List<String> newlore = meta.getLore();
-						newlore.add("ID#"+identifier);
-						meta.setLore(newlore);
-						event.getCurrentItem().setItemMeta(meta);
-						
-							if (enderchest) {
-								event.getCurrentItem().setAmount(2);
-							}
-							
-					}
-					if (smallchest) {
-						FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
-						if (!f.contains("created")) {
-							for (int i=0;i<9;i++) {
-								f.set("item-"+i, new ItemStack(Material.AIR));
-							}
-							f.set("item-0", event.getCursor());
-							event.getCursor().setType(Material.AIR);
-							f.set("created", Boolean.valueOf(true));
-						} else {
-							
-							//We need to see if we have the inventory opened already...If so we have to add it to THAT one.
-							Inventory thisinven=Bukkit.createInventory(event.getWhoClicked(), 9, "Item Cube #"+identifier);
-							boolean changeinven=false;
-							if (event.getInventory().getTitle().contains("Item Cube") && event.getInventory().getTitle().length()>0) {
-								if (Integer.valueOf(event.getInventory().getTitle().substring(event.getInventory().getTitle().indexOf("#")).replace("#", ""))==identifier) {
-									thisinven=event.getInventory();
-									changeinven=true;
-								}
-							} 
-							if (!changeinven) {
-								for (int i=0;i<9;i++) {
-									//items.add(f.getItemStack("item-"+i));
-									if (f.contains("item-"+i)) {
-										thisinven.addItem(f.getItemStack("item-"+i));
-									}
-								}
-							}
-							int countinven = countSpace(thisinven,event.getCursor());
-							if (countinven>=event.getCursor().getAmount()) {
-								//We can simply add it in no problem.
-								thisinven.addItem(event.getCursor());
-								  for (int i=0;i<thisinven.getContents().length;i++) {
-									  f.set("item-"+i, thisinven.getItem(i));
-								  }
-								  event.setCursor(new ItemStack(Material.AIR));
-									this.plugin.saveItemCubeConfig(f, identifier);
-									//Cancel the event here too.
-									event.setCancelled(true);
-									return;
-							} else 
-							if (countinven>0) {
-								//We can at least fit a few.
-								int fit = event.getCursor().getAmount()-countinven;
-								//Leave behind this many.
-								ItemStack thisitem = event.getCursor(), thisitem2 = event.getCursor();
-								thisitem.setAmount(fit);
-								event.setCursor(thisitem);
-								//Bukkit.getPlayer("sigonasr2").sendMessage("Cursor gets "+thisitem.getAmount());
-								thisitem2.setAmount(countinven);
-								thisinven.addItem(thisitem2);
-								//Bukkit.getPlayer("sigonasr2").sendMessage("Item Cube gets "+thisitem2.getAmount());
-								  for (int i=0;i<thisinven.getContents().length;i++) {
-									  f.set("item-"+i, thisinven.getItem(i));
-								  }
-									this.plugin.saveItemCubeConfig(f, identifier);
-									p.updateInventory();
-							}
-							else {
-								//Well, we can't do anything, just treat it as an item swap.
-								this.plugin.saveItemCubeConfig(f, identifier);
-							}
-						}
-					}
-					if (largechest) {
-						FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
-						if (!f.contains("created")) {
-							for (int i=0;i<54;i++) {
-								f.set("item-"+i, new ItemStack(Material.AIR));
-							}
-							f.set("item-0", event.getCursor());
-							event.getCursor().setType(Material.AIR);
-							f.set("created", Boolean.valueOf(true));
-						} else {
-							//If it does exist already, we need to add it to that inventory.
-							//Try to find a blank slot in there.
-							//List<ItemStack> items = new ArrayList<ItemStack>();
-							//We need to see if we have the inventory opened already...If so we have to add it to THAT one.
-							Inventory thisinven=Bukkit.createInventory(event.getWhoClicked(), 54, "Item Cube #"+identifier);
-							boolean changeinven=false;
-							if (event.getInventory().getTitle().contains("Item Cube") && event.getInventory().getTitle().length()>0) {
-								if (Integer.valueOf(event.getInventory().getTitle().substring(event.getInventory().getTitle().indexOf("#")).replace("#", ""))==identifier) {
-									thisinven=event.getInventory();
-									changeinven=true;
-								}
-							}
-							if (!changeinven) {
-								for (int i=0;i<54;i++) {
-									//items.add(f.getItemStack("item-"+i));
-									if (f.contains("item-"+i)) {
-										thisinven.addItem(f.getItemStack("item-"+i));
-									}
-								}
-							}
-							int countinven = countSpace(thisinven,event.getCursor());
-							if (countinven>=event.getCursor().getAmount()) {
-								//We can simply add it in no problem.
-								thisinven.addItem(event.getCursor());
-								  for (int i=0;i<thisinven.getContents().length;i++) {
-									  f.set("item-"+i, thisinven.getItem(i));
-								  }
-								  event.setCursor(new ItemStack(Material.AIR));
-									this.plugin.saveItemCubeConfig(f, identifier);
-									//Cancel the event here too.
-									event.setCancelled(true);
-									return;
-							} else 
-							if (countinven>0) {
-								//We can at least fit a few.
-								int fit = event.getCursor().getAmount()-countinven;
-								//Leave behind this many.
-								ItemStack thisitem = event.getCursor(), thisitem2 = event.getCursor();
-								thisitem.setAmount(fit);
-								event.setCursor(thisitem);
-								//Bukkit.getPlayer("sigonasr2").sendMessage("Cursor gets "+thisitem.getAmount());
-								thisitem2.setAmount(countinven);
-								thisinven.addItem(thisitem2);
-								//Bukkit.getPlayer("sigonasr2").sendMessage("Item Cube gets "+thisitem2.getAmount());
-								  for (int i=0;i<thisinven.getContents().length;i++) {
-									  f.set("item-"+i, thisinven.getItem(i));
-								  }
-									this.plugin.saveItemCubeConfig(f, identifier);
-									p.updateInventory();
-							}
-							else {
-								//Well, we can't do anything, just treat it as an item swap.
-								this.plugin.saveItemCubeConfig(f, identifier);
-							}
-						}
-						this.plugin.saveItemCubeConfig(f, identifier);
-					}
-					if (enderchest) {
-						FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
-						if (!f.contains("created")) {
-							for (int i=0;i<27;i++) {
-								f.set("item-"+i, new ItemStack(Material.AIR));
-							}
-							f.set("item-0", event.getCursor());
-							event.getCursor().setType(Material.AIR);
-							f.set("created", Boolean.valueOf(true));
-						} else {
-							//If it does exist already, we need to add it to that inventory.
-							//Try to find a blank slot in there.
-							//List<ItemStack> items = new ArrayList<ItemStack>();
-							//We need to see if we have the inventory opened already...If so we have to add it to THAT one.
-							Inventory thisinven=Bukkit.createInventory(event.getWhoClicked(), 27, "Item Cube #"+identifier);
-							boolean changeinven=false;
-							if (event.getInventory().getTitle().contains("Item Cube") && event.getInventory().getTitle().length()>0) {
-								if (Integer.valueOf(event.getInventory().getTitle().substring(event.getInventory().getTitle().indexOf("#")).replace("#", ""))==identifier) {
-									thisinven=event.getInventory();
-									changeinven=true;
-								}
-							}
-							if (!changeinven) {
-								for (int i=0;i<27;i++) {
-									//items.add(f.getItemStack("item-"+i));
-									if (f.contains("item-"+i)) {
-										thisinven.addItem(f.getItemStack("item-"+i));
-									}
-								}
-							}
-							int countinven = countSpace(thisinven,event.getCursor());
-							if (countinven>=event.getCursor().getAmount()) {
-								//We can simply add it in no problem.
-								thisinven.addItem(event.getCursor());
-								  for (int i=0;i<thisinven.getContents().length;i++) {
-									  f.set("item-"+i, thisinven.getItem(i));
-								  }
-								  event.setCursor(new ItemStack(Material.AIR));
-									this.plugin.saveItemCubeConfig(f, identifier);
-									//Cancel the event here too.
-									event.setCancelled(true);
-									return;
-							} else 
-							if (countinven>0) {
-								//We can at least fit a few.
-								int fit = event.getCursor().getAmount()-countinven;
-								//Leave behind this many.
-								ItemStack thisitem = event.getCursor(), thisitem2 = event.getCursor();
-								thisitem.setAmount(fit);
-								event.setCursor(thisitem);
-								//Bukkit.getPlayer("sigonasr2").sendMessage("Cursor gets "+thisitem.getAmount());
-								thisitem2.setAmount(countinven);
-								thisinven.addItem(thisitem2);
-								//Bukkit.getPlayer("sigonasr2").sendMessage("Item Cube gets "+thisitem2.getAmount());
-								  for (int i=0;i<thisinven.getContents().length;i++) {
-									  f.set("item-"+i, thisinven.getItem(i));
-								  }
-									this.plugin.saveItemCubeConfig(f, identifier);
-									p.updateInventory();
-							}
-							else {
-								//Well, we can't do anything, just treat it as an item swap.
-								this.plugin.saveItemCubeConfig(f, identifier);
-							}
-						}
-						this.plugin.saveItemCubeConfig(f, identifier);
-					}
-				  }
+				event.setCursor(insertIntoItemCube(p, event.getCurrentItem(), event.getCursor()));
 			  }
 		  }
+	  }
+	  if (isViewingEnderCube(p)) {
+		  //If we are viewing an ender cube, every single click should prompt an update for all viewers of it. In case it does something.
+		  ItemCube_updateSameEnderCube(getViewingEnderCubeID(p),p);
 	  }
 	  if (event.getInventory().getType()==InventoryType.CRAFTING /*|| event.getInventory().getType()==InventoryType.CHEST*//*Buggy for some reason. We can't open chests in chests.*/) {
 		  if (event.getCurrentItem()!=null) {
 			  if ((event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST) && event.getClick()==ClickType.RIGHT) {
-				boolean largechest=false;
-				boolean smallchest=false;
-				boolean enderchest=false;
-				int identifier=-1;
-				  if (event.getCurrentItem().getItemMeta().getLore()!=null) {
-					//Check to see if the Lore contains anything.
-					for (int i=0;i<event.getCurrentItem().getItemMeta().getLore().size();i++) {
-						if (event.getCurrentItem().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.")) {
-							smallchest=true;
-						}
-						if (event.getCurrentItem().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
-							largechest=true;
-						}
-						if (event.getCurrentItem().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
-							enderchest=true;
-						}
-						if (event.getCurrentItem().getItemMeta().getLore().get(i).contains("ID#")) {
-							identifier=Integer.valueOf(event.getCurrentItem().getItemMeta().getLore().get(i).replace("ID#", ""));
-						}
-					}
-					if (identifier==-1) {
-						//This doesn't have an identifier yet. Create a new one.
-						identifier=this.plugin.getConfig().getInt("item-cube-numb");
-						this.plugin.getConfig().set("item-cube-numb", Integer.valueOf(identifier+1));
-						this.plugin.saveConfig();
-						//See if this chest is stacked. If so, set the amount to 1, and drop a side inventory of Item Cubes.
-						if (event.getCurrentItem().getAmount()>1) {
-							ItemStack newitem = event.getCurrentItem().clone();
-							newitem.setAmount(event.getCurrentItem().getAmount()-1);
-							event.getCurrentItem().setAmount(1);
-							//Drop the rest on the ground.
-							p.getWorld().dropItemNaturally(p.getLocation(), newitem);
-						}
-						ItemMeta meta = event.getCurrentItem().getItemMeta();
-						List<String> newlore = meta.getLore();
-						newlore.add("ID#"+identifier);
-						meta.setLore(newlore);
-						event.getCurrentItem().setItemMeta(meta);
-						
-						if (enderchest) {
-							event.getCurrentItem().setAmount(2);
-						}
-					}
-					Inventory screen = null;
-					if (smallchest) {
-						FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
-						if (!f.contains("created")) {
-							for (int i=0;i<9;i++) {
-								f.set("item-"+i, new ItemStack(Material.AIR));
-							}
-							f.set("created", Boolean.valueOf(true));
-						}
-						//List<ItemStack> items = new ArrayList<ItemStack>();
-						screen=Bukkit.createInventory(event.getWhoClicked(), 9, "Item Cube #"+identifier);
-						for (int i=0;i<9;i++) {
-							//items.add(f.getItemStack("item-"+i));
-							screen.setItem(i, f.getItemStack("item-"+i));
-						}
-						this.plugin.saveItemCubeConfig(f, identifier);
-					}
-					if (largechest) {
-						FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
-						if (!f.contains("created")) {
-							for (int i=0;i<54;i++) {
-								f.set("item-"+i, new ItemStack(Material.AIR));
-							}
-							f.set("created", Boolean.valueOf(true));
-						}
-						//List<ItemStack> items = new ArrayList<ItemStack>();
-						screen=Bukkit.createInventory(event.getWhoClicked(), 54, "Large Item Cube #"+identifier);
-						for (int i=0;i<54;i++) {
-							//items.add(f.getItemStack("item-"+i));
-							screen.setItem(i, f.getItemStack("item-"+i));
-						}
-						this.plugin.saveItemCubeConfig(f, identifier);
-					}
-					if (enderchest) {
-						FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
-						if (!f.contains("created")) {
-							for (int i=0;i<27;i++) {
-								f.set("item-"+i, new ItemStack(Material.AIR));
-							}
-							f.set("created", Boolean.valueOf(true));
-						}
-						//List<ItemStack> items = new ArrayList<ItemStack>();
-						screen=Bukkit.createInventory(event.getWhoClicked(), 27, "Ender Item Cube #"+identifier);
-						for (int i=0;i<27;i++) {
-							//items.add(f.getItemStack("item-"+i));
-							screen.setItem(i, f.getItemStack("item-"+i));
-						}
-						this.plugin.saveItemCubeConfig(f, identifier);
-					}
-					if (screen!=null) {
-						event.getWhoClicked().closeInventory();
-						event.getWhoClicked().openInventory(screen);
-						event.setCancelled(true);
-						//return;
-					}
-				  }
+				viewItemCube(p, event.getCurrentItem());
+				event.setCancelled(true);
+				return;
 			  }
 		  }
 	  }else
@@ -11773,6 +11440,312 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
 		  //e.getPlayer().sendMessage(e.getMessage());
 	  }
   }
+  
+  public void viewItemCube(Player p, ItemStack item_cube) {
+	  //This function will figure out what type of Item Cube this item is and then display the correct inventory on-screen, also setting up the identifier.
+	  //Note that this function does not check if the item *is* an item cube. It assumes it is.
+	  Cube cube_type = null;
+	  int identifier=-1;
+	  if (item_cube.getItemMeta().getLore()!=null) {
+			//Check to see if the Lore contains anything.
+			for (int i=0;i<item_cube.getItemMeta().getLore().size();i++) {
+				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.")) {
+					cube_type = Cube.SMALL;
+				}
+				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
+					cube_type = Cube.LARGE;
+				}
+				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
+					cube_type = Cube.ENDER;
+				}
+				if (item_cube.getItemMeta().getLore().get(i).contains("ID#")) {
+					identifier=Integer.valueOf(item_cube.getItemMeta().getLore().get(i).replace("ID#", ""));
+				}
+			}
+			if (identifier==-1) {
+				//This doesn't have an identifier yet. Create a new one.
+				identifier=this.plugin.getConfig().getInt("item-cube-numb");
+				this.plugin.getConfig().set("item-cube-numb", Integer.valueOf(identifier+1));
+				this.plugin.saveConfig();
+				//See if this chest is stacked. If so, set the amount to 1, and drop a side inventory of Item Cubes.
+				if (item_cube.getAmount()>1) {
+					ItemStack newitem = item_cube.clone();
+					newitem.setAmount(item_cube.getAmount()-1);
+					item_cube.setAmount(1);
+					//Drop the rest on the ground.
+					p.getWorld().dropItemNaturally(p.getLocation(), newitem);
+				}
+				ItemMeta meta = item_cube.getItemMeta();
+				List<String> newlore = meta.getLore();
+				newlore.add("ID#"+identifier);
+				meta.setLore(newlore);
+				item_cube.setItemMeta(meta);
+				
+				if (cube_type == Cube.ENDER) {
+					item_cube.setAmount(2);
+				}
+			}
+			Inventory screen = null;
+			switch (cube_type) {
+				case SMALL: {
+					FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
+					if (!f.contains("created")) {
+						for (int i=0;i<9;i++) {
+							f.set("item-"+i, new ItemStack(Material.AIR));
+						}
+						f.set("created", Boolean.valueOf(true));
+					}
+					//List<ItemStack> items = new ArrayList<ItemStack>();
+					screen=Bukkit.createInventory(p, 9, "Item Cube #"+identifier);
+					for (int i=0;i<9;i++) {
+						//items.add(f.getItemStack("item-"+i));
+						screen.setItem(i, f.getItemStack("item-"+i));
+					}
+					this.plugin.saveItemCubeConfig(f, identifier);
+				}break;
+				case LARGE: {
+					FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
+					if (!f.contains("created")) {
+						for (int i=0;i<54;i++) {
+							f.set("item-"+i, new ItemStack(Material.AIR));
+						}
+						f.set("created", Boolean.valueOf(true));
+					}
+					//List<ItemStack> items = new ArrayList<ItemStack>();
+					screen=Bukkit.createInventory(p, 54, "Large Item Cube #"+identifier);
+					for (int i=0;i<54;i++) {
+						//items.add(f.getItemStack("item-"+i));
+						screen.setItem(i, f.getItemStack("item-"+i));
+					}
+					this.plugin.saveItemCubeConfig(f, identifier);
+				}break;
+				case ENDER: {
+					FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
+					if (!f.contains("created")) {
+						for (int i=0;i<27;i++) {
+							f.set("item-"+i, new ItemStack(Material.AIR));
+						}
+						f.set("created", Boolean.valueOf(true));
+					}
+					//List<ItemStack> items = new ArrayList<ItemStack>();
+					screen=Bukkit.createInventory(p, 27, "Ender Item Cube #"+identifier);
+					for (int i=0;i<27;i++) {
+						//items.add(f.getItemStack("item-"+i));
+						screen.setItem(i, f.getItemStack("item-"+i));
+					}
+					this.plugin.saveItemCubeConfig(f, identifier);
+				}break;
+			}
+			if (screen!=null) {
+				p.closeInventory();
+				p.openInventory(screen);
+			}
+		  }
+  }
+  
+  public boolean isViewingEnderCube(Player p) {
+	  //Returns whether or not this player is viewing an ender cube.
+	  //This is useful for determining if you have to update the ender cube for other viewers.
+	  if (p.getOpenInventory().getTopInventory()!=null && p.getOpenInventory().getTopInventory().getTitle().contains("Ender Item Cube")) {
+		  return true;
+	  } else {
+		  return false;
+	  }
+  }
+  
+  public int getViewingEnderCubeID(Player p) {
+	  //Returns whether or not this player is viewing an ender cube.
+	  //This is useful for determining if you have to update the ender cube for other viewers.
+	  if (p.getOpenInventory().getTopInventory()!=null && p.getOpenInventory().getTopInventory().getTitle().contains("Ender Item Cube")) {
+		  return Integer.valueOf(p.getOpenInventory().getTopInventory().getTitle().substring(p.getOpenInventory().getTopInventory().getTitle().indexOf("#")).replace("#", ""));
+	  } else {
+		  return -1; //Invalid use.
+	  }
+  }
+
+  public void ItemCube_updateSameEnderCube(int cube_id, Player player) {
+	  //If a player attempts to do something in an Ender Cube, update the Ender Cube for all other viewers that is not player. (The player argument is the player making modifications to the inventory.)
+		for (int i=0;i<Bukkit.getOnlinePlayers().length;i++) {
+			if (!Bukkit.getOnlinePlayers()[i].equals(player)) {
+				if (Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory()!=null) {
+					//Check if it's the same ID.
+					if (Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().contains("Ender Item Cube") && Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().length()>0) {
+						if (Integer.valueOf(Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().substring(Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().indexOf("#")).replace("#", ""))==cube_id) {
+							//It is! We need to close it out and re-open with the updated properties of the cube.
+							Inventory new_inven = player.getOpenInventory().getTopInventory();
+							Bukkit.getOnlinePlayers()[i].closeInventory();
+							Bukkit.getOnlinePlayers()[i].openInventory(new_inven);
+						}
+					}
+				}
+			}
+		}
+  }
+  
+  private void ItemCube_addSameEnderCube(ItemStack add_item, int cube_id, Player player) {
+	  //Helper function for ItemCube_add.
+	  //Checks for any players that are viewing the same Ender Item Cube as player, and updating it accordingly so the changes are reflected.
+		for (int i=0;i<Bukkit.getOnlinePlayers().length;i++) {
+			if (!Bukkit.getOnlinePlayers()[i].equals(player)) {
+				if (Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory()!=null) {
+					//Check if it's the same ID.
+					if (Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().contains("Ender Item Cube") && Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().length()>0) {
+						if (Integer.valueOf(Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().substring(Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().indexOf("#")).replace("#", ""))==cube_id) {
+							//It is! "Add" it to that inventory list too.
+							player.getOpenInventory().getTopInventory().addItem(add_item);
+						}
+					}
+				}
+			}
+		}
+  }
+  
+  private ItemStack ItemCube_add(Player p, int identifier, Cube size, ItemStack insert_item) {
+	  //Helper function for InsertIntoItemCube(). Inserts the item into the correct cube.
+	  //If this is an Ender Item Cube, also attempts to refresh the inventories of any players viewing it.
+	  
+	  int slots = 0;
+	  
+	  String heading = "";
+	  
+	  switch (size) {
+	  	case SMALL: {
+	  		slots = 9;
+	  		heading = "";
+	  	}break;
+	  	case LARGE: {
+	  		slots = 54;
+	  		heading = "Large";
+	  	}break;
+	  	case ENDER: {
+	  		slots = 27;
+	  		heading = "Ender";
+	  	}break;
+	  }
+	  
+	  if (!heading.equalsIgnoreCase("")) {
+		  heading+=" "; //Add a space to separate the heading from "Item Cube".
+	  }
+	  
+	  FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
+		if (!f.contains("created")) {
+			for (int i=0;i<slots;i++) {
+				f.set("item-"+i, new ItemStack(Material.AIR));
+			}
+			f.set("item-0", insert_item);
+			insert_item.setType(Material.AIR);
+			f.set("created", Boolean.valueOf(true));
+			return insert_item;
+		} else {
+			//We need to see if we have the inventory opened already...If so we have to add it to THAT one.
+			Inventory thisinven=Bukkit.createInventory(p, slots, heading+"Item Cube #"+identifier);
+			boolean changeinven=false;
+			if (p.getOpenInventory().getTopInventory().getTitle().contains(heading+"Item Cube") && p.getOpenInventory().getTopInventory().getTitle().length()>0) {
+				if (Integer.valueOf(p.getOpenInventory().getTopInventory().getTitle().substring(p.getOpenInventory().getTopInventory().getTitle().indexOf("#")).replace("#", ""))==identifier) {
+					thisinven=p.getOpenInventory().getTopInventory();
+					changeinven=true;
+				}
+			} 
+			if (!changeinven) {
+				for (int i=0;i<slots;i++) {
+					//items.add(f.getItemStack("item-"+i));
+					if (f.contains("item-"+i)) {
+						thisinven.addItem(f.getItemStack("item-"+i));
+					}
+				}
+			}
+			int countinven = countSpace(thisinven,insert_item);
+			if (countinven>=insert_item.getAmount()) {
+				//We can simply add it in no problem.
+				thisinven.addItem(insert_item);
+			    for (int i=0;i<thisinven.getContents().length;i++) {
+			  	  f.set("item-"+i, thisinven.getItem(i));
+			    }
+				this.plugin.saveItemCubeConfig(f, identifier);
+				if (size == Cube.ENDER) {
+					//This is an Ender Item Cube. We have to check if any other players are looking at the correspnding Ender Item Cube inventory.
+					ItemCube_addSameEnderCube(insert_item, identifier, p);
+				}
+			    return new ItemStack(Material.AIR);
+			} else 
+			if (countinven>0) {
+				//We can at least fit a few.
+				int fit = insert_item.getAmount()-countinven;
+				//Leave behind this many.
+				ItemStack thisitem = insert_item, thisitem2 = insert_item;
+				thisitem.setAmount(fit);
+				//Bukkit.getPlayer("sigonasr2").sendMessage("Cursor gets "+thisitem.getAmount());
+				thisitem2.setAmount(countinven);
+				thisinven.addItem(thisitem2);
+				if (size == Cube.ENDER) {
+					//This is an Ender Item Cube. We have to check if any other players are looking at the correspnding Ender Item Cube inventory.
+					ItemCube_addSameEnderCube(thisitem2, identifier, p);
+				}
+				//Bukkit.getPlayer("sigonasr2").sendMessage("Item Cube gets "+thisitem2.getAmount());
+			    for (int i=0;i<thisinven.getContents().length;i++) {
+			  	  f.set("item-"+i, thisinven.getItem(i));
+			    }
+				this.plugin.saveItemCubeConfig(f, identifier);
+				p.updateInventory();
+				return thisitem;
+			}
+			else {
+				//Well, we can't do anything, just treat it as an item swap.
+				this.plugin.saveItemCubeConfig(f, identifier);
+				return new ItemStack(insert_item);
+			}
+		}
+  }
+  
+  public ItemStack insertIntoItemCube(Player p, ItemStack item_cube, ItemStack insert_item) {
+	  //This function will attmempt to insert an item into an item cube. It actually returns whatever cannot fit into the
+	  //item cube after attempting to insert it.
+
+	  //We have to attempt to insert the item in the Item Cube.
+	  Cube cube_type = null;
+	  int identifier=-1;
+	  if (item_cube.getItemMeta().getLore()!=null) {
+		//Check to see if the Lore contains anything.
+		for (int i=0;i<item_cube.getItemMeta().getLore().size();i++) {
+			if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.")) {
+				cube_type = Cube.SMALL;
+			}
+			if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
+				cube_type = Cube.LARGE;
+			}
+			if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
+				cube_type = Cube.ENDER;
+			}
+			if (item_cube.getItemMeta().getLore().get(i).contains("ID#")) {
+				identifier=Integer.valueOf(item_cube.getItemMeta().getLore().get(i).replace("ID#", ""));
+			}
+		}
+		if (identifier==-1) {
+			//This doesn't have an identifier yet. Create a new one.
+			identifier=this.plugin.getConfig().getInt("item-cube-numb");
+			this.plugin.getConfig().set("item-cube-numb", Integer.valueOf(identifier+1));
+			this.plugin.saveConfig();
+			//See if this chest is stacked. If so, set the amount to 1, and drop a side inventory of Item Cubes.
+			if (item_cube.getAmount()>1) {
+				ItemStack newitem = item_cube.clone();
+				newitem.setAmount(item_cube.getAmount()-1);
+				item_cube.setAmount(1);
+				//Drop the rest on the ground.
+				p.getWorld().dropItemNaturally(p.getLocation(), newitem);
+			}
+			ItemMeta meta = item_cube.getItemMeta();
+			List<String> newlore = meta.getLore();
+			newlore.add("ID#"+identifier);
+			meta.setLore(newlore);
+			item_cube.setItemMeta(meta);
+			if (cube_type == Cube.ENDER) {
+				item_cube.setAmount(2);
+			}
+		}
+		return ItemCube_add(p, identifier, cube_type, insert_item);
+	}
+	  return new ItemStack(Material.AIR); //Something went wrong. Just return a blank item.
+  }
 
   @EventHandler
   public void onPlayerInteract(PlayerInteractEvent e)
@@ -11827,101 +11800,9 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
 			return;
 		}
 		if (p.getItemInHand()!=null && (p.getItemInHand().getType()==Material.CHEST || p.getItemInHand().getType()==Material.TRAPPED_CHEST || p.getItemInHand().getType()==Material.ENDER_CHEST)) {
-		  if (p.getItemInHand().getItemMeta().getLore()!=null) {
-			//Check to see if the Lore contains anything.
-			for (int i=0;i<p.getItemInHand().getItemMeta().getLore().size();i++) {
-				if (p.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.")) {
-					smallchest=true;
-				}
-				if (p.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
-					largechest=true;
-				}
-				if (p.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
-					enderchest=true;
-				}
-				if (p.getItemInHand().getItemMeta().getLore().get(i).contains("ID#")) {
-					identifier=Integer.valueOf(p.getItemInHand().getItemMeta().getLore().get(i).replace("ID#", ""));
-				}
-			}
-			if (identifier==-1) {
-				//This doesn't have an identifier yet. Create a new one.
-				identifier=this.plugin.getConfig().getInt("item-cube-numb");
-				this.plugin.getConfig().set("item-cube-numb", Integer.valueOf(identifier+1));
-				this.plugin.saveConfig();
-				//See if this chest is stacked. If so, set the amount to 1, and drop a side inventory of Item Cubes.
-				if (p.getItemInHand().getAmount()>1) {
-					ItemStack newitem = p.getItemInHand().clone();
-					newitem.setAmount(p.getItemInHand().getAmount()-1);
-					p.getItemInHand().setAmount(1);
-					//Drop the rest on the ground.
-					p.getWorld().dropItemNaturally(p.getLocation(), newitem);
-				}
-				ItemMeta meta = p.getItemInHand().getItemMeta();
-				List<String> newlore = meta.getLore();
-				newlore.add("ID#"+identifier);
-				meta.setLore(newlore);
-				p.getItemInHand().setItemMeta(meta);
-				
-				if (enderchest) {
-					p.getItemInHand().setAmount(2);
-				}
-			}
-			Inventory screen = null;
-			if (smallchest) {
-				FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
-				if (!f.contains("created")) {
-					for (int i=0;i<9;i++) {
-						f.set("item-"+i, new ItemStack(Material.AIR));
-					}
-					f.set("created", Boolean.valueOf(true));
-				}
-				//List<ItemStack> items = new ArrayList<ItemStack>();
-				screen=Bukkit.createInventory(p, 9, "Item Cube #"+identifier);
-				for (int i=0;i<9;i++) {
-					//items.add(f.getItemStack("item-"+i));
-					screen.setItem(i, f.getItemStack("item-"+i));
-				}
-				this.plugin.saveItemCubeConfig(f, identifier);
-			}
-			if (largechest) {
-				FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
-				if (!f.contains("created")) {
-					for (int i=0;i<54;i++) {
-						f.set("item-"+i, new ItemStack(Material.AIR));
-					}
-					f.set("created", Boolean.valueOf(true));
-				}
-				//List<ItemStack> items = new ArrayList<ItemStack>();
-				screen=Bukkit.createInventory(p, 54, "Large Item Cube #"+identifier);
-				for (int i=0;i<54;i++) {
-					//items.add(f.getItemStack("item-"+i));
-					screen.setItem(i, f.getItemStack("item-"+i));
-				}
-				this.plugin.saveItemCubeConfig(f, identifier);
-			}
-			if (enderchest) {
-				FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
-				if (!f.contains("created")) {
-					for (int i=0;i<27;i++) {
-						f.set("item-"+i, new ItemStack(Material.AIR));
-					}
-					f.set("created", Boolean.valueOf(true));
-				}
-				//List<ItemStack> items = new ArrayList<ItemStack>();
-				screen=Bukkit.createInventory(p, 27, "Ender Item Cube #"+identifier);
-				for (int i=0;i<27;i++) {
-					//items.add(f.getItemStack("item-"+i));
-					screen.setItem(i, f.getItemStack("item-"+i));
-				}
-				this.plugin.saveItemCubeConfig(f, identifier);
-			}
-			if (screen!=null) {
-				p.closeInventory();
-				p.openInventory(screen);
-				e.setCancelled(true);
-				return;
-			}
-		  }
+		  viewItemCube(p, p.getItemInHand());
+		  e.setCancelled(true);
+		  return;
 		}
     }
     if (blockAction == Action.RIGHT_CLICK_BLOCK) {
