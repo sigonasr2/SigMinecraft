@@ -3456,7 +3456,7 @@ public void updateTime() {
 	  				  }
 	  			  }
 	  		  }
-  			Bukkit.getWorld("world").setFullTime(Main.SERVER_TICK_TIME-4);
+  			Bukkit.getWorld("world").setFullTime(Bukkit.getWorld("world").getFullTime()-4);
     	}
     }
     , 8, 8);

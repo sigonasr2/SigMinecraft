@@ -428,6 +428,10 @@ public String convertToItemName(String val) {
     		  p.sendMessage("Enchantments removed on this item.");
           }
           else
+          if (cmd.getName().equalsIgnoreCase("ticktime")) {
+    		  p.sendMessage("Current Server Time: "+ChatColor.GRAY+""+ChatColor.ITALIC+Main.SERVER_TICK_TIME);
+          }
+          else
           if (cmd.getName().equalsIgnoreCase("jobs")) {
         	  FileConfiguration config = this.plugin.getConfig();
         	  int MAXJOBS = config.getInt("jobs.MAX_JOBS");
