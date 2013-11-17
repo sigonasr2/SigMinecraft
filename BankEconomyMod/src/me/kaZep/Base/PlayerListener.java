@@ -49,6 +49,8 @@ import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Golem;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
@@ -63,6 +65,7 @@ import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Wither;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
@@ -96,6 +99,9 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
 import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.CraftItemEvent;
@@ -453,11 +459,7 @@ public class PlayerListener
 				  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 					  List<String> thelore = e.getItem().getItemMeta().getLore();
 					  for (int i=0;i<thelore.size();i++) {
-						  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
-							  //This is a weak piece.
-							  ourLore.add(thelore.get(i));
-							  break;
-						  }
+						  ourLore.add(thelore.get(i));
 					  }
 				  }
 				  if (Math.random()<=0.2) {
@@ -490,11 +492,7 @@ public class PlayerListener
 					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 						  List<String> thelore = e.getItem().getItemMeta().getLore();
 						  for (int i=0;i<thelore.size();i++) {
-							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
-								  //This is a weak piece.
-								  ourLore.add(thelore.get(i));
-								  break;
-							  }
+							  ourLore.add(thelore.get(i));
 						  }
 					  }
 					  if (Math.random()<=0.2) {
@@ -529,11 +527,7 @@ public class PlayerListener
 					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 						  List<String> thelore = e.getItem().getItemMeta().getLore();
 						  for (int i=0;i<thelore.size();i++) {
-							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
-								  //This is a weak piece.
-								  ourLore.add(thelore.get(i));
-								  break;
-							  }
+							  ourLore.add(thelore.get(i));
 						  }
 					  }
 					  if (Math.random()<=0.2) {
@@ -565,11 +559,7 @@ public class PlayerListener
 					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 						  List<String> thelore = e.getItem().getItemMeta().getLore();
 						  for (int i=0;i<thelore.size();i++) {
-							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
-								  //This is a weak piece.
-								  ourLore.add(thelore.get(i));
-								  break;
-							  }
+							  ourLore.add(thelore.get(i));
 						  }
 					  }
 					  if (Math.random()<=0.2) {
@@ -610,11 +600,7 @@ public class PlayerListener
 				  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 					  List<String> thelore = e.getItem().getItemMeta().getLore();
 					  for (int i=0;i<thelore.size();i++) {
-						  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
-							  //This is a weak piece.
-							  ourLore.add(thelore.get(i));
-							  break;
-						  }
+						  ourLore.add(thelore.get(i));
 					  }
 				  }
 				  if (Math.random()<=0.2) {
@@ -640,7 +626,6 @@ public class PlayerListener
 					  int enchants[] = {16,17,18,19,20,21,34};
 					  for (int j=0;j<enchants.length;j++) {
 						  if (Math.random()<1.0d/enchants.length) {
-							  
 							  e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
 						  }
 					  }
@@ -648,11 +633,7 @@ public class PlayerListener
 					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 						  List<String> thelore = e.getItem().getItemMeta().getLore();
 						  for (int i=0;i<thelore.size();i++) {
-							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
-								  //This is a weak piece.
-								  ourLore.add(thelore.get(i));
-								  break;
-							  }
+							  ourLore.add(thelore.get(i));
 						  }
 					  }
 					  if (Math.random()<=0.2) {
@@ -682,12 +663,12 @@ public class PlayerListener
 						  if (Math.random()<1.0d/enchants.length) {
 							  if (enchants[j]==33) {
 								  if (e.getItem().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)==0) {
-									  e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+									  e.getItem().addEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
 								  }
 							  }
 							  if (enchants[j]==35) {
 								  if (e.getItem().getEnchantmentLevel(Enchantment.SILK_TOUCH)==0) {
-									  e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+									  e.getItem().addEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
 								  }
 							  }
 						  }
@@ -696,11 +677,7 @@ public class PlayerListener
 					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 						  List<String> thelore = e.getItem().getItemMeta().getLore();
 						  for (int i=0;i<thelore.size();i++) {
-							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
-								  //This is a weak piece.
-								  ourLore.add(thelore.get(i));
-								  break;
-							  }
+							ourLore.add(thelore.get(i));
 						  }
 					  }
 					  if (Math.random()<=0.2) {
@@ -732,11 +709,7 @@ public class PlayerListener
 					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 						  List<String> thelore = e.getItem().getItemMeta().getLore();
 						  for (int i=0;i<thelore.size();i++) {
-							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
-								  //This is a weak piece.
-								  ourLore.add(thelore.get(i));
-								  break;
-							  }
+							  ourLore.add(thelore.get(i));
 						  }
 					  }
 					  if (Math.random()<=0.2) {
@@ -944,7 +917,7 @@ public class PlayerListener
 							  if (temp.equals(e.getRightClicked().getUniqueId())) {
 								  //The next key contains the data then. Modify it.
 								  contains_uuid=true;
-								  mobslist[i+1]=String.valueOf(Bukkit.getWorld("world").getFullTime()+5184000);
+								  mobslist[i+1]=String.valueOf(Main.SERVER_TICK_TIME+5184000);
 							  }
 						  //Reconstruct the data
 						  if (finalstring.equalsIgnoreCase("")) {
@@ -962,9 +935,9 @@ public class PlayerListener
 				  } else {
 					  //Set this entity to 'fed' status. You get 3 days to feed it after that.
 					  if (this.plugin.getConfig().getString("fed.mobs").length()<4) {
-						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+e.getRightClicked().getUniqueId()+","+(Bukkit.getWorld("world").getFullTime()+5184000)));
+						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+e.getRightClicked().getUniqueId()+","+(Main.SERVER_TICK_TIME+5184000)));
 					  } else {
-						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+","+e.getRightClicked().getUniqueId()+","+(Bukkit.getWorld("world").getFullTime()+5184000)));
+						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+","+e.getRightClicked().getUniqueId()+","+(Main.SERVER_TICK_TIME+5184000)));
 					  }
 					  this.plugin.saveConfig();
 				  }
@@ -992,7 +965,7 @@ public class PlayerListener
 							  if (temp.equals(e.getRightClicked().getUniqueId())) {
 								  //The next key contains the data then. Modify it.
 								  contains_uuid=true;
-								  mobslist[i+1]=String.valueOf(Bukkit.getWorld("world").getFullTime()+5184000);
+								  mobslist[i+1]=String.valueOf(Main.SERVER_TICK_TIME+5184000);
 							  }
 						  //Reconstruct the data
 						  if (finalstring.equalsIgnoreCase("")) {
@@ -1010,9 +983,9 @@ public class PlayerListener
 				  } else {
 					  //Set this entity to 'fed' status. You get 3 days to feed it after that.
 					  if (this.plugin.getConfig().getString("fed.mobs").length()<4) {
-						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+e.getRightClicked().getUniqueId()+","+(Bukkit.getWorld("world").getFullTime()+5184000)));
+						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+e.getRightClicked().getUniqueId()+","+(Main.SERVER_TICK_TIME+5184000)));
 					  } else {
-						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+","+e.getRightClicked().getUniqueId()+","+(Bukkit.getWorld("world").getFullTime()+5184000)));
+						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+","+e.getRightClicked().getUniqueId()+","+(Main.SERVER_TICK_TIME+5184000)));
 					  }
 					  this.plugin.saveConfig();
 				  }
@@ -1040,7 +1013,7 @@ public class PlayerListener
 							  if (temp.equals(e.getRightClicked().getUniqueId())) {
 								  //The next key contains the data then. Modify it.
 								  contains_uuid=true;
-								  mobslist[i+1]=String.valueOf(Bukkit.getWorld("world").getFullTime()+5184000);
+								  mobslist[i+1]=String.valueOf(Main.SERVER_TICK_TIME+5184000);
 							  }
 						  //Reconstruct the data
 						  if (finalstring.equalsIgnoreCase("")) {
@@ -1058,9 +1031,9 @@ public class PlayerListener
 				  } else {
 					  //Set this entity to 'fed' status. You get 3 days to feed it after that.
 					  if (this.plugin.getConfig().getString("fed.mobs").length()<4) {
-						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+e.getRightClicked().getUniqueId()+","+(Bukkit.getWorld("world").getFullTime()+5184000)));
+						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+e.getRightClicked().getUniqueId()+","+(Main.SERVER_TICK_TIME+5184000)));
 					  } else {
-						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+","+e.getRightClicked().getUniqueId()+","+(Bukkit.getWorld("world").getFullTime()+5184000)));
+						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+","+e.getRightClicked().getUniqueId()+","+(Main.SERVER_TICK_TIME+5184000)));
 					  }
 					  this.plugin.saveConfig();
 				  }
@@ -1088,7 +1061,7 @@ public class PlayerListener
 							  if (temp.equals(e.getRightClicked().getUniqueId())) {
 								  //The next key contains the data then. Modify it.
 								  contains_uuid=true;
-								  mobslist[i+1]=String.valueOf(Bukkit.getWorld("world").getFullTime()+5184000);
+								  mobslist[i+1]=String.valueOf(Main.SERVER_TICK_TIME+5184000);
 							  }
 						  //Reconstruct the data
 						  if (finalstring.equalsIgnoreCase("")) {
@@ -1106,9 +1079,9 @@ public class PlayerListener
 				  } else {
 					  //Set this entity to 'fed' status. You get 3 days to feed it after that.
 					  if (this.plugin.getConfig().getString("fed.mobs").length()<4) {
-						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+e.getRightClicked().getUniqueId()+","+(Bukkit.getWorld("world").getFullTime()+5184000)));
+						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+e.getRightClicked().getUniqueId()+","+(Main.SERVER_TICK_TIME+5184000)));
 					  } else {
-						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+","+e.getRightClicked().getUniqueId()+","+(Bukkit.getWorld("world").getFullTime()+5184000)));
+						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+","+e.getRightClicked().getUniqueId()+","+(Main.SERVER_TICK_TIME+5184000)));
 					  }
 					  this.plugin.saveConfig();
 				  }
@@ -1136,7 +1109,7 @@ public class PlayerListener
 							  if (temp.equals(e.getRightClicked().getUniqueId())) {
 								  //The next key contains the data then. Modify it.
 								  contains_uuid=true;
-								  mobslist[i+1]=String.valueOf(Bukkit.getWorld("world").getFullTime()+5184000);
+								  mobslist[i+1]=String.valueOf(Main.SERVER_TICK_TIME+5184000);
 							  }
 						  //Reconstruct the data
 						  if (finalstring.equalsIgnoreCase("")) {
@@ -1154,9 +1127,9 @@ public class PlayerListener
 				  } else {
 					  //Set this entity to 'fed' status. You get 3 days to feed it after that.
 					  if (this.plugin.getConfig().getString("fed.mobs").length()<4) {
-						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+e.getRightClicked().getUniqueId()+","+(Bukkit.getWorld("world").getFullTime()+5184000)));
+						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+e.getRightClicked().getUniqueId()+","+(Main.SERVER_TICK_TIME+5184000)));
 					  } else {
-						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+","+e.getRightClicked().getUniqueId()+","+(Bukkit.getWorld("world").getFullTime()+5184000)));
+						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+","+e.getRightClicked().getUniqueId()+","+(Main.SERVER_TICK_TIME+5184000)));
 					  }
 					  this.plugin.saveConfig();
 				  }
@@ -1184,7 +1157,7 @@ public class PlayerListener
 							  if (temp.equals(e.getRightClicked().getUniqueId())) {
 								  //The next key contains the data then. Modify it.
 								  contains_uuid=true;
-								  mobslist[i+1]=String.valueOf(Bukkit.getWorld("world").getFullTime()+5184000);
+								  mobslist[i+1]=String.valueOf(Main.SERVER_TICK_TIME+5184000);
 							  }
 						  //Reconstruct the data
 						  if (finalstring.equalsIgnoreCase("")) {
@@ -1202,9 +1175,9 @@ public class PlayerListener
 				  } else {
 					  //Set this entity to 'fed' status. You get 3 days to feed it after that.
 					  if (this.plugin.getConfig().getString("fed.mobs").length()<4) {
-						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+e.getRightClicked().getUniqueId()+","+(Bukkit.getWorld("world").getFullTime()+5184000)));
+						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+e.getRightClicked().getUniqueId()+","+(Main.SERVER_TICK_TIME+5184000)));
 					  } else {
-						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+","+e.getRightClicked().getUniqueId()+","+(Bukkit.getWorld("world").getFullTime()+5184000)));
+						  this.plugin.getConfig().set("fed.mobs", String.valueOf(this.plugin.getConfig().getString("fed.mobs")+","+e.getRightClicked().getUniqueId()+","+(Main.SERVER_TICK_TIME+5184000)));
 					  }
 					  this.plugin.saveConfig();
 				  }
@@ -1235,6 +1208,9 @@ public class PlayerListener
 		  if (e.getEntity().getType()==EntityType.MUSHROOM_COW) {
 			  this.plugin.gainMoneyExp(p,"Breeder",0.005,1);
 		  }
+	  } 
+	  if (e.getEntity().getType()==EntityType.MUSHROOM_COW) {
+		  Bukkit.getWorld("world").spawnEntity(e.getEntity().getLocation(), EntityType.COW);
 	  }
 	  Bukkit.getWorld("world").spawnEntity((Location) e.getEntity(), EntityType.COW);
   }
@@ -1300,7 +1276,7 @@ public class PlayerListener
   }
   
   public String healthbar(double curHP,double maxHP) {
-	  //█ ▌
+	  //笆�笆�
 	  int bits=(int)(Math.ceil(curHP/maxHP*10));
 	  String bar=" ";
 	  if (bits>6) {
@@ -1313,16 +1289,16 @@ public class PlayerListener
 		  bar+=ChatColor.RED+"";
 	  }
 	  for (int i=0;i<bits/2;i++) {
-		  bar+="█";
+		  bar+=Character.toString((char)0x2588);
 	  }
 	  if (bits%2!=0) {
-		  bar+="▌";
+		  bar+=Character.toString((char)0x258C);
 	  }
 	  return bar;
   }
   
   public String healthbar(double curHP,double maxHP,int hunger) {
-	  //█ ▌
+	  //笆�笆�
 	  int bits=(int)(Math.ceil(curHP/maxHP*10));
 	  String bar=" ";
 	  if (hunger==20) {
@@ -1347,10 +1323,10 @@ public class PlayerListener
 		  }
 	  }
 	  for (int i=0;i<bits/2;i++) {
-		  bar+="█";
+		  bar+=Character.toString((char)0x2588);
 	  }
 	  if (bits%2!=0) {
-		  bar+="▌";
+		  bar+=Character.toString((char)0x258C);
 	  }
 	  return bar;
   }
@@ -1648,7 +1624,7 @@ public class PlayerListener
 	    	      this.plugin.saveAccountsConfig();
 	    	}
 	    	if (!this.plugin.getAccountsConfig().contains(p.getName() + ".halloween.wand")) {
-	    		this.plugin.getAccountsConfig().set(p.getName() + ".halloween.wand", Long.valueOf(Bukkit.getWorld("world").getFullTime()));
+	    		this.plugin.getAccountsConfig().set(p.getName() + ".halloween.wand", Long.valueOf(Main.SERVER_TICK_TIME));
 	    	      this.plugin.saveAccountsConfig();
 	    	}
     	}
@@ -1751,7 +1727,7 @@ public class PlayerListener
   public void onPlayerInteract(PlayerInteractEntityEvent ev) {
       Entity theAnimal = ev.getRightClicked();
       if (ev.getPlayer().getItemInHand().getType()==Material.getMaterial(127)) {
-    	  if (this.plugin.getAccountsConfig().getLong(ev.getPlayer().getName()+".halloween.wand")<Bukkit.getWorld("world").getFullTime())
+    	  if (this.plugin.getAccountsConfig().getLong(ev.getPlayer().getName()+".halloween.wand")<Main.SERVER_TICK_TIME)
     	  if (theAnimal.getType()!=EntityType.PLAYER) {
 		      if (theAnimal instanceof LivingEntity) {
 		    	  LivingEntity l = (LivingEntity)theAnimal;
@@ -1791,7 +1767,7 @@ public class PlayerListener
 						        this.plugin.POLYMORPH=10;
 						        this.plugin.POLYMORPH_LOC=l2.getLocation();
 					        }
-					        this.plugin.getAccountsConfig().set(ev.getPlayer().getName()+".halloween.wand",Long.valueOf(Bukkit.getWorld("world").getFullTime()+1200));
+					        this.plugin.getAccountsConfig().set(ev.getPlayer().getName()+".halloween.wand",Long.valueOf(Main.SERVER_TICK_TIME+1200));
 			    	  } else {
 			    		  if (!l.getCustomName().contains(ChatColor.DARK_PURPLE+"")) {
 				    		  //This is not a boss. Convert it to something else.
@@ -1828,14 +1804,14 @@ public class PlayerListener
 							        this.plugin.POLYMORPH=10;
 							        this.plugin.POLYMORPH_LOC=l2.getLocation();
 						        }
-						        this.plugin.getAccountsConfig().set(ev.getPlayer().getName()+".halloween.wand",Long.valueOf(Bukkit.getWorld("world").getFullTime()+1200));
+						        this.plugin.getAccountsConfig().set(ev.getPlayer().getName()+".halloween.wand",Long.valueOf(Main.SERVER_TICK_TIME+1200));
 			    		  }
 			    	  }
 		    	  }
 		      }
     	  }
       } else {
-    	  //Make sure we're not polymporphin, otherwise do other things in here.
+    	  //Make sure we're not polymorphing, otherwise do other things in here.
 	      if (theAnimal.getType() == EntityType.WOLF) {
 	        Wolf dog = (Wolf)theAnimal;
 	        DyeColor dogcolor = dog.getCollarColor();
@@ -1919,1139 +1895,1169 @@ public class PlayerListener
 
   @EventHandler
   public void onCreatureSpawn(CreatureSpawnEvent e) {
-	  Entity entity = e.getEntity();
-	  if (entity.getWorld().getName().compareTo("world")==0) {
-		  boolean despawn=true;
-		  if (entity instanceof Monster) {
-			  LivingEntity test = (LivingEntity)entity;
-			  /*test.setMaxHealth(10);
-			  Warning(test,1);
-			  if (test!=null && test.isValid()) {
-				  test.setHealth(test.getMaxHealth());
-			  }*/
-			  boolean block=false;
-			  if (test.getCustomName()!=null && (test.getCustomName().contains(ChatColor.DARK_PURPLE+"") || test.getCustomName().contains(ChatColor.DARK_AQUA+"Polymorphed Creature"))) {
-				  for (int i=-2;i<3;i++) {
-					  for (int j=-2;j<3;j++) {
-						  for (int k=-2;k<3;k++) {
-							  if (Bukkit.getWorld("world").getBlockAt(test.getLocation().add(i,j,k)).getType()==Material.COMMAND) {
-								  block=true;
-								  Bukkit.getWorld("world").getBlockAt(test.getLocation().add(i,j,k)).setType(Material.COBBLESTONE);
-								  despawn=false;
-							  }
-						  }
-					  }
-				  }
-			  }
-			  List<Entity> entities = Bukkit.getWorld("world").getEntities();
-			  for (int i=0;i<entities.size();i++) {
-				  if (entities.get(i) instanceof LivingEntity) {
-					  LivingEntity l = (LivingEntity)entities.get(i);
-					  if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.DARK_PURPLE+"") && l.getLocation().distance(test.getLocation())<10) {
-						  despawn=false; //Allow it to spawn. It's next to a boss.
-					  }
-				  }
-			  }
-			  if (block || (test.getCustomName()!=null && (test.getCustomName().contains(ChatColor.DARK_PURPLE+"") || test.getType()==EntityType.ENDER_DRAGON || test.getCustomName().contains(ChatColor.DARK_AQUA+"") || !test.getRemoveWhenFarAway()))) {
-				  despawn=false;  //This is an epic boss and its healthbar. WE can't just despawn it.
-			  }
-		  }
-		  if (despawn) {
-			  if (this.plugin.getConfig().getBoolean("halloween-enabled") && Math.random()<=0.75 && entity instanceof Monster) {
-				  //Just despawn it right now.
-				  entity.remove();
-				  e.setCancelled(true);
-			  }
-			  double distancefromcity = Math.abs(1627-entity.getLocation().getX())+Math.abs((67-entity.getLocation().getY()))+Math.abs(-267-entity.getLocation().getZ());
-			  int maxgroup=0; //The maximum number of mobs that may be near each other and together when spawning.
-			  double chancer=1.0d; //The percent chance a duplicated mob will form.
-			  double despawnchancer=0.0d; //The percent chance the mob will be forced to despawn. Decreasing natural spawning.
-			  EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
-			  boolean contains=entity instanceof Monster;
-			  if (contains) {
-				  Monster m = (Monster)entity;
-				  Warning(m,3);
-				  if (m!=null && m.isValid()) {
-					  m.setMaxHealth(m.getMaxHealth()*1.15d); //Increase all mobs' HP by 15%.
-					  Warning(m,4);
-					  if (m!=null && m.isValid()) {
-						  m.setHealth(m.getMaxHealth());
-					  }
-				  }
-			  }
-			  //Mobs have more health when they are farther away, to make the mobs harder in general.
-			  float groupmult=0.25f; //Change this to modify the global grouping multiplier.
-			  /*
-			  if (distancefromcity>50000) {
-				  maxgroup=(int)(20*groupmult); //Groups of up to 20 mobs.
-				  chancer=0.25d;
-				  despawnchancer=0.0625d;
-				  LivingEntity l = (LivingEntity)entity;
-				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*1.0d));
-				  if (Math.random()<=0.25) {
-					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.5d));
-				  }
-				  l.setHealth(l.getMaxHealth());
-			  } else
-			  if (distancefromcity>20000) {
-				  maxgroup=(int)(15*groupmult); //Groups of up to 15 mobs.
-				  chancer=0.175d;
-				  despawnchancer=0.1250d;
-				  LivingEntity l = (LivingEntity)entity;
-				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.75d));
-				  if (Math.random()<=0.25) {
-					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.5d));
-				  }
-				  l.setHealth(l.getMaxHealth());
-			  } else
-			  if (distancefromcity>10000) {
-				  maxgroup=(int)(12*groupmult); //Groups of up to 12 mobs.
-				  chancer=0.125d;
-				  despawnchancer=0.15d;
-				  LivingEntity l = (LivingEntity)entity;
-				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.5d));
-				  if (Math.random()<=0.25) {
-					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
-				  }
-				  l.setHealth(l.getMaxHealth());
-			  } else*/
-			 maxgroup=(int)(10*groupmult);
-			 chancer=0.10d;
-			  despawnchancer=0.25d;
-			  if (this.plugin.getConfig().getBoolean("halloween-enabled")) {
-				  groupmult=0.0625f;
-				  chancer=0.025f;
-				  despawnchancer=0.4375d;
-			  }
-			  /*
-			  if (distancefromcity>4000) {
-				  maxgroup=(int)(10*groupmult); //Groups of up to 10 mobs.
-				  chancer=0.10d;
-				  despawnchancer=0.25d;
-				  LivingEntity l = (LivingEntity)entity;
-				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.5d));
-				  if (Math.random()<=0.25) {
-					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
-				  }
-				  l.setHealth(l.getMaxHealth());
-			  } else
-			  if (distancefromcity>2000) {
-				  maxgroup=(int)(7*groupmult); //Groups of up to 7 mobs.
-				  chancer=0.075d;
-				  despawnchancer=0.35d;
-				  LivingEntity l = (LivingEntity)entity;
-				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
-				  if (Math.random()<=0.25) {
-					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
-				  }
-				  l.setHealth(l.getMaxHealth());
-			  } else
-			  if (distancefromcity>1000) {
-				  maxgroup=(int)(5*groupmult); //Groups of up to 5 mobs.
-				  chancer=0.05d;
-				  despawnchancer=0.50d;
-				  LivingEntity l = (LivingEntity)entity;
-				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
-				  if (Math.random()<=0.25) {
-					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
-				  }
-				  l.setHealth(l.getMaxHealth());
-			  } else
-			  if (distancefromcity>400) {
-				  maxgroup=(int)(3*groupmult); //Groups of up to 3 mobs.
-				  chancer=0.025d;
-				  despawnchancer=0.75d;
-			  } else {
-				  maxgroup=(int)(3*groupmult); //Groups of up to 3 mobs.
-				  chancer=0.005d;
-				  despawnchancer=0.95d;
-			  }*/
-			  if (entity.getType()==EntityType.ZOMBIE || entity.getType()==EntityType.PIG_ZOMBIE || entity.getType()==EntityType.SKELETON) {
-				  LivingEntity l = (LivingEntity)entity;
-				  EntityEquipment inven = l.getEquipment();
-				  if (l.getCustomName()!=null && l.getCustomName().equals(ChatColor.GOLD+"Charge Zombie II")) {
-					  despawnchancer/=4;
-					  //Destroy a huge amount around it when it spawns.
-					  for (int k=-4;k<5;k++) {
-						  for (int j=-4;j<5;j++) {
-							  for (int m=-1;m<5;m++) {
-								  Location checkloc = l.getLocation().add(k,m,j);
-								  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-								  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER || bl.getType()!=Material.COMMAND || bl.getType()!=Material.MOSSY_COBBLESTONE) {
-									  bl.breakNaturally();
-								  }
-							  }
-						  }
-					  }
-				  }
-				  if (inven!=null) {
-					  inven.setBootsDropChance(0.02f);
-					  inven.setChestplateDropChance(0.02f);
-					  inven.setLeggingsDropChance(0.02f);
-					  inven.setHelmetDropChance(0.02f);
-					  inven.setItemInHandDropChance(0.02f);
-					  if (entity.getType()==EntityType.SKELETON) {
-						  inven.setItemInHand(new ItemStack(Material.BOW));
-					  }
-					  if (distancefromcity<2000) {
-						  if (entity.getType()==EntityType.ZOMBIE) {
-							  Zombie zomb = (Zombie)l;
-							  if (zomb.isBaby()) {
-								  zomb.setBaby(false);
-							  }
-						  }
-						  if (inven.getItemInHand()!=null && inven.getItemInHand().getType()==Material.DIAMOND_SWORD ||
-								  inven.getItemInHand().getType()==Material.GOLD_SWORD ||
-								  inven.getItemInHand().getType()==Material.IRON_SWORD) {
-							  inven.setItemInHand(new ItemStack(Material.WOOD_SWORD));
-						  }
-						  if (inven.getChestplate()!=null && inven.getChestplate().getType()==Material.DIAMOND_CHESTPLATE ||
-								  inven.getChestplate().getType()==Material.GOLD_CHESTPLATE ||
-								  inven.getChestplate().getType()==Material.IRON_CHESTPLATE ||
-								  inven.getChestplate().getType()==Material.CHAINMAIL_CHESTPLATE) {
-							  inven.setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
-						  }
-						  if (inven.getLeggings()!=null && inven.getLeggings().getType()==Material.DIAMOND_LEGGINGS ||
-								  inven.getLeggings().getType()==Material.GOLD_LEGGINGS ||
-								  inven.getLeggings().getType()==Material.IRON_LEGGINGS ||
-								  inven.getLeggings().getType()==Material.CHAINMAIL_LEGGINGS) {
-							  inven.setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
-						  }
-						  if (inven.getBoots()!=null && inven.getBoots().getType()==Material.DIAMOND_BOOTS ||
-								  inven.getBoots().getType()==Material.GOLD_BOOTS ||
-								  inven.getBoots().getType()==Material.IRON_BOOTS ||
-								  inven.getBoots().getType()==Material.CHAINMAIL_BOOTS) {
-							  inven.setBoots(new ItemStack(Material.LEATHER_BOOTS));
-						  }
-						  if (inven.getHelmet()!=null && inven.getHelmet().getType()==Material.DIAMOND_HELMET ||
-								  inven.getHelmet().getType()==Material.GOLD_HELMET ||
-								  inven.getHelmet().getType()==Material.IRON_HELMET ||
-								  inven.getHelmet().getType()==Material.CHAINMAIL_HELMET) {
-							  inven.setHelmet(new ItemStack(Material.LEATHER_HELMET));
-						  }
-					  }
-					  else if (distancefromcity<8000) {
-						  if (entity.getType()==EntityType.ZOMBIE) {
-							  Zombie zomb = (Zombie)l;
-							  if (zomb.isBaby()) {
-								  zomb.setBaby(false);
-							  }
-						  }
-						  if (inven.getItemInHand()!=null && inven.getItemInHand().getType()==Material.DIAMOND_SWORD ||
-								  inven.getItemInHand().getType()==Material.GOLD_SWORD) {
-							  inven.setItemInHand(new ItemStack(Material.IRON_SWORD));
-						  }
-						  if (inven.getChestplate()!=null && inven.getChestplate().getType()==Material.DIAMOND_CHESTPLATE) {
-							  inven.setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
-						  }
-						  if (inven.getLeggings()!=null && inven.getLeggings().getType()==Material.DIAMOND_LEGGINGS) {
-							  inven.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
-						  }
-						  if (inven.getBoots()!=null && inven.getBoots().getType()==Material.DIAMOND_BOOTS) {
-							  inven.setBoots(new ItemStack(Material.IRON_BOOTS));
-						  }
-						  if (inven.getHelmet()!=null && inven.getHelmet().getType()==Material.DIAMOND_HELMET) {
-							  inven.setHelmet(new ItemStack(Material.IRON_HELMET));
-						  }
-					  }
-				  }
-			  }
-			  //Get the torches/glowstone/mob spawners around this entity.
-			  int torches=0,glowstone=0,spawners=0;
-			  for (int x=-5;x<5;x++) {
-				  for (int y=-5;y<5;y++) {
-					  for (int z=-5;z<5;z++) {
-						  Block test = entity.getWorld().getBlockAt(entity.getLocation().add(x,y,z));
-						  if (test.getType()==Material.TORCH) {
-							  torches++;
-						  } else
-						  if (test.getType()==Material.GLOWSTONE) {
-							  glowstone++;
-						  } else
-						  if (test.getType()==Material.MOB_SPAWNER) {
-							  spawners++;
-						  }
-					  }
-				  }
-			  }
-			  if (!this.plugin.harrowing_night) {
-				  if (Bukkit.getWorld("world").getHighestBlockYAt(entity.getLocation())>=96) {
-					  //This is a tall world.
-					  if (entity.getLocation().getBlockY()>104) {
-						  despawnchancer*=(Math.random()*3.0d)+1;
-					  } else {
-						  for (int i=104-entity.getLocation().getBlockY();i>0;i--) {
-							  despawnchancer/=1.0175d;
-						  }
-					  }
-				  } else {
-					  //This is a short world.
-					  if (entity.getLocation().getBlockY()>52) {
-						  despawnchancer*=(Math.random()*3.0d)+1;
-					  } else {
-						  for (int i=52-entity.getLocation().getBlockY();i>0;i--) {
-							  despawnchancer/=1.025d;
-						  }
-					  }
-				  }
-			  } else {
-				  for (int i=52;i>0;i--) {
-					  despawnchancer/=1.025d;
-				  }
-			  }
-			  //if (e.getSpawnReason()!=SpawnReason.NATURAL) { //If it's a natural spawn, we gotta do it. Ignore our checking stuff.
-			  if (contains && spawners==0) { //We only do this despawn/extra spawn chance stuff when we have an actual mob AND when there's not a spawner nearby.
-				  if ((Math.random()<=despawnchancer || (torches+glowstone>=3))/* && entity.getNearbyEntities(5, 5, 5).size()>50*/) {
-					  //if (e.getSpawnReason()!=SpawnReason.CUSTOM && e.getLocation().getBlockY()!=Bukkit.getPlayer("AaMay").getLocation().getBlockY()) {
-					  entity.remove();
-					  e.setCancelled(true);
-					  //}
-					  //Bukkit.getPlayer("AaMay").sendMessage(ChatColor.BLUE+entity.getType().getName()+": Removed mob due to despawn chancer / special case.");
-				  }
-				  else {
-					  int totallvs=0;
-					  List<Entity> nearbylist = entity.getNearbyEntities(30, 30, 30);
-					  //Filter out all unrelated entity types.
-					  for (int k=0;k<nearbylist.size();k++) {
-						  //See if human players are near. If so, factor that in for determining how many mobs may exist.
-						  if (nearbylist.get(k).getType()==EntityType.PLAYER) {
-							  //This is a player.
-							  Player g = (Player)nearbylist.get(k);
-							  maxgroup+=this.plugin.getJobTotalLvs(g)/20;
-							  totallvs+=this.plugin.getJobTotalLvs(g);
-				  			////Bukkit.getLogger().info("Mob maxgroup increased to "+maxgroup+" down here.");
-						  }
-						  if (nearbylist.get(k).getType()!=EntityType.SKELETON &&
-								  nearbylist.get(k).getType()!=EntityType.ZOMBIE &&
-								  nearbylist.get(k).getType()!=EntityType.CREEPER &&
-								  nearbylist.get(k).getType()!=EntityType.SPIDER &&
-								  nearbylist.get(k).getType()!=EntityType.ENDERMAN) {
-							  nearbylist.remove(k);
-							  k--;
-						  }
-					  }
-					  maxgroup/=groupmult;
-					  int currentnearby = nearbylist.size();
-					  boolean keep=false;
-					  if (entity.getType()==EntityType.ZOMBIE || entity.getType()==EntityType.PIG_ZOMBIE || entity.getType()==EntityType.SKELETON) {
-						  LivingEntity l = (LivingEntity)entity;
-						  if (l.getCustomName()!=null && l.getCustomName().equals(ChatColor.GOLD+"Charge Zombie II")) {
-							  keep=false;
-						  }
-					  }
-					  if (currentnearby-maxgroup>1 && !keep) {
-						  entity.remove();
-						  e.setCancelled(true);
-						  //Bukkit.getPlayer("AaMay").sendMessage(ChatColor.GREEN+entity.getType().getName()+": Removed mob due to too many mobs near it.");
-					  } else {
-						  //We then attempt to see if despawn chancer occurs.
-						  if (Math.random()<=despawnchancer) {
-							  entity.remove();
-							  e.setCancelled(true);
-							  //Bukkit.getPlayer("AaMay").sendMessage(ChatColor.YELLOW+entity.getType().getName()+": Removed mob due to despawner chance.");
-						  } else {
-							  //Now we attempt to spawn more things.
-							  int k = currentnearby;
-							  while (k<maxgroup-currentnearby+1) {
-								  if (Bukkit.getWorld("world").getFullTime()-this.plugin.last_mob_random_time>10 && Math.random()<=chancer) {
-									  Location testloc = entity.getLocation().add(Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d);
-									  if (Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR) {
-										  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
-										  this.plugin.last_mob_random_time=Bukkit.getWorld("world").getFullTime();
-										  //Bukkit.getPlayer("AaMay").sendMessage(ChatColor.RED+entity.getType().getName()+": Spawned extra mob.");
-										  /*int j=0;
-										  while (j<10) {
-											  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
-											  j++;
-										  }*/
-									  }
-								  }
-								  k++;
-							  }
-						  }
-					  }
-					  double levelsmult=1.5;
-					  if (totallvs>20*levelsmult) {
-						  if (totallvs<40*levelsmult) {
-							  //Sometimes wear leather armor. Only for Skeletons and Zombies.
-							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-								  LivingEntity l = (LivingEntity) entity;
-								  if (Math.random()>=0.15) {
-									  l.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
-									  if (Math.random()>=0.25) {
-										  l.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
-										  if (Math.random()>=0.5) {
-											  l.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
-											  if (Math.random()>=0.8) {
-												  l.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
-											  }
-										  }
-									  }
-								  }
-							  }
-						  } else
-						  if (totallvs<60*levelsmult) {
-							  //Wear leather armor a bit more often. Sometimes a chain piece here or there. Include a Wooden sword usually.
-							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-								  LivingEntity l = (LivingEntity) entity;
-								  if (entity.getType()==EntityType.ZOMBIE) {
-									  if (Math.random()<=0.65) {
-										  l.getEquipment().setItemInHand(new ItemStack(Material.WOOD_SWORD));
-									  }
-								  }
-								  if (entity.getType()==EntityType.SKELETON) {
-									  if (Math.random()<=0.65) {
-										  ItemStack new_bow = new ItemStack(Material.BOW);
-										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
-										  l.getEquipment().setItemInHand(new_bow);
-									  }
-								  }
-								  if (Math.random()>=0.25) {
-									  if (Math.random()<=0.75) {
-										  l.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
-									  } else {
-										  l.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
-									  }
-									  if (Math.random()>=0.45) {
-										  if (Math.random()<=0.75) {
-										  l.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
-										  } else {
-											  l.getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
-										  }
-										  if (Math.random()>=0.65) {
-											  if (Math.random()<=0.75) {
-											  l.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
-											  } else {
-												  l.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
-											  }
-											  if (Math.random()>=0.95) {
-												  if (Math.random()<=0.75) {
-												  l.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
-												  } else {
-													  l.getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
-												  }
-											  }
-										  }
-									  }
-								  }
-							  }
-						  } else
-						  if (totallvs<80*levelsmult) {
-							  //Wear chainmail armor a bit more often. Sometimes an iron piece here or there. Include an Iron sword sometimes, a wooden one usually.
-							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-								  LivingEntity l = (LivingEntity) entity;
-								  if (entity.getType()==EntityType.ZOMBIE) {
-									  if (Math.random()<=0.65) {
-										  if (Math.random()<=0.75) {
-											  l.getEquipment().setItemInHand(new ItemStack(Material.WOOD_SWORD));
-										  } else {
-											  l.getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD));
-										  }
-									  }
-								  } else
-								  if (entity.getType()==EntityType.SKELETON) {
-									  if (Math.random()<=0.65) {
-										  if (Math.random()<=0.75) {
-											  ItemStack new_bow = new ItemStack(Material.BOW);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
-											  l.getEquipment().setItemInHand(new_bow);
-										  } else {
-											  ItemStack new_bow = new ItemStack(Material.BOW);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-											  l.getEquipment().setItemInHand(new_bow);
-										  }
-									  }
-								  } else {
-									  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,0));
-								  }
-								  if (Math.random()>=0.25) {
-									  if (Math.random()<=0.75) {
-										  l.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
-									  } else {
-										  l.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
-									  }
-									  if (Math.random()>=0.45) {
-										  if (Math.random()<=0.75) {
-										  l.getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
-										  } else {
-											  l.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
-										  }
-										  if (Math.random()>=0.65) {
-											  if (Math.random()<=0.75) {
-											  l.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
-											  } else {
-												  l.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
-											  }
-											  if (Math.random()>=0.95) {
-												  if (Math.random()<=0.75) {
-												  l.getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
-												  } else {
-													  l.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
-												  }
-											  }
-										  }
-									  }
-								  }
-							  }
-						  } else
-						  if (totallvs<100*levelsmult) {
-							  //Wear iron armor a bit more often. Sometimes a diamond piece here or there. Include a Diamond sword sometimes, an iron one usually.
-							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-								  LivingEntity l = (LivingEntity) entity;
-								  if (entity.getType()==EntityType.ZOMBIE) {
-									  if (Math.random()<=0.65) {
-										  if (Math.random()<=0.75) {
-											  l.getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD));
-										  } else {
-											  l.getEquipment().setItemInHand(new ItemStack(Material.DIAMOND_SWORD));
-										  }
-									  }
-								  } else
-								  if (entity.getType()==EntityType.SKELETON) {
-									  if (Math.random()<=0.65) {
-										  if (Math.random()<=0.75) {
-											  ItemStack new_bow = new ItemStack(Material.BOW);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 2);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-											  l.getEquipment().setItemInHand(new_bow);
-										  } else {
-											  ItemStack new_bow = new ItemStack(Material.BOW);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 3);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-											  l.getEquipment().setItemInHand(new_bow);
-										  }
-									  }
-								  } else {
-									  if (Math.random()<=0.65) {
-										  if (Math.random()<=0.75) {
-											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,1));
-										  } else {
-											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,1));
-											  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,0));
-										  }
-									  }
-								  }
-								  if (Math.random()>=0.25) {
-									  if (Math.random()<=0.75) {
-										  l.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
-									  } else {
-										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-									  }
-									  if (Math.random()>=0.45) {
-										  if (Math.random()<=0.75) {
-										  l.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
-										  } else {
-											  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
-										  }
-										  if (Math.random()>=0.65) {
-											  if (Math.random()<=0.75) {
-											  l.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
-											  } else {
-												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-											  }
-											  if (Math.random()>=0.95) {
-												  if (Math.random()<=0.75) {
-												  l.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
-												  } else {
-													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-												  }
-											  }
-										  }
-									  }
-								  }
-							  }
-						  } else
-						  if (totallvs<120*levelsmult) {
-							  //Wear diamond armor a bit more often. Sometimes an enchanted diamond piece here or there. Include a Golden sword sometimes, a diamond one usually.
-							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-								  LivingEntity l = (LivingEntity) entity;
-								  if (entity.getType()==EntityType.ZOMBIE) {
-									  if (Math.random()<=0.65) {
-										  if (Math.random()<=0.75) {
-											  l.getEquipment().setItemInHand(new ItemStack(Material.DIAMOND_SWORD));
-										  } else {
-											  l.getEquipment().setItemInHand(new ItemStack(Material.GOLD_SWORD));
-										  }
-									  }
-								  } else
-								  if (entity.getType()==EntityType.SKELETON) {
-									  if (Math.random()<=0.65) {
-										  if (Math.random()<=0.75) {
-											  ItemStack new_bow = new ItemStack(Material.BOW);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 3);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-											  l.getEquipment().setItemInHand(new_bow);
-										  } else {
-											  ItemStack new_bow = new ItemStack(Material.BOW);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 4);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);
-											  l.getEquipment().setItemInHand(new_bow);
-										  }
-									  }
-								  } else {
-									  if (Math.random()<=0.65) {
-										  if (Math.random()<=0.75) {
-											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
-										  } else {
-											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
-											  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,0));
-										  }
-									  }
-								  }
-								  if (Math.random()>=0.25) {
-									  if (Math.random()<=0.75) {
-										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-									  } else {
-										  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
-										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
-										  l.getEquipment().setChestplate(enchanted);
-									  }
-									  if (Math.random()>=0.45) {
-										  if (Math.random()<=0.75) {
-										  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
-										  } else {
-											  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
-											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
-											  l.getEquipment().setLeggings(enchanted);
-										  }
-										  if (Math.random()>=0.65) {
-											  if (Math.random()<=0.75) {
-											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-											  } else {
-												  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
-												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
-												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-											  }
-											  if (Math.random()>=0.95) {
-												  if (Math.random()<=0.75) {
-												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-												  } else {
-													  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
-													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
-													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-												  }
-											  }
-										  }
-									  }
-								  }
-							  }
-						  } else
-							  if (totallvs<140*levelsmult) {
-							  //Well dang, your party's huge and OP.
-							//Wear diamond armor almost always. Enchanted diamond pieces here and there.
-							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-								  LivingEntity l = (LivingEntity) entity;
-								  if (entity.getType()==EntityType.ZOMBIE) {
-									  if (Math.random()<=0.80) {
-										  if (Math.random()<=0.75) {
-											  ItemStack enchanted = new ItemStack(Material.DIAMOND_SWORD);
-											  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*2.0d)+1);
-											  if (Math.random()<=0.5) {
-												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
-											  } else {
-												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*2.0d)+1);
-											  }
-											  l.getEquipment().setItemInHand(enchanted);
-										  } else {
-											  ItemStack enchanted = new ItemStack(Material.GOLD_SWORD);
-											  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*2.0d)+1);
-											  if (Math.random()<=0.5) {
-												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
-											  } else {
-												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*4.0d)+1);
-											  }
-											  l.getEquipment().setItemInHand(enchanted);
-										  }
-									  }
-								  } else
-								  if (entity.getType()==EntityType.SKELETON) {
-									  if (Math.random()<=0.65) {
-										  if (Math.random()<=0.75) {
-											  ItemStack new_bow = new ItemStack(Material.BOW);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 5);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);
-											  l.getEquipment().setItemInHand(new_bow);
-										  } else {
-											  ItemStack new_bow = new ItemStack(Material.BOW);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 4);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 2);
-											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 2);
-											  l.getEquipment().setItemInHand(new_bow);
-										  }
-									  }
-								  } else {
-									  if (Math.random()<=0.65) {
-										  if (Math.random()<=0.75) {
-											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
-											  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,0));
-										  } else {
-											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
-											  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,1));
-											  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,0));
-										  }
-									  }
-								  }
-								  if (Math.random()>=0.25) {
-									  if (Math.random()<=0.75) {
-										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-									  } else {
-										  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
-										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
-										  if (Math.random()<=0.5) {
-											  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*1.0d)+1);
-										  }
-										  l.getEquipment().setChestplate(enchanted);
-									  }
-									  if (Math.random()>=0.45) {
-										  if (Math.random()<=0.75) {
-										  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
-										  } else {
-											  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
-											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
-											  if (Math.random()<=0.5) {
-												  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
-											  }
-											  l.getEquipment().setLeggings(enchanted);
-										  }
-										  if (Math.random()>=0.65) {
-											  if (Math.random()<=0.75) {
-											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-											  } else {
-												  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
-												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
-												  if (Math.random()<=0.5) {
-													  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
-												  }
-												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-											  }
-											  if (Math.random()>=0.95) {
-												  if (Math.random()<=0.75) {
-												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-												  } else {
-													  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
-													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
-													  if (Math.random()<=0.5) {
-														  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
-													  }
-													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-												  }
-											  }
-										  }
-									  }
-								  }
-							  }
-						  } else
-						  if (totallvs<200*levelsmult) {
-							  //Well dang, your party's huge and OP.
-							//Wear diamond armor almost always. Enchanted diamond pieces here and there.
-							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-								  LivingEntity l = (LivingEntity) entity;
-								  if (entity.getType()==EntityType.ZOMBIE) {
-									  if (Math.random()<=0.80) {
-										  if (Math.random()<=0.75) {
-											  ItemStack enchanted = new ItemStack(Material.DIAMOND_SWORD);
-											  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
-											  if (Math.random()<=0.5) {
-												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*3.0d)+1);
-											  } else {
-												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*2.0d)+1);
-											  }
-											  l.getEquipment().setItemInHand(enchanted);
-										  } else {
-											  ItemStack enchanted = new ItemStack(Material.GOLD_SWORD);
-											  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
-											  if (Math.random()<=0.5) {
-												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*3.0d)+1);
-											  } else {
-												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*2.0d)+1);
-											  }
-											  l.getEquipment().setItemInHand(enchanted);
-										  }
-									  }
-								  } else
-									  if (entity.getType()==EntityType.SKELETON) {
-										  if (Math.random()<=0.65) {
-											  if (Math.random()<=0.75) {
-												  ItemStack new_bow = new ItemStack(Material.BOW);
-												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 5);
-												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 2);
-												  l.getEquipment().setItemInHand(new_bow);
-											  } else {
-												  ItemStack new_bow = new ItemStack(Material.BOW);
-												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 6);
-												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 2);
-												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 3);
-												  l.getEquipment().setItemInHand(new_bow);
-											  }
-										  }
-									  } else {
-										  if (Math.random()<=0.65) {
-											  if (Math.random()<=0.75) {
-												  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,3));
-												  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,2));
-												  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,1));
-											  } else {
-												  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,4));
-												  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,2));
-												  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,1));
-											  }
-										  }
-									  }
-								  if (Math.random()>=0.25) {
-									  if (Math.random()<=0.75) {
-										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-									  } else {
-										  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
-										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*3.0d)+1);
-										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*3.0d)+1);
-										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*3.0d)+1);
-										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
-										  if (Math.random()<=0.5) {
-											  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
-										  }
-										  l.getEquipment().setChestplate(enchanted);
-									  }
-									  if (Math.random()>=0.45) {
-										  if (Math.random()<=0.75) {
-										  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
-										  } else {
-											  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
-											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
-											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*2.0d)+1);
-											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
-											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
-											  if (Math.random()<=0.5) {
-												  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
-											  }
-											  l.getEquipment().setLeggings(enchanted);
-										  }
-										  if (Math.random()>=0.65) {
-											  if (Math.random()<=0.75) {
-											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-											  } else {
-												  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
-												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
-												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*2.0d)+1);
-												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
-												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
-												  if (Math.random()<=0.5) {
-													  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
-												  }
-												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-											  }
-											  if (Math.random()>=0.95) {
-												  if (Math.random()<=0.75) {
-												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-												  } else {
-													  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
-													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
-													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
-													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
-													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
-													  if (Math.random()<=0.5) {
-														  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
-													  }
-													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-												  }
-											  }
-										  }
-									  }
-								  }
-							  }
-						  }
-						  else {
-							  //Time to give it our all.
-							//Well dang, your party's huge and OP.
-								//Wear diamond armor almost always. Enchanted diamond pieces here and there.
-								  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-									  LivingEntity l = (LivingEntity) entity;
-									  //l.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,999999,1));
-									  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,1));
-									  l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,999999,0));
-									  l.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,0));
-									  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,0));
-									  //l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,1));
-									  if (entity.getType()==EntityType.ZOMBIE) {
-										  if (Math.random()<=0.80) {
-											  if (Math.random()<=0.75) {
-												  ItemStack enchanted = new ItemStack(Material.DIAMOND_SWORD);
-												  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
-												  if (Math.random()<=0.5) {
-													  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
-												  } else {
-													  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*3.0d)+1);
-												  }
-												  l.getEquipment().setItemInHand(enchanted);
-											  } else {
-												  ItemStack enchanted = new ItemStack(Material.GOLD_SWORD);
-												  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
-												  if (Math.random()<=0.5) {
-													  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
-												  } else {
-													  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*3.0d)+1);
-												  }
-												  l.getEquipment().setItemInHand(enchanted);
-											  }
-										  }
-									  }
-									  if (Math.random()>=0.25) {
-										  if (Math.random()<=0.75) {
-											  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-										  } else {
-											  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
-											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
-											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
-											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*4.0d)+1);
-											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*3.0d)+1);
-											  if (Math.random()<=0.5) {
-												  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
-											  }
-											  l.getEquipment().setChestplate(enchanted);
-										  }
-										  if (Math.random()>=0.45) {
-											  if (Math.random()<=0.75) {
-											  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
-											  } else {
-												  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
-												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
-												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
-												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*3.0d)+1);
-												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
-												  if (Math.random()<=0.5) {
-													  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
-												  }
-												  l.getEquipment().setLeggings(enchanted);
-											  }
-											  if (Math.random()>=0.65) {
-												  if (Math.random()<=0.75) {
-												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-												  } else {
-													  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
-													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
-													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
-													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
-													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
-													  if (Math.random()<=0.5) {
-														  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
-													  }
-													  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-												  }
-												  if (Math.random()>=0.95) {
-													  if (Math.random()<=0.75) {
-													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-													  } else {
-														  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
-														  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
-														  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
-														  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*4.0d)+1);
-														  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*4.0d)+1);
-														  if (Math.random()<=0.5) {
-															  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
-														  }
-														  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-													  }
-												  }
-											  }
-										  }
-									  }
-								  }
-						  }
-					  }
-				  }
-			  }
-			  //}
-			  /*
-			  double distancefromcity = Math.abs(1627-entity.getLocation().getX())+Math.abs((67-entity.getLocation().getY()))+Math.abs(-267-entity.getLocation().getZ());
-			  double chancer=1.0d, increasechancer = 0.5d, despawnchancer = 32.0d;
-			  if (distancefromcity>50000) {
-				  chancer = 0.5d;
-				  increasechancer=0.25d;
-				  despawnchancer = 16.0d;
-			  } else 
-			  if (distancefromcity>20000) {
-				  chancer = 0.5d;
-				  increasechancer=0.5d;
-				  despawnchancer = 16.0d;
-			  } else 
-			  if (distancefromcity>10000) {
-				  chancer = 0.5d;
-				  increasechancer=1.0d;
-				  despawnchancer = 4.0d;
-			  } else 
-			  if (distancefromcity>4000) {
-				  chancer = 1.0d;
-				  increasechancer=4.0d;
-				  despawnchancer = 2.0d;
-			  } else 
-			  if (distancefromcity>2000) {
-				  chancer = 2.0d;
-				  increasechancer=8.0d;
-				  despawnchancer = 1.25d;
-			  } else 
-			  if (distancefromcity>1000) {
-				  chancer = 2.0d;
-				  increasechancer=16.0d;
-				  despawnchancer = 1.25d;
-			  } else 
-			  if (distancefromcity>400) {
-				  chancer = 16.0d;
-				  increasechancer = 32.0d;
-				  despawnchancer = 1.125d;
-			  } else {
-				  chancer = 32.0d;
-				  increasechancer = 64.0d;
-				  despawnchancer = 1.025d;
-			  }
-			  if (entity.getLocation().getY()>62) {
-				  despawnchancer/=Math.random()*16.0d+1.0d;
-			  }
-			  if (entity.getLocation().getY()<50) {
-				  chancer/=1.5d;
-				  if (chancer<0.5d) {
-					  chancer=0.5d;
-				  }
-				  for (int i=50;i>entity.getLocation().getY();i--) {
-					  increasechancer/=1.03d;
-					  despawnchancer*=1.03d;
-				  }
-				  if (increasechancer<0.01d) {
-					  increasechancer=0.01d;
-				  }
-			  }
-			  EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
-			  boolean contains=entity instanceof Monster
-			  for (int i=0;i<allowedtypes.length;i++) {
-				  if (entity.getType()==allowedtypes[i]) {
-					  contains=true;
-					  break;
-				  }
-			  }
-			  if (entity.getType()==EntityType.ZOMBIE || entity.getType()==EntityType.PIG_ZOMBIE || entity.getType()==EntityType.SKELETON) {
-				  LivingEntity l = (LivingEntity)entity;
-				  EntityEquipment inven = l.getEquipment();
-				  if (inven!=null) {
-					  if (distancefromcity<2000) {
-						  if (entity.getType()==EntityType.ZOMBIE) {
-							  Zombie zomb = (Zombie)l;
-							  if (zomb.isBaby()) {
-								  zomb.setBaby(false);
-							  }
-						  }
-						  if (inven.getItemInHand()!=null && inven.getItemInHand().getType()==Material.DIAMOND_SWORD ||
-								  inven.getItemInHand().getType()==Material.GOLD_SWORD ||
-								  inven.getItemInHand().getType()==Material.IRON_SWORD) {
-							  inven.setItemInHand(new ItemStack(Material.WOOD_SWORD));
-						  }
-						  if (inven.getChestplate()!=null && inven.getChestplate().getType()==Material.DIAMOND_CHESTPLATE ||
-								  inven.getChestplate().getType()==Material.GOLD_CHESTPLATE ||
-								  inven.getChestplate().getType()==Material.IRON_CHESTPLATE ||
-								  inven.getChestplate().getType()==Material.CHAINMAIL_CHESTPLATE) {
-							  inven.setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
-						  }
-						  if (inven.getLeggings()!=null && inven.getLeggings().getType()==Material.DIAMOND_LEGGINGS ||
-								  inven.getLeggings().getType()==Material.GOLD_LEGGINGS ||
-								  inven.getLeggings().getType()==Material.IRON_LEGGINGS ||
-								  inven.getLeggings().getType()==Material.CHAINMAIL_LEGGINGS) {
-							  inven.setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
-						  }
-						  if (inven.getBoots()!=null && inven.getBoots().getType()==Material.DIAMOND_BOOTS ||
-								  inven.getBoots().getType()==Material.GOLD_BOOTS ||
-								  inven.getBoots().getType()==Material.IRON_BOOTS ||
-								  inven.getBoots().getType()==Material.CHAINMAIL_BOOTS) {
-							  inven.setBoots(new ItemStack(Material.LEATHER_BOOTS));
-						  }
-						  if (inven.getHelmet()!=null && inven.getHelmet().getType()==Material.DIAMOND_HELMET ||
-								  inven.getHelmet().getType()==Material.GOLD_HELMET ||
-								  inven.getHelmet().getType()==Material.IRON_HELMET ||
-								  inven.getHelmet().getType()==Material.CHAINMAIL_HELMET) {
-							  inven.setHelmet(new ItemStack(Material.LEATHER_HELMET));
-						  }
-					  }
-					  else if (distancefromcity<8000) {
-						  if (entity.getType()==EntityType.ZOMBIE) {
-							  Zombie zomb = (Zombie)l;
-							  if (zomb.isBaby()) {
-								  zomb.setBaby(false);
-							  }
-						  }
-						  if (inven.getItemInHand()!=null && inven.getItemInHand().getType()==Material.DIAMOND_SWORD ||
-								  inven.getItemInHand().getType()==Material.GOLD_SWORD) {
-							  inven.setItemInHand(new ItemStack(Material.IRON_SWORD));
-						  }
-						  if (inven.getChestplate()!=null && inven.getChestplate().getType()==Material.DIAMOND_CHESTPLATE) {
-							  inven.setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
-						  }
-						  if (inven.getLeggings()!=null && inven.getLeggings().getType()==Material.DIAMOND_LEGGINGS) {
-							  inven.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
-						  }
-						  if (inven.getBoots()!=null && inven.getBoots().getType()==Material.DIAMOND_BOOTS) {
-							  inven.setBoots(new ItemStack(Material.IRON_BOOTS));
-						  }
-						  if (inven.getHelmet()!=null && inven.getHelmet().getType()==Material.DIAMOND_HELMET) {
-							  inven.setHelmet(new ItemStack(Material.IRON_HELMET));
-						  }
-					  }
-				  }
-			  }
-			  //Get the torches/glowstone/mob spawners around this entity.
-			  int torches=0,glowstone=0,spawners=0;
-			  for (int x=-5;x<5;x++) {
-				  for (int y=-5;y<5;y++) {
-					  for (int z=-5;z<5;z++) {
-						  Block test = entity.getWorld().getBlockAt(entity.getLocation().add(x,y,z));
-						  if (test.getType()==Material.TORCH) {
-							  torches++;
-						  } else
-						  if (test.getType()==Material.GLOWSTONE) {
-							  glowstone++;
-						  } else
-						  if (test.getType()==Material.MOB_SPAWNER) {
-							  spawners++;
-						  }
-					  }
-				  }
-			  }
-			  //Bukkit.getPlayer("sigonasr2").sendMessage(entity.getType()+": Found "+torches+" torches, "+glowstone+" glowstone, "+spawners+" spawners around me.");
-			  if (contains && (Math.random()*despawnchancer<1.0d || (torches+glowstone>=3)) && spawners==0 && entity.getNearbyEntities(5, 5, 5).size()<50) {
-				  //if (e.getSpawnReason()!=SpawnReason.CUSTOM && e.getLocation().getBlockY()!=Bukkit.getPlayer("AaMay").getLocation().getBlockY()) {
-				  entity.remove();
-				  e.setCancelled(true);
-				  //}
-				  //Bukkit.getPlayer("sigonasr2").sendMessage(entity.getType()+" prevented from spawning.");
-			  }
-			  if (contains && (Bukkit.getWorld("world").getFullTime()-this.plugin.last_mob_random_time>10 || this.plugin.last_mob_random_time==0) && Math.random()*chancer<1.0d) {
-				  this.plugin.last_mob_random_time=Bukkit.getWorld("world").getFullTime();
-				  Location testloc = entity.getLocation().add(Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d);
-				  if (Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR) {
-					  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
-					  /*int j=0;
-					  while (j<10) {
-						  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
-						  j++;
-					  }*/
-			  /*
-				  }
-				  while (Math.random()*chancer<1.0d) {
-					  chancer+=increasechancer;
-					  testloc = entity.getLocation().add(Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d);
-					  if (Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR && Bukkit.getWorld("world").getBlockAt(testloc.add(0,1,0)).getType()==Material.AIR) {
-						  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
-						  /*int j=0;
-						  while (j<10) {
-							  Bukkit.getWorld("world").spawnEntity(entity.getLocation().add(Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d), entity.getType());
-							  j++;
-						  }*/
-					/*  }
-				  }
-			  }
-	  		*/
-			  
-		  }
-	  }
+	  final CreatureSpawnEvent e2 = e;
+	  final Entity entity = e.getEntity();
+	  final Main plugin = this.plugin;
+	  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+	      @Override
+	      public void run() {
+	    	  if (entity.getWorld().getName().compareTo("world")==0) {
+	    		  boolean despawn=true;
+	    		  if (entity instanceof Monster) {
+	    			  LivingEntity test = (LivingEntity)entity;
+	    			  /*test.setMaxHealth(10);
+	    			  Warning(test,1);
+	    			  if (test!=null && test.isValid()) {
+	    				  test.setHealth(test.getMaxHealth());
+	    			  }*/
+	    			  boolean block=false;
+	    			  if (test.getCustomName()!=null && (test.getCustomName().contains(ChatColor.DARK_PURPLE+"") || test.getCustomName().contains(ChatColor.DARK_AQUA+"Polymorphed Creature"))) {
+	    				  for (int i=-2;i<3;i++) {
+	    					  for (int j=-2;j<3;j++) {
+	    						  for (int k=-2;k<3;k++) {
+	    							  if (Bukkit.getWorld("world").getBlockAt(test.getLocation().add(i,j,k)).getType()==Material.COMMAND) {
+	    								  block=true;
+	    								  Bukkit.getWorld("world").getBlockAt(test.getLocation().add(i,j,k)).setType(Material.COBBLESTONE);
+	    								  despawn=false;
+	    							  }
+	    						  }
+	    					  }
+	    				  }
+	    			  }
+	    			  List<Entity> entities = Bukkit.getWorld("world").getEntities();
+	    			  for (int i=0;i<entities.size();i++) {
+	    				  if (entities.get(i) instanceof LivingEntity) {
+	    					  LivingEntity l = (LivingEntity)entities.get(i);
+	    					  if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.DARK_PURPLE+"") && l.getLocation().distance(test.getLocation())<10) {
+	    						  despawn=false; //Allow it to spawn. It's next to a boss.
+	    					  }
+	    				  }
+	    			  }
+	    			  if (block || (test.getCustomName()!=null && (test.getCustomName().contains(ChatColor.DARK_PURPLE+"") || test.getType()==EntityType.ENDER_DRAGON || test.getCustomName().contains(ChatColor.DARK_AQUA+"") || !test.getRemoveWhenFarAway()))) {
+	    				  despawn=false;  //This is an epic boss and its healthbar. WE can't just despawn it.
+	    			  }
+	    		  }
+	    		  if (entity instanceof Golem || entity instanceof Wither || entity instanceof Animals) {
+	    			  despawn=false;
+	    			  if (entity instanceof Wither) {
+	    				  Wither w = (Wither)entity;
+	    				  w.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,999999,3));
+	    				  w.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,3));
+	    				  w.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,999999,3));
+	    				  w.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,999999,40));
+	    				  w.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
+	    				  w.setCustomName(ChatColor.GOLD+""+ChatColor.BOLD+"Mega Wither");
+	    				  Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule mobGriefing true");
+	    			  }
+	    		  }
+	    		  if (entity instanceof LivingEntity) {
+	    			  LivingEntity l = (LivingEntity)entity;
+	    			  if (!l.getRemoveWhenFarAway()) {
+	    				  despawn=false;
+	    			  }
+	    		  }
+	    		  if (despawn) {
+	    			  if (plugin.getConfig().getBoolean("halloween-enabled") && Math.random()<=0.75 && entity instanceof Monster) {
+	    				  //Just despawn it right now.
+	    				  entity.remove();
+	    				  e2.setCancelled(true);
+	    			  }
+	    			  double distancefromcity = Math.abs(1627-entity.getLocation().getX())+Math.abs((67-entity.getLocation().getY()))+Math.abs(-267-entity.getLocation().getZ());
+	    			  int maxgroup=0; //The maximum number of mobs that may be near each other and together when spawning.
+	    			  double chancer=1.0d; //The percent chance a duplicated mob will form.
+	    			  double despawnchancer=0.0d; //The percent chance the mob will be forced to despawn. Decreasing natural spawning.
+	    			  EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
+	    			  boolean contains=entity instanceof Monster;
+	    			  if (contains) {
+	    				  Monster m = (Monster)entity;
+	    				  Warning(m,3);
+	    				  if (m!=null && m.isValid()) {
+	    					  m.setMaxHealth(m.getMaxHealth()*1.15d); //Increase all mobs' HP by 15%.
+	    					  Warning(m,4);
+	    					  if (m!=null && m.isValid()) {
+	    						  m.setHealth(m.getMaxHealth());
+	    					  }
+	    				  }
+	    			  }
+	    			  //Mobs have more health when they are farther away, to make the mobs harder in general.
+	    			  float groupmult=0.25f; //Change this to modify the global grouping multiplier.
+	    			  /*
+	    			  if (distancefromcity>50000) {
+	    				  maxgroup=(int)(20*groupmult); //Groups of up to 20 mobs.
+	    				  chancer=0.25d;
+	    				  despawnchancer=0.0625d;
+	    				  LivingEntity l = (LivingEntity)entity;
+	    				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*1.0d));
+	    				  if (Math.random()<=0.25) {
+	    					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.5d));
+	    				  }
+	    				  l.setHealth(l.getMaxHealth());
+	    			  } else
+	    			  if (distancefromcity>20000) {
+	    				  maxgroup=(int)(15*groupmult); //Groups of up to 15 mobs.
+	    				  chancer=0.175d;
+	    				  despawnchancer=0.1250d;
+	    				  LivingEntity l = (LivingEntity)entity;
+	    				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.75d));
+	    				  if (Math.random()<=0.25) {
+	    					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.5d));
+	    				  }
+	    				  l.setHealth(l.getMaxHealth());
+	    			  } else
+	    			  if (distancefromcity>10000) {
+	    				  maxgroup=(int)(12*groupmult); //Groups of up to 12 mobs.
+	    				  chancer=0.125d;
+	    				  despawnchancer=0.15d;
+	    				  LivingEntity l = (LivingEntity)entity;
+	    				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.5d));
+	    				  if (Math.random()<=0.25) {
+	    					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
+	    				  }
+	    				  l.setHealth(l.getMaxHealth());
+	    			  } else*/
+	    			 maxgroup=(int)(10*groupmult);
+	    			 chancer=0.10d;
+	    			  despawnchancer=0.25d;
+	    			  if (plugin.getConfig().getBoolean("halloween-enabled")) {
+	    				  groupmult=0.0625f;
+	    				  chancer=0.025f;
+	    				  despawnchancer=0.4375d;
+	    			  }
+	    			  /*
+	    			  if (distancefromcity>4000) {
+	    				  maxgroup=(int)(10*groupmult); //Groups of up to 10 mobs.
+	    				  chancer=0.10d;
+	    				  despawnchancer=0.25d;
+	    				  LivingEntity l = (LivingEntity)entity;
+	    				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.5d));
+	    				  if (Math.random()<=0.25) {
+	    					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
+	    				  }
+	    				  l.setHealth(l.getMaxHealth());
+	    			  } else
+	    			  if (distancefromcity>2000) {
+	    				  maxgroup=(int)(7*groupmult); //Groups of up to 7 mobs.
+	    				  chancer=0.075d;
+	    				  despawnchancer=0.35d;
+	    				  LivingEntity l = (LivingEntity)entity;
+	    				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
+	    				  if (Math.random()<=0.25) {
+	    					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
+	    				  }
+	    				  l.setHealth(l.getMaxHealth());
+	    			  } else
+	    			  if (distancefromcity>1000) {
+	    				  maxgroup=(int)(5*groupmult); //Groups of up to 5 mobs.
+	    				  chancer=0.05d;
+	    				  despawnchancer=0.50d;
+	    				  LivingEntity l = (LivingEntity)entity;
+	    				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
+	    				  if (Math.random()<=0.25) {
+	    					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
+	    				  }
+	    				  l.setHealth(l.getMaxHealth());
+	    			  } else
+	    			  if (distancefromcity>400) {
+	    				  maxgroup=(int)(3*groupmult); //Groups of up to 3 mobs.
+	    				  chancer=0.025d;
+	    				  despawnchancer=0.75d;
+	    			  } else {
+	    				  maxgroup=(int)(3*groupmult); //Groups of up to 3 mobs.
+	    				  chancer=0.005d;
+	    				  despawnchancer=0.95d;
+	    			  }*/
+	    			  if (entity.getType()==EntityType.ZOMBIE || entity.getType()==EntityType.PIG_ZOMBIE || entity.getType()==EntityType.SKELETON) {
+	    				  LivingEntity l = (LivingEntity)entity;
+	    				  EntityEquipment inven = l.getEquipment();
+	    				  if (l.getCustomName()!=null && l.getCustomName().equals(ChatColor.GOLD+"Charge Zombie II")) {
+	    					  despawnchancer/=4;
+	    					  //Destroy a huge amount around it when it spawns.
+	    					  for (int k=-4;k<5;k++) {
+	    						  for (int j=-4;j<5;j++) {
+	    							  for (int m=-1;m<5;m++) {
+	    								  if (Math.random()<=1.00-((j+4)*0.05d)) {
+		    								  Location checkloc = l.getLocation().add(k,m,j);
+		    								  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+		    								  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER || bl.getType()!=Material.COMMAND || bl.getType()!=Material.MOSSY_COBBLESTONE) {
+		    									  bl.breakNaturally();
+		    								  }
+	    								  }
+	    							  }
+	    						  }
+	    					  }
+	    				  }
+	    				  if (inven!=null) {
+	    					  inven.setBootsDropChance(0.02f);
+	    					  inven.setChestplateDropChance(0.02f);
+	    					  inven.setLeggingsDropChance(0.02f);
+	    					  inven.setHelmetDropChance(0.02f);
+	    					  inven.setItemInHandDropChance(0.02f);
+	    					  if (entity.getType()==EntityType.SKELETON) {
+	    						  inven.setItemInHand(new ItemStack(Material.BOW));
+	    					  }
+	    					  if (distancefromcity<2000) {
+	    						  if (entity.getType()==EntityType.ZOMBIE) {
+	    							  Zombie zomb = (Zombie)l;
+	    							  if (zomb.isBaby()) {
+	    								  zomb.setBaby(false);
+	    							  }
+	    						  }
+	    						  if (inven.getItemInHand()!=null && inven.getItemInHand().getType()==Material.DIAMOND_SWORD ||
+	    								  inven.getItemInHand().getType()==Material.GOLD_SWORD ||
+	    								  inven.getItemInHand().getType()==Material.IRON_SWORD) {
+	    							  inven.setItemInHand(new ItemStack(Material.WOOD_SWORD));
+	    						  }
+	    						  if (inven.getChestplate()!=null && inven.getChestplate().getType()==Material.DIAMOND_CHESTPLATE ||
+	    								  inven.getChestplate().getType()==Material.GOLD_CHESTPLATE ||
+	    								  inven.getChestplate().getType()==Material.IRON_CHESTPLATE ||
+	    								  inven.getChestplate().getType()==Material.CHAINMAIL_CHESTPLATE) {
+	    							  inven.setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
+	    						  }
+	    						  if (inven.getLeggings()!=null && inven.getLeggings().getType()==Material.DIAMOND_LEGGINGS ||
+	    								  inven.getLeggings().getType()==Material.GOLD_LEGGINGS ||
+	    								  inven.getLeggings().getType()==Material.IRON_LEGGINGS ||
+	    								  inven.getLeggings().getType()==Material.CHAINMAIL_LEGGINGS) {
+	    							  inven.setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
+	    						  }
+	    						  if (inven.getBoots()!=null && inven.getBoots().getType()==Material.DIAMOND_BOOTS ||
+	    								  inven.getBoots().getType()==Material.GOLD_BOOTS ||
+	    								  inven.getBoots().getType()==Material.IRON_BOOTS ||
+	    								  inven.getBoots().getType()==Material.CHAINMAIL_BOOTS) {
+	    							  inven.setBoots(new ItemStack(Material.LEATHER_BOOTS));
+	    						  }
+	    						  if (inven.getHelmet()!=null && inven.getHelmet().getType()==Material.DIAMOND_HELMET ||
+	    								  inven.getHelmet().getType()==Material.GOLD_HELMET ||
+	    								  inven.getHelmet().getType()==Material.IRON_HELMET ||
+	    								  inven.getHelmet().getType()==Material.CHAINMAIL_HELMET) {
+	    							  inven.setHelmet(new ItemStack(Material.LEATHER_HELMET));
+	    						  }
+	    					  }
+	    					  else if (distancefromcity<8000) {
+	    						  if (entity.getType()==EntityType.ZOMBIE) {
+	    							  Zombie zomb = (Zombie)l;
+	    							  if (zomb.isBaby()) {
+	    								  zomb.setBaby(false);
+	    							  }
+	    						  }
+	    						  if (inven.getItemInHand()!=null && inven.getItemInHand().getType()==Material.DIAMOND_SWORD ||
+	    								  inven.getItemInHand().getType()==Material.GOLD_SWORD) {
+	    							  inven.setItemInHand(new ItemStack(Material.IRON_SWORD));
+	    						  }
+	    						  if (inven.getChestplate()!=null && inven.getChestplate().getType()==Material.DIAMOND_CHESTPLATE) {
+	    							  inven.setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+	    						  }
+	    						  if (inven.getLeggings()!=null && inven.getLeggings().getType()==Material.DIAMOND_LEGGINGS) {
+	    							  inven.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+	    						  }
+	    						  if (inven.getBoots()!=null && inven.getBoots().getType()==Material.DIAMOND_BOOTS) {
+	    							  inven.setBoots(new ItemStack(Material.IRON_BOOTS));
+	    						  }
+	    						  if (inven.getHelmet()!=null && inven.getHelmet().getType()==Material.DIAMOND_HELMET) {
+	    							  inven.setHelmet(new ItemStack(Material.IRON_HELMET));
+	    						  }
+	    					  }
+	    				  }
+	    			  }
+	    			  //Get the torches/glowstone/mob spawners around this entity.
+	    			  int torches=0,glowstone=0,spawners=0;
+	    			  for (int x=-5;x<5;x++) {
+	    				  for (int y=-5;y<5;y++) {
+	    					  for (int z=-5;z<5;z++) {
+	    						  Block test = entity.getWorld().getBlockAt(entity.getLocation().add(x,y,z));
+	    						  if (test!=null) {
+	    							  if (test.getType()==Material.TORCH) {
+	    								  torches++;
+	    							  } else
+	    							  if (test.getType()==Material.GLOWSTONE) {
+	    								  glowstone++;
+	    							  } else
+	    							  if (test.getType()==Material.MOB_SPAWNER) {
+	    								  spawners++;
+	    						  }
+	    						  }
+	    					  }
+	    				  }
+	    			  }
+	    			  if (!plugin.harrowing_night) {
+	    				  if (Bukkit.getWorld("world").getHighestBlockYAt(entity.getLocation())>=96) {
+	    					  //This is a tall world.
+	    					  if (entity.getLocation().getBlockY()>104) {
+	    						  despawnchancer*=(Math.random()*3.0d)+1;
+	    					  } else {
+	    						  for (int i=104-entity.getLocation().getBlockY();i>0;i--) {
+	    							  despawnchancer/=1.0175d;
+	    						  }
+	    					  }
+	    				  } else {
+	    					  //This is a short world.
+	    					  if (entity.getLocation().getBlockY()>52) {
+	    						  despawnchancer*=(Math.random()*3.0d)+1;
+	    					  } else {
+	    						  for (int i=52-entity.getLocation().getBlockY();i>0;i--) {
+	    							  despawnchancer/=1.025d;
+	    						  }
+	    					  }
+	    				  }
+	    			  } else {
+	    				  for (int i=52;i>0;i--) {
+	    					  despawnchancer/=1.025d;
+	    				  }
+	    			  }
+	    			  //if (e.getSpawnReason()!=SpawnReason.NATURAL) { //If it's a natural spawn, we gotta do it. Ignore our checking stuff.
+	    			  if (contains && spawners==0) { //We only do this despawn/extra spawn chance stuff when we have an actual mob AND when there's not a spawner nearby.
+	    				  if ((Math.random()<=despawnchancer || (torches+glowstone>=3))/* && entity.getNearbyEntities(5, 5, 5).size()>50*/) {
+	    					  //if (e.getSpawnReason()!=SpawnReason.CUSTOM && e.getLocation().getBlockY()!=Bukkit.getPlayer("AaMay").getLocation().getBlockY()) {
+	    					  entity.remove();
+	    					  e2.setCancelled(true);
+	    					  //}
+	    					  //Bukkit.getPlayer("AaMay").sendMessage(ChatColor.BLUE+entity.getType().getName()+": Removed mob due to despawn chancer / special case.");
+	    				  }
+	    				  else {
+	    					  int totallvs=0;
+	    					  List<Entity> nearbylist = entity.getNearbyEntities(30, 30, 30);
+	    					  //Filter out all unrelated entity types.
+	    					  for (int k=0;k<nearbylist.size();k++) {
+	    						  //See if human players are near. If so, factor that in for determining how many mobs may exist.
+	    						  if (nearbylist.get(k).getType()==EntityType.PLAYER) {
+	    							  //This is a player.
+	    							  Player g = (Player)nearbylist.get(k);
+	    							  maxgroup+=plugin.getJobTotalLvs(g)/20;
+	    							  totallvs+=plugin.getJobTotalLvs(g);
+	    				  			////Bukkit.getLogger().info("Mob maxgroup increased to "+maxgroup+" down here.");
+	    						  }
+	    						  if (nearbylist.get(k).getType()!=EntityType.SKELETON &&
+	    								  nearbylist.get(k).getType()!=EntityType.ZOMBIE &&
+	    								  nearbylist.get(k).getType()!=EntityType.CREEPER &&
+	    								  nearbylist.get(k).getType()!=EntityType.SPIDER &&
+	    								  nearbylist.get(k).getType()!=EntityType.ENDERMAN) {
+	    							  nearbylist.remove(k);
+	    							  k--;
+	    						  }
+	    					  }
+	    					  maxgroup/=groupmult;
+	    					  int currentnearby = nearbylist.size();
+	    					  boolean keep=false;
+	    					  if (entity.getType()==EntityType.ZOMBIE || entity.getType()==EntityType.PIG_ZOMBIE || entity.getType()==EntityType.SKELETON) {
+	    						  LivingEntity l = (LivingEntity)entity;
+	    						  if (l.getCustomName()!=null && l.getCustomName().equals(ChatColor.GOLD+"Charge Zombie II")) {
+	    							  keep=false;
+	    						  }
+	    					  }
+	    					  if (currentnearby-maxgroup>1 && !keep) {
+	    						  entity.remove();
+	    						  e2.setCancelled(true);
+	    						  //Bukkit.getPlayer("AaMay").sendMessage(ChatColor.GREEN+entity.getType().getName()+": Removed mob due to too many mobs near it.");
+	    					  } else {
+	    						  //We then attempt to see if despawn chancer occurs.
+	    						  if (Math.random()<=despawnchancer) {
+	    							  entity.remove();
+	    							  e2.setCancelled(true);
+	    							  //Bukkit.getPlayer("AaMay").sendMessage(ChatColor.YELLOW+entity.getType().getName()+": Removed mob due to despawner chance.");
+	    						  } else {
+	    							  //Now we attempt to spawn more things.
+	    							  int k = currentnearby;
+	    							  while (k<maxgroup-currentnearby+1) {
+	    								  if (Main.SERVER_TICK_TIME-plugin.last_mob_random_time>10 && Math.random()<=chancer) {
+	    									  Location testloc = entity.getLocation().add(Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d);
+	    									  if (Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR) {
+	    										  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
+	    										  plugin.last_mob_random_time=Main.SERVER_TICK_TIME;
+	    										  //Bukkit.getPlayer("AaMay").sendMessage(ChatColor.RED+entity.getType().getName()+": Spawned extra mob.");
+	    										  /*int j=0;
+	    										  while (j<10) {
+	    											  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
+	    											  j++;
+	    										  }*/
+	    									  }
+	    								  }
+	    								  k++;
+	    							  }
+	    						  }
+	    					  }
+	    					  double levelsmult=1.5;
+	    					  if (totallvs>20*levelsmult) {
+	    						  if (totallvs<40*levelsmult) {
+	    							  //Sometimes wear leather armor. Only for Skeletons and Zombies.
+	    							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
+	    								  LivingEntity l = (LivingEntity) entity;
+	    								  if (Math.random()>=0.15) {
+	    									  l.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
+	    									  if (Math.random()>=0.25) {
+	    										  l.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
+	    										  if (Math.random()>=0.5) {
+	    											  l.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
+	    											  if (Math.random()>=0.8) {
+	    												  l.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
+	    											  }
+	    										  }
+	    									  }
+	    								  }
+	    							  }
+	    						  } else
+	    						  if (totallvs<60*levelsmult) {
+	    							  //Wear leather armor a bit more often. Sometimes a chain piece here or there. Include a Wooden sword usually.
+	    							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
+	    								  LivingEntity l = (LivingEntity) entity;
+	    								  if (entity.getType()==EntityType.ZOMBIE) {
+	    									  if (Math.random()<=0.65) {
+	    										  l.getEquipment().setItemInHand(new ItemStack(Material.WOOD_SWORD));
+	    									  }
+	    								  }
+	    								  if (entity.getType()==EntityType.SKELETON) {
+	    									  if (Math.random()<=0.65) {
+	    										  ItemStack new_bow = new ItemStack(Material.BOW);
+	    										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+	    										  l.getEquipment().setItemInHand(new_bow);
+	    									  }
+	    								  }
+	    								  if (Math.random()>=0.25) {
+	    									  if (Math.random()<=0.75) {
+	    										  l.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
+	    									  } else {
+	    										  l.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
+	    									  }
+	    									  if (Math.random()>=0.45) {
+	    										  if (Math.random()<=0.75) {
+	    										  l.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
+	    										  } else {
+	    											  l.getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
+	    										  }
+	    										  if (Math.random()>=0.65) {
+	    											  if (Math.random()<=0.75) {
+	    											  l.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
+	    											  } else {
+	    												  l.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
+	    											  }
+	    											  if (Math.random()>=0.95) {
+	    												  if (Math.random()<=0.75) {
+	    												  l.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
+	    												  } else {
+	    													  l.getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
+	    												  }
+	    											  }
+	    										  }
+	    									  }
+	    								  }
+	    							  }
+	    						  } else
+	    						  if (totallvs<80*levelsmult) {
+	    							  //Wear chainmail armor a bit more often. Sometimes an iron piece here or there. Include an Iron sword sometimes, a wooden one usually.
+	    							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
+	    								  LivingEntity l = (LivingEntity) entity;
+	    								  if (entity.getType()==EntityType.ZOMBIE) {
+	    									  if (Math.random()<=0.65) {
+	    										  if (Math.random()<=0.75) {
+	    											  l.getEquipment().setItemInHand(new ItemStack(Material.WOOD_SWORD));
+	    										  } else {
+	    											  l.getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD));
+	    										  }
+	    									  }
+	    								  } else
+	    								  if (entity.getType()==EntityType.SKELETON) {
+	    									  if (Math.random()<=0.65) {
+	    										  if (Math.random()<=0.75) {
+	    											  ItemStack new_bow = new ItemStack(Material.BOW);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+	    											  l.getEquipment().setItemInHand(new_bow);
+	    										  } else {
+	    											  ItemStack new_bow = new ItemStack(Material.BOW);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+	    											  l.getEquipment().setItemInHand(new_bow);
+	    										  }
+	    									  }
+	    								  } else {
+	    									  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,0));
+	    								  }
+	    								  if (Math.random()>=0.25) {
+	    									  if (Math.random()<=0.75) {
+	    										  l.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
+	    									  } else {
+	    										  l.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+	    									  }
+	    									  if (Math.random()>=0.45) {
+	    										  if (Math.random()<=0.75) {
+	    										  l.getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
+	    										  } else {
+	    											  l.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+	    										  }
+	    										  if (Math.random()>=0.65) {
+	    											  if (Math.random()<=0.75) {
+	    											  l.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
+	    											  } else {
+	    												  l.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+	    											  }
+	    											  if (Math.random()>=0.95) {
+	    												  if (Math.random()<=0.75) {
+	    												  l.getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
+	    												  } else {
+	    													  l.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
+	    												  }
+	    											  }
+	    										  }
+	    									  }
+	    								  }
+	    							  }
+	    						  } else
+	    						  if (totallvs<100*levelsmult) {
+	    							  //Wear iron armor a bit more often. Sometimes a diamond piece here or there. Include a Diamond sword sometimes, an iron one usually.
+	    							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
+	    								  LivingEntity l = (LivingEntity) entity;
+	    								  if (entity.getType()==EntityType.ZOMBIE) {
+	    									  if (Math.random()<=0.65) {
+	    										  if (Math.random()<=0.75) {
+	    											  l.getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD));
+	    										  } else {
+	    											  l.getEquipment().setItemInHand(new ItemStack(Material.DIAMOND_SWORD));
+	    										  }
+	    									  }
+	    								  } else
+	    								  if (entity.getType()==EntityType.SKELETON) {
+	    									  if (Math.random()<=0.65) {
+	    										  if (Math.random()<=0.75) {
+	    											  ItemStack new_bow = new ItemStack(Material.BOW);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 2);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+	    											  l.getEquipment().setItemInHand(new_bow);
+	    										  } else {
+	    											  ItemStack new_bow = new ItemStack(Material.BOW);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 3);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+	    											  l.getEquipment().setItemInHand(new_bow);
+	    										  }
+	    									  }
+	    								  } else {
+	    									  if (Math.random()<=0.65) {
+	    										  if (Math.random()<=0.75) {
+	    											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,1));
+	    										  } else {
+	    											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,1));
+	    											  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,0));
+	    										  }
+	    									  }
+	    								  }
+	    								  if (Math.random()>=0.25) {
+	    									  if (Math.random()<=0.75) {
+	    										  l.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+	    									  } else {
+	    										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+	    									  }
+	    									  if (Math.random()>=0.45) {
+	    										  if (Math.random()<=0.75) {
+	    										  l.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+	    										  } else {
+	    											  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+	    										  }
+	    										  if (Math.random()>=0.65) {
+	    											  if (Math.random()<=0.75) {
+	    											  l.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+	    											  } else {
+	    												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+	    											  }
+	    											  if (Math.random()>=0.95) {
+	    												  if (Math.random()<=0.75) {
+	    												  l.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
+	    												  } else {
+	    													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+	    												  }
+	    											  }
+	    										  }
+	    									  }
+	    								  }
+	    							  }
+	    						  } else
+	    						  if (totallvs<120*levelsmult) {
+	    							  //Wear diamond armor a bit more often. Sometimes an enchanted diamond piece here or there. Include a Golden sword sometimes, a diamond one usually.
+	    							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
+	    								  LivingEntity l = (LivingEntity) entity;
+	    								  if (entity.getType()==EntityType.ZOMBIE) {
+	    									  if (Math.random()<=0.65) {
+	    										  if (Math.random()<=0.75) {
+	    											  l.getEquipment().setItemInHand(new ItemStack(Material.DIAMOND_SWORD));
+	    										  } else {
+	    											  l.getEquipment().setItemInHand(new ItemStack(Material.GOLD_SWORD));
+	    										  }
+	    									  }
+	    								  } else
+	    								  if (entity.getType()==EntityType.SKELETON) {
+	    									  if (Math.random()<=0.65) {
+	    										  if (Math.random()<=0.75) {
+	    											  ItemStack new_bow = new ItemStack(Material.BOW);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 3);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+	    											  l.getEquipment().setItemInHand(new_bow);
+	    										  } else {
+	    											  ItemStack new_bow = new ItemStack(Material.BOW);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 4);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);
+	    											  l.getEquipment().setItemInHand(new_bow);
+	    										  }
+	    									  }
+	    								  } else {
+	    									  if (Math.random()<=0.65) {
+	    										  if (Math.random()<=0.75) {
+	    											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
+	    										  } else {
+	    											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
+	    											  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,0));
+	    										  }
+	    									  }
+	    								  }
+	    								  if (Math.random()>=0.25) {
+	    									  if (Math.random()<=0.75) {
+	    										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+	    									  } else {
+	    										  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
+	    										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
+	    										  l.getEquipment().setChestplate(enchanted);
+	    									  }
+	    									  if (Math.random()>=0.45) {
+	    										  if (Math.random()<=0.75) {
+	    										  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+	    										  } else {
+	    											  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
+	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
+	    											  l.getEquipment().setLeggings(enchanted);
+	    										  }
+	    										  if (Math.random()>=0.65) {
+	    											  if (Math.random()<=0.75) {
+	    											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+	    											  } else {
+	    												  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
+	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
+	    												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+	    											  }
+	    											  if (Math.random()>=0.95) {
+	    												  if (Math.random()<=0.75) {
+	    												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+	    												  } else {
+	    													  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
+	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
+	    													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+	    												  }
+	    											  }
+	    										  }
+	    									  }
+	    								  }
+	    							  }
+	    						  } else
+	    							  if (totallvs<140*levelsmult) {
+	    							  //Well dang, your party's huge and OP.
+	    							//Wear diamond armor almost always. Enchanted diamond pieces here and there.
+	    							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
+	    								  LivingEntity l = (LivingEntity) entity;
+	    								  if (entity.getType()==EntityType.ZOMBIE) {
+	    									  if (Math.random()<=0.80) {
+	    										  if (Math.random()<=0.75) {
+	    											  ItemStack enchanted = new ItemStack(Material.DIAMOND_SWORD);
+	    											  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*2.0d)+1);
+	    											  if (Math.random()<=0.5) {
+	    												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
+	    											  } else {
+	    												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*2.0d)+1);
+	    											  }
+	    											  l.getEquipment().setItemInHand(enchanted);
+	    										  } else {
+	    											  ItemStack enchanted = new ItemStack(Material.GOLD_SWORD);
+	    											  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*2.0d)+1);
+	    											  if (Math.random()<=0.5) {
+	    												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
+	    											  } else {
+	    												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*4.0d)+1);
+	    											  }
+	    											  l.getEquipment().setItemInHand(enchanted);
+	    										  }
+	    									  }
+	    								  } else
+	    								  if (entity.getType()==EntityType.SKELETON) {
+	    									  if (Math.random()<=0.65) {
+	    										  if (Math.random()<=0.75) {
+	    											  ItemStack new_bow = new ItemStack(Material.BOW);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 5);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);
+	    											  l.getEquipment().setItemInHand(new_bow);
+	    										  } else {
+	    											  ItemStack new_bow = new ItemStack(Material.BOW);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 4);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 2);
+	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 2);
+	    											  l.getEquipment().setItemInHand(new_bow);
+	    										  }
+	    									  }
+	    								  } else {
+	    									  if (Math.random()<=0.65) {
+	    										  if (Math.random()<=0.75) {
+	    											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
+	    											  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,0));
+	    										  } else {
+	    											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
+	    											  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,1));
+	    											  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,0));
+	    										  }
+	    									  }
+	    								  }
+	    								  if (Math.random()>=0.25) {
+	    									  if (Math.random()<=0.75) {
+	    										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+	    									  } else {
+	    										  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
+	    										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
+	    										  if (Math.random()<=0.5) {
+	    											  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*1.0d)+1);
+	    										  }
+	    										  l.getEquipment().setChestplate(enchanted);
+	    									  }
+	    									  if (Math.random()>=0.45) {
+	    										  if (Math.random()<=0.75) {
+	    										  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+	    										  } else {
+	    											  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
+	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
+	    											  if (Math.random()<=0.5) {
+	    												  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
+	    											  }
+	    											  l.getEquipment().setLeggings(enchanted);
+	    										  }
+	    										  if (Math.random()>=0.65) {
+	    											  if (Math.random()<=0.75) {
+	    											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+	    											  } else {
+	    												  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
+	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
+	    												  if (Math.random()<=0.5) {
+	    													  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
+	    												  }
+	    												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+	    											  }
+	    											  if (Math.random()>=0.95) {
+	    												  if (Math.random()<=0.75) {
+	    												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+	    												  } else {
+	    													  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
+	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
+	    													  if (Math.random()<=0.5) {
+	    														  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
+	    													  }
+	    													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+	    												  }
+	    											  }
+	    										  }
+	    									  }
+	    								  }
+	    							  }
+	    						  } else
+	    						  if (totallvs<200*levelsmult) {
+	    							  //Well dang, your party's huge and OP.
+	    							//Wear diamond armor almost always. Enchanted diamond pieces here and there.
+	    							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
+	    								  LivingEntity l = (LivingEntity) entity;
+	    								  if (entity.getType()==EntityType.ZOMBIE) {
+	    									  if (Math.random()<=0.80) {
+	    										  if (Math.random()<=0.75) {
+	    											  ItemStack enchanted = new ItemStack(Material.DIAMOND_SWORD);
+	    											  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
+	    											  if (Math.random()<=0.5) {
+	    												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*3.0d)+1);
+	    											  } else {
+	    												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*2.0d)+1);
+	    											  }
+	    											  l.getEquipment().setItemInHand(enchanted);
+	    										  } else {
+	    											  ItemStack enchanted = new ItemStack(Material.GOLD_SWORD);
+	    											  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
+	    											  if (Math.random()<=0.5) {
+	    												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*3.0d)+1);
+	    											  } else {
+	    												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*2.0d)+1);
+	    											  }
+	    											  l.getEquipment().setItemInHand(enchanted);
+	    										  }
+	    									  }
+	    								  } else
+	    									  if (entity.getType()==EntityType.SKELETON) {
+	    										  if (Math.random()<=0.65) {
+	    											  if (Math.random()<=0.75) {
+	    												  ItemStack new_bow = new ItemStack(Material.BOW);
+	    												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 5);
+	    												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+	    												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 2);
+	    												  l.getEquipment().setItemInHand(new_bow);
+	    											  } else {
+	    												  ItemStack new_bow = new ItemStack(Material.BOW);
+	    												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 6);
+	    												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 2);
+	    												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 3);
+	    												  l.getEquipment().setItemInHand(new_bow);
+	    											  }
+	    										  }
+	    									  } else {
+	    										  if (Math.random()<=0.65) {
+	    											  if (Math.random()<=0.75) {
+	    												  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,3));
+	    												  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,2));
+	    												  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,1));
+	    											  } else {
+	    												  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,4));
+	    												  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,2));
+	    												  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,1));
+	    											  }
+	    										  }
+	    									  }
+	    								  if (Math.random()>=0.25) {
+	    									  if (Math.random()<=0.75) {
+	    										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+	    									  } else {
+	    										  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
+	    										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*3.0d)+1);
+	    										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*3.0d)+1);
+	    										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*3.0d)+1);
+	    										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
+	    										  if (Math.random()<=0.5) {
+	    											  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
+	    										  }
+	    										  l.getEquipment().setChestplate(enchanted);
+	    									  }
+	    									  if (Math.random()>=0.45) {
+	    										  if (Math.random()<=0.75) {
+	    										  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+	    										  } else {
+	    											  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
+	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
+	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*2.0d)+1);
+	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
+	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
+	    											  if (Math.random()<=0.5) {
+	    												  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
+	    											  }
+	    											  l.getEquipment().setLeggings(enchanted);
+	    										  }
+	    										  if (Math.random()>=0.65) {
+	    											  if (Math.random()<=0.75) {
+	    											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+	    											  } else {
+	    												  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
+	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*2.0d)+1);
+	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
+	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
+	    												  if (Math.random()<=0.5) {
+	    													  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
+	    												  }
+	    												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+	    											  }
+	    											  if (Math.random()>=0.95) {
+	    												  if (Math.random()<=0.75) {
+	    												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+	    												  } else {
+	    													  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
+	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
+	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
+	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
+	    													  if (Math.random()<=0.5) {
+	    														  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
+	    													  }
+	    													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+	    												  }
+	    											  }
+	    										  }
+	    									  }
+	    								  }
+	    							  }
+	    						  }
+	    						  else {
+	    							  //Time to give it our all.
+	    							//Well dang, your party's huge and OP.
+	    								//Wear diamond armor almost always. Enchanted diamond pieces here and there.
+	    								  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
+	    									  LivingEntity l = (LivingEntity) entity;
+	    									  //l.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,999999,1));
+	    									  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,1));
+	    									  l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,999999,0));
+	    									  l.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,0));
+	    									  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,0));
+	    									  //l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,1));
+	    									  if (entity.getType()==EntityType.ZOMBIE) {
+	    										  if (Math.random()<=0.80) {
+	    											  if (Math.random()<=0.75) {
+	    												  ItemStack enchanted = new ItemStack(Material.DIAMOND_SWORD);
+	    												  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
+	    												  if (Math.random()<=0.5) {
+	    													  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
+	    												  } else {
+	    													  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*3.0d)+1);
+	    												  }
+	    												  l.getEquipment().setItemInHand(enchanted);
+	    											  } else {
+	    												  ItemStack enchanted = new ItemStack(Material.GOLD_SWORD);
+	    												  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
+	    												  if (Math.random()<=0.5) {
+	    													  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
+	    												  } else {
+	    													  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*3.0d)+1);
+	    												  }
+	    												  l.getEquipment().setItemInHand(enchanted);
+	    											  }
+	    										  }
+	    									  }
+	    									  if (Math.random()>=0.25) {
+	    										  if (Math.random()<=0.75) {
+	    											  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+	    										  } else {
+	    											  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
+	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
+	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*4.0d)+1);
+	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*3.0d)+1);
+	    											  if (Math.random()<=0.5) {
+	    												  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
+	    											  }
+	    											  l.getEquipment().setChestplate(enchanted);
+	    										  }
+	    										  if (Math.random()>=0.45) {
+	    											  if (Math.random()<=0.75) {
+	    											  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+	    											  } else {
+	    												  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
+	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
+	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*3.0d)+1);
+	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
+	    												  if (Math.random()<=0.5) {
+	    													  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
+	    												  }
+	    												  l.getEquipment().setLeggings(enchanted);
+	    											  }
+	    											  if (Math.random()>=0.65) {
+	    												  if (Math.random()<=0.75) {
+	    												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+	    												  } else {
+	    													  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
+	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
+	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
+	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
+	    													  if (Math.random()<=0.5) {
+	    														  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
+	    													  }
+	    													  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+	    												  }
+	    												  if (Math.random()>=0.95) {
+	    													  if (Math.random()<=0.75) {
+	    													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+	    													  } else {
+	    														  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
+	    														  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+	    														  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
+	    														  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*4.0d)+1);
+	    														  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*4.0d)+1);
+	    														  if (Math.random()<=0.5) {
+	    															  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
+	    														  }
+	    														  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+	    													  }
+	    												  }
+	    											  }
+	    										  }
+	    									  }
+	    								  }
+	    						  }
+	    					  }
+	    				  }
+	    			  }
+	    			  //}
+	    			  /*
+	    			  double distancefromcity = Math.abs(1627-entity.getLocation().getX())+Math.abs((67-entity.getLocation().getY()))+Math.abs(-267-entity.getLocation().getZ());
+	    			  double chancer=1.0d, increasechancer = 0.5d, despawnchancer = 32.0d;
+	    			  if (distancefromcity>50000) {
+	    				  chancer = 0.5d;
+	    				  increasechancer=0.25d;
+	    				  despawnchancer = 16.0d;
+	    			  } else 
+	    			  if (distancefromcity>20000) {
+	    				  chancer = 0.5d;
+	    				  increasechancer=0.5d;
+	    				  despawnchancer = 16.0d;
+	    			  } else 
+	    			  if (distancefromcity>10000) {
+	    				  chancer = 0.5d;
+	    				  increasechancer=1.0d;
+	    				  despawnchancer = 4.0d;
+	    			  } else 
+	    			  if (distancefromcity>4000) {
+	    				  chancer = 1.0d;
+	    				  increasechancer=4.0d;
+	    				  despawnchancer = 2.0d;
+	    			  } else 
+	    			  if (distancefromcity>2000) {
+	    				  chancer = 2.0d;
+	    				  increasechancer=8.0d;
+	    				  despawnchancer = 1.25d;
+	    			  } else 
+	    			  if (distancefromcity>1000) {
+	    				  chancer = 2.0d;
+	    				  increasechancer=16.0d;
+	    				  despawnchancer = 1.25d;
+	    			  } else 
+	    			  if (distancefromcity>400) {
+	    				  chancer = 16.0d;
+	    				  increasechancer = 32.0d;
+	    				  despawnchancer = 1.125d;
+	    			  } else {
+	    				  chancer = 32.0d;
+	    				  increasechancer = 64.0d;
+	    				  despawnchancer = 1.025d;
+	    			  }
+	    			  if (entity.getLocation().getY()>62) {
+	    				  despawnchancer/=Math.random()*16.0d+1.0d;
+	    			  }
+	    			  if (entity.getLocation().getY()<50) {
+	    				  chancer/=1.5d;
+	    				  if (chancer<0.5d) {
+	    					  chancer=0.5d;
+	    				  }
+	    				  for (int i=50;i>entity.getLocation().getY();i--) {
+	    					  increasechancer/=1.03d;
+	    					  despawnchancer*=1.03d;
+	    				  }
+	    				  if (increasechancer<0.01d) {
+	    					  increasechancer=0.01d;
+	    				  }
+	    			  }
+	    			  EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
+	    			  boolean contains=entity instanceof Monster
+	    			  for (int i=0;i<allowedtypes.length;i++) {
+	    				  if (entity.getType()==allowedtypes[i]) {
+	    					  contains=true;
+	    					  break;
+	    				  }
+	    			  }
+	    			  if (entity.getType()==EntityType.ZOMBIE || entity.getType()==EntityType.PIG_ZOMBIE || entity.getType()==EntityType.SKELETON) {
+	    				  LivingEntity l = (LivingEntity)entity;
+	    				  EntityEquipment inven = l.getEquipment();
+	    				  if (inven!=null) {
+	    					  if (distancefromcity<2000) {
+	    						  if (entity.getType()==EntityType.ZOMBIE) {
+	    							  Zombie zomb = (Zombie)l;
+	    							  if (zomb.isBaby()) {
+	    								  zomb.setBaby(false);
+	    							  }
+	    						  }
+	    						  if (inven.getItemInHand()!=null && inven.getItemInHand().getType()==Material.DIAMOND_SWORD ||
+	    								  inven.getItemInHand().getType()==Material.GOLD_SWORD ||
+	    								  inven.getItemInHand().getType()==Material.IRON_SWORD) {
+	    							  inven.setItemInHand(new ItemStack(Material.WOOD_SWORD));
+	    						  }
+	    						  if (inven.getChestplate()!=null && inven.getChestplate().getType()==Material.DIAMOND_CHESTPLATE ||
+	    								  inven.getChestplate().getType()==Material.GOLD_CHESTPLATE ||
+	    								  inven.getChestplate().getType()==Material.IRON_CHESTPLATE ||
+	    								  inven.getChestplate().getType()==Material.CHAINMAIL_CHESTPLATE) {
+	    							  inven.setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
+	    						  }
+	    						  if (inven.getLeggings()!=null && inven.getLeggings().getType()==Material.DIAMOND_LEGGINGS ||
+	    								  inven.getLeggings().getType()==Material.GOLD_LEGGINGS ||
+	    								  inven.getLeggings().getType()==Material.IRON_LEGGINGS ||
+	    								  inven.getLeggings().getType()==Material.CHAINMAIL_LEGGINGS) {
+	    							  inven.setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
+	    						  }
+	    						  if (inven.getBoots()!=null && inven.getBoots().getType()==Material.DIAMOND_BOOTS ||
+	    								  inven.getBoots().getType()==Material.GOLD_BOOTS ||
+	    								  inven.getBoots().getType()==Material.IRON_BOOTS ||
+	    								  inven.getBoots().getType()==Material.CHAINMAIL_BOOTS) {
+	    							  inven.setBoots(new ItemStack(Material.LEATHER_BOOTS));
+	    						  }
+	    						  if (inven.getHelmet()!=null && inven.getHelmet().getType()==Material.DIAMOND_HELMET ||
+	    								  inven.getHelmet().getType()==Material.GOLD_HELMET ||
+	    								  inven.getHelmet().getType()==Material.IRON_HELMET ||
+	    								  inven.getHelmet().getType()==Material.CHAINMAIL_HELMET) {
+	    							  inven.setHelmet(new ItemStack(Material.LEATHER_HELMET));
+	    						  }
+	    					  }
+	    					  else if (distancefromcity<8000) {
+	    						  if (entity.getType()==EntityType.ZOMBIE) {
+	    							  Zombie zomb = (Zombie)l;
+	    							  if (zomb.isBaby()) {
+	    								  zomb.setBaby(false);
+	    							  }
+	    						  }
+	    						  if (inven.getItemInHand()!=null && inven.getItemInHand().getType()==Material.DIAMOND_SWORD ||
+	    								  inven.getItemInHand().getType()==Material.GOLD_SWORD) {
+	    							  inven.setItemInHand(new ItemStack(Material.IRON_SWORD));
+	    						  }
+	    						  if (inven.getChestplate()!=null && inven.getChestplate().getType()==Material.DIAMOND_CHESTPLATE) {
+	    							  inven.setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+	    						  }
+	    						  if (inven.getLeggings()!=null && inven.getLeggings().getType()==Material.DIAMOND_LEGGINGS) {
+	    							  inven.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+	    						  }
+	    						  if (inven.getBoots()!=null && inven.getBoots().getType()==Material.DIAMOND_BOOTS) {
+	    							  inven.setBoots(new ItemStack(Material.IRON_BOOTS));
+	    						  }
+	    						  if (inven.getHelmet()!=null && inven.getHelmet().getType()==Material.DIAMOND_HELMET) {
+	    							  inven.setHelmet(new ItemStack(Material.IRON_HELMET));
+	    						  }
+	    					  }
+	    				  }
+	    			  }
+	    			  //Get the torches/glowstone/mob spawners around this entity.
+	    			  int torches=0,glowstone=0,spawners=0;
+	    			  for (int x=-5;x<5;x++) {
+	    				  for (int y=-5;y<5;y++) {
+	    					  for (int z=-5;z<5;z++) {
+	    						  Block test = entity.getWorld().getBlockAt(entity.getLocation().add(x,y,z));
+	    						  if (test.getType()==Material.TORCH) {
+	    							  torches++;
+	    						  } else
+	    						  if (test.getType()==Material.GLOWSTONE) {
+	    							  glowstone++;
+	    						  } else
+	    						  if (test.getType()==Material.MOB_SPAWNER) {
+	    							  spawners++;
+	    						  }
+	    					  }
+	    				  }
+	    			  }
+	    			  //Bukkit.getPlayer("sigonasr2").sendMessage(entity.getType()+": Found "+torches+" torches, "+glowstone+" glowstone, "+spawners+" spawners around me.");
+	    			  if (contains && (Math.random()*despawnchancer<1.0d || (torches+glowstone>=3)) && spawners==0 && entity.getNearbyEntities(5, 5, 5).size()<50) {
+	    				  //if (e.getSpawnReason()!=SpawnReason.CUSTOM && e.getLocation().getBlockY()!=Bukkit.getPlayer("AaMay").getLocation().getBlockY()) {
+	    				  entity.remove();
+	    				  e.setCancelled(true);
+	    				  //}
+	    				  //Bukkit.getPlayer("sigonasr2").sendMessage(entity.getType()+" prevented from spawning.");
+	    			  }
+	    			  if (contains && (Main.SERVER_TICK_TIME-this.plugin.last_mob_random_time>10 || this.plugin.last_mob_random_time==0) && Math.random()*chancer<1.0d) {
+	    				  this.plugin.last_mob_random_time=Main.SERVER_TICK_TIME;
+	    				  Location testloc = entity.getLocation().add(Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d);
+	    				  if (Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR) {
+	    					  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
+	    					  /*int j=0;
+	    					  while (j<10) {
+	    						  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
+	    						  j++;
+	    					  }*/
+	    			  /*
+	    				  }
+	    				  while (Math.random()*chancer<1.0d) {
+	    					  chancer+=increasechancer;
+	    					  testloc = entity.getLocation().add(Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d);
+	    					  if (Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR && Bukkit.getWorld("world").getBlockAt(testloc.add(0,1,0)).getType()==Material.AIR) {
+	    						  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
+	    						  /*int j=0;
+	    						  while (j<10) {
+	    							  Bukkit.getWorld("world").spawnEntity(entity.getLocation().add(Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d), entity.getType());
+	    							  j++;
+	    						  }*/
+	    					/*  }
+	    				  }
+	    			  }
+	    	  		*/
+	    			  
+	    		  }
+	    	  }
+	      }
+	  	},1);
 	  if (entity.getWorld().getName().compareTo("world_nether")==0) {
 		  if (entity.getType()==EntityType.PIG_ZOMBIE) {
 			  if (Math.random()<=0.005) {
@@ -3265,6 +3271,12 @@ public class PlayerListener
 	  //p.sendMessage("Has name: "+p.getItemInHand().getItemMeta().hasDisplayName());
 	  //p.sendMessage("Name is: "+p.getItemInHand().getItemMeta().getDisplayName());
 	  int myData=this.plugin.getPlayerDataSlot(p);
+	  boolean has_silktouch=false;
+	  if (!p.getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH)) {
+		  has_silktouch=false;
+	  } else {
+		  has_silktouch=true;
+	  }
 	  if (p!=null) {
 		  if (e.getBlock().getType()==Material.COMMAND) {
 			  e.setCancelled(true);
@@ -3507,12 +3519,6 @@ public class PlayerListener
 					  }
 				  }
 			  }
-			  boolean has_silktouch=false;
-			  if (!p.getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH)) {
-				  has_silktouch=false;
-			  } else {
-				  has_silktouch=true;
-			  }
 			  if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
 				  if (e.getBlock().getType()==Material.STONE) {
 					  this.plugin.gainMoneyExp(p,"Miner",0.0025,1);
@@ -3659,24 +3665,6 @@ public class PlayerListener
 				  }
 			  }
 		  }
-		  if (e.getBlock().getType()==Material.IRON_ORE) {
-			  e.setExpToDrop(1);
-		  }
-		  if (e.getBlock().getType()==Material.GOLD_ORE) {
-			  e.setExpToDrop(1);
-		  }
-		  if (e.getBlock().getType()==Material.REDSTONE_ORE) {
-			  e.setExpToDrop(3);
-		  }
-		  if (e.getBlock().getType()==Material.LAPIS_ORE) {
-			  e.setExpToDrop(3);
-		  }
-		  if (e.getBlock().getType()==Material.DIAMOND_ORE) {
-			  e.setExpToDrop(12);
-		  }
-		  if (e.getBlock().getType()==Material.EMERALD_ORE) {
-			  e.setExpToDrop(28);
-		  }
 		  if (e.getBlock().getType()==Material.MOB_SPAWNER) {
 			  p.setLevel(p.getLevel()+30);
 			try {
@@ -3684,7 +3672,7 @@ public class PlayerListener
 					//Figure out potion effects when player joins.
 					while (effects.hasNext()) {
 						PotionEffect nexteffect = effects.next();
-						if (nexteffect.getType().getName().compareTo(PotionEffectType.SPEED.getName())==0) {
+						if (nexteffect.getType().getName().compareTo(PotionEffectType.SPEED.getName())==0 && nexteffect.getAmplifier()<4) {
 							p.removePotionEffect(PotionEffectType.SPEED);
 							p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 360000, nexteffect.getAmplifier()+2, true));
 						}
@@ -3736,6 +3724,88 @@ public class PlayerListener
 			  //p.sendMessage("Got in.");
 			  p.updateInventory();
 		  }
+	  }
+	  Material[] fortune_materials = {Material.EMERALD_ORE,Material.COAL_ORE,Material.DIAMOND_ORE,Material.REDSTONE_ORE,Material.LAPIS_ORE,Material.QUARTZ_ORE}; //An array of all blocks that multiply via fortune.
+	  Material[] result_materials = {Material.EMERALD,Material.COAL,Material.DIAMOND,Material.REDSTONE,Material.INK_SACK,Material.QUARTZ}; //The resulting materials corresponding to the fortune blocks being broken.
+	  boolean fortune_material=false;
+	  int fortune_material_slot=0;
+	  for (int i=0;i<fortune_materials.length;i++) {
+		  if (fortune_materials[i].equals(e.getBlock().getType())) {
+			  fortune_material=true;
+			  fortune_material_slot=i;
+			  break;
+		  }
+	  }
+	  if (!has_silktouch) {
+		  if (e.getBlock().getType()==Material.IRON_ORE) {
+			  ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
+			  exp.setExperience(1);
+		  }
+		  if (e.getBlock().getType()==Material.GOLD_ORE) {
+			  ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
+			  exp.setExperience(1);
+		  }
+		  if (e.getBlock().getType()==Material.REDSTONE_ORE) {
+			  ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
+			  exp.setExperience(3);
+		  }
+		  if (e.getBlock().getType()==Material.LAPIS_ORE) {
+			  ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
+			  exp.setExperience(3);
+		  }
+		  if (e.getBlock().getType()==Material.DIAMOND_ORE) {
+			  ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
+			  exp.setExperience(12);
+		  }
+		  if (e.getBlock().getType()==Material.EMERALD_ORE) {
+			  ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
+			  exp.setExperience(28);
+		  }
+		  if (e.getBlock().getType()==Material.QUARTZ_ORE) {
+			  ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
+			  exp.setExperience(4);
+		  }
+	  }
+	  if (p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)>0) { //Check if the player has fortune.
+		  if (fortune_material) { //If this is a fortune material, we have to account for the new fortune enchantment algorithm.
+			  e.setCancelled(true);
+			  e.getPlayer().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
+			  int fortune_level = p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
+			  int drop_chance=50;
+			  for (int i=1;i<fortune_level;i++) {
+				  drop_chance += (100-drop_chance)/2;
+			  }
+			  boolean drop_extra=false;
+			  if (Math.random()*100d<=drop_chance) {
+				  drop_extra=true;
+			  }
+			  if (result_materials[fortune_material_slot]!=Material.REDSTONE &&
+					  result_materials[fortune_material_slot]!=Material.INK_SACK) {
+				  //This is an item that actually just drops one of per ore. Drop normally.
+				  e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(result_materials[fortune_material_slot],(drop_extra)?2:1));
+			  } else {
+				  if (result_materials[fortune_material_slot]==Material.REDSTONE) { //Drop redstone
+					  e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(result_materials[fortune_material_slot],(drop_extra)?(((int)(Math.random()*2))+4)*2:((int)(Math.random()*2))+4));
+				  } else {//Drop Lapis.
+					  Item lapis = e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(result_materials[fortune_material_slot],(drop_extra)?(((int)(Math.random()*5))+4)*2:((int)(Math.random()*5))+4,(byte)4));
+				  }
+			  }
+		  }
+	  }
+	  if (e.getBlock().getType()==Material.IRON_ORE && !has_silktouch) {
+		  e.setCancelled(true);
+		  e.getPlayer().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
+		  e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(Material.IRON_INGOT));
+	  }
+	  if (e.getBlock().getType()==Material.GOLD_ORE && !has_silktouch) {
+		  e.setCancelled(true);
+		  e.getPlayer().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
+		  e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(Material.GOLD_INGOT));
+	  }
+	  if (e.getBlock().getType()==Material.MELON_BLOCK) {
+		  e.setCancelled(true);
+		  e.getPlayer().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
+		  e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(Material.MELON_BLOCK));
 	  }
 	  return;
   }
@@ -3794,7 +3864,7 @@ public class PlayerListener
 	  if (e.getItem().getType()==Material.MILK_BUCKET) {
 		  for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
 			  if (this.plugin.SPEED_CONTROL.get(i).p.getName().equalsIgnoreCase(p.getName())) {
-				  this.plugin.SPEED_CONTROL.get(i).potion_time=Bukkit.getWorld("world").getFullTime();
+				  this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME;
 				  this.plugin.SPEED_CONTROL.get(i).potion_spdlv=0;
 				  break;
 			  }
@@ -3809,12 +3879,12 @@ public class PlayerListener
 				  if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
 					  this.plugin.SPEED_CONTROL.get(i).potion_spdlv=pot.getLevel();
 					  if (pot.hasExtendedDuration()) {
-						  this.plugin.SPEED_CONTROL.get(i).potion_time=Bukkit.getWorld("world").getFullTime()+4800;
+						  this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+4800;
 					  } else {
 						  if (pot.getLevel()==1) {
-							  this.plugin.SPEED_CONTROL.get(i).potion_time=Bukkit.getWorld("world").getFullTime()+2400;
+							  this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+2400;
 						  } else {
-							  this.plugin.SPEED_CONTROL.get(i).potion_time=Bukkit.getWorld("world").getFullTime()+1200;
+							  this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+1200;
 						  }
 					  }
 					  this.plugin.SPEED_CONTROL.get(i).updatePlayerSpd();
@@ -3870,7 +3940,7 @@ public class PlayerListener
 										  for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
 											  if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
 												  this.plugin.SPEED_CONTROL.get(i).potion_spdlv=nextpotioneffect.getAmplifier();
-												  this.plugin.SPEED_CONTROL.get(i).potion_time=Bukkit.getWorld("world").getFullTime()+nextpotioneffect.getDuration();
+												  this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+nextpotioneffect.getDuration();
 												  this.plugin.SPEED_CONTROL.get(i).updatePlayerSpd();
 											  }
 										  }
@@ -3922,7 +3992,7 @@ public class PlayerListener
 									  for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
 										  if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
 											  this.plugin.SPEED_CONTROL.get(i).potion_spdlv=nextpotioneffect.getAmplifier();
-											  this.plugin.SPEED_CONTROL.get(i).potion_time=Bukkit.getWorld("world").getFullTime()+nextpotioneffect.getDuration();
+											  this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+nextpotioneffect.getDuration();
 											  this.plugin.SPEED_CONTROL.get(i).updatePlayerSpd();
 										  }
 									  }
@@ -3965,7 +4035,7 @@ public class PlayerListener
 										  for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
 											  if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
 												  this.plugin.SPEED_CONTROL.get(i).potion_spdlv=nextpotioneffect.getAmplifier();
-												  this.plugin.SPEED_CONTROL.get(i).potion_time=Bukkit.getWorld("world").getFullTime()+nextpotioneffect.getDuration();
+												  this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+nextpotioneffect.getDuration();
 												  this.plugin.SPEED_CONTROL.get(i).updatePlayerSpd();
 											  }
 										  }
@@ -4016,7 +4086,7 @@ public class PlayerListener
 									  for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
 										  if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
 											  this.plugin.SPEED_CONTROL.get(i).potion_spdlv=nextpotioneffect.getAmplifier();
-											  this.plugin.SPEED_CONTROL.get(i).potion_time=Bukkit.getWorld("world").getFullTime()+nextpotioneffect.getDuration();
+											  this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+nextpotioneffect.getDuration();
 											  this.plugin.SPEED_CONTROL.get(i).updatePlayerSpd();
 										  }
 									  }
@@ -4049,6 +4119,9 @@ public class PlayerListener
   @EventHandler
   public void onItemPrepareCraft(PrepareItemCraftEvent e) {
 	  CraftingInventory result = e.getInventory();
+	  if (result.getResult().getType()==Material.MELON_BLOCK) {
+		  result.setResult(new ItemStack(Material.AIR));
+	  }
 	  if (result.getResult().getType()==Material.IRON_HELMET ||
 			  result.getResult().getType()==Material.IRON_CHESTPLATE ||
 			  result.getResult().getType()==Material.IRON_LEGGINGS ||
@@ -5198,20 +5271,35 @@ public ItemStack getGoodie() {
 		  int rand = (int)(Math.random()*5);
 		  String type = "";
 		  String type2 = "";
-		  int rarity=0; //0 = Normal, 1 = Rare, 2 = Legendary
-		  switch ((int)(Math.random()*7)) {
+		  int rarity=0; //0 = Normal, 1 = Rare, 2 = Legendary, 3 = Mythical
+		  switch ((int)(Math.random()*20)) {
 			  case 0:
 			  case 1:
 			  case 2:
 			  case 3:
-			  case 4:{
+			  case 4:
+			  case 10:
+			  case 11:
+			  case 7:
+			  case 8:
+			  case 9:
+			  case 12:
+			  case 13:
+			  case 18:{
 				  rarity=0;
 			  }break;
-			  case 5:{
+			  case 5:
+			  case 14:
+			  case 15:{
 				  rarity=1;
 			  }break;
-			  case 6:{
+			  case 6:
+			  case 16:
+			  case 17:{
 				  rarity=2;
+			  }break;
+			  case 19:{
+				  rarity=3;
 			  }break;
 		  }
 		  switch (rand) {
@@ -5293,6 +5381,11 @@ public ItemStack getGoodie() {
 			  int enchants[] = {48,49,50,51};
 			  for (int j=0;j<enchants.length;j++) {
 				  if (Math.random()*chance_increase<1.0d/enchants.length) {
+					  if (rarity==3) {
+						  if (Math.random()<=0.5) {
+							  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*20)+10+1);
+						  }
+					  } else
 					  if (rarity==2) {
 						  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*10)+1);
 					  } else {
@@ -5301,44 +5394,86 @@ public ItemStack getGoodie() {
 				  }
 			  }
 			  List<String> ourLore = new ArrayList<String>();
-			  if (Math.random()<=0.2) {
-				  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
-			  }
-			  if (Math.random()<=0.2) {
-				  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*3)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-			  }
-			  if (Math.random()<=0.2) {
-				  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Life Steal");
-			  }
-			  if (Math.random()<=0.2) {
-				  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-			  }
-			  if (Math.random()<=0.2) {
-				  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+1)+" "+ChatColor.BLUE+"Damage");
-			  }
-			  ItemMeta meta = item.getItemMeta();
-			  meta.setLore(ourLore);
-			  if (rarity==1) {
-				  meta.setDisplayName(ChatColor.BLUE+"Rare "+convertToItemName(item.getType().name().replace("_", " ")));
-			  }
+			  if (rarity==3) {
+				  int choice1=0;
+				  if (Math.random()<=0.2) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+20+1)+"% "+ChatColor.BLUE+"Critical Chance");
+				  } else
+				  if (Math.random()<=0.2) {
+					  choice1=1;
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+4+1)+" "+ChatColor.BLUE+"Armor Penetration");
+				  } else
+				  if (Math.random()<=0.2) {
+					  choice1=2;
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+20+1)+"% "+ChatColor.BLUE+"Life Steal");
+				  } else
+				  if (Math.random()<=0.2) {
+					  choice1=3;
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*180)+60+1)+"% "+ChatColor.BLUE+"Attack Speed");
+				  } else {
+					  choice1=4;
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+10+1)+" "+ChatColor.BLUE+"Damage");
+				  }
+			  } else
 			  if (rarity==2) {
-				  meta.setDisplayName(ChatColor.YELLOW+""+ChatColor.BOLD+"Legendary "+convertToItemName(item.getType().name().replace("_", " ")));
-			  }
-			  item.setItemMeta(meta);
-		  } else {
-			  item = new ItemStack(Material.getMaterial(type+"_"+type2));
-			  if (type2.equalsIgnoreCase("SWORD")) {
-				  int enchants[] = {16,17,18,19,20,21,34};
-				  for (int j=0;j<enchants.length;j++) {
-					  if (Math.random()*chance_increase<1.0d/enchants.length) {
-						  if (rarity==2) {
-							  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*10)+1);
-						  } else {
-							  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*6)+1);
-						  }
+				  int choice1=0;
+				  if (Math.random()<=0.2) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+				  } else
+				  if (Math.random()<=0.2) {
+					  choice1=1;
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*12)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+				  } else
+				  if (Math.random()<=0.2) {
+					  choice1=2;
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Life Steal");
+				  } else
+				  if (Math.random()<=0.2) {
+					  choice1=3;
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*120)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+				  } else {
+					  choice1=4;
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+" "+ChatColor.BLUE+"Damage");
+				  }
+			  } else
+			  if (rarity==1) {
+				  int choice1=0;
+				  if (Math.random()<=0.2) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+				  } else
+				  if (Math.random()<=0.2) {
+					  choice1=1;
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+				  } else
+				  if (Math.random()<=0.2) {
+					  choice1=2;
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
+				  } else
+				  if (Math.random()<=0.2) {
+					  choice1=3;
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+				  } else {
+					  choice1=4;
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
+				  }
+				  if (Math.random()<=0.2 && choice1!=0) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+				  } else
+				  if (Math.random()<=0.2 && choice1!=1) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+				  } else
+				  if (Math.random()<=0.2 && choice1!=2) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
+				  } else
+				  if (Math.random()<=0.2 && choice1!=3) {
+					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+				  } else {
+					  if (choice1!=4) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
 					  }
 				  }
-				  List<String> ourLore = new ArrayList<String>();
+			  }
+			  else {
 				  if (Math.random()<=0.2) {
 					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
 				  }
@@ -5354,6 +5489,134 @@ public ItemStack getGoodie() {
 				  if (Math.random()<=0.2) {
 					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+1)+" "+ChatColor.BLUE+"Damage");
 				  }
+			  }
+			  ItemMeta meta = item.getItemMeta();
+			  meta.setLore(ourLore);
+			  if (rarity==1) {
+				  meta.setDisplayName(ChatColor.BLUE+"Rare "+convertToItemName(item.getType().name().replace("_", " ")));
+			  }
+			  if (rarity==2) {
+				  meta.setDisplayName(ChatColor.YELLOW+""+ChatColor.BOLD+"Legendary "+convertToItemName(item.getType().name().replace("_", " ")));
+			  }
+			  if (rarity==3) {
+				  meta.setDisplayName(ChatColor.LIGHT_PURPLE+""+"Mythical "+convertToItemName(item.getType().name().replace("_", " ")));
+			  }
+			  item.setItemMeta(meta);
+		  } else {
+			  item = new ItemStack(Material.getMaterial(type+"_"+type2));
+			  if (type2.equalsIgnoreCase("SWORD")) {
+				  int enchants[] = {16,17,18,19,20,21,34};
+				  for (int j=0;j<enchants.length;j++) {
+					  if (Math.random()*chance_increase<1.0d/enchants.length) {
+						  if (rarity==3) {
+							  if (Math.random()<=0.5) {
+								  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*20)+10+1);
+							  }
+						  } else
+						  if (rarity==2) {
+							  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*10)+1);
+						  } else {
+							  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*6)+1);
+						  }
+					  }
+				  }
+				  List<String> ourLore = new ArrayList<String>();
+				  if (rarity==3) {
+					  int choice1=0;
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+20+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=1;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+4+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=2;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+20+1)+"% "+ChatColor.BLUE+"Life Steal");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=3;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*180)+60+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					  } else {
+						  choice1=4;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+10+1)+" "+ChatColor.BLUE+"Damage");
+					  }
+				  } else
+				  if (rarity==2) {
+					  int choice1=0;
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=1;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*12)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=2;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Life Steal");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=3;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*120)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					  } else {
+						  choice1=4;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+" "+ChatColor.BLUE+"Damage");
+					  }
+				  } else
+				  if (rarity==1) {
+					  int choice1=0;
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=1;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=2;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=3;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					  } else {
+						  choice1=4;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
+					  }
+					  if (Math.random()<=0.2 && choice1!=0) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					  } else
+					  if (Math.random()<=0.2 && choice1!=1) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					  } else
+					  if (Math.random()<=0.2 && choice1!=2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
+					  } else
+					  if (Math.random()<=0.2 && choice1!=3) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					  } else {
+						  if (choice1!=4) {
+							  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
+						  }
+					  }
+				  }
+				  else {
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*3)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Life Steal");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+1)+" "+ChatColor.BLUE+"Damage");
+					  }
+				  }
 				  ItemMeta meta = item.getItemMeta();
 				  meta.setLore(ourLore);
 				  if (rarity==1) {
@@ -5362,6 +5625,9 @@ public ItemStack getGoodie() {
 				  if (rarity==2) {
 					  meta.setDisplayName(ChatColor.YELLOW+""+ChatColor.BOLD+"Legendary "+convertToItemName(item.getType().name().replace("_", " ")));
 				  }
+				  if (rarity==3) {
+					  meta.setDisplayName(ChatColor.LIGHT_PURPLE+""+"Mythical "+convertToItemName(item.getType().name().replace("_", " ")));
+				  }
 				  item.setItemMeta(meta);
 			  } else if (type2.equalsIgnoreCase("SPADE") || type2.equalsIgnoreCase("PICKAXE") || type2.equalsIgnoreCase("HOE") || type2.equalsIgnoreCase("AXE")) {
 				  int enchants[] = {32,33,34,35};
@@ -5369,6 +5635,11 @@ public ItemStack getGoodie() {
 					  if (Math.random()<1.0d/enchants.length) {
 						  if (Math.random()<1.0d/enchants.length) {
 							  if (Math.random()*chance_increase<1.0d/enchants.length) {
+								  if (rarity==3) {
+									  if (Math.random()<=0.5) {
+										  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*20)+10+1);
+									  }
+								  } else
 								  if (rarity==2) {
 									  if (enchants[j]==33) {
 										  if (item.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)==0) {
@@ -5397,20 +5668,101 @@ public ItemStack getGoodie() {
 					  }
 				  }
 				  List<String> ourLore = new ArrayList<String>();
-				  if (Math.random()<=0.2) {
-					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+				  if (rarity==3) {
+					  int choice1=0;
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+20+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=1;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+4+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=2;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+20+1)+"% "+ChatColor.BLUE+"Life Steal");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=3;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*180)+60+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					  } else {
+						  choice1=4;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+10+1)+" "+ChatColor.BLUE+"Damage");
+					  }
+				  } else
+				  if (rarity==2) {
+					  int choice1=0;
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=1;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*12)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=2;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Life Steal");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=3;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*120)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					  } else {
+						  choice1=4;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+" "+ChatColor.BLUE+"Damage");
+					  }
+				  } else
+				  if (rarity==1) {
+					  int choice1=0;
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=1;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=2;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
+					  } else
+					  if (Math.random()<=0.2) {
+						  choice1=3;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					  } else {
+						  choice1=4;
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
+					  }
+					  if (Math.random()<=0.2 && choice1!=0) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					  } else
+					  if (Math.random()<=0.2 && choice1!=1) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					  } else
+					  if (Math.random()<=0.2 && choice1!=2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
+					  } else
+					  if (Math.random()<=0.2 && choice1!=3) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					  } else {
+						  if (choice1!=4) {
+							  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
+						  }
+					  }
 				  }
-				  if (Math.random()<=0.2) {
-					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*3)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-				  }
-				  if (Math.random()<=0.2) {
-					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Life Steal");
-				  }
-				  if (Math.random()<=0.2) {
-					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-				  }
-				  if (Math.random()<=0.2) {
-					  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+1)+" "+ChatColor.BLUE+"Damage");
+				  else {
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*3)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Life Steal");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					  }
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+1)+" "+ChatColor.BLUE+"Damage");
+					  }
 				  }
 				  ItemMeta meta = item.getItemMeta();
 				  meta.setLore(ourLore);
@@ -5420,11 +5772,19 @@ public ItemStack getGoodie() {
 				  if (rarity==2) {
 					  meta.setDisplayName(ChatColor.YELLOW+""+ChatColor.BOLD+"Legendary "+convertToItemName(item.getType().name().replace("_", " ")));
 				  }
+				  if (rarity==3) {
+					  meta.setDisplayName(ChatColor.LIGHT_PURPLE+""+"Mythical "+convertToItemName(item.getType().name().replace("_", " ")));
+				  }
 				  item.setItemMeta(meta);
 			  } else {
 				  int enchants[] = {0,1,2,3,4,5,6,7,34};
 				  for (int j=0;j<enchants.length;j++) {
 					  if (Math.random()<1.0d/enchants.length) {
+						  if (rarity==3) {
+							  if (Math.random()<=0.5) {
+								  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*20)+10+1);
+							  }
+						  } else
 						  if (rarity==2) {
 							  item.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*10)+1);
 						  } else {
@@ -5433,6 +5793,23 @@ public ItemStack getGoodie() {
 					  }
 				  }
 				  List<String> ourLore = new ArrayList<String>();
+				  if (rarity==3) { 
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*48)+16+1)+" "+ChatColor.BLUE+"Health");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+20+1)+"% "+ChatColor.BLUE+"Damage Reduction");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*400)+100+1)*10)+"% "+ChatColor.BLUE+"Durability");
+					  } else
+					  if (Math.random()<=0.2) {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+10+1)+"% "+ChatColor.BLUE+"Block Chance");
+					  } else
+					  {
+						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*70)+20+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
+					  }
+				  } else 
 				  if (rarity==2) { 
 					  if (Math.random()<=0.2) {
 						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*16)+1)+" "+ChatColor.BLUE+"Health");
@@ -5451,35 +5828,43 @@ public ItemStack getGoodie() {
 					  }
 				  } else 
 				  if (rarity==1) {
+					  int choice1=0;
 					  if (Math.random()<=0.2) {
+						  choice1=0;
 						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*8)+1)+" "+ChatColor.BLUE+"Health");
 					  } else
 					  if (Math.random()<=0.2) {
+						  choice1=1;
 						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Damage Reduction");
 					  } else
 					  if (Math.random()<=0.2) {
+						  choice1=2;
 						  ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*100)+1)*10)+"% "+ChatColor.BLUE+"Durability");
 					  } else
 					  if (Math.random()<=0.2) {
+						  choice1=3;
 						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Block Chance");
 					  } else
-					  {
+					  { 
+						  choice1=4;
 						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
 					  }
-					  if (Math.random()<=0.2) {
+					  if (Math.random()<=0.2 && choice1!=0) {
 						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*8)+1)+" "+ChatColor.BLUE+"Health");
 					  } else
-					  if (Math.random()<=0.2) {
+					  if (Math.random()<=0.2 && choice1!=1) {
 						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Damage Reduction");
 					  } else
-					  if (Math.random()<=0.2) {
+					  if (Math.random()<=0.2 && choice1!=2) {
 						  ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*100)+1)*10)+"% "+ChatColor.BLUE+"Durability");
 					  } else
-					  if (Math.random()<=0.2) {
+					  if (Math.random()<=0.2 && choice1!=3) {
 						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Block Chance");
 					  } else
 					  {
-						  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
+						  if (choice1!=4) {
+							  ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
+						  }
 					  }
 				  } else {
 					  if (Math.random()<=0.2) {
@@ -5506,36 +5891,48 @@ public ItemStack getGoodie() {
 				  if (rarity==2) {
 					  meta.setDisplayName(ChatColor.YELLOW+""+ChatColor.BOLD+"Legendary "+convertToItemName(item.getType().name().replace("_", " ")));
 				  }
+				  if (rarity==3) {
+					  meta.setDisplayName(ChatColor.LIGHT_PURPLE+""+"Mythical "+convertToItemName(item.getType().name().replace("_", " ")));
+				  }
 				  item.setItemMeta(meta);
 			  }
 		  }
 	  } else {
 		  //Add minerals.
-		  int rand = (int)(Math.random()*9);
+		  int rand = (int)(Math.random()*18);
 		  switch (rand) {
-			  case 0 :{
+			  case 0 :
+			  case 9:
+			  case 10:
+			  case 11:{
 				  item = new ItemStack(Material.IRON_INGOT,(int)(Math.random()*40)+20);
 			  }break;
 			  case 1 :{
-				  item = new ItemStack(Material.IRON_BLOCK,(int)(Math.random()*4)+2);
+				  item = new ItemStack(Material.IRON_BLOCK,(int)(Math.random()*2)+1);
 			  }break;
-			  case 2 :{
+			  case 2 :
+			  case 12:
+			  case 13:
+			  case 14:{
 				  item = new ItemStack(Material.GOLD_INGOT,(int)(Math.random()*20)+10);
 			  }break;
 			  case 3 :{
-				  item = new ItemStack(Material.GOLD_BLOCK,(int)(Math.random()*2)+1);
+				  item = new ItemStack(Material.GOLD_BLOCK,(int)(Math.random()*1)+1);
 			  }break;
-			  case 4 :{
+			  case 4 :
+			  case 15:
+			  case 16:
+			  case 17: {
 				  item = new ItemStack(Material.LAPIS_BLOCK,(int)(Math.random()*40)+20);
 			  }break;
 			  case 5 :{
-				  item = new ItemStack(Material.REDSTONE_BLOCK,(int)(Math.random()*25)+5);
+				  item = new ItemStack(Material.REDSTONE_BLOCK,(int)(Math.random()*12)+2);
 			  }break;
 			  case 6 :{
-				  item = new ItemStack(Material.DIAMOND,(int)(Math.random()*4)+1);
+				  item = new ItemStack(Material.DIAMOND,(int)(Math.random()*2)+1);
 			  }break;
 			  case 7 :{
-				  item = new ItemStack(Material.DIAMOND_BLOCK,(int)(Math.random()*2)+1);
+				  item = new ItemStack(Material.DIAMOND_BLOCK,(int)(Math.random()*1)+1);
 			  }break;
 			  case 8 :{
 				  item = new ItemStack(Material.EMERALD,(int)(Math.random()*2)+1);
@@ -5646,6 +6043,22 @@ public ItemStack getGoodie() {
 			  }
 			  if (f.getCustomName().contains("Sniper")) {
 				  e.setDroppedExp(e.getDroppedExp()*2);
+			  }
+			  if (f.getCustomName().contains("Mega Wither")) {
+				  e.setDroppedExp(e.getDroppedExp()*500);
+				  for (int j=0;j<4;j++) {
+					  Location dd = f.getLocation().add(Math.random()*4,Math.random()*4,Math.random()*4);
+					  Bukkit.getWorld("world").getBlockAt(dd).setType(Material.CHEST);
+					  Chest c=(Chest)Bukkit.getWorld("world").getBlockAt(dd).getState();
+					  for (int i=0;i<27;i++) {
+						  ItemStack item = null;
+						  if (Math.random()<=0.3) {
+							  item = getGoodie();
+							  c.getBlockInventory().setItem(i, item);
+						  }
+				  }
+				  }
+				  Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule mobGriefing false");
 			  }
 			  if (f.getCustomName().contains(ChatColor.DARK_PURPLE+"")) {
 				  e.setDroppedExp(e.getDroppedExp()*20);
@@ -5882,8 +6295,8 @@ public ItemStack getGoodie() {
   
   @EventHandler
   public void onLightningStrike(LightningStrikeEvent e) {
-	  if (this.plugin.last_lightning_random_time<Bukkit.getWorld("world").getFullTime()) {
-		  this.plugin.last_lightning_random_time=Bukkit.getWorld("world").getFullTime()+60;
+	  if (this.plugin.last_lightning_random_time<Main.SERVER_TICK_TIME) {
+		  this.plugin.last_lightning_random_time=Main.SERVER_TICK_TIME+60;
 		  if (Math.random()<=0.125) {
 			  LightningStrike strike = e.getLightning();
 			  int i=(int)(Math.random()*4);
@@ -5936,10 +6349,12 @@ public ItemStack getGoodie() {
 					  if (Math.random()<=0.25) {
 						  this.plugin.gainMoneyExp(p,"Fisherman",0.175,3);
 						  if (Math.random()<=0.50) {
-							  p.getInventory().addItem(new ItemStack(Material.COOKED_FISH));
+							  p.getWorld().dropItemNaturally(p.getLocation(), new ItemStack(Material.COOKED_FISH));
+							  //p.getInventory().addItem(new ItemStack(Material.COOKED_FISH));
 							  this.plugin.gainMoneyExp(p,"Fisherman",0.125,2);
 						  } else {
-							  p.getInventory().addItem(new ItemStack(Material.RAW_FISH));
+							  p.getWorld().dropItemNaturally(p.getLocation(), new ItemStack(Material.RAW_FISH));
+							  //p.getInventory().addItem(new ItemStack(Material.RAW_FISH));
 						  }
 					  }
 					  i--;
@@ -5948,7 +6363,8 @@ public ItemStack getGoodie() {
 			  if (this.plugin.getJobLv("Fisherman", p)>=10) {
 				  e.setExpToDrop(e.getExpToDrop()*2);
 				  if (Math.random()<=0.25) {
-					  p.getInventory().addItem(new ItemStack(Material.RAW_FISH));
+					  p.getWorld().dropItemNaturally(p.getLocation(), new ItemStack(Material.RAW_FISH));
+					  //p.getInventory().addItem(new ItemStack(Material.RAW_FISH));
 					  this.plugin.gainMoneyExp(p,"Fisherman",0.175,3);
 				  }
 			  }
@@ -5992,10 +6408,12 @@ public ItemStack getGoodie() {
 		    }
 		    this.plugin.cleaned=true;
 		}
+		if (this.plugin.chunk_queue_list!=null && e.getChunk()!=null && e.getChunk().isLoaded()) {
 		  this.plugin.chunk_queue_list.add(e.getChunk());
 		  if (this.plugin.chunk_queue_list.size()>640) {
 			  this.plugin.chunk_queue_list.remove(0);
 		  }
+		}
 	  }
   
   @EventHandler
@@ -6051,7 +6469,7 @@ public ItemStack getGoodie() {
 
   @EventHandler
   public void onInventoryOpen(InventoryOpenEvent e) {
-	  // █ ▌((Player)e.getPlayer()).sendMessage(((Player)e.getPlayer()).getScoreboard().getPlayerTeam((OfflinePlayer)e.getPlayer()).getName());
+	  // 笆�笆�(Player)e.getPlayer()).sendMessage(((Player)e.getPlayer()).getScoreboard().getPlayerTeam((OfflinePlayer)e.getPlayer()).getName());
 	  Player p = (Player)e.getPlayer();
 	  p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.DARK_GRAY+"");
 	  if (p.hasPermission("group.moderator")) {
@@ -6162,7 +6580,7 @@ public ItemStack getGoodie() {
 		  }
 	  }
   }
-  
+
   final public void FatalSurvivor(Player p) {
 	  p.setHealth(p.getMaxHealth());
 	  p.sendMessage("You used your "+ChatColor.YELLOW+"Lv10 Fatal Survivor"+ChatColor.WHITE+" buff. Your health has been restored."+ChatColor.AQUA+" It will be recharged in one hour.");
@@ -6216,7 +6634,7 @@ public ItemStack getGoodie() {
 				  eve.event=1;
 				  eve.data=p.getExp();
 				  eve.data2=p.getLevel();
-				  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
+				  eve.expiretime=Main.SERVER_TICK_TIME+1200;
 				  this.plugin.explorers.add(eve);
 				  if (!survivor) {
 				  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
@@ -6256,7 +6674,7 @@ public ItemStack getGoodie() {
 							  eve.event=1;
 							  eve.data=p.getExp();
 							  eve.data2=p.getLevel();
-							  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
+							  eve.expiretime=Main.SERVER_TICK_TIME+1200;
 							  plugin.explorers.add(eve);
 							  if (!survivor) {
 						      if (p.getHealth()<=0) {
@@ -6379,10 +6797,10 @@ public ItemStack getGoodie() {
                 }
 		  		}, 1L);
 		  	}
-			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat1")>0) {
-				e.setAmount(e.getAmount()+this.plugin.getStatBonus(0, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat1")/6));
-			}
 		  }
+		if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat1")>0) {
+			e.setAmount(e.getAmount()+this.plugin.getStatBonus(0, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat1")/6));
+		}
 	  }
   }
   
@@ -6390,6 +6808,26 @@ public ItemStack getGoodie() {
   public void onEnemyHit(EntityDamageByEntityEvent e) {
 	  if (e.getEntity() instanceof LivingEntity) {
 		  final LivingEntity l = (LivingEntity)e.getEntity();
+		  if (l instanceof Player) {
+			  e.setDamage(e.getDamage()*1.45d);
+			  if (e.getDamager() instanceof Wither) {
+				  if (Math.random()<=0.25) {
+					  l.getWorld().spawnEntity(l.getLocation(), EntityType.CREEPER);
+				  }
+			  }
+		  }
+		  if (e.getEntity() instanceof Wither) {
+			  e.setDamage(e.getDamage()*0.2d);
+		  }
+		  if (e.getDamager() instanceof Projectile) {
+			  Projectile pp = (Projectile)(e.getDamager());			  
+			  if (pp.getShooter() instanceof Player && l instanceof Wither) {
+				  Player p = (Player)(pp.getShooter());
+				  if (Math.random()<=0.25) {
+					  l.getWorld().spawnEntity(pp.getLocation(), EntityType.CREEPER);
+				  }
+			  }
+		  }
 		  if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.DARK_PURPLE+"")) {
 			  //Bukkit.getPlayer("sigonasr2").sendMessage("Entered Boss Entity hit loop.");
 			  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
@@ -6432,7 +6870,7 @@ public ItemStack getGoodie() {
 							//Make lightning strikes in random places.
 							for (int i=0;i<8;i++) {
 								Bukkit.getWorld("world").strikeLightningEffect(l.getLocation().add(Math.random()*10-Math.random()*10,0,Math.random()*10-Math.random()*10));
-								this.plugin.last_lightning_random_time=Bukkit.getWorld("world").getFullTime()+60;
+								this.plugin.last_lightning_random_time=Main.SERVER_TICK_TIME+60;
 							}
 							int extramobs=0;
 							List<Entity> nearbylist = e.getEntity().getNearbyEntities(30, 30, 30);
@@ -6569,7 +7007,7 @@ public ItemStack getGoodie() {
 							  eve.event=1;
 							  eve.data=p.getExp();
 							  eve.data2=p.getLevel();
-							  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
+							  eve.expiretime=Main.SERVER_TICK_TIME+1200;
 							  plugin.explorers.add(eve);
 							  if (!survivor) {
 						      if (p.getHealth()<=0) {
@@ -6952,7 +7390,7 @@ public ItemStack getGoodie() {
 				  } catch (ConcurrentModificationException ex_e) {
 					  Bukkit.getLogger().warning("Potion Effect Collection not accessible while finalizing player speed.");
 				  }
-				p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,1200,2));
+				p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,200,2));
 			}
 			if (Math.random()<=block_chance/100.0d) {
 				e.setDamage(0);
@@ -7078,7 +7516,7 @@ public ItemStack getGoodie() {
 								  eve.event=1;
 								  eve.data=p.getExp();
 								  eve.data2=p.getLevel();
-								  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
+								  eve.expiretime=Main.SERVER_TICK_TIME+1200;
 								  plugin.explorers.add(eve);
 								  if (!survivor) {
 							      if (p2.getHealth()<=0) {
@@ -7111,7 +7549,7 @@ public ItemStack getGoodie() {
 								  eve.event=1;
 								  eve.data=p.getExp();
 								  eve.data2=p.getLevel();
-								  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
+								  eve.expiretime=Main.SERVER_TICK_TIME+1200;
 								  plugin.explorers.add(eve);
 								  if (!survivor) {
 								  Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -7175,7 +7613,7 @@ public ItemStack getGoodie() {
 								  eve.event=1;
 								  eve.data=p.getExp();
 								  eve.data2=p.getLevel();
-								  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
+								  eve.expiretime=Main.SERVER_TICK_TIME+1200;
 								  plugin.explorers.add(eve);
 								  if (!survivor) {
 								  Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -7213,7 +7651,7 @@ public ItemStack getGoodie() {
 								  eve.event=1;
 								  eve.data=p.getExp();
 								  eve.data2=p.getLevel();
-								  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
+								  eve.expiretime=Main.SERVER_TICK_TIME+1200;
 								  plugin.explorers.add(eve);
 								  if (!survivor) {
 								  Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -7254,7 +7692,7 @@ public ItemStack getGoodie() {
 		  } else
 		  if (enemy.getCustomName()!=null && (enemy.getCustomName().compareTo(ChatColor.GRAY+"Zombie Ninja")==0)) {
 			  enemy.removePotionEffect(PotionEffectType.INVISIBILITY);
-			  this.plugin.ninjavisible_list.add(new InvisibilityData(enemy.getUniqueId(), Bukkit.getWorld("world").getFullTime()+10));
+			  this.plugin.ninjavisible_list.add(new InvisibilityData(enemy.getUniqueId(), Main.SERVER_TICK_TIME+10));
 		  }
 	  }
 	  //Bukkit.getLogger().info("Made it through 7.");
@@ -7279,13 +7717,13 @@ public ItemStack getGoodie() {
 							  if (this.plugin.ninjavisible_list.get(i).val.equals(enemy.getUniqueId())) {
 								  found=true;
 								  enemy.removePotionEffect(PotionEffectType.INVISIBILITY);
-								  	this.plugin.ninjavisible_list.get(i).resettime=Bukkit.getWorld("world").getFullTime()+20;
+								  	this.plugin.ninjavisible_list.get(i).resettime=Main.SERVER_TICK_TIME+20;
 								  break;
 							  }
 						  }
 						  if (!found) {
 							  enemy.removePotionEffect(PotionEffectType.INVISIBILITY);
-						  	this.plugin.ninjavisible_list.add(new InvisibilityData(enemy.getUniqueId(), Bukkit.getWorld("world").getFullTime()+10));
+						  	this.plugin.ninjavisible_list.add(new InvisibilityData(enemy.getUniqueId(), Main.SERVER_TICK_TIME+10));
 						  }
 					  }
 				  }
@@ -7367,7 +7805,7 @@ public ItemStack getGoodie() {
 							  if (!this.plugin.supportmoblist.get(i).id.contains(((Entity)f).getUniqueId())) {
 								  this.plugin.supportmoblist.get(i).id.add(((Entity)f).getUniqueId());
 								  //Bukkit.getPlayer("sigonasr2").sendMessage("Added to list: "+((Entity)f).getUniqueId().toString());
-								  this.plugin.supportmoblist.get(i).registeredtime=Bukkit.getWorld("world").getFullTime()+1200;
+								  this.plugin.supportmoblist.get(i).registeredtime=Main.SERVER_TICK_TIME+1200;
 							  }
 						  }
 					  }
@@ -7377,7 +7815,7 @@ public ItemStack getGoodie() {
 							  if (!this.plugin.hitmoblist.get(i).id.contains(((Entity)f).getUniqueId())) {
 								  this.plugin.hitmoblist.get(i).id.add(((Entity)f).getUniqueId());
 								  //p.sendMessage("Added to list: "+((Entity)f).getUniqueId().toString());
-								  this.plugin.hitmoblist.get(i).registeredtime=Bukkit.getWorld("world").getFullTime()+1200;
+								  this.plugin.hitmoblist.get(i).registeredtime=Main.SERVER_TICK_TIME+1200;
 							  }
 						  }
 					  }
@@ -7396,13 +7834,15 @@ public ItemStack getGoodie() {
 					//This means some piercing can be done.
 					//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4));
 					if (f.getHealth()-(normaldmg+armor_pen)>0) {
-						f.setHealth(Warning(f.getHealth()-(normaldmg+armor_pen),13));
-						if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
-							if (f.getCustomName()!=null) {
-								//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(normaldmg+armor_pen)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
-							} else {
-								//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(normaldmg+armor_pen)*10)/10+" damage to "+convertToItemName(f.getType().getName())+".");
-							}
+						f.setHealth(Warning(f,13));
+						if (f!=null) {
+							if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+								if (f.getCustomName()!=null) {
+									//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(normaldmg+armor_pen)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
+								} else {
+									//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(normaldmg+armor_pen)*10)/10+" damage to "+convertToItemName(f.getType().getName())+".");
+								}
+						}
 						}
 					} else {
 						f.setHealth(0);
@@ -7410,12 +7850,14 @@ public ItemStack getGoodie() {
 				} else {
 					//This means piercing would do extra damage. Just subtract throughdmg.
 					if (f.getHealth()-throughdmg>0) {
-						f.setHealth(Warning(f.getHealth()-throughdmg,14));
-						if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
-							if (f.getCustomName()!=null) {
-								//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
-							} else {
-								//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getType().getName())+".");
+						f.setHealth(Warning(f,14));
+						if (f!=null) {
+							if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+								if (f.getCustomName()!=null) {
+									//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
+								} else {
+									//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getType().getName())+".");
+								}
 							}
 						}
 					} else {
@@ -7547,13 +7989,13 @@ public ItemStack getGoodie() {
 							  if (this.plugin.ninjavisible_list.get(i).val.equals(enemy.getUniqueId())) {
 								  found=true;
 								  enemy.removePotionEffect(PotionEffectType.INVISIBILITY);
-								  	this.plugin.ninjavisible_list.get(i).resettime=Bukkit.getWorld("world").getFullTime()+20;
+								  	this.plugin.ninjavisible_list.get(i).resettime=Main.SERVER_TICK_TIME+20;
 								  break;
 							  }
 						  }
 						  if (!found) {
 							  enemy.removePotionEffect(PotionEffectType.INVISIBILITY);
-						  	this.plugin.ninjavisible_list.add(new InvisibilityData(enemy.getUniqueId(), Bukkit.getWorld("world").getFullTime()+10));
+						  	this.plugin.ninjavisible_list.add(new InvisibilityData(enemy.getUniqueId(), Main.SERVER_TICK_TIME+10));
 						  }
 					  }
 				  }
@@ -7563,7 +8005,7 @@ public ItemStack getGoodie() {
 							  if (!this.plugin.supportmoblist.get(i).id.contains(((Entity)f).getUniqueId())) {
 								  this.plugin.supportmoblist.get(i).id.add(((Entity)f).getUniqueId());
 								  //Bukkit.getPlayer("sigonasr2").sendMessage("Added to list: "+((Entity)f).getUniqueId().toString());
-								  this.plugin.supportmoblist.get(i).registeredtime=Bukkit.getWorld("world").getFullTime()+1200;
+								  this.plugin.supportmoblist.get(i).registeredtime=Main.SERVER_TICK_TIME+1200;
 							  }
 						  }
 					  }
@@ -7573,7 +8015,7 @@ public ItemStack getGoodie() {
 							  if (!this.plugin.hitmoblist.get(i).id.contains(((Entity)f).getUniqueId())) {
 								  this.plugin.hitmoblist.get(i).id.add(((Entity)f).getUniqueId());
 								  //Bukkit.getPlayer("sigonasr2").sendMessage("Added to list: "+((Entity)f).getUniqueId().toString());
-								  this.plugin.hitmoblist.get(i).registeredtime=Bukkit.getWorld("world").getFullTime()+1200;
+								  this.plugin.hitmoblist.get(i).registeredtime=Main.SERVER_TICK_TIME+1200;
 							  }
 						  }
 					  }
@@ -7741,6 +8183,40 @@ public ItemStack getGoodie() {
   @EventHandler
   public void onBlockPlace(BlockPlaceEvent e) {
 	  Player p = e.getPlayer();
+		  if (e.getItemInHand().getType()==Material.PUMPKIN) {
+			  if (e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-1,0)).getType()==Material.SNOW_BLOCK &&
+					  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-2,0)).getType()==Material.SNOW_BLOCK) {
+				  //Create a snowman.
+				  e.getBlockPlaced().setType(Material.AIR);
+				  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-1,0)).setType(Material.AIR);
+				  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-2,0)).setType(Material.AIR);
+				  e.getBlockPlaced().getWorld().spawnEntity(e.getBlockPlaced().getLocation(), EntityType.SNOWMAN);
+			  }
+			  if (e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-1,0)).getType()==Material.IRON_BLOCK &&
+					  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-2,0)).getType()==Material.IRON_BLOCK &&
+					  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(1,-1,0)).getType()==Material.IRON_BLOCK &&
+					  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(-1,-1,0)).getType()==Material.IRON_BLOCK) {
+				  //Create a snowman.
+				  e.getBlockPlaced().setType(Material.AIR);
+				  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-1,0)).setType(Material.AIR);
+				  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-2,0)).setType(Material.AIR);
+				  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(1,-1,0)).setType(Material.AIR);
+				  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(-1,-1,0)).setType(Material.AIR);
+				  e.getBlockPlaced().getWorld().spawnEntity(e.getBlockPlaced().getLocation(), EntityType.IRON_GOLEM);
+			  }
+			  if (e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-1,0)).getType()==Material.IRON_BLOCK &&
+					  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-2,0)).getType()==Material.IRON_BLOCK &&
+					  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-1,1)).getType()==Material.IRON_BLOCK &&
+					  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-1,-1)).getType()==Material.IRON_BLOCK) {
+				  //Create a snowman.
+				  e.getBlockPlaced().setType(Material.AIR);
+				  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-1,0)).setType(Material.AIR);
+				  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-2,0)).setType(Material.AIR);
+				  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-1,1)).setType(Material.AIR);
+				  e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-1,-1)).setType(Material.AIR);
+				  e.getBlockPlaced().getWorld().spawnEntity(e.getBlockPlaced().getLocation(), EntityType.IRON_GOLEM);
+			  }
+		  }
 	  if (this.plugin.getConfig().getBoolean("halloween-enabled")) {
 		  if (e.getItemInHand().getType()==Material.PUMPKIN) {
 			  //Check the lore to see if it's a giant pumpkin.
@@ -8312,6 +8788,12 @@ public ItemStack getGoodie() {
 	  if (this.plugin.getConfig().getBoolean("spleef4insession")==true && (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0 || this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0 || this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0 || this.plugin.getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0)) {
 		  e.setCancelled(true);
 	  }
+	  if (e.getItemInHand().getType()==Material.getMaterial(127)) {
+		  e.setCancelled(true);
+	  }
+	  if (this.plugin.is_ItemCube(e.getItemInHand())) {
+		  e.setCancelled(true);
+	  }
 	  return;
   }
 
@@ -8339,18 +8821,11 @@ public ItemStack getGoodie() {
 			  ItemMeta meta = i.getItemMeta();
 			  meta.setDisplayName(ChatColor.DARK_GRAY+"[BROKEN] "+meta.getDisplayName());
 			  finallore.add("");
-			  finallore.add("Will be repaired @ "+(Bukkit.getWorld("world").getFullTime()+12096000));
+			  finallore.add("Will be repaired @ "+(Main.SERVER_TICK_TIME+12096000));
 			  meta.setLore(finallore);
 			  //p.sendMessage("Meta is set.");
 			  i.setItemMeta(meta);
-			  if (this.plugin.inventoryFull(p)) {
-				  i.setAmount(0);
-				  //Drop it on the ground since our inventory is full.
-				  p.sendMessage(ChatColor.LIGHT_PURPLE+"Dropped "+i.getItemMeta().getDisplayName()+ChatColor.LIGHT_PURPLE+" on the ground since there is no room in your inventory.");
-				  p.getWorld().dropItemNaturally(p.getLocation(), i);
-			  } else {
-				  i.setAmount(1);
-			  }
+			  i.setAmount(1);
 			  p.updateInventory();
 		  }
 	  }
@@ -8952,6 +9427,121 @@ public ItemStack getGoodie() {
 	  if (p.hasPermission("group.administrators")) {
 		  p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.DARK_PURPLE+"");
 	  }
+	  if (event.getCursor()!=null || event.getCurrentItem()!=null) {
+		  if (event.getCursor().getType()==Material.SULPHUR) {
+			  //This is a broken Halloween item...Maybe. Let's find out.
+			  boolean is_halloween=false;
+			  String storename="";
+			  long time=0;
+			  int repairline=0;
+			  ItemStack store = new ItemStack(Material.SULPHUR);
+			  if (event.getCursor()!=null) {
+				  store = event.getCursor();
+			  } else {
+				  store = event.getCurrentItem();
+			  }
+			  if (store.hasItemMeta() && store.getItemMeta().hasLore()) {
+				  storename=store.getItemMeta().getDisplayName();
+				  List<String> storelore = store.getItemMeta().getLore();
+				  for (int i=0;i<storelore.size();i++) {
+					  if (storelore.get(i).contains(ChatColor.YELLOW+"[Halloween]")) {
+						  is_halloween=true;
+					  }
+					  if (storelore.get(i).contains("Will be repaired @ ")) {
+						  time = Long.valueOf(storelore.get(i).replace("Will be repaired @ ", ""));
+						  repairline=i;
+					  }
+				  }
+			  }
+			  if (time<Main.SERVER_TICK_TIME && is_halloween && repairline>0) {
+				  if (storename.contains("Diamond Chestplate")) {
+					  store.setType(Material.DIAMOND_CHESTPLATE);
+					  ItemMeta meta = store.getItemMeta();
+					  meta.setDisplayName(meta.getDisplayName().replace(ChatColor.DARK_GRAY+"[BROKEN] ",""));
+					  List<String> lore = store.getItemMeta().getLore();
+					  lore.remove(repairline);
+					  lore.remove(repairline-1);
+					  meta.setLore(lore);
+					  store.setItemMeta(meta);
+					  p.sendMessage("Your "+meta.getDisplayName()+ChatColor.RESET+" has been repaired!");
+				  }
+				  if (storename.contains("Diamond Leggings")) {
+					  store.setType(Material.DIAMOND_LEGGINGS);
+					  ItemMeta meta = store.getItemMeta();
+					  meta.setDisplayName(meta.getDisplayName().replace(ChatColor.DARK_GRAY+"[BROKEN] ",""));
+					  List<String> lore = store.getItemMeta().getLore();
+					  lore.remove(repairline);
+					  lore.remove(repairline-1);
+					  meta.setLore(lore);
+					  store.setItemMeta(meta);
+					  p.sendMessage("Your "+meta.getDisplayName()+ChatColor.RESET+" has been repaired!");
+				  }
+				  if (storename.contains("Diamond Helmet")) {
+					  store.setType(Material.DIAMOND_HELMET);
+					  ItemMeta meta = store.getItemMeta();
+					  meta.setDisplayName(meta.getDisplayName().replace(ChatColor.DARK_GRAY+"[BROKEN] ",""));
+					  List<String> lore = store.getItemMeta().getLore();
+					  lore.remove(repairline);
+					  lore.remove(repairline-1);
+					  meta.setLore(lore);
+					  store.setItemMeta(meta);
+					  p.sendMessage("Your "+meta.getDisplayName()+ChatColor.RESET+" has been repaired!");
+				  }
+				  if (storename.contains("Diamond Boots")) {
+					  store.setType(Material.DIAMOND_CHESTPLATE);
+					  ItemMeta meta = store.getItemMeta();
+					  meta.setDisplayName(meta.getDisplayName().replace(ChatColor.DARK_GRAY+"[BROKEN] ",""));
+					  List<String> lore = store.getItemMeta().getLore();
+					  lore.remove(repairline);
+					  lore.remove(repairline-1);
+					  meta.setLore(lore);
+					  store.setItemMeta(meta);
+					  p.sendMessage("Your "+meta.getDisplayName()+ChatColor.RESET+" has been repaired!");
+				  }
+				  if (storename.contains("Diamond Sword")) {
+					  store.setType(Material.DIAMOND_SWORD);
+					  ItemMeta meta = store.getItemMeta();
+					  meta.setDisplayName(meta.getDisplayName().replace(ChatColor.DARK_GRAY+"[BROKEN] ",""));
+					  List<String> lore = store.getItemMeta().getLore();
+					  lore.remove(repairline);
+					  lore.remove(repairline-1);
+					  meta.setLore(lore);
+					  store.setItemMeta(meta);
+					  p.sendMessage("Your "+meta.getDisplayName()+ChatColor.RESET+" has been repaired!");
+				  }
+				  if (storename.contains("Bow")) {
+					  store.setType(Material.BOW);
+					  ItemMeta meta = store.getItemMeta();
+					  meta.setDisplayName(meta.getDisplayName().replace(ChatColor.DARK_GRAY+"[BROKEN] ",""));
+					  List<String> lore = store.getItemMeta().getLore();
+					  lore.remove(repairline);
+					  lore.remove(repairline-1);
+					  meta.setLore(lore);
+					  store.setItemMeta(meta);
+					  p.sendMessage("Your "+meta.getDisplayName()+ChatColor.RESET+" has been repaired!");
+				  }
+			  }
+		  }
+	  }
+	  if ((event.getClick()==ClickType.LEFT || event.getClick()==ClickType.RIGHT)) {
+		  if (event.getCursor()!=null && event.getCurrentItem()!=null && event.getCursor().getType().equals(event.getCurrentItem().getType()) && event.getCursor().getType()==Material.POTION) {
+			  //Literally swap them and cancel.
+			  ItemStack temp = event.getCursor();
+			  event.setCursor(event.getCurrentItem());
+			  event.setCurrentItem(temp);
+			  event.setCancelled(true);
+		  }
+	  }
+	  if ((event.getClick()==ClickType.SHIFT_RIGHT || event.getClick()==ClickType.SHIFT_LEFT) && (event.getInventory().getType()==InventoryType.CRAFTING || event.getInventory().getType()==InventoryType.PLAYER) && event.getSlotType()==SlotType.RESULT) {
+		  //Always refresh your inventory after a delay, just in case. This is a temporary fix for bugs with crafting multiple amounts of a crafting recipe.
+		  final Player p2 = p;
+		  p.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+              @Override
+              public void run() {
+                  p2.updateInventory();
+              }
+          }, 1);
+	  }
 	  if (event.getSlot() != -999) {
 		  ItemStack item = event.getCurrentItem();
 	      if (event.getInventory().getType() == InventoryType.ANVIL)
@@ -8980,7 +9570,7 @@ public ItemStack getGoodie() {
 	                    .getDisplayName()) && event
 	                    .getInventory().getItem(0)
 	                    .getItemMeta()
-	                    .getDisplayName().contains("§")) {
+	                    .getDisplayName().contains(Character.toString((char)0x00A7))) {
 	              item.setItemMeta(event.getInventory().getItem(0).getItemMeta());
 	            }
 	          }
@@ -9702,15 +10292,18 @@ public ItemStack getGoodie() {
 			i.getType()==Material.IRON_LEGGINGS ||
 			i.getType()==Material.IRON_CHESTPLATE ||
 			i.getType()==Material.IRON_HELMET ||
+			i.getType()==Material.IRON_AXE ||
 			i.getType()==Material.GOLD_SPADE ||
 			i.getType()==Material.GOLD_HOE ||
 			i.getType()==Material.GOLD_BOOTS ||
 			i.getType()==Material.GOLD_CHESTPLATE ||
 			i.getType()==Material.GOLD_LEGGINGS ||
 			i.getType()==Material.GOLD_HELMET ||
+			i.getType()==Material.GOLD_AXE ||
 			i.getType()==Material.DIAMOND_PICKAXE ||
 			i.getType()==Material.DIAMOND_HOE ||
 			i.getType()==Material.DIAMOND_SPADE ||
+			i.getType()==Material.DIAMOND_AXE ||
 			i.getType()==Material.DIAMOND_HELMET ||
 			i.getType()==Material.DIAMOND_CHESTPLATE ||
 			i.getType()==Material.DIAMOND_LEGGINGS ||
@@ -9826,7 +10419,7 @@ public ItemStack getGoodie() {
 	        return a.getAmount() + b.getAmount() <= a.getType().getMaxStackSize();
 	}
 
-  @EventHandler
+  /*@EventHandler
   public void onItemSpawn(ItemSpawnEvent e) {
 	  if (e.getEntity().getType()==EntityType.DROPPED_ITEM) {
 		  if (e.getEntity().getItemStack().getType()==Material.IRON_ORE) {
@@ -9837,7 +10430,7 @@ public ItemStack getGoodie() {
 		  return;
 	  }
   }
-  
+  */
   @EventHandler
   public void onItemDespawn(ItemDespawnEvent e) {
 	  Item i = e.getEntity();
@@ -9855,127 +10448,74 @@ public ItemStack getGoodie() {
 	  //String metastring = "Has name: "+i.getItemStack().getItemMeta().hasDisplayName();
 	  //p.sendMessage(metastring);
 	  if (allow) {
-		  Location l1 = new Location(Bukkit.getWorld("world"), 1617, 67, -351);
-		  Location l2 = new Location(Bukkit.getWorld("world"), 1618, 67, -351);
-		  Location k1 = new Location(Bukkit.getWorld("world"), 1617, 67, -355);
-		  Location k2 = new Location(Bukkit.getWorld("world"), 1618, 67, -355);
-		  Location j1 = new Location(Bukkit.getWorld("world"), 1622, 67, -355);
-		  Location j2 = new Location(Bukkit.getWorld("world"), 1623, 67, -355);
-		  Location i1 = new Location(Bukkit.getWorld("world"), 1622, 67, -351);
-		  Location i2 = new Location(Bukkit.getWorld("world"), 1623, 67, -351);
-		  Chest c=(Chest)Bukkit.getWorld("world").getBlockAt(l1).getState();
-		  int selection=0;
-		  //Choose a chest randomly.
-		  switch ((int)(Math.random()*8)) {
-			  case 0:{
-				  c=(Chest)Bukkit.getWorld("world").getBlockAt(l1).getState();
-				  selection=1;
-			  }break;
-			  case 1:{
-				  c=(Chest)Bukkit.getWorld("world").getBlockAt(l2).getState();
-				  selection=2;
-			  }break;
-			  case 2:{
-				  c=(Chest)Bukkit.getWorld("world").getBlockAt(k1).getState();
-				  selection=3;
-			  }break;
-			  case 3:{
-				  c=(Chest)Bukkit.getWorld("world").getBlockAt(k2).getState();
-				  selection=4;
-			  }break;
-			  case 4:{
-				  c=(Chest)Bukkit.getWorld("world").getBlockAt(j1).getState();
-				  selection=5;
-			  }break;
-			  case 5:{
-				  c=(Chest)Bukkit.getWorld("world").getBlockAt(j2).getState();
-				  selection=6;
-			  }break;
-			  case 6:{
-				  c=(Chest)Bukkit.getWorld("world").getBlockAt(i1).getState();
-				  selection=7;
-			  }break;
-			  case 7:{
-				  c=(Chest)Bukkit.getWorld("world").getBlockAt(i2).getState();
-				  selection=8;
-			  }break;
-		  }
-		  //Get data about this slot.
-		  int itemslot=this.plugin.getConfig().getInt("chest"+selection+"item");
-		  double chance=this.plugin.getConfig().getDouble("chest"+selection+"i");
-		  //First determine if we can even allow this item in.
-		  if (i.getItemStack().getItemMeta().hasDisplayName()==false) {
-			  //p.sendMessage("Item is being checked.");
-			  //Now see if the chance should be reduced, based on its material name.
-			  for (int y=0;y<27;y++) {
-				  if (c.getBlockInventory().getItem(y)!=null && c.getBlockInventory().getItem(y).getType()==i.getItemStack().getType()) {
-					  chance*=2.0d;
-					  //p.sendMessage("Block inventory chance went up. "+c.getBlockInventory().getItem(y).getType()+"="+i.getItemStack().getType());
+		  //Find the nearest recycling center to dump to...usually.
+		  RecyclingCenterNode center = null;
+		  double distance = 99999999d;
+		  for (int j=0;j<this.plugin.recycling_center_list.size();j++) {
+			  if (this.plugin.recycling_center_list.get(j).locations.size()>0) {
+				  if (i.getWorld()==this.plugin.recycling_center_list.get(j).locations.get(0).getWorld() && i.getLocation().distanceSquared(this.plugin.recycling_center_list.get(j).locations.get(0))<distance) { //Check if the first location in that node is close enough.
+					  if (Math.random()<=0.95) {
+						  distance = i.getLocation().distanceSquared(this.plugin.recycling_center_list.get(j).locations.get(0));
+						  center = this.plugin.recycling_center_list.get(j);
+					  }
 				  }
-			  }
-			  //p.sendMessage("Past for loop.");
-			  //Now check for chance to deposit it.
-			  if (Math.random()*chance<1.0d) {
-				  //Deposit item. Set chance higher.
-				  //p.sendMessage("Going inside...");
-				  if (c.getBlockInventory().getItem(itemslot)!=null) {
-					  c.getBlockInventory().remove(itemslot);
-				  }
-				  //p.sendMessage("Removed...");
-				  c.getBlockInventory().setItem(itemslot,i.getItemStack());
-				  //Clone the item.
-				  //ItemStack tempitem = i.getItemStack(); 
-				  //tempitem.setType(Material.STONE_SPADE);
-				  //ItemMeta tempmeta = tempitem.getItemMeta();
-				  //tempmeta.setDisplayName("Spleef Stone Shovel");
-				  //tempitem.setItemMeta(tempmeta);
-				  //tempitem.setDurability((short)0);
-				  //p.sendMessage("This item has "+tempitem.getDurability()+" uses.");
-				  //p.getInventory().setItemInHand(tempitem);
-				  //p.sendMessage("Added...");
-				  this.plugin.getConfig().set("chest"+selection+"item", Integer.valueOf((itemslot+1)%27));
-				  this.plugin.getConfig().set("chest"+selection+"i", Double.valueOf(this.plugin.getConfig().getDouble("chest"+selection+"i")+this.plugin.getConfig().getDouble("chestchanceincrease")));
-				  if (this.plugin.getConfig().getDouble("randomitemchance")>8.0d) {
-					  this.plugin.getConfig().set("randomitemchance", Double.valueOf(this.plugin.getConfig().getDouble("randomitemchance")-1.0d));
-				  }
-				  //////////////p.sendMessage(ChatColor.GRAY+"A new item has been deposited.");
 			  } else {
-				  //p.sendMessage("Failed. Trying this method.");
-				  if (Math.random()*this.plugin.getConfig().getDouble("randomitemchance")<1.0d) {
-					  //p.sendMessage("Made it in.");
-					  int[] items = {1,3,4,5,6,1,13,14,15,17,18,20,22,23,24,25,27,28,39,31,32,33,35,37,38,39,40,41,42,44,45,46,47,48,49,50,53,54,57,58,61,65,66,67,69,70,72,76,77,78,80,81,82,84,85,86,87,88,89,91,96,98,101,102,103,106,107,108,109,111,112,113,114,116,121,122,123,126,128,130,131,133,134,135,136,138,139,143,145,146,147,148,151,152,154,155,156,157,158,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,2256,2257,2258,2259,2260,2261,2262,2263,2264,2265,2266,2267};
-					  int[] rareitems = {41,46,57,116,122,133,130,146,151,264,266,276,277,278,279,293,310,311,312,313,368,381,406};
-					  int item = items[(int)(Math.random()*items.length)];
-					  ItemStack newitem = i.getItemStack();
-					  newitem.setTypeId(item);
-					  boolean contains=false;
-					  for (int k=0;k<rareitems.length;k++) {
-						  if (item==rareitems[k]) {
-							  contains=true;
-							  break;
+				  Bukkit.getLogger().warning("Found a Recycling center that has no nodes! Skipping...");
+			  }
+		  }
+		  if (center!=null) {
+			  //Add the item to the center!
+			  center.recycleItem(i.getItemStack());
+		  }
+		  
+		  //There is a small chance we can swap items between two centers.
+		  if (Math.random()<=0.20) {
+			  //Get the first center. It's randomly picked.
+			  if (this.plugin.recycling_center_list.size()<=2) {
+				  //If there are only two centers in the list, it has to be those two...
+				  RecyclingCenterNode center1 = null;
+				  RecyclingCenterNode center2 = null;
+				  center1 = this.plugin.recycling_center_list.get(0);
+				  center2 = this.plugin.recycling_center_list.get(1);
+			  } else {
+				  //Run a loop until two are selected.
+				  RecyclingCenterNode center1 = null;
+				  RecyclingCenterNode center2 = null;
+				  int maxiterator=1000;
+				  while ((center1==null || center2==null) && maxiterator>0) {
+					  if (center1==null) {
+						  //Choose one randomly, if it's not equal to center2.
+						  int randomnumb = (int)(Math.random()*this.plugin.recycling_center_list.size());
+						  if (center2==null) {
+							  center1=this.plugin.recycling_center_list.get(randomnumb);
+						  } else {
+							  if (!center2.equals(this.plugin.recycling_center_list.get(randomnumb))) {
+								  center1=this.plugin.recycling_center_list.get(randomnumb);
+							  }
 						  }
 					  }
-					  if (contains) {
-						  newitem.setAmount(1);
-						  this.plugin.getConfig().set("randomitemchance", Double.valueOf(this.plugin.getConfig().getDouble("randomitemchance")+400.0d));
+					  if (center2==null) {
+						  //Choose one randomly, if it's not equal to center2.
+						  int randomnumb = (int)(Math.random()*this.plugin.recycling_center_list.size());
+						  if (center1==null) {
+							  center2=this.plugin.recycling_center_list.get(randomnumb);
+						  } else {
+							  if (!center1.equals(this.plugin.recycling_center_list.get(randomnumb))) {
+								  center2=this.plugin.recycling_center_list.get(randomnumb);
+							  }
+						  }
 					  }
-					  if (c.getBlockInventory().getItem(itemslot)!=null) {
-						  c.getBlockInventory().remove(itemslot);
-					  }
-					  c.getBlockInventory().setItem(itemslot,newitem);
-					  ///////////////////////p.sendMessage(ChatColor.BLUE+"A new (random) item has been deposited.");
-					  this.plugin.getConfig().set("randomitemchance", Double.valueOf(this.plugin.getConfig().getDouble("randomitemchance")+100.0d));
-				  } else {
-					  if (this.plugin.getConfig().getDouble("randomitemchance")>8.0d) {
-						  this.plugin.getConfig().set("randomitemchance", Double.valueOf(this.plugin.getConfig().getDouble("randomitemchance")-1.0d));
+					  if (center1==null || center2==null) {
+						  maxiterator--;
+					  } else {
+						  maxiterator=0;
 					  }
 				  }
-				  if (this.plugin.getConfig().getDouble("chest"+selection+"i")>=this.plugin.getConfig().getDouble("chestdecrease")) {
-					this.plugin.getConfig().set("chest"+selection+"i", Double.valueOf(this.plugin.getConfig().getDouble("chest"+selection+"i")-this.plugin.getConfig().getDouble("chestdecrease")));
+				  if (center1!=null && center2!=null) {
+					  //Do a swap.
+					  center1.swapItem(center2);
 				  }
-				  this.plugin.getConfig().set("chest"+selection+"item", Integer.valueOf((itemslot+1)%27));
 			  }
-			  this.plugin.saveConfig();
 		  }
 	  }
 	  return;
@@ -10560,7 +11100,7 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
     	if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
     	    p.removePotionEffect(PotionEffectType.SPEED);
     	    //If they have a "speed" potion, give it back.
-    	    p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((this.plugin.SPEED_CONTROL.get(i).potion_time-Bukkit.getWorld("world").getFullTime())*2), this.plugin.SPEED_CONTROL.get(i).potion_spdlv, true));
+    	    p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((this.plugin.SPEED_CONTROL.get(i).potion_time-Main.SERVER_TICK_TIME)*2), this.plugin.SPEED_CONTROL.get(i).potion_spdlv, true));
     		this.plugin.SPEED_CONTROL.remove(i);
     		break;
     	}
@@ -10809,7 +11349,7 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
 	  if (this.plugin.PlayerinJob(p,"Explorer")) {
 		  PersistentExplorerList eve = new PersistentExplorerList(p.getName());
 		  eve.event=2;
-		  eve.expiretime=Bukkit.getWorld("world").getFullTime()+3600;
+		  eve.expiretime=Main.SERVER_TICK_TIME+3600;
 		  this.plugin.explorers.add(eve);
 	  }
       DecimalFormat df = new DecimalFormat("#0.00");
@@ -10822,7 +11362,7 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
 	  this.plugin.getAccountsConfig().set(p.getName() + ".deathpointZ",Double.valueOf(deathZ));
 	  this.plugin.getAccountsConfig().set(p.getName() + ".deathworld",String.valueOf(deathWorld));
 	  this.plugin.getAccountsConfig().set(p.getName() + ".revived",Boolean.valueOf(false));
-	  this.plugin.getAccountsConfig().set(p.getName() + ".revivetime",Long.valueOf(Bukkit.getWorld("world").getFullTime()));
+	  this.plugin.getAccountsConfig().set(p.getName() + ".revivetime",Long.valueOf(Main.SERVER_TICK_TIME));
       this.plugin.saveAccountsConfig();
       double mincost = this.plugin.getConfig().getDouble("revive-cost-rate");
       if (p.getBedSpawnLocation()!=null) {
@@ -10870,7 +11410,7 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
         } else {
         	if ((lines[0].equalsIgnoreCase("[Bank]"))) {
     	      e.setCancelled(true);
-    	      p.sendMessage("ｧcYou do not have permission to create [Bank] signs.");
+    	      p.sendMessage("�ｧcYou do not have permission to create [Bank] signs.");
         	}
         }
     }
@@ -10881,15 +11421,15 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
         if (!lines[2].matches("^[0-9]+$")) {
           e.setLine(1, ChatColor.DARK_RED + "Error");
           e.setLine(2, " ");
-          p.sendMessage("ｧ2[BankEconomy]" + ChatColor.AQUA + " The amount of money is invalid. (line 3)");
+          p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " The amount of money is invalid. (line 3)");
         } else if (!lines[3].isEmpty()) {
           e.setLine(1, ChatColor.DARK_RED + "Error");
           e.setLine(2, " ");
           e.setLine(3, " ");
-          p.sendMessage("ｧ2[BankEconomy]" + ChatColor.AQUA + " The line 4 must be empty.");
+          p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " The line 4 must be empty.");
         } else {
           e.setLine(1, ChatColor.YELLOW + "deposit");
-          p.sendMessage("ｧ2[BankEconomy]" + ChatColor.AQUA + " Sign created successfully!");
+          p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " Sign created successfully!");
         }
       } else if ((lines[0].equalsIgnoreCase("[BankEconomy]")) && (lines[1].equalsIgnoreCase("withdraw"))) {
         e.setLine(0, ChatColor.DARK_GREEN + "[BankEconomy]");
@@ -10897,14 +11437,14 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
           e.setLine(1, ChatColor.DARK_RED + "Error");
           e.setLine(2, " ");
           e.setLine(3, " ");
-          p.sendMessage("ｧ2[BankEconomy]" + ChatColor.AQUA + " The line 4 must be empty.");
+          p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " The line 4 must be empty.");
         } else if (!lines[2].matches("^[0-9]+$")) {
           e.setLine(1, ChatColor.DARK_RED + "Error");
           e.setLine(2, " ");
-          p.sendMessage("ｧ2[BankEconomy]" + ChatColor.AQUA + " The amount of money is invalid. (line 3)");
+          p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " The amount of money is invalid. (line 3)");
         } else {
           e.setLine(1, ChatColor.YELLOW + "withdraw");
-          p.sendMessage("ｧ2[BankEconomy]" + ChatColor.AQUA + " Sign created successfully!");
+          p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " Sign created successfully!");
         }
       } else if ((lines[0].equalsIgnoreCase("[BankEconomy]")) && (lines[1].equalsIgnoreCase("information"))) {
         e.setLine(0, ChatColor.DARK_GREEN + "[BankEconomy]");
@@ -10912,7 +11452,7 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
           e.setLine(1, ChatColor.DARK_RED + "Error");
           e.setLine(2, " ");
           e.setLine(3, " ");
-          p.sendMessage("ｧ2[BankEconomy]" + ChatColor.AQUA + " Lines 3 and 4 must be empty.");
+          p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " Lines 3 and 4 must be empty.");
         } else {
           e.setLine(0, ChatColor.DARK_GREEN + "[BankEconomy]");
           e.setLine(1, ChatColor.YELLOW + "information");
@@ -10922,12 +11462,12 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
         e.setLine(1, ChatColor.DARK_RED + "Error");
         e.setLine(2, " ");
         e.setLine(3, " ");
-        p.sendMessage("ｧ2[BankEconomy]" + ChatColor.AQUA + " Invalid action.");
+        p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " Invalid action.");
       }
     } else {
     	if ((lines[0].equalsIgnoreCase("[BankEconomy]"))) {
 	      e.setCancelled(true);
-	      p.sendMessage("ｧcYou do not have permission.");
+	      p.sendMessage("�ｧcYou do not have permission.");
     	}
     }*/
   }
@@ -10977,7 +11517,7 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
   public void onPlayerChat(PlayerChatEvent e) {
 	  //Check if they are withdrawing or depositing money.
       DecimalFormat df = new DecimalFormat("#0.00");
-	  if (e.getPlayer().getName().equalsIgnoreCase(this.plugin.last_bank_deposit_user) && this.plugin.last_bank_deposit_use_time+200>Bukkit.getWorld("world").getFullTime()) {
+	  if (e.getPlayer().getName().equalsIgnoreCase(this.plugin.last_bank_deposit_user) && this.plugin.last_bank_deposit_use_time+200>Main.SERVER_TICK_TIME) {
 		  //Parse the amount.
 		  double val=0;
 		  if (e.getMessage().equalsIgnoreCase("all")) {
@@ -11004,16 +11544,16 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
 					  this.plugin.last_bank_deposit_use_time=0;
 				  } else {
 					  e.getPlayer().sendMessage(ChatColor.RED+"You are not holding that much! " + ChatColor.YELLOW +"Enter a value equal to or lower than $" + ChatColor.GREEN+ df.format(this.plugin.economy.getBalance(e.getPlayer().getName())) + "" + ChatColor.GRAY + ChatColor.ITALIC + " (Remember you can also use the word all)");
-					  this.plugin.last_bank_deposit_use_time=Bukkit.getWorld("world").getFullTime();
+					  this.plugin.last_bank_deposit_use_time=Main.SERVER_TICK_TIME;
 				  }
 			  } catch (NumberFormatException ex_e) {
 				  e.getPlayer().sendMessage(ChatColor.RED+"That is not a valid amount! Please try again.");
-				  this.plugin.last_bank_deposit_use_time=Bukkit.getWorld("world").getFullTime();
+				  this.plugin.last_bank_deposit_use_time=Main.SERVER_TICK_TIME;
 			  }
 		  }
 		  e.setCancelled(true);
 	  } else 
-	  if (e.getPlayer().getName().equalsIgnoreCase(this.plugin.last_bank_withdraw_user) && this.plugin.last_bank_withdraw_use_time+200>Bukkit.getWorld("world").getFullTime()) {
+	  if (e.getPlayer().getName().equalsIgnoreCase(this.plugin.last_bank_withdraw_user) && this.plugin.last_bank_withdraw_use_time+200>Main.SERVER_TICK_TIME) {
 		  //Parse the amount.
 		  double val=0;
 		  if (e.getMessage().equalsIgnoreCase("all")) {
@@ -11039,11 +11579,11 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
 					  this.plugin.last_bank_withdraw_use_time=0;
 				  } else {
 					  e.getPlayer().sendMessage(ChatColor.RED+"You do not have that much! " + ChatColor.YELLOW +"Enter a value equal to or lower than $" + ChatColor.GREEN+ df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")) + "" + ChatColor.GRAY + ChatColor.ITALIC + " (Remember you can also use the word all)");
-					  this.plugin.last_bank_withdraw_use_time=Bukkit.getWorld("world").getFullTime();
+					  this.plugin.last_bank_withdraw_use_time=Main.SERVER_TICK_TIME;
 				  }
 			  } catch (NumberFormatException ex_e) {
 				  e.getPlayer().sendMessage(ChatColor.RED+"That is not a valid amount! Please try again.");
-				  this.plugin.last_bank_withdraw_use_time=Bukkit.getWorld("world").getFullTime();
+				  this.plugin.last_bank_withdraw_use_time=Main.SERVER_TICK_TIME;
 			  }
 		  }
 		  e.setCancelled(true);
@@ -11092,6 +11632,18 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
     		e.getClickedBlock().setData((byte) ((e.getClickedBlock().getData()+2 % 4)));
     	}
     }*/
+    /*Was for testing lightning in item frames.
+    if (e.getAction()==Action.LEFT_CLICK_AIR) {
+    	if (p.getName().equalsIgnoreCase("sigonasr2")) {
+    		Bukkit.getWorld("world").strikeLightning(p.getLocation());
+    	}
+    }*/
+    /*
+    if (e.getAction()==Action.LEFT_CLICK_BLOCK) {
+    	if (p.getName().equalsIgnoreCase("sigonasr2")) {
+    		p.sendMessage("This block at "+e.getClickedBlock().getLocation());
+    	}
+    }*/
     if (e.getAction()==Action.RIGHT_CLICK_AIR || e.getAction()==Action.RIGHT_CLICK_BLOCK) {
     	if (p.getItemInHand()!=null && (p.getItemInHand().getType()==Material.FLINT_AND_STEEL || p.getItemInHand().getType()==Material.LAVA_BUCKET)) {
     		if (this.plugin.PlayerinJob(p, "Support")) {
@@ -11099,7 +11651,7 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
     		}
     	}
     }
-    if (e.getAction()==Action.RIGHT_CLICK_AIR || e.getAction()==Action.RIGHT_CLICK_BLOCK) {
+    if (e.getAction()==Action.RIGHT_CLICK_AIR) {
     	boolean largechest=false;
 		boolean smallchest=false;
 		int identifier=-1;
@@ -11238,7 +11790,7 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
     		 }
     	 }
     	 if (!contains) {
-    		 this.plugin.jukeboxlist.add(new JukeboxData(e.getClickedBlock(), e.getItem().getType(), 100, getSongDuration(e.getItem().getType()), Bukkit.getWorld("world").getFullTime()));
+    		 this.plugin.jukeboxlist.add(new JukeboxData(e.getClickedBlock(), e.getItem().getType(), 100, getSongDuration(e.getItem().getType()), Main.SERVER_TICK_TIME));
 			 if (p.getName().compareTo("sigonasr2")==0) {p.sendMessage("Added this jukebox to the list.");}
     	 }
      }
@@ -11591,21 +12143,21 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
                 this.plugin.getAccountsConfig().set(p.getName() + ".money", Double.valueOf(total));
                 this.plugin.saveAccountsConfig();
                 if (value <= 1)
-                  p.sendMessage("ｧ2[BankEconomy]" + ChatColor.AQUA + " You added " + value + " " + currencySG + " to your bank account.");
+                  p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " You added " + value + " " + currencySG + " to your bank account.");
                 else {
-                  p.sendMessage("ｧ2[BankEconomy]" + ChatColor.AQUA + " You added " + value + " " + currencyPL + " to your bank account.");
+                  p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " You added " + value + " " + currencyPL + " to your bank account.");
                 }
                 Main.economy.withdrawPlayer(p.getName(), value);
               } else {
-                p.sendMessage("ｧ2[BankEconomy]" + ChatColor.AQUA + " Sorry, you can't deposit that amount of money.");
+                p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " Sorry, you can't deposit that amount of money.");
               }*/
             	//If they were using the withdraw bank before, clear them from it.
         		if (this.plugin.last_bank_withdraw_user.equalsIgnoreCase(p.getName())) {
         			this.plugin.last_bank_withdraw_user="";
         		}
-            	if (this.plugin.last_bank_deposit_use_time+200<Bukkit.getWorld("world").getFullTime() || this.plugin.last_bank_deposit_user.equalsIgnoreCase(p.getName())) {
+            	if (this.plugin.last_bank_deposit_use_time+200<Main.SERVER_TICK_TIME || this.plugin.last_bank_deposit_user.equalsIgnoreCase(p.getName())) {
             		this.plugin.last_bank_deposit_user=p.getName();
-            		this.plugin.last_bank_deposit_use_time=Bukkit.getWorld("world").getFullTime();
+            		this.plugin.last_bank_deposit_use_time=Main.SERVER_TICK_TIME;
             		p.sendMessage(ChatColor.DARK_GREEN+"[Bank]" + ChatColor.AQUA +" Please enter the amount of money in chat that you would like to deposit. " + ChatColor.YELLOW + "(Type all to deposit every dollar you are holding.)");
             	} else {
             		p.sendMessage(ChatColor.DARK_GREEN+"[Bank]" + ChatColor.RED +" Someone else is using the deposit bank at the moment. Please wait until they are finished.");
@@ -11617,21 +12169,21 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
                 this.plugin.getAccountsConfig().set(p.getName() + ".money", Double.valueOf(total));
                 this.plugin.saveAccountsConfig();
                 if (value <= 1)
-                  p.sendMessage("ｧ2[BankEconomy]" + ChatColor.AQUA + " You withdrawn " + value + " " + currencySG + " from your bank account.");
+                  p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " You withdrawn " + value + " " + currencySG + " from your bank account.");
                 else {
-                  p.sendMessage("ｧ2[BankEconomy]" + ChatColor.AQUA + " You withdrawn " + value + " " + currencyPL + " from your bank account.");
+                  p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " You withdrawn " + value + " " + currencyPL + " from your bank account.");
                 }
                 Main.economy.depositPlayer(p.getName(), value);
               } else {
-                p.sendMessage("ｧ2[BankEconomy]" + ChatColor.AQUA + " Sorry, you can't withdraw that amount of money.");
+                p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " Sorry, you can't withdraw that amount of money.");
               }*/
-            	if (this.plugin.last_bank_withdraw_use_time+200<Bukkit.getWorld("world").getFullTime() || this.plugin.last_bank_withdraw_user.equalsIgnoreCase(p.getName())) {
+            	if (this.plugin.last_bank_withdraw_use_time+200<Main.SERVER_TICK_TIME || this.plugin.last_bank_withdraw_user.equalsIgnoreCase(p.getName())) {
             		//If they were using the deposit bank before, clear them from it.
             		if (this.plugin.last_bank_deposit_user.equalsIgnoreCase(p.getName())) {
             			this.plugin.last_bank_deposit_user="";
             		}
             		this.plugin.last_bank_withdraw_user=p.getName();
-            		this.plugin.last_bank_withdraw_use_time=Bukkit.getWorld("world").getFullTime();
+            		this.plugin.last_bank_withdraw_use_time=Main.SERVER_TICK_TIME;
             		p.sendMessage(ChatColor.DARK_GREEN+"[Bank]" + ChatColor.AQUA +" Please enter the amount of money in chat that you would like to withdraw. " + ChatColor.YELLOW + "(Type all to withdraw every dollar you have in the bank.)");
             	} else {
             		p.sendMessage(ChatColor.DARK_GREEN+"[Bank]" + ChatColor.RED +" Someone else is using the withdraw bank at the moment. Please wait until they are finished.");
@@ -11693,6 +12245,25 @@ public String convertToItemName(String val) {
 	  }
 	  return String.valueOf(mod);
 }
+
+@EventHandler
+public void onHangingBreak(HangingBreakEvent e) {
+	//Bukkit.broadcastMessage(""+e.getCause());
+	if (e.getCause().name().equalsIgnoreCase(RemoveCause.DEFAULT.name()) || e.getCause().name().equalsIgnoreCase(RemoveCause.EXPLOSION.name())) {
+		//Prevent this from happening here.
+		e.setCancelled(true);
+	}
+}
+
+@EventHandler
+public void onHangingBreakEntity(HangingBreakByEntityEvent e) {
+	//Bukkit.broadcastMessage(""+e.getRemover().getType());
+	if (e.getRemover().getType()==EntityType.LIGHTNING || (e.getRemover() instanceof Monster)) {
+		//Prevent this from happening here.
+		e.setCancelled(true);
+	}
+}
+
 /*
 	@EventHandler
 	public void onLightningStrike(LightningStrikeEvent e) {

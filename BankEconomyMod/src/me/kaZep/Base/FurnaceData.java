@@ -12,7 +12,7 @@ public class FurnaceData {
 	public FurnaceData(Location pos, String owner) {
 		this.pos=pos;
 		this.owner=owner;
-		this.time=Bukkit.getWorld("world").getFullTime()+9000;
+		this.time=Main.SERVER_TICK_TIME+9000;
 	}
 	
 	public void setOwner(String owner) {
@@ -36,7 +36,7 @@ public class FurnaceData {
 		return time;
 	}
 	public void resetTime() {
-		this.time=Bukkit.getWorld("world").getFullTime()+9000;
+		this.time=Main.SERVER_TICK_TIME+9000;
 	}
 	
 }

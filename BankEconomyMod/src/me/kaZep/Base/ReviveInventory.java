@@ -18,7 +18,7 @@ public class ReviveInventory {
 		armorInventory = p.getInventory().getArmorContents();
 		expamt = p.getExp();
 		explv = p.getLevel();
-		dropTime = Bukkit.getWorld("world").getFullTime()+12000;
+		dropTime = Main.SERVER_TICK_TIME+12000;
 		deathLocation = p.getLocation();
 	}
 }

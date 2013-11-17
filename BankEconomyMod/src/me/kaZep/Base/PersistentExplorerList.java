@@ -13,6 +13,6 @@ public class PersistentExplorerList {
 	//Event 2: Simply says if this player has died recently or not.
 	public PersistentExplorerList(String name) {
 		this.name=name;
-		this.expiretime=Bukkit.getWorld("world").getFullTime()+36000;
+		this.expiretime=Main.SERVER_TICK_TIME+36000;
 	}
 }

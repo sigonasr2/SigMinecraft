@@ -19,7 +19,7 @@ public class BrewingStandData {
 	public BrewingStandData(Location pos, String owner) {
 		this.pos=pos;
 		this.owner=owner;
-		this.time=Bukkit.getWorld("world").getFullTime()+9000;
+		this.time=Main.SERVER_TICK_TIME+9000;
 		this.setnewtime=false;
 	}
 	
@@ -98,7 +98,7 @@ public class BrewingStandData {
 		return time;
 	}
 	public void resetTime() {
-		this.time=Bukkit.getWorld("world").getFullTime()+9000;
+		this.time=Main.SERVER_TICK_TIME+9000;
 	}
 	
 }

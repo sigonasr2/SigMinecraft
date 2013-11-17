@@ -14,8 +14,8 @@ public class PlayerData {
 	public PlayerData(Player p) {
 		this.data=p;
 		this.lastblocktype=Material.DIRT;
-		lastinteracttime=Bukkit.getWorld("world").getFullTime();
-		lastminetime=Bukkit.getWorld("world").getFullTime();
+		lastinteracttime=Main.SERVER_TICK_TIME;
+		lastminetime=Main.SERVER_TICK_TIME;
 		minestreak=0;
 	}
 	public boolean CheckMineStreak() {
@@ -23,13 +23,13 @@ public class PlayerData {
 		//Resets when the miner hasn't mined for 10 seconds.
 		//If it reaches 10 blocks, we assume the miner is mining, and we need to do something about it.
 		//Attempt to spawn Charge Zombie II's in rooms that are unlit.
-		if (Bukkit.getWorld("world").getFullTime()>lastminetime+200) {
+		if (Main.SERVER_TICK_TIME>lastminetime+200) {
 			//Reset. Too much time has passed.
-			lastminetime=Bukkit.getWorld("world").getFullTime();
+			lastminetime=Main.SERVER_TICK_TIME;
 			minestreak=0;
 		} else {
 			minestreak++;
-			lastminetime=Bukkit.getWorld("world").getFullTime();
+			lastminetime=Main.SERVER_TICK_TIME;
 			if (minestreak>10) {
 				minestreak=0;
 				return true;

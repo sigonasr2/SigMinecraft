@@ -15,7 +15,7 @@ public class EntityHitData {
 	public EntityHitData(Player p) {
 		this.p=p;
 		id = new ArrayList<UUID>();
-		registeredtime = Bukkit.getWorld("world").getFullTime()+1200;
+		registeredtime = Main.SERVER_TICK_TIME+1200;
 	}
 	public List<UUID> getEntities() {
 		return id;

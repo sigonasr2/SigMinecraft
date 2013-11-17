@@ -11,7 +11,7 @@ public class EntityInteractData {
 	public EntityInteractData(UUID id, String owner) {
 		this.entityid=id;
 		this.entityowner=owner;
-		removetime=Bukkit.getWorld("world").getFullTime()+3000;
+		removetime=Main.SERVER_TICK_TIME+3000;
 	}
 	public long getTime() {
 		return removetime;
@@ -24,6 +24,6 @@ public class EntityInteractData {
 	}
 	public void setOwner(String owner) {
 		this.entityowner=owner;
-		removetime=Bukkit.getWorld("world").getFullTime()+3000;
+		removetime=Main.SERVER_TICK_TIME+3000;
 	}
 }

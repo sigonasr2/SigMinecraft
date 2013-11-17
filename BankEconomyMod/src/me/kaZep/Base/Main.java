@@ -54,6 +54,7 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Wither;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -108,6 +109,8 @@ public class Main extends JavaPlugin
   public long check_lights_time=0;
   public long check_spleef_game=0;
   public boolean harrowing_night=false;
+  public double randomitemchance = 800;
+  public static long SERVER_TICK_TIME = 0;
   
   public int REVIVE_EFFECT=0; 
   public Location REVIVE_EFFECT_LOC; 
@@ -155,6 +158,7 @@ public class Main extends JavaPlugin
   public List<InvisibilityData> ninjavisible_list = null;
   public List<ReviveInventory> revive_inventory_list = null;
   public List<Chunk> chunk_queue_list = null;
+  public static List<RecyclingCenterNode> recycling_center_list = null;
   public DamageAPI DMGCALC = null;
   public long lastMessage = 0;
   
@@ -177,7 +181,7 @@ public class Main extends JavaPlugin
 
   public final PlayerListener pl = new PlayerListener(this);
 
-  String pluginPrefix = "§2[BankEconomy]";
+  String pluginPrefix = ChatColor.DARK_GREEN+"[BankEconomy]";
 
   public double Warning(LivingEntity l,int id) {
 	  double hp = l.getHealth();
@@ -216,7 +220,8 @@ public class Main extends JavaPlugin
     getCommand("settings").setExecutor(new commandBankEconomy(this));
     getCommand("maintenance").setExecutor(new commandBankEconomy(this));
     getCommand("event").setExecutor(new commandBankEconomy(this));
-    getCommand("dungeon").setExecutor(new commandBankEconomy(this));
+    //getCommand("dungeon").setExecutor(new commandBankEconomy(this));
+    getCommand("ticktime").setExecutor(new commandBankEconomy(this));
 
     setupEconomy();
 
@@ -229,7 +234,10 @@ public class Main extends JavaPlugin
     getConfig().addDefault("maintenance-mode", Boolean.valueOf(false));
     getConfig().addDefault("halloween-enabled", Boolean.valueOf(true));
     getConfig().addDefault("item-cube-numb", Integer.valueOf(0));
+    getConfig().addDefault("server-tick-time", Long.valueOf(143000000l));
     saveConfig();
+    
+    SERVER_TICK_TIME = getConfig().getLong("server-tick-time");
 
     getAccountsConfig().options().copyDefaults(true);
     saveAccountsConfig();
@@ -261,7 +269,31 @@ public class Main extends JavaPlugin
     revive_inventory_list = new ArrayList<ReviveInventory>();
     chunk_queue_list = new ArrayList<Chunk>();
     
+    recycling_center_list = new ArrayList<RecyclingCenterNode>();
+    
+    //Add in Twoside Recycling Center.
+    RecyclingCenterNode Twoside_recycling_center = new RecyclingCenterNode(this);
+    Twoside_recycling_center.addChest(new Location(Bukkit.getWorld("world"), 1617, 67, -351));
+	Twoside_recycling_center.addChest(new Location(Bukkit.getWorld("world"), 1618, 67, -351));
+	Twoside_recycling_center.addChest(new Location(Bukkit.getWorld("world"), 1617, 67, -355));
+	Twoside_recycling_center.addChest(new Location(Bukkit.getWorld("world"), 1618, 67, -355));
+	Twoside_recycling_center.addChest(new Location(Bukkit.getWorld("world"), 1622, 67, -355));
+	Twoside_recycling_center.addChest(new Location(Bukkit.getWorld("world"), 1623, 67, -355));
+	Twoside_recycling_center.addChest(new Location(Bukkit.getWorld("world"), 1622, 67, -351));
+	Twoside_recycling_center.addChest(new Location(Bukkit.getWorld("world"), 1623, 67, -351));
+    recycling_center_list.add(Twoside_recycling_center);
+    
+    //Add in Sarayn Recycling Center.
+    RecyclingCenterNode Sarayn_recycling_center = new RecyclingCenterNode(this);
+    Sarayn_recycling_center.addChest(new Location(Bukkit.getWorld("world"), 1540, 57, 154));
+    Sarayn_recycling_center.addChest(new Location(Bukkit.getWorld("world"), 1541, 57, 154));
+    recycling_center_list.add(Sarayn_recycling_center);
+    
     //Add Recipes for new Block armor crafting.
+    ShapedRecipe Melons = new ShapedRecipe(new ItemStack(Material.MELON, 8));
+    Melons.shape("a");
+    Melons.setIngredient('a', Material.MELON_BLOCK);
+    Bukkit.addRecipe(Melons);
     ShapedRecipe iron_helmet = new ShapedRecipe(new ItemStack(Material.IRON_HELMET));
     iron_helmet.shape("aaa","a a");
     iron_helmet.setIngredient('a', Material.IRON_BLOCK);
@@ -774,6 +806,8 @@ public class Main extends JavaPlugin
 
   public void onDisable()
   {
+	  getConfig().set("server-tick-time", Long.valueOf(SERVER_TICK_TIME));
+	  saveConfig();
     PluginDescriptionFile pdf = getDescription();
     System.out.println("[" + pdf.getName() + "] The plugin has been disabled succesfully.");
   }
@@ -849,6 +883,7 @@ public class Main extends JavaPlugin
 public void runTick() {
   this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new  Runnable(){
 		  public void run(){
+			SERVER_TICK_TIME++;
 			for (int i=0;i<ARROW_SHOOTERS.size();i++) {
 				ArrowShooter shooter = ARROW_SHOOTERS.get(i);
 				shooter.timer--;
@@ -881,7 +916,7 @@ public void runTick() {
 				}
 			}
 			for (int i=0;i<ninjavisible_list.size();i++) {
-				if (Bukkit.getWorld("world").getFullTime()>ninjavisible_list.get(i).resettime) {
+				if (Main.SERVER_TICK_TIME>ninjavisible_list.get(i).resettime) {
 					//Recloak this ninja if it's still alive.
 					List<Entity> entities = Bukkit.getWorld("world").getEntities();
 					for (int j=0;j<entities.size();j++) {
@@ -898,7 +933,7 @@ public void runTick() {
 				}
 			}
 		    //Put your code here...
-			//Bukkit.getPlayer("sigonasr2").sendMessage("Server Tick "+Bukkit.getWorld("world").getFullTime());
+			//Bukkit.getPlayer("sigonasr2").sendMessage("Server Tick "+Main.SERVER_TICK_TIME);
 			  if (POLYMORPH>0) {
 				  Bukkit.getWorld("world").playEffect(new Location(POLYMORPH_LOC.getWorld(),POLYMORPH_LOC.getX()+(Math.random()-Math.random())*2,POLYMORPH_LOC.getY()+(Math.random())*2+2,POLYMORPH_LOC.getZ()+(Math.random()-Math.random())*2), Effect.STEP_SOUND, Material.EMERALD_BLOCK);
 				  Bukkit.getWorld("world").playEffect(new Location(POLYMORPH_LOC.getWorld(),POLYMORPH_LOC.getX()+(Math.random()-Math.random())*2,POLYMORPH_LOC.getY()+(Math.random())*2+2,POLYMORPH_LOC.getZ()+(Math.random()-Math.random())*2), Effect.STEP_SOUND, Material.WATER);
@@ -971,6 +1006,20 @@ public void runTick() {
 				  //Bukkit.getPlayer("sigonasr2").sendMessage(REVIVE_EFFECT+"");
 			  }
 			  List<UUID> lineofsight_check = new ArrayList<UUID>();
+			  if (Main.SERVER_TICK_TIME%100==0) {
+				  //This is for events that occur once every 5 seconds. 
+				  List<Entity> world_entities = Bukkit.getWorld("world").getEntities();
+				  for (int i=0;i<world_entities.size();i++) {
+					  if (world_entities.get(i).getType()==EntityType.WITHER) {
+						  Wither l = (Wither)world_entities.get(i);
+						  if (l.getMaxHealth()<l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth()))) {
+						      DecimalFormat df = new DecimalFormat("#0.0");
+							  l.setHealth(l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth())));
+							  //Bukkit.broadcastMessage("Healed "+(+5+(0.2*(l.getMaxHealth()/l.getHealth())))+" health. "+df.format(l.getHealth())+"/"+l.getMaxHealth()+" HP");
+						  }
+					  }
+				  }
+			  }
 			  for (int zx=0;zx<Bukkit.getOnlinePlayers().length;zx++) {
 			  Player p = Bukkit.getOnlinePlayers()[zx];
 			  //p.sendMessage("That's item slot #"+p.getInventory().getHeldItemSlot());
@@ -993,11 +1042,11 @@ public void runTick() {
 					  Bukkit.getPlayer("sigonasr2").sendMessage("New Time: "+Bukkit.getWorld("world").getTime());
 				  }
 			  }*/
-			  //last_world_time = Bukkit.getWorld("world").getFullTime();
+			  //last_world_time = Main.SERVER_TICK_TIME;
 			  if (p.getWorld().getName().compareTo("world")==0) {
 				  //Bukkit.getWorld("world").spawnEntity(p.getLocation(), EntityType.EXPERIENCE_ORB);
 				  //Bukkit.getWorld("world").dropItemNaturally(p.getLocation(), new ItemStack(Material.DIRT));
-				  if (getConfig().getBoolean("halloween-enabled") && Bukkit.getWorld("world").getFullTime()%10==0) {
+				  if (getConfig().getBoolean("halloween-enabled") && Main.SERVER_TICK_TIME%10==0) {
 					  //1551,69,275
 					  Location testloc = new Location(p.getWorld(),1551,69,-275);
 					  if (p.getLocation().distanceSquared(testloc)<900) {
@@ -1035,7 +1084,7 @@ public void runTick() {
 						  }
 					  }
 				  }
-				  if (getConfig().getBoolean("halloween-enabled") && Bukkit.getWorld("world").hasStorm() && Bukkit.getWorld("world").getFullTime()%20==0) {
+				  if (getConfig().getBoolean("halloween-enabled") && Bukkit.getWorld("world").hasStorm() && Main.SERVER_TICK_TIME%20==0) {
 					  Item i = null;
 					  int item = (int)(Math.random()*4);
 					  switch (item) {
@@ -1046,7 +1095,7 @@ public void runTick() {
 					  }
 					  i.setTicksLived(3600);
 				  }
-				  if (Bukkit.getWorld("world").getFullTime()%90==0) {
+				  if (Main.SERVER_TICK_TIME%90==0) {
 					  for (int i=-15;i<=15;i++) {
 						  for (int j=-15;j<=15;j++) {
 							  for (int k=-15;k<=15;k++) {
@@ -1095,12 +1144,17 @@ public void runTick() {
 									  List<Entity> nearby = p.getNearbyEntities(30, 30, 30);
 									  boolean exists=false;
 									  for (int m=0;m<nearby.size();m++) {
-										  if (nearby.get(m).getType()==EntityType.ZOMBIE) {
+										  if (nearby.get(m) instanceof LivingEntity) {
 											  LivingEntity ev = (LivingEntity)nearby.get(m);
-											  if (ev.getCustomName()!=null && ev.getCustomName().equalsIgnoreCase(ChatColor.DARK_PURPLE+"Charge Zombie III")) {
-												  //ev.setTicksLived(0);
-												  exists=true;
-												  break;
+											  if (nearby.get(m).getType()==EntityType.ZOMBIE) {
+												  if (ev.getCustomName()!=null && ev.getCustomName().equalsIgnoreCase(ChatColor.DARK_PURPLE+"Charge Zombie III")) {
+													  //ev.setTicksLived(0);
+													  exists=true;
+												  }
+											  } else {
+												  if (Math.random()<=0.5) {
+													  ev.remove();
+												  }
 											  }
 										  }
 									  }
@@ -1141,7 +1195,6 @@ public void runTick() {
 										  zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,0));
 										  zombie.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,999999,0));
 										  zombie.setTicksLived(1);
-										  //p.sendMessage("Command is: "+"npc create Boss --type EnderDragon --at "+(p.getLocation().getBlockX()+i)+":-50:"+(p.getLocation().getBlockZ()+j));
 										  Iterator<EnderDragon> e_list = Bukkit.getWorld("world").getEntitiesByClass(EnderDragon.class).iterator();
 										  boolean first=false;
 										  while (e_list.hasNext()) {
@@ -1159,9 +1212,9 @@ public void runTick() {
 						  }
 					  }
 				  }
-				  if (Bukkit.getWorld("world").getFullTime()%20==0) {
+				  if (Main.SERVER_TICK_TIME%20==0) {
 			    	for (int d=0;d<chunk_queue_list.size();d++) {
-			    		if (!chunk_queue_list.get(d).isLoaded()) {
+			    		if (chunk_queue_list.get(d)==null || !chunk_queue_list.get(d).isLoaded()) {
 			    			chunk_queue_list.remove(0);
 			    		} else {
 			    			break;
@@ -1173,7 +1226,7 @@ public void runTick() {
 						List<String> debugmessages = new ArrayList<String>();
 						FileConfiguration customchunk = reloadChunksConfig(chunk_queue_list.get(0).getX(), chunk_queue_list.get(0).getZ());
 						if (!customchunk.contains("animal-reset2")) {
-							customchunk.set("animal-reset2", Long.valueOf(Bukkit.getWorld("world").getFullTime()+17280000));
+							customchunk.set("animal-reset2", Long.valueOf(Main.SERVER_TICK_TIME+17280000));
 							Chunk c = chunk_queue_list.get(0);
 							Random r = new Random();
 							  for (int x=0;x<16;x++) {
@@ -1245,8 +1298,8 @@ public void runTick() {
 							  }
 						} else {
 							//Check the value and regenerate if necessary.
-							if (Bukkit.getWorld("world").getFullTime()>customchunk.getLong("animal-reset2")) {
-								customchunk.set("animal-reset2", Long.valueOf(Bukkit.getWorld("world").getFullTime()+17280000));
+							if (Main.SERVER_TICK_TIME>customchunk.getLong("animal-reset2")) {
+								customchunk.set("animal-reset2", Long.valueOf(Main.SERVER_TICK_TIME+17280000));
 								Chunk c = chunk_queue_list.get(0);
 								Random r = new Random();
 								  for (int x=0;x<16;x++) {
@@ -1450,7 +1503,9 @@ public void runTick() {
 										  //l.setCustomNameVisible(true);
 										  l.setMaxHealth(Warning(l.getMaxHealth()*1.75d,4));
 									  }
-									  l.setHealth(Warning(l.getMaxHealth(),20));
+									  if (l!=null && l.isValid()) {
+										  l.setHealth(Warning(l.getMaxHealth(),20));
+									  }
 								  }
 								  l.setTicksLived(6400);
 							  }
@@ -1482,7 +1537,9 @@ public void runTick() {
 										  //l.setCustomNameVisible(true);
 										  l.setMaxHealth(Warning(l.getMaxHealth()*2,8));
 									  }
-									  l.setHealth(Warning(l.getMaxHealth(),21));
+									  if (l!=null && l.isValid()) {
+										  l.setHealth(Warning(l.getMaxHealth(),21));
+									  }
 								  }
 								  l.setTicksLived(6400);
 							  }
@@ -1502,7 +1559,9 @@ public void runTick() {
 										  //l.setCustomNameVisible(true);
 										  l.setMaxHealth(Warning(l.getMaxHealth()/4,10));
 									  }
-									  l.setHealth(Warning(l.getMaxHealth(),11));
+									  if (l!=null && l.isValid()) {
+										  l.setHealth(Warning(l.getMaxHealth(),11));
+									  }
 								  }
 								  l.setTicksLived(6400);
 							  }
@@ -1664,7 +1723,7 @@ public void runTick() {
 				  }
 			  }
 			  if (p.getWorld().getName().compareTo("world_nether")==0) {
-				  if (Bukkit.getWorld("world").getFullTime()%60==0) {
+				  if (Main.SERVER_TICK_TIME%60==0) {
 					  for (int i=-15;i<=15;i++) {
 						  for (int j=-15;j<=15;j++) {
 							  for (int k=-5;k<=5;k++) {
@@ -1707,7 +1766,7 @@ public void runTick() {
 					  }
 				  }
 			  }
-			  if (Bukkit.getWorld("world").getFullTime()%600==0) {
+			  if (Main.SERVER_TICK_TIME%600==0) {
 				  if (turnedon==false && Bukkit.getWorld("world").getTime()>13000) {
 					  //Bukkit.getPlayer("sigonasr2").sendMessage("It's night now...");
 					  turnedon=true;
@@ -1737,7 +1796,7 @@ public void runTick() {
 					  }
 				  }
 			  }
-			  if (Bukkit.getWorld("world").getFullTime()%10==0) {
+			  if (Main.SERVER_TICK_TIME%10==0) {
 				  if (getConfig().getBoolean("spleef4insession")) {
 					  //Check to see if we fall off.
 					  if ((p.getLocation().getX()<1585 || p.getLocation().getX()>1600 || p.getLocation().getZ()<24 || p.getLocation().getZ()>39 || p.getLocation().getY()<86.5d) && (
@@ -2243,7 +2302,7 @@ public void runTick() {
 }
 
 public String healthbar(double curHP,double maxHP) {
-	  //█ ▌
+	  //笆�笆�
 	  int bits=(int)(Math.ceil(curHP/maxHP*10));
 	  String bar=" ";
 	  if (bits>6) {
@@ -2256,16 +2315,16 @@ public String healthbar(double curHP,double maxHP) {
 		  bar+=ChatColor.RED+"";
 	  }
 	  for (int i=0;i<bits/2;i++) {
-		  bar+="█";
+		  bar+=Character.toString((char)0x2588);
 	  }
 	  if (bits%2!=0) {
-		  bar+="▌";
+		  bar+=Character.toString((char)0x258C);
 	  }
 	  return bar;
 }
 
 public String healthbar(double curHP,double maxHP,int hunger) {
-	  //█ ▌
+	  //笆�笆�
 	  int bits=(int)(Math.ceil(curHP/maxHP*10));
 	  String bar=" ";
 	  if (hunger==20) {
@@ -2290,10 +2349,10 @@ public String healthbar(double curHP,double maxHP,int hunger) {
 		  }
 	  }
 	  for (int i=0;i<bits/2;i++) {
-		  bar+="█";
+		  bar+=Character.toString((char)0x2588);
 	  }
 	  if (bits%2!=0) {
-		  bar+="▌";
+		  bar+=Character.toString((char)0x258C);
 	  }
 	  return bar;
 }
@@ -2327,7 +2386,7 @@ public void checkJukeboxes() {
     				  eve.event=1;
     				  eve.data=p.getExp();
     				  eve.data2=p.getLevel();
-    				  eve.expiretime=Bukkit.getWorld("world").getFullTime()+1200;
+    				  eve.expiretime=Main.SERVER_TICK_TIME+1200;
     				  explorers.add(eve);
         		  }
         	  }
@@ -2348,7 +2407,7 @@ public void checkJukeboxes() {
 				 deadpoint=-1;
 			  }
 			  */
-        	  if (explorers.get(i).event==-1 || explorers.get(i).expiretime<Bukkit.getWorld("world").getFullTime()) {
+        	  if (explorers.get(i).event==-1 || explorers.get(i).expiretime<Main.SERVER_TICK_TIME) {
         		  explorers.remove(i);
         		  i--;
         	  }
@@ -2405,7 +2464,7 @@ public void checkJukeboxes() {
     				}
 					boolean testing=false;
     				if (testing || !notallowed) {
-    					if (testing || ((unmatched/9610.0d*100)>7 && (unmatched/9610.0d*100)<8.35 && (last_boss_dungeon_time==0 || last_boss_dungeon_time<Bukkit.getWorld("world").getFullTime()))) {
+    					if (testing || ((unmatched/9610.0d*100)>7 && (unmatched/9610.0d*100)<8.35 && (last_boss_dungeon_time==0 || last_boss_dungeon_time<Main.SERVER_TICK_TIME))) {
 	    					if (Math.random()<0.25) {
 	    	    				//Empty the whole area.
 	    	    				for (int j=-15;j<16;j++) {
@@ -2437,9 +2496,9 @@ public void checkJukeboxes() {
 	    					    } else {
 	    					    	Bukkit.getLogger().warning(("File does not exist."));
 	    					    }
-	    					    last_boss_dungeon_time=Bukkit.getWorld("world").getFullTime()+12000;
+	    					    last_boss_dungeon_time=Main.SERVER_TICK_TIME+12000;
 	    					} else {
-	    					    last_boss_dungeon_time=Bukkit.getWorld("world").getFullTime()+12000;
+	    					    last_boss_dungeon_time=Main.SERVER_TICK_TIME+12000;
 	    					}
     					}
     					//Bukkit.getLogger().info("Disparity is "+(unmatched/6727.0d*100)+"%");
@@ -2850,12 +2909,12 @@ public void checkJukeboxes() {
 	  		  for (int i=0;i<supportmoblist.size();i++) {
     			  if (Bukkit.getPlayer(supportmoblist.get(i).p.getName())!=null) {
 		  			  for (int j=0;j<supportmoblist.get(i).id.size();j++) {
-						  if (supportmoblist.get(i).registeredtime<Bukkit.getWorld("world").getFullTime()) {
+						  if (supportmoblist.get(i).registeredtime<Main.SERVER_TICK_TIME) {
 							  supportmoblist.get(i).id.remove(j);
 							  j--;
 						  }
 		  			  }
-					  /*if (supportmoblist.get(i).registeredtime<Bukkit.getWorld("world").getFullTime()) {
+					  /*if (supportmoblist.get(i).registeredtime<Main.SERVER_TICK_TIME) {
 						  supportmoblist.remove(i);
 						  i--;
 					  }*/
@@ -2949,10 +3008,10 @@ public void checkJukeboxes() {
 				    							  if (!SPEED_CONTROL.get(k).hpbufflist.contains(p)) {
 				    								  SPEED_CONTROL.get(k).hpbufflist.add(p);
 				    								  p2.sendMessage(ChatColor.YELLOW+"[Aura]"+ChatColor.ITALIC+"HP buff (+10) from Support "+ChatColor.DARK_RED+p.getName());
-				    								  SPEED_CONTROL.get(k).hpbuff_time = Bukkit.getWorld("world").getFullTime()+260;
+				    								  SPEED_CONTROL.get(k).hpbuff_time = Main.SERVER_TICK_TIME+260;
 				    								  SPEED_CONTROL.get(k).updatePlayerSpd();
 				    							  } else {
-				    								  SPEED_CONTROL.get(k).hpbuff_time = Bukkit.getWorld("world").getFullTime()+260;
+				    								  SPEED_CONTROL.get(k).hpbuff_time = Main.SERVER_TICK_TIME+260;
 				    								  SPEED_CONTROL.get(k).updatePlayerSpd();
 				    							  }
 				    						  }
@@ -3005,7 +3064,7 @@ public void checkJukeboxes() {
 		    				  if (lookat.getType()==Material.LOG || lookat.getType()==Material.WOOD) {
 		    					  explorerlist.get(i).villagecriteria=100;
 		    				  }
-		    				  if (explorerlist.get(i).villagecriteria<40 && GLOBAL_villagetimer<Bukkit.getWorld("world").getFullTime()) {
+		    				  if (explorerlist.get(i).villagecriteria<40 && GLOBAL_villagetimer<Main.SERVER_TICK_TIME) {
 		    					  //Start checking for villagers. Start going up if they aren't there.
 		    					  boolean village=false;
 		    					  List<Entity> lister = p.getNearbyEntities(10, 10, 10);
@@ -3015,7 +3074,7 @@ public void checkJukeboxes() {
 		    							  village=true;
 		    							  explorerlist.get(i).villagecriteria=100;
 		    							  gainMoneyExp(p,"Explorer",0.50,50);
-		    							  GLOBAL_villagetimer=Bukkit.getWorld("world").getFullTime()+6000;
+		    							  GLOBAL_villagetimer=Main.SERVER_TICK_TIME+6000;
 		    							  break;
 		    						  }
 		    					  }
@@ -3043,10 +3102,10 @@ public void checkJukeboxes() {
 		    				  if (lookat.getType()==Material.LOG || lookat.getType()==Material.WOOD) {
 		    					  explorerlist.get(i).templecriteria=100;
 		    				  }
-		    				  if (explorerlist.get(i).templecriteria<=0 && GLOBAL_templetimer<Bukkit.getWorld("world").getFullTime()) {
+		    				  if (explorerlist.get(i).templecriteria<=0 && GLOBAL_templetimer<Main.SERVER_TICK_TIME) {
 		    					  explorerlist.get(i).templecriteria=100;
 								  gainMoneyExp(p,"Explorer",0.50,50);
-								  GLOBAL_templetimer=Bukkit.getWorld("world").getFullTime()+36000;
+								  GLOBAL_templetimer=Main.SERVER_TICK_TIME+36000;
 		    				  }
 	
 		    				  //CAVE CRITERIA
@@ -3071,20 +3130,20 @@ public void checkJukeboxes() {
 		    				  if (lookat.getType()==Material.LOG || lookat.getType()==Material.SAND) {
 		    					  explorerlist.get(i).cavecriteria=100;
 		    				  }
-		    				  if (explorerlist.get(i).cavecriteria<=0 && GLOBAL_cavetimer<Bukkit.getWorld("world").getFullTime()) {
+		    				  if (explorerlist.get(i).cavecriteria<=0 && GLOBAL_cavetimer<Main.SERVER_TICK_TIME) {
 		    					  explorerlist.get(i).cavecriteria=100;
 								  gainMoneyExp(p,"Explorer",0.50,50);
-								  GLOBAL_cavetimer=Bukkit.getWorld("world").getFullTime()+3000;
+								  GLOBAL_cavetimer=Main.SERVER_TICK_TIME+3000;
 		    				  }
 		    				  
 		    				  //UNDERGROUND CRITERIA
 		    				  if (p.getLocation().getY()<30 && p.getLocation().getY()>10 && lookat.getLightLevel()<6) {
 		    					  explorerlist.get(i).undergroundcriteria-=20;
 		    				  }
-		    				  if (explorerlist.get(i).undergroundcriteria<=0 && GLOBAL_undergroundtimer<Bukkit.getWorld("world").getFullTime()) {
+		    				  if (explorerlist.get(i).undergroundcriteria<=0 && GLOBAL_undergroundtimer<Main.SERVER_TICK_TIME) {
 		    					  explorerlist.get(i).undergroundcriteria=100;
 								  gainMoneyExp(p,"Explorer",0.50,50);
-								  GLOBAL_undergroundtimer=Bukkit.getWorld("world").getFullTime()+3000;
+								  GLOBAL_undergroundtimer=Main.SERVER_TICK_TIME+3000;
 		    				  }
 		    				  if (p.getLocation().getY()>50) {
 		    					  explorerlist.get(i).undergroundcriteria=100;
@@ -3100,10 +3159,10 @@ public void checkJukeboxes() {
 		    				  if (lookat.getType()==Material.LAVA) {
 		    					  explorerlist.get(i).nethercriteria-=5;
 		    				  }
-		    				  if (explorerlist.get(i).nethercriteria<=0 && GLOBAL_nethertimer<Bukkit.getWorld("world").getFullTime()) {
+		    				  if (explorerlist.get(i).nethercriteria<=0 && GLOBAL_nethertimer<Main.SERVER_TICK_TIME) {
 		    					  explorerlist.get(i).nethercriteria=100;
 								  gainMoneyExp(p,"Explorer",0.50,50);
-								  GLOBAL_nethertimer=Bukkit.getWorld("world").getFullTime()+6000;
+								  GLOBAL_nethertimer=Main.SERVER_TICK_TIME+6000;
 		    				  }
 		    				  if (lookat.getType()==Material.DIRT) {
 		    					  explorerlist.get(i).nethercriteria=100;
@@ -3173,7 +3232,7 @@ public void checkJukeboxes() {
     		  }
               LOGGING_UPDATE_COUNTS++; //8
 	  		  for (int i=0;i<animallist.size();i++) {
-	  			if (animallist.get(i).getTime()<Bukkit.getWorld("world").getFullTime()) {
+	  			if (animallist.get(i).getTime()<Main.SERVER_TICK_TIME) {
 	  				//Remove it.
 	  				animallist.remove(i);
 	  				i--;
@@ -3182,7 +3241,7 @@ public void checkJukeboxes() {
 	          LOGGING_UPDATE_COUNTS++; //9
 	  		  for (int i=0;i<furnacelist.size();i++) {
 	  			  if (Bukkit.getWorld("world").getBlockAt(furnacelist.get(i).getLoc()).getType()==Material.FURNACE || Bukkit.getWorld("world").getBlockAt(furnacelist.get(i).getLoc()).getType()==Material.BURNING_FURNACE) {
-		  			  if (furnacelist.get(i).getTime()<Bukkit.getWorld("world").getFullTime() && ((Furnace)Bukkit.getWorld("world").getBlockAt(furnacelist.get(i).getLoc()).getState()).getBurnTime()==0) {
+		  			  if (furnacelist.get(i).getTime()<Main.SERVER_TICK_TIME && ((Furnace)Bukkit.getWorld("world").getBlockAt(furnacelist.get(i).getLoc()).getState()).getBurnTime()==0) {
 		  				  //Remove it.
 		  				  furnacelist.remove(i);
 		  				  i--;
@@ -3206,7 +3265,7 @@ public void checkJukeboxes() {
 		    				  if (((Jukebox)jukeboxlist.get(i).getJukebox().getState()).getPlaying()!=jukeboxlist.get(i).getDisk()) {
 		    					  jukeboxlist.get(i).setDisk(((Jukebox)jukeboxlist.get(i).getJukebox().getState()).getPlaying());
 		    				  }
-		    				  if (Bukkit.getWorld("world").getFullTime()-jukeboxlist.get(i).getSongStart()>jukeboxlist.get(i).getSongDuration()*20+60) {
+		    				  if (Main.SERVER_TICK_TIME-jukeboxlist.get(i).getSongStart()>jukeboxlist.get(i).getSongDuration()*20+60) {
 		    					  //Check to see if players are closer to one or the other.
 		    					  boolean closest=true;
 		    					  for (int j=0;j<jukeboxlist.size();j++) {
@@ -3258,7 +3317,7 @@ public void updateTime() {
 		  					  //Bukkit.getPlayer("sigonasr2").sendMessage("New Brewing time: "+brewingstandlist.get(i).getBrewingTime());
 	  					  }
 	  				  }
-		  			  if (brewingstandlist.get(i).getTime()<Bukkit.getWorld("world").getFullTime() && ((BrewingStand)Bukkit.getWorld("world").getBlockAt(brewingstandlist.get(i).getLoc()).getState()).getBrewingTime()==0) {
+		  			  if (brewingstandlist.get(i).getTime()<Main.SERVER_TICK_TIME && ((BrewingStand)Bukkit.getWorld("world").getBlockAt(brewingstandlist.get(i).getLoc()).getState()).getBrewingTime()==0) {
 		  				  //Remove it.
 		  				  brewingstandlist.remove(i);
 		  				  i--;
@@ -3278,31 +3337,10 @@ public void updateTime() {
 	  				  }
 	  			  }
 	  		  }
-	  		  if (last_world_time==0) {
-    			  last_world_time = Bukkit.getWorld("world").getFullTime();
-    		  } else {
-    			  int raisecount=0;
-    			  while (Bukkit.getWorld("world").getFullTime()-last_world_time>=2) {
-    				  last_world_time+=2;
-    				  raisecount++;
-    			  }
-    			Bukkit.getWorld("world").setFullTime(Bukkit.getWorld("world").getFullTime()-raisecount);
-    			  /*
-    			  if (Bukkit.getWorld("world").getFullTime()-last_world_time+hold_diff>=2) {
-    				  last_world_time = Bukkit.getWorld("world").getFullTime()+((Bukkit.getWorld("world").getFullTime()-last_world_time+(hold_diff/2))/2);
-    				  accumulator -= (Bukkit.getWorld("world").getFullTime()-last_world_time+(hold_diff/2))/2;
-    				  Bukkit.getWorld("world").setFullTime(last_world_time);
-    				  hold_diff=0;
-    			  } else {
-    				  hold_diff += Bukkit.getWorld("world").getFullTime() - last_world_time;
-    				  accumulator += Bukkit.getWorld("world").getFullTime() - last_world_time;
-    				  Bukkit.getWorld("world").setFullTime(last_world_time);
-    			  }
-    			  */
-    		  }
+  			Bukkit.getWorld("world").setFullTime(Main.SERVER_TICK_TIME-4);
     	}
     }
-    , 10, 10);
+    , 8, 8);
 }
 
   @SuppressWarnings("deprecation")
@@ -3313,11 +3351,11 @@ public void payDay(int time)
       public void run()
       {
         for (Player allOnlineP : Bukkit.getOnlinePlayers()) {
-          allOnlineP.sendMessage("§2<=========[§dInterest§2]=========>");
+          allOnlineP.sendMessage(ChatColor.DARK_GREEN+"<=========["+ChatColor.LIGHT_PURPLE+"Interest"+ChatColor.DARK_GREEN+"]=========>");
           DecimalFormat df = new DecimalFormat("#0.00");
-          allOnlineP.sendMessage("§6The money interest has been delivered to all players. ("+df.format((double)(Main.this.getConfig().getDouble("payday.amount")*100))+"% interest rate)");
-          allOnlineP.sendMessage("§6Your Balance: $"+df.format((getAccountsConfig().getDouble(allOnlineP.getName() + ".money")))+" -> $"+df.format(((Main.this.getConfig().getDouble("payday.amount")*(getAccountsConfig().getDouble(allOnlineP.getName() + ".money"))+getAccountsConfig().getDouble(allOnlineP.getName() + ".money")))));
-          allOnlineP.sendMessage("§2<==========================>");
+          allOnlineP.sendMessage(ChatColor.GOLD+"The money interest has been delivered to all players. ("+df.format((double)(Main.this.getConfig().getDouble("payday.amount")*100))+"% interest rate)");
+          allOnlineP.sendMessage(ChatColor.GOLD+"Your Balance: $"+df.format((getAccountsConfig().getDouble(allOnlineP.getName() + ".money")))+" -> $"+df.format(((Main.this.getConfig().getDouble("payday.amount")*(getAccountsConfig().getDouble(allOnlineP.getName() + ".money"))+getAccountsConfig().getDouble(allOnlineP.getName() + ".money")))));
+          allOnlineP.sendMessage(ChatColor.DARK_GREEN+"<==========================>");
           getAccountsConfig().set(allOnlineP.getName() + ".money", ((Main.this.getConfig().getDouble("payday.amount")*(getAccountsConfig().getDouble(allOnlineP.getName() + ".money"))+getAccountsConfig().getDouble(allOnlineP.getName() + ".money"))));
           //Main.economy.depositPlayer(allOnlineP.getName(), (Main.this.getConfig().getDouble("payday.amount")*Main.economy.bankBalance(allOnlineP.getName()).balance));
         }
@@ -3335,7 +3373,7 @@ public void payDay(int time)
 		if (getConfig().getString("fed.mobs").length()>4) {
 			String[] mobslist = moblist.split(",");
 			  for (int i=0;i<mobslist.length;i+=2) {
-				  if (Bukkit.getWorld("world").getFullTime()>Long.valueOf(mobslist[i+1])) {
+				  if (Main.SERVER_TICK_TIME>Long.valueOf(mobslist[i+1])) {
 					  expired_uuids.add(UUID.fromString(mobslist[i]));
 				  } else {
 					  //Send this back for holding on until next time.
@@ -3839,7 +3877,9 @@ public void payDay(int time)
 		if (item.getType()==Material.IRON_BOOTS) {enchant_data=ENCHANTMENT_DATA.iron_boots;} else
 		if (item.getType()==Material.IRON_PICKAXE) {enchant_data=ENCHANTMENT_DATA.iron_pickaxe;} else
 		if (item.getType()==Material.IRON_HELMET) {enchant_data=ENCHANTMENT_DATA.iron_helmet;} else
+		if (item.getType()==Material.IRON_AXE) {enchant_data=ENCHANTMENT_DATA.iron_axe;} else
 		if (item.getType()==Material.GOLD_SPADE) {enchant_data=ENCHANTMENT_DATA.golden_shovel;} else
+		if (item.getType()==Material.GOLD_AXE) {enchant_data=ENCHANTMENT_DATA.golden_axe;} else
 		if (item.getType()==Material.IRON_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.iron_leggings;} else
 		if (item.getType()==Material.DIAMOND_SPADE) {enchant_data=ENCHANTMENT_DATA.diamond_shovel;} else
 		if (item.getType()==Material.GOLD_BOOTS) {enchant_data=ENCHANTMENT_DATA.golden_boots;} else
@@ -3848,6 +3888,7 @@ public void payDay(int time)
 		if (item.getType()==Material.IRON_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.iron_chestplate;} else
 		if (item.getType()==Material.DIAMOND_PICKAXE) {enchant_data=ENCHANTMENT_DATA.diamond_pickaxe;} else
 		if (item.getType()==Material.DIAMOND_BOOTS) {enchant_data=ENCHANTMENT_DATA.diamond_boots;} else
+		if (item.getType()==Material.DIAMOND_AXE) {enchant_data=ENCHANTMENT_DATA.diamond_axe;} else
 		if (item.getType()==Material.GOLD_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.golden_leggings;} else
 		if (item.getType()==Material.GOLD_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.golden_chestplate;} else
 		if (item.getType()==Material.DIAMOND_HELMET) {enchant_data=ENCHANTMENT_DATA.diamond_helmet;} else
@@ -3913,6 +3954,8 @@ public void payDay(int time)
 			}
 		}
 		Map<Enchantment,Integer> map = item.getEnchantments();
+		boolean silk_touch=false;
+		boolean fortune=false;
 		  if (PlayerinJob(p, "Enchanter")) {
 			  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
 				  if (getJobLv("Enchanter", p)>=20) {
@@ -3933,6 +3976,9 @@ public void payDay(int time)
 							  mult=0.03d;
 						  } else
 						  if (item.getType().toString().toLowerCase().contains("pickaxe")) {
+							  mult=0.045d;
+						  } else
+						  if (item.getType().toString().toLowerCase().contains("axe")) {
 							  mult=0.045d;
 						  }
 					  } else {
@@ -4009,10 +4055,19 @@ public void payDay(int time)
 				  }
 				  if (entry.getKey().getName()==Enchantment.LOOT_BONUS_BLOCKS.getName()) {
 					  gainMoneyExp(p,"Enchanter",0.50*entry.getValue()*mult,40*entry.getValue()*mult);
+					  fortune=true;
 				  }
 				  if (entry.getKey().getName()==Enchantment.SILK_TOUCH.getName()) {
 					  gainMoneyExp(p,"Enchanter",0.50*entry.getValue()*mult,40*entry.getValue()*mult);
+					  silk_touch=true;
 				  }
+			  }
+		  }
+		  if (fortune && silk_touch) {
+			  if (Math.random()<=0.5) {
+				  item.removeEnchantment(Enchantment.SILK_TOUCH);
+			  } else {
+				  item.removeEnchantment(Enchantment.LOOT_BONUS_BLOCKS);
 			  }
 		  }
 		return item;
@@ -4531,11 +4586,26 @@ public void payDay(int time)
   	  return false;
     }
     
+    public boolean is_ItemCube(ItemStack i) {
+    	if (i.hasItemMeta() && i.getItemMeta().hasLore() && i.getItemMeta().getLore()!=null) {
+			//Check to see if the Lore contains anything.
+			for (int j=0;j<i.getItemMeta().getLore().size();j++) {
+				if (i.getItemMeta().getLore().get(j).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.")) {
+					return true;
+				}
+				if (i.getItemMeta().getLore().get(j).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
+					return true;
+				}
+			}
+    	}
+    	return false;
+    }
+    
     public double getEnchantmentNumb(String s) {
   	  //Parse the string for spaces.
   	  String[] enchant = s.split(" ");
   	  if (enchant[0].contains(ChatColor.YELLOW+"")) {
-  		  String newstring = ((enchant[0].replace(ChatColor.YELLOW.getChar(), ' ')).replace('%', ' ')).replace('§', ' ');
+  		  String newstring = ((enchant[0].replace(ChatColor.YELLOW.getChar(), ' ')).replace('%', ' ')).replace(Character.toString((char)0x00A7), Character.toString((char)0x0020));
   		  //Bukkit.getLogger().info("Enchant number is "+Double.valueOf(newstring));
   		  return Double.valueOf(newstring);
   	  } else {

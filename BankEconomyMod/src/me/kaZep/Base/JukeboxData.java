@@ -23,7 +23,7 @@ public class JukeboxData {
 		this.songtickstart=currenttime;
 	}
 	public boolean Restart() {
-		this.songtickstart=Bukkit.getWorld("world").getFullTime();
+		this.songtickstart=Main.SERVER_TICK_TIME;
 		if (jukebox!=null) {
 			((Jukebox)jukebox.getState()).setPlaying(disk);
 		} else {

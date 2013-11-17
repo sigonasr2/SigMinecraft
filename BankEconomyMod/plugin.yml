@@ -23,5 +23,5 @@ commands:
     description: Unenchant your currently held item.
   event:
     description: Toggles or untoggles events.
-  dungeon:
-    description: X
+  ticktime:
+    description: Displays the server tick time.

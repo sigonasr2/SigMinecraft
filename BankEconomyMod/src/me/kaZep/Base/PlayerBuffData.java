@@ -32,7 +32,7 @@ public class PlayerBuffData {
 	public Main plugin;
 
 	public String healthbar(double curHP,double maxHP) {
-		  //█ ▌
+		  //笆�笆�
 		  int bits=(int)(Math.ceil(curHP/maxHP*10));
 		  String bar=" ";
 		  if (bits>6) {
@@ -45,10 +45,10 @@ public class PlayerBuffData {
 			  bar+=ChatColor.RED+"";
 		  }
 		  for (int i=0;i<bits/2;i++) {
-			  bar+="█";
+			  bar+=Character.toString((char)0x2588);
 		  }
 		  if (bits%2!=0) {
-			  bar+="▌";
+			  bar+=Character.toString((char)0x258C);
 		  }
 		  return bar;
 	  }
@@ -60,7 +60,7 @@ public class PlayerBuffData {
 		this.hpbuff_time=0;
 		this.armorbufflist=new ArrayList<Player>();
 		this.hpbufflist=new ArrayList<Player>();
-		this.last_money_report_time=Bukkit.getWorld("world").getFullTime();
+		this.last_money_report_time=Main.SERVER_TICK_TIME;
 		this.money_gained=0;
 		if (p.getInventory().getHelmet()!=null) {
 			this.helmet_durability=p.getInventory().getHelmet().getDurability();
@@ -91,7 +91,7 @@ public class PlayerBuffData {
 				if (nexteffect.getType().getName().compareTo(PotionEffectType.SPEED.getName())==0) {
 					potion_spdlv = nexteffect.getAmplifier();
 					//Bukkit.getLogger().info("Speed level is "+nexteffect.getAmplifier()+" and lasts for "+nexteffect.getDuration()+" ticks.");
-					potion_time = Bukkit.getWorld("world").getFullTime()+nexteffect.getDuration();
+					potion_time = Main.SERVER_TICK_TIME+nexteffect.getDuration();
 				}
 				effects.remove();
 			}
@@ -184,7 +184,7 @@ public class PlayerBuffData {
 				//p.sendMessage("Health too high. Lowering to "+p.getMaxHealth());
 			}*/
 			//Send new speed totals so the player's speed can be manually adjusted.
-			if (potion_spdlv>0 && potion_time<Bukkit.getWorld("world").getFullTime()) {
+			if (potion_spdlv>0 && potion_time<Main.SERVER_TICK_TIME) {
 				//Remove the potion speed buff.
 				potion_spdlv=0;
 			}
@@ -204,12 +204,12 @@ public class PlayerBuffData {
 							//This is not a buff we applied via our plugin.
 							potion_spdlv+=nexteffect.getAmplifier()+1;
 							//p.sendMessage("Store speed "+nexteffect.getAmplifier()+" for "+nexteffect.getDuration()+" ticks.");
-							potion_time = Bukkit.getWorld("world").getFullTime()+nexteffect.getDuration();
+							potion_time = Main.SERVER_TICK_TIME+nexteffect.getDuration();
 						}
 					}
 					effects.remove();
 				}
-				if (hpbuff_time<Bukkit.getWorld("world").getFullTime()) {
+				if (hpbuff_time<Main.SERVER_TICK_TIME) {
 					while (hpbufflist.size()>0) {
 						hpbufflist.remove(0);
 					}
@@ -224,8 +224,8 @@ public class PlayerBuffData {
 				//Bukkit.getPlayer("AaMay").sendMessage("Explorer giving speed buff: "+(base_spdlv-1+potion_spdlv));
 				p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 2147479999, base_spdlv-1+potion_spdlv, true));
 			}
-			if (last_money_report_time+72000<Bukkit.getWorld("world").getFullTime()) {
-				last_money_report_time=Bukkit.getWorld("world").getFullTime();
+			if (last_money_report_time+72000<Main.SERVER_TICK_TIME) {
+				last_money_report_time=Main.SERVER_TICK_TIME;
 				if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify6")) {
 				    DecimalFormat df = new DecimalFormat("#0.00");
 					p.sendMessage(ChatColor.YELLOW+""+ChatColor.ITALIC+"You have earned $"+df.format(money_gained)+" from your jobs in the past hour.");
