@@ -342,6 +342,31 @@ public class Main extends JavaPlugin
     nether_quartz.shape("aa");
     nether_quartz.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 7).getData());
     Bukkit.addRecipe(nether_quartz);    
+
+    //Add Recipes for chain armor crafting.
+    ShapedRecipe chain_helmet = new ShapedRecipe(new ItemStack(Material.CHAINMAIL_HELMET));
+    chain_helmet.shape("aaa","b b");
+    chain_helmet.setIngredient('a', Material.IRON_BLOCK);
+    chain_helmet.setIngredient('b', Material.IRON_INGOT);
+    Bukkit.addRecipe(chain_helmet);
+    
+    ShapedRecipe chain_chestplate = new ShapedRecipe(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
+    chain_chestplate.shape("b b","aba","aaa");
+    chain_chestplate.setIngredient('a', Material.IRON_BLOCK);
+    chain_chestplate.setIngredient('b', Material.IRON_INGOT);
+    Bukkit.addRecipe(chain_chestplate);
+    
+    ShapedRecipe chain_leggings = new ShapedRecipe(new ItemStack(Material.CHAINMAIL_LEGGINGS));
+    chain_leggings.shape("bbb","a a","a a");
+    chain_leggings.setIngredient('a', Material.IRON_BLOCK);
+    chain_leggings.setIngredient('b', Material.IRON_INGOT);
+    Bukkit.addRecipe(chain_leggings);
+    
+    ShapedRecipe chain_boots = new ShapedRecipe(new ItemStack(Material.CHAINMAIL_BOOTS));
+    chain_boots.shape("b a","b a");
+    chain_boots.setIngredient('a', Material.IRON_BLOCK);
+    chain_boots.setIngredient('a', Material.IRON_INGOT);
+    Bukkit.addRecipe(chain_boots);
     
     //Add Recipes for new Block armor crafting.
     ShapedRecipe iron_helmet = new ShapedRecipe(new ItemStack(Material.IRON_HELMET));
@@ -598,7 +623,7 @@ public class Main extends JavaPlugin
     Farmer_job.addData("POTATO", 0.015, 3, 0);
     Farmer_job.addData("NETHER WART", 0.015, 3, 0);
     //Farmer_job.addData("PUMPKIN SEEDS", 0.02, 4, 0);
-    //Farmer_job.addData("PUMPKIN", 0.04, 8, 0);
+    Farmer_job.addData("PUMPKIN", 0.04, 8, 0);
     Farmer_job.addData("MELON", 0.05, 10, 0);
     Farmer_job.addData("SEEDS", 0.0025, 1, 1);
     Farmer_job.addData("PUMPKIN SEEDS", 0.005, 2, 1);
@@ -712,6 +737,10 @@ public class Main extends JavaPlugin
     Blacksmith_job.addData("WEAK DIAMOND HELMET", 1.15, 480, 0);
     Blacksmith_job.addData("WEAK DIAMOND LEGGINGS", 1.325, 660, 0);
     Blacksmith_job.addData("WEAK DIAMOND CHESTPLATE", 1.50, 750, 0);
+    Blacksmith_job.addData("CHAIN BOOTS", 0.375*5, 80*5, 0);
+    Blacksmith_job.addData("CHAIN HELMET", 0.50*5, 100*5, 0);
+    Blacksmith_job.addData("CHAIN LEGGINGS", 0.725*5, 140*5, 0);
+    Blacksmith_job.addData("CHAIN CHESTPLATE", 0.875*5, 175*5, 0);
     Blacksmith_job.addData("IRON BOOTS", 0.375*10, 80*10, 0);
     Blacksmith_job.addData("IRON HELMET", 0.50*10, 100*10, 0);
     Blacksmith_job.addData("IRON LEGGINGS", 0.725*10, 140*10, 0);
@@ -3970,10 +3999,13 @@ public void payDay(int time)
 		if (item.getType()==Material.IRON_AXE) {enchant_data=ENCHANTMENT_DATA.iron_axe;} else
 		if (item.getType()==Material.GOLD_SPADE) {enchant_data=ENCHANTMENT_DATA.golden_shovel;} else
 		if (item.getType()==Material.GOLD_AXE) {enchant_data=ENCHANTMENT_DATA.golden_axe;} else
+		if (item.getType()==Material.CHAINMAIL_HELMET) {enchant_data=ENCHANTMENT_DATA.chain_helmet;} else
+		if (item.getType()==Material.CHAINMAIL_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.chain_chestplate;} else
+		if (item.getType()==Material.CHAINMAIL_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.chain_leggings;} else
+		if (item.getType()==Material.CHAINMAIL_BOOTS) {enchant_data=ENCHANTMENT_DATA.chain_boots;} else
 		if (item.getType()==Material.IRON_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.iron_leggings;} else
 		if (item.getType()==Material.DIAMOND_SPADE) {enchant_data=ENCHANTMENT_DATA.diamond_shovel;} else
 		if (item.getType()==Material.GOLD_BOOTS) {enchant_data=ENCHANTMENT_DATA.golden_boots;} else
-		if (item.getType()==Material.IRON_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.iron_chestplate;} else
 		if (item.getType()==Material.GOLD_HELMET) {enchant_data=ENCHANTMENT_DATA.golden_helmet;} else
 		if (item.getType()==Material.IRON_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.iron_chestplate;} else
 		if (item.getType()==Material.DIAMOND_PICKAXE) {enchant_data=ENCHANTMENT_DATA.diamond_pickaxe;} else

@@ -3647,10 +3647,10 @@ public class PlayerListener
 			  }
 			  /*if (e.getBlock().getType()==Material.PUMPKIN) {
 				  this.plugin.gainMoneyExp(p,"Farmer",0.00,1);
-			  }*/
+			  }
 			  if (e.getBlock().getType()==Material.MELON_BLOCK) {
 				  this.plugin.gainMoneyExp(p,"Farmer",0.10,10);
-			  }
+			  }*/
 		  }
 		  boolean hasfortune;
 		  hasfortune = (p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)>0)?true:false;
@@ -8325,7 +8325,7 @@ public ItemStack getGoodie() {
 	  if (e.getItemInHand().hasItemMeta() && e.getItemInHand().getItemMeta().getLore()!=null) {
 		  //Check the Lore.
 		  for (int i=0;i<e.getItemInHand().getItemMeta().getLore().size();i++) {
-			  if (e.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.") || e.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
+			  if (e.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.") || e.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.") || e.getItemInHand().getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
 				  e.setCancelled(true);
 				  p.updateInventory();
 				  //The intent is to open the inventory.
@@ -10146,6 +10146,26 @@ public ItemStack getGoodie() {
 			  this.plugin.gainMoneyExp(p,"Blacksmith",0.35*amount,40*amount);
 			  crafteditem=true;
 		  }
+		  if (item.getType()==Material.CHAINMAIL_BOOTS) {
+			  int mult=0.5;
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.375*mult*amount,80*mult*amount);
+			  crafteditem=true;
+		  }
+		  if (item.getType()==Material.CHAINMAIL_HELMET) {
+			  int mult=0.5;
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.50*mult*amount,100*mult*amount);
+			  crafteditem=true;
+		  }
+		  if (item.getType()==Material.CHAINMAIL_LEGGINGS) {
+			  int mult=0.5;
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.725*mult*amount,140*mult*amount);
+			  crafteditem=true;
+		  }
+		  if (item.getType()==Material.CHAINMAIL_CHESTPLATE) {
+			  int mult=0.5;
+			  this.plugin.gainMoneyExp(p,"Blacksmith",0.875*mult*amount,175*mult*amount);
+			  crafteditem=true;
+		  }
 		  if (item.getType()==Material.IRON_BOOTS) {
 			  int mult=1;
 			  if ((item.getItemMeta().getDisplayName()!=null && !item.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || item.getItemMeta().getDisplayName()==null) {
@@ -10272,6 +10292,23 @@ public ItemStack getGoodie() {
 				  mult=10;
 			  }
 			  this.plugin.gainMoneyExp(p,"Blacksmith",1.50*mult*amount,750*mult*amount);
+			  crafteditem=true;
+		  }
+	  }
+	  /*if (e.getBlock().getType()==Material.PUMPKIN) {
+	  this.plugin.gainMoneyExp(p,"Farmer",0.00,1);
+  }
+  if (e.getBlock().getType()==Material.MELON_BLOCK) {
+	  this.plugin.gainMoneyExp(p,"Farmer",0.10,10);
+  }*/
+	  if (this.plugin.PlayerinJob(p,"Farmer")) {
+		  boolean crafteditem=false;
+		  if (item.getType()==Material.MELON) {
+			  this.plugin.gainMoneyExp(p,"Farmer",0.10,10);
+			  crafteditem=true;
+		  }
+		  if (item.getType()==Material.PUMPKIN_SEEDS) {
+			  this.plugin.gainMoneyExp(p,"Farmer",0.04,8);
 			  crafteditem=true;
 		  }
 	  }
