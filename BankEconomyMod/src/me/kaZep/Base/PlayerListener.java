@@ -9566,7 +9566,7 @@ public ItemStack getGoodie() {
 			  event.setCancelled(true);
 		  }
 	  }
-	  if ((event.getClick()==ClickType.SHIFT_RIGHT || event.getClick()==ClickType.SHIFT_LEFT) && (event.getInventory().getType()==InventoryType.CRAFTING || event.getInventory().getType()==InventoryType.PLAYER) && event.getSlotType()==SlotType.RESULT) {
+	  if ((event.getClick()==ClickType.SHIFT_RIGHT || event.getClick()==ClickType.SHIFT_LEFT) && (event.getInventory().getType()==InventoryType.WORKBENCH || event.getInventory().getType()==InventoryType.CRAFTING || event.getInventory().getType()==InventoryType.PLAYER) && event.getSlotType()==SlotType.RESULT) {
 		  //Always refresh your inventory after a delay, just in case. This is a temporary fix for bugs with crafting multiple amounts of a crafting recipe.
 		  final Player p2 = p;
 		  p.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -9613,7 +9613,7 @@ public ItemStack getGoodie() {
 	  if (event.getCursor()!=null) {
 		  //Regardless of the inventory, if we try to put it inside a chest, got to try to insert it in there.
   		  if (event.getCurrentItem()!=null) {
-			  if (event.getCursor()!=null && event.getCursor().getType()!=Material.AIR && (event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST) && event.getClick()==ClickType.LEFT) {
+			  if (event.getCursor()!=null && event.getSlotType()!=SlotType.RESULT && event.getCursor().getType()!=Material.AIR && (event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST) && event.getClick()==ClickType.LEFT) {
 				event.setCursor(insertIntoItemCube(p, event.getCurrentItem(), event.getCursor()));
 			  }
 		  }
