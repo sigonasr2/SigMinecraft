@@ -338,7 +338,7 @@ public class Main extends JavaPlugin
     nether_bricks.shape("aa");
     nether_bricks.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 6).getData());
     Bukkit.addRecipe(nether_bricks);
-    ShapedRecipe nether_quartz = new ShapedRecipe(new ItemStack(Material.QUARTZ, 1));
+    ShapedRecipe nether_quartz = new ShapedRecipe(new ItemStack(Material.QUARTZ_BLOCK, 1));
     nether_quartz.shape("aa");
     nether_quartz.setIngredient('a', new ItemStack(Material.STEP, 1, (short) 7).getData());
     Bukkit.addRecipe(nether_quartz);    
@@ -392,6 +392,19 @@ public class Main extends JavaPlugin
     diamond_boots.shape("a a","a a");
     diamond_boots.setIngredient('a', Material.DIAMOND_BLOCK);
     Bukkit.addRecipe(diamond_boots);
+    
+    // Add Recipe for fireproof Wooden Slab
+    ItemStack slab = new ItemStack(Material.STEP, 3, (short) 2);
+    ItemMeta slab_name = slab.getItemMeta();
+    slab_name.setDisplayName(ChatColor.RESET+"Fireproof Wood Slab");
+    slab.setItemMeta(slab_name);
+    ShapedRecipe fireproof_wood_slab = new ShapedRecipe(slab);
+    fireproof_wood_slab.shape(" a ","bbb");
+    fireproof_wood_slab.setIngredient('a', Material.SLIME_BALL);
+    fireproof_wood_slab.setIngredient('b', Material.WOOD_STEP);
+    Bukkit.addRecipe(fireproof_wood_slab);
+    
+    // Add Recipes for Item cube crafting.
     ItemStack temp = new ItemStack(Material.CHEST);
     ItemMeta tempmeta = temp.getItemMeta();
     tempmeta.setDisplayName(ChatColor.YELLOW+"Item Cube");
@@ -424,6 +437,23 @@ public class Main extends JavaPlugin
     item_cube.setIngredient('a', Material.ENDER_CHEST);
     item_cube.setIngredient('b', Material.HOPPER);
     item_cube.setIngredient('c', Material.DIAMOND_BLOCK);
+    Bukkit.addRecipe(item_cube);
+    temp = new ItemStack(Material.ENDER_CHEST);
+    tempmeta = temp.getItemMeta();
+    tempmeta.setDisplayName(ChatColor.BLUE+"Ender Item Cube");
+    templore = new ArrayList<String>();
+    templore.add(ChatColor.AQUA+"Contains 27 item slots.");
+    templore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"Click on an item and then");
+    templore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"click the Item Cube to store");
+    templore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"it inside. Right-Click the");
+    templore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"Item Cube to view its contents.");
+    tempmeta.setLore(templore);
+    temp.setItemMeta(tempmeta);
+    item_cube = new ShapedRecipe(temp);
+    item_cube.shape("cac","aba","cac");
+    item_cube.setIngredient('a', Material.ENDER_CHEST);
+    item_cube.setIngredient('b', Material.HOPPER);
+    item_cube.setIngredient('c', Material.EMERALD_BLOCK);
     Bukkit.addRecipe(item_cube);
     
     DMGCALC = new DamageAPI();
@@ -2845,6 +2875,16 @@ public void checkJukeboxes() {
 	                				List<String> loredata = items[j].getItemMeta().getLore();
 	                				for (int m=0;m<loredata.size();m++) {
 	                					if (loredata.get(m).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
+	                						value+=10*items[j].getAmount();
+	                					}
+	                				}
+	                			}
+	                		}
+	                		if (items[j].getType()==Material.ENDER_CHEST) {
+	                			if (items[j].hasItemMeta() && items[j].getItemMeta().getLore()!=null) {
+	                				List<String> loredata = items[j].getItemMeta().getLore();
+	                				for (int m=0;m<loredata.size();m++) {
+	                					if (loredata.get(m).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
 	                						value+=10*items[j].getAmount();
 	                					}
 	                				}
