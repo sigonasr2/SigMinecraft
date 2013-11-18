@@ -1894,6 +1894,274 @@ public class PlayerListener
 	  }
   }
   
+  private boolean allowedToSpawn(CreatureSpawnEvent e, LivingEntity l) {
+	  //Will return true if it's allowed to spawn. False if it needs to go away.
+	  //Basically this is the control that will determine if the mob stays or goes, before further processing is done.
+	  //If the mob is identified as a special mob...
+	  
+	  EntityType type = l.getType();
+
+	  //heightmodifier determines if it's a super tall chunk or a normal sized one.
+	  int heightmodifier=0;
+	  if (Bukkit.getWorld("world").getHighestBlockYAt(l.getLocation())>=96) {
+		  heightmodifier=126;
+	  } else {
+		  heightmodifier=63;
+	  }
+	  
+	  //Handle every special entity's spawning properties in here.
+	  switch (type) {
+		  case CREEPER:{
+			  if (l.getLocation().getY()<=40 && Math.random()<=0.08+((heightmodifier-l.getLocation().getY())*0.01d)) {
+				  if (Math.random()<=0.35) {
+					  l.setCustomName(ChatColor.YELLOW+"Explosive Creeper");
+					  l.setCustomNameVisible(false);
+					  //l.setCustomNameVisible(true);
+					  l.setMaxHealth(l.getMaxHealth()*1.25d);
+					  l.setHealth(l.getMaxHealth());
+				  } else
+				  if (Math.random()<=0.15) {
+					  l.setCustomName(ChatColor.GOLD+"Explosive Creeper II");
+					  l.setCustomNameVisible(false);
+					  //l.setCustomNameVisible(true);
+					  l.setMaxHealth(l.getMaxHealth()*1.75d);
+					  l.setHealth(l.getMaxHealth());
+				  } else
+				  if (Math.random()<=0.35) {
+					  l.setCustomName(ChatColor.YELLOW+"Destructive Creeper");
+					  l.setCustomNameVisible(false);
+					  //l.setCustomNameVisible(true);
+					  l.setMaxHealth(l.getMaxHealth()*1.25d);
+					  l.setHealth(l.getMaxHealth());
+				  } else {
+					  l.setCustomName(ChatColor.GOLD+"Destructive Creeper II");
+					  l.setCustomNameVisible(false);
+					  //l.setCustomNameVisible(true);
+					  l.setMaxHealth(l.getMaxHealth()*1.75d);
+					  l.setHealth(l.getMaxHealth());
+				  }
+			  }
+		  }break;
+		case ARROW: {
+			}break;
+		case BAT: {
+			}break;
+		case BLAZE: {
+			}break;
+		case BOAT: {
+			}break;
+		case CAVE_SPIDER: {
+			}break;
+		case CHICKEN: {
+			}break;
+		case COMPLEX_PART: {
+			}break;
+		case COW: {
+			}break;
+		case DROPPED_ITEM: {
+			}break;
+		case EGG: {
+			}break;
+		case ENDERMAN: {
+			}break;
+		case ENDER_CRYSTAL: {
+			}break;
+		case ENDER_DRAGON: {
+			}break;
+		case ENDER_PEARL: {
+			}break;
+		case ENDER_SIGNAL: {
+			}break;
+		case EXPERIENCE_ORB: {
+			}break;
+		case FALLING_BLOCK: {
+			}break;
+		case FIREBALL: {
+			}break;
+		case FIREWORK: {
+			}break;
+		case FISHING_HOOK: {
+			}break;
+		case GHAST: {
+			}break;
+		case GIANT: {
+			}break;
+		case HORSE: {
+			}break;
+		case IRON_GOLEM: {
+			}break;
+		case ITEM_FRAME: {
+			}break;
+		case LEASH_HITCH: {
+			}break;
+		case LIGHTNING: {
+			}break;
+		case MAGMA_CUBE: {
+			}break;
+		case MINECART: {
+			}break;
+		case MINECART_CHEST: {
+			}break;
+		case MINECART_FURNACE: {
+			}break;
+		case MINECART_HOPPER: {
+			}break;
+		case MINECART_MOB_SPAWNER: {
+			}break;
+		case MINECART_TNT: {
+			}break;
+		case MUSHROOM_COW: {
+			}break;
+		case OCELOT: {
+			}break;
+		case PAINTING: {
+			}break;
+		case PIG: {
+			}break;
+		case PIG_ZOMBIE: {
+			}break;
+		case PLAYER: {
+			}break;
+		case PRIMED_TNT: {
+			}break;
+		case SHEEP: {
+			}break;
+		case SILVERFISH: {
+			}break;
+		case SKELETON: {
+			  if (Math.random()<=0.10+((heightmodifier-l.getLocation().getY())*0.01d)) {
+				  if (Math.random()<=0.85) {
+					  l.setCustomName(ChatColor.YELLOW+"Sniper");
+					  l.setCustomNameVisible(false);
+					  //l.setCustomNameVisible(true);
+					  l.setMaxHealth(l.getMaxHealth()/2);
+					  l.setHealth(l.getMaxHealth());
+				  } else {
+					  l.setCustomName(ChatColor.GOLD+"Sniper II");
+					  l.setCustomNameVisible(false);
+					  //l.setCustomNameVisible(true);
+					  l.setMaxHealth(l.getMaxHealth()/4);
+					  l.setHealth(l.getMaxHealth());
+				  }
+			  }
+			}break;
+		case SLIME: {
+			}break;
+		case SMALL_FIREBALL: {
+			}break;
+		case SNOWBALL: {
+			}break;
+		case SNOWMAN: {
+			}break;
+		case SPIDER: {
+			if (Math.random()<=0.08+((heightmodifier-l.getLocation().getY())*0.01d)) {
+				  if (Math.random()<=0.35) {
+					  l.setCustomName(ChatColor.YELLOW+"Venomous Spider");
+					  l.setCustomNameVisible(false);
+					  //l.setCustomNameVisible(true);
+					  l.setMaxHealth(l.getMaxHealth());
+					  l.setHealth(l.getMaxHealth());
+				  } else
+				  if (Math.random()<=0.15) {
+					  l.setCustomName(ChatColor.GOLD+"Venomous Spider II");
+					  l.setCustomNameVisible(false);
+					  //l.setCustomNameVisible(true);
+					  l.setMaxHealth(l.getMaxHealth()*1.5);
+					  l.setHealth(l.getMaxHealth());
+				  } else
+				  if (Math.random()<=0.35) {
+					  l.setCustomName(ChatColor.YELLOW+"Snaring Spider");
+					  l.setCustomNameVisible(false);
+					  //l.setCustomNameVisible(true);
+					  l.setMaxHealth(l.getMaxHealth()*1.5);
+					  l.setHealth(l.getMaxHealth());
+				  } else {
+					  l.setCustomName(ChatColor.GOLD+"Snaring Spider II");
+					  l.setCustomNameVisible(false);
+					  //l.setCustomNameVisible(true);
+					  l.setMaxHealth(l.getMaxHealth()*2);
+					  l.setHealth(l.getMaxHealth());
+				  }
+			  }
+			}break;
+		case SPLASH_POTION: {
+			}break;
+		case SQUID: {
+			}break;
+		case THROWN_EXP_BOTTLE: {
+			}break;
+		case UNKNOWN: {
+			}break;
+		case VILLAGER: {
+			}break;
+		case WEATHER: {
+			}break;
+		case WITCH: {
+			}break;
+		case WITHER: {
+			}break;
+		case WITHER_SKULL: {
+			}break;
+		case WOLF: {
+			}break;
+		case ZOMBIE: {
+			if (l.getHealth()<65) {
+				if (l.getLocation().getY()<=35 && Math.random()<=0.15) {
+					  if (Math.random()<=0.85) {
+						  l.setCustomName(ChatColor.YELLOW+"Charge Zombie");
+						  l.setCustomNameVisible(false);
+						  //l.setCustomNameVisible(true);
+						  l.setMaxHealth(l.getMaxHealth()+5);
+						  l.setHealth(l.getMaxHealth());
+					  } else {
+						  l.setCustomName(ChatColor.GOLD+"Charge Zombie II");
+						  l.setCustomNameVisible(false);
+						  //l.setCustomNameVisible(true);
+						  l.setMaxHealth(l.getMaxHealth()+20);
+						  l.setHealth(l.getMaxHealth());
+					  }
+				  } else {
+					  if (Math.random()<=0.10+((heightmodifier-l.getLocation().getY())*0.01d)) {
+						  if (Math.random()<=0.25) {
+							  l.setCustomName(ChatColor.GRAY+"Zombie Ninja");
+							  l.setCustomNameVisible(false);
+							  l.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0, true));
+							  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 2, true));
+							  //l.setCustomNameVisible(true);
+							  //A Zombie Ninja will not wear armor to stay hidden. But may carry a sword.
+							  l.getEquipment().setChestplate(new ItemStack(Material.AIR));
+							  l.getEquipment().setBoots(new ItemStack(Material.AIR));
+							  l.getEquipment().setLeggings(new ItemStack(Material.AIR));
+							  l.getEquipment().setHelmet(new ItemStack(Material.AIR));
+							  Zombie g = (Zombie)l;
+							  g.setBaby(true);
+							  l.setMaxHealth(l.getMaxHealth()*0.65d);
+							  l.setHealth(l.getMaxHealth());
+						  }
+					  }
+				  }
+			} else {
+				return false;
+			}
+			//If it's a super zombie, we're going to despawn it now.
+			}break;
+		default: {
+			}
+	  }
+	  
+	  //This allows bosses to spawn.
+	  if (e.getEntity().getType()==EntityType.ENDER_DRAGON || e.getEntity().getType()==EntityType.WITHER) {
+		  return true;
+	  }
+	  
+	  if (e.getSpawnReason()==SpawnReason.CUSTOM || e.getSpawnReason()==SpawnReason.NATURAL) {
+		  return true; //Always return custom spawns, we have no reason not to. Natural spawning also is allowed, since it'll always make sense.
+	  }
+	  
+	  return true; //If we got down to here, allow this particular mob to spawn.
+	  
+  }
+  
 
   @EventHandler
   public void onCreatureSpawn(CreatureSpawnEvent e) {
@@ -1907,11 +2175,6 @@ public class PlayerListener
 	    		  boolean despawn=true;
 	    		  if (entity instanceof Monster) {
 	    			  LivingEntity test = (LivingEntity)entity;
-	    			  /*test.setMaxHealth(10);
-	    			  Warning(test,1);
-	    			  if (test!=null && test.isValid()) {
-	    				  test.setHealth(test.getMaxHealth());
-	    			  }*/
 	    			  boolean block=false;
 	    			  if (test.getCustomName()!=null && (test.getCustomName().contains(ChatColor.DARK_PURPLE+"") || test.getCustomName().contains(ChatColor.DARK_AQUA+"Polymorphed Creature"))) {
 	    				  for (int i=-2;i<3;i++) {
@@ -1983,40 +2246,6 @@ public class PlayerListener
 	    			  }
 	    			  //Mobs have more health when they are farther away, to make the mobs harder in general.
 	    			  float groupmult=0.25f; //Change this to modify the global grouping multiplier.
-	    			  /*
-	    			  if (distancefromcity>50000) {
-	    				  maxgroup=(int)(20*groupmult); //Groups of up to 20 mobs.
-	    				  chancer=0.25d;
-	    				  despawnchancer=0.0625d;
-	    				  LivingEntity l = (LivingEntity)entity;
-	    				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*1.0d));
-	    				  if (Math.random()<=0.25) {
-	    					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.5d));
-	    				  }
-	    				  l.setHealth(l.getMaxHealth());
-	    			  } else
-	    			  if (distancefromcity>20000) {
-	    				  maxgroup=(int)(15*groupmult); //Groups of up to 15 mobs.
-	    				  chancer=0.175d;
-	    				  despawnchancer=0.1250d;
-	    				  LivingEntity l = (LivingEntity)entity;
-	    				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.75d));
-	    				  if (Math.random()<=0.25) {
-	    					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.5d));
-	    				  }
-	    				  l.setHealth(l.getMaxHealth());
-	    			  } else
-	    			  if (distancefromcity>10000) {
-	    				  maxgroup=(int)(12*groupmult); //Groups of up to 12 mobs.
-	    				  chancer=0.125d;
-	    				  despawnchancer=0.15d;
-	    				  LivingEntity l = (LivingEntity)entity;
-	    				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.5d));
-	    				  if (Math.random()<=0.25) {
-	    					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
-	    				  }
-	    				  l.setHealth(l.getMaxHealth());
-	    			  } else*/
 	    			 maxgroup=(int)(10*groupmult);
 	    			 chancer=0.10d;
 	    			  despawnchancer=0.25d;
@@ -2025,49 +2254,6 @@ public class PlayerListener
 	    				  chancer=0.025f;
 	    				  despawnchancer=0.4375d;
 	    			  }
-	    			  /*
-	    			  if (distancefromcity>4000) {
-	    				  maxgroup=(int)(10*groupmult); //Groups of up to 10 mobs.
-	    				  chancer=0.10d;
-	    				  despawnchancer=0.25d;
-	    				  LivingEntity l = (LivingEntity)entity;
-	    				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.5d));
-	    				  if (Math.random()<=0.25) {
-	    					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
-	    				  }
-	    				  l.setHealth(l.getMaxHealth());
-	    			  } else
-	    			  if (distancefromcity>2000) {
-	    				  maxgroup=(int)(7*groupmult); //Groups of up to 7 mobs.
-	    				  chancer=0.075d;
-	    				  despawnchancer=0.35d;
-	    				  LivingEntity l = (LivingEntity)entity;
-	    				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
-	    				  if (Math.random()<=0.25) {
-	    					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
-	    				  }
-	    				  l.setHealth(l.getMaxHealth());
-	    			  } else
-	    			  if (distancefromcity>1000) {
-	    				  maxgroup=(int)(5*groupmult); //Groups of up to 5 mobs.
-	    				  chancer=0.05d;
-	    				  despawnchancer=0.50d;
-	    				  LivingEntity l = (LivingEntity)entity;
-	    				  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
-	    				  if (Math.random()<=0.25) {
-	    					  //l.setMaxHealth(l.getMaxHealth()+(l.getMaxHealth()*0.25d));
-	    				  }
-	    				  l.setHealth(l.getMaxHealth());
-	    			  } else
-	    			  if (distancefromcity>400) {
-	    				  maxgroup=(int)(3*groupmult); //Groups of up to 3 mobs.
-	    				  chancer=0.025d;
-	    				  despawnchancer=0.75d;
-	    			  } else {
-	    				  maxgroup=(int)(3*groupmult); //Groups of up to 3 mobs.
-	    				  chancer=0.005d;
-	    				  despawnchancer=0.95d;
-	    			  }*/
 	    			  if (entity.getType()==EntityType.ZOMBIE || entity.getType()==EntityType.PIG_ZOMBIE || entity.getType()==EntityType.SKELETON) {
 	    				  LivingEntity l = (LivingEntity)entity;
 	    				  EntityEquipment inven = l.getEquipment();
@@ -6503,94 +6689,6 @@ public ItemStack getGoodie() {
 
   @EventHandler
   public void onInventoryOpen(InventoryOpenEvent e) {
-	  
-		// Inventory override if anvil.
-		if (e.getInventory().getType() == InventoryType.ANVIL) {
-			// Bukkit.getLogger().info("If triggered.");
-
-			Inventory i = Bukkit.createInventory(e.getPlayer(), 27,
-					"Repair & Enchant");
-			ItemStack filler, temp;
-			int count = -1;
-
-			temp = new ItemStack(Material.COBBLESTONE);
-
-			ItemMeta temp_meta = temp.getItemMeta();
-			temp_meta.setDisplayName(ChatColor.YELLOW + "Item Input");
-			List<String> temp_meta_lore = new ArrayList<String>();
-			temp_meta_lore.add(ChatColor.ITALIC
-					+ "Place the item to be repaired or enchanted here.");
-			temp_meta.setLore(temp_meta_lore);
-			temp.setItemMeta(temp_meta);
-			temp.setType(Material.IRON_AXE);
-			i.setItem(count += 2, temp);
-
-			temp_meta.setDisplayName(ChatColor.YELLOW + "Item Tributes");
-			temp_meta_lore = new ArrayList<String>();
-			temp_meta_lore.add(ChatColor.ITALIC
-					+ "Place applicable item tributes here.");
-			temp_meta_lore.add(ChatColor.ITALIC + "");
-			temp_meta_lore.add(ChatColor.ITALIC + "" + ChatColor.GRAY
-					+ "Chainmail repairs with iron ingots.");
-			temp_meta.setLore(temp_meta_lore);
-			temp.setItemMeta(temp_meta);
-			temp.setType(Material.IRON_INGOT);
-			i.setItem(count += 2, temp);
-
-			temp_meta.setDisplayName(ChatColor.YELLOW + "Magical Artifacts");
-			temp_meta_lore = new ArrayList<String>();
-			temp_meta_lore.add(ChatColor.ITALIC
-					+ "Place applicable magic artifacts here.");
-			temp_meta_lore.add(ChatColor.ITALIC + "");
-			temp_meta_lore.add(ChatColor.ITALIC + "" + ChatColor.GRAY
-					+ "Includes enchanted boots and repair shards.");
-			temp_meta.setLore(temp_meta_lore);
-			temp.setItemMeta(temp_meta);
-			temp.setType(Material.WRITTEN_BOOK);
-			i.setItem(count += 2, temp);
-
-			temp_meta.setDisplayName(ChatColor.YELLOW + "Output");
-			temp_meta_lore = new ArrayList<String>();
-			temp_meta_lore.add(ChatColor.ITALIC
-					+ "Grab your finished item here!");
-			temp_meta.setLore(temp_meta_lore);
-			temp.setItemMeta(temp_meta);
-			temp.setType(Material.CHEST);
-			i.setItem(count += 2, temp);
-
-			temp_meta.setDisplayName(ChatColor.YELLOW + "Experience Cost");
-			temp_meta_lore = new ArrayList<String>();
-			temp_meta_lore.add(ChatColor.ITALIC
-					+ "Experience Cost of Enchanting.");
-			temp_meta.setLore(temp_meta_lore);
-			temp.setItemMeta(temp_meta);
-			temp.setType(Material.SLIME_BALL);
-			i.setItem(count += 15, temp);
-
-			temp_meta.setDisplayName(ChatColor.RESET + "Anvil Interface");
-			temp_meta_lore = new ArrayList<String>();
-			temp_meta_lore.add(ChatColor.GRAY + "Nothing to see here. Shoo!");
-			temp_meta.setLore(temp_meta_lore);
-			temp.setItemMeta(temp_meta);
-			temp.setType(Material.COBBLESTONE);
-			for (int c = 0; c < 27; c++) {
-				if (i.getItem(c) == null) {
-					i.setItem(c, temp);
-				}
-			}
-			i.setItem(10, new ItemStack(Material.AIR));
-			i.setItem(12, new ItemStack(Material.AIR));
-			i.setItem(14, new ItemStack(Material.AIR));
-			i.setItem(16, new ItemStack(Material.AIR));
-
-			e.setCancelled(true);
-
-			e.getPlayer().closeInventory();
-			e.getPlayer().openInventory(i);
-
-		}
-
-		
 	  // 笆�笆�(Player)e.getPlayer()).sendMessage(((Player)e.getPlayer()).getScoreboard().getPlayerTeam((OfflinePlayer)e.getPlayer()).getName());
 	  Player p = (Player)e.getPlayer();
 	  p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.DARK_GRAY+"");
@@ -9278,16 +9376,6 @@ public ItemStack getGoodie() {
 		  savefile.set(p.getName()+".settings.notify6", Boolean.valueOf(e.getInventory().getItem(24).getType()==Material.REDSTONE_TORCH_ON));
 		  this.plugin.saveAccountsConfig();
 	  }
-		if (e.getInventory().getTitle().equalsIgnoreCase("Repair & Enchant")) {
-	// We have to return the items the player placed inside the anvil
-	// interface.
-	for (int i = 10; i < 16; i += 2) {
-		if (e.getInventory().getItem(i) != null && e.getInventory().getItem(i).getType() != Material.AIR) {
-			p.getWorld().dropItemNaturally(p.getLocation(),
-					e.getInventory().getItem(i));
-		}
-	}
-}
   }
   
 
@@ -9793,142 +9881,6 @@ public ItemStack getGoodie() {
 			  }
 		  }
 	  } else
-		  
-		  if (event.getInventory().getName().equalsIgnoreCase("Repair & Enchant")) {
-			  final int INPUT = 10;
-			  final int MATERIALS = 12;
-			  final int MAGIC = 14;
-			  final int OUTPUT = 16;
-			  final int LEVELS = 22;
-			  
-			  Inventory newInventory = event.getInventory();
-			  
-			  // If click on output and it's not null
-			  if (event.getInventory().getContents()[OUTPUT] != null && event.getSlot()==OUTPUT) { 
-				  if (event.getCursor() != null)
-				  {
-					  event.setCancelled(true); // Cancel event if cursor is not empty
-					  if (event.isShiftClick()) 
-					  {
-						  // Attempts to store the item in the player's inventory. If it succeeds, remove the item from the anvil interface. 
-						  if (event.getWhoClicked().getInventory().addItem(event.getInventory().getContents()[OUTPUT]).isEmpty()) {
-							  newInventory.getContents()[OUTPUT].setType(Material.AIR);
-						  }
-					  }
-				  }
-				  
-			  }
-
-			  if (event.getSlotType()==SlotType.CONTAINER && (event.getSlot()==INPUT || 
-					  event.getSlot()==MATERIALS || event.getSlot()==MAGIC)) {
-				  // Check if operation is legal
-				  
-				  boolean valid = false;
-				  
-				  switch (event.getSlot()) {
-					  case INPUT: // Verify that it's a weapon/armor/tool piece. 
-						  
-						 // if (event.get
-						  
-						  Bukkit.getLogger().info("Case INPUT");
-						  break;
-
-					  case MATERIALS: // Verify that it's an appropriate repair material. 
-						  
-						  Bukkit.getLogger().info("Case MATERIALS");
-						  break;
-						  
-					  case MAGIC: 
-						  
-						  Bukkit.getLogger().info("Case MAGIC");
-						  break;
-						  
-					  default:
-						  Bukkit.getLogger().warning("Something terrible happened in event.getSlot() for anvils.");
-				  }
-				  
-
-				  				  
-				  // Attempt to calculate enchant/repair cost.
-				  if (event.getInventory().getContents()[INPUT] != null &&
-						  event.getInventory().getContents()[MATERIALS] != null &&
-								  event.getInventory().getContents()[MAGIC] == null) {
-				  // We are repairing an item. Calculate the repair cost. 
-					  
-					  int cost = event.getInventory().getContents()[MATERIALS].getAmount() * 2;
-					  int bonus_cost = 0;
-					  ItemStack item = event.getInventory().getContents()[INPUT];
-					  
-							  
-					  if (valid){
-						  Bukkit.getLogger().warning("Repair cost calculation valid");
-						  Map<Enchantment, Integer> enchantments = item.getEnchantments();
-						  
-						  Bukkit.getLogger().warning(enchantments.keySet().toString());
-							  for(Enchantment e : enchantments.keySet()){
-								  Bukkit.getLogger().warning("BC: " + bonus_cost + " | INCR: " + Math.round(2.5 + enchantments.get(e) * 1.3));
-								  bonus_cost += Math.round(2.5 + enchantments.get(e) * 1.3);
-							  }
-						  }
-					  cost += bonus_cost;
-					  cost = Math.min(cost, 99); // Cap cost at 99 in case some egregiously enchanted item exists
-					  
-					  Bukkit.getLogger().warning("Cost: " + cost);
-					  
-					  ItemStack orbs = event.getInventory().getContents()[LEVELS];
-					  orbs.setAmount(cost);
-					  event.getInventory().setItem(LEVELS, orbs);
-					  
-					  
-//					  event.getInventory().getContents()[OUTPUT].setType(item.getType());
-//					  event.getInventory().getContents()[OUTPUT].setData(item.getData());
-					  event.getInventory().setItem(OUTPUT, item.clone());
-					  event.getInventory().getContents()[OUTPUT].setDurability((short)(item.getDurability() - item.getType().getMaxDurability() * 0.2 * event.getInventory().getContents()[MATERIALS].getAmount()));
-				  }
-				  
-				  if (event.getInventory().getContents()[INPUT] != null &&
-						  event.getInventory().getContents()[MATERIALS] == null &&
-								  event.getInventory().getContents()[MAGIC] != null) {
-				  // We are enchanting an item. Calculate the enchant cost and valid applicable enchantments. 
-					  
-					  int cost = 5;
-					  int bonus_cost = 0;
-					  ItemStack item = event.getInventory().getContents()[INPUT];
-					  
-							  
-					  if (valid){
-						  Bukkit.getLogger().warning("Enchantment cost calculation valid");
-						  Map<Enchantment, Integer> enchantments = item.getEnchantments();
-							  for(Enchantment e : enchantments.keySet()){
-								  bonus_cost += 1 + enchantments.get(e);
-							  }
-						  }
-					  Bukkit.getLogger().warning("Cost: " + cost);
-				  }
-				  
-				  if (event.getInventory().getContents()[INPUT] == null ||
-						  (event.getInventory().getContents()[MATERIALS] == null &&
-								  event.getInventory().getContents()[MAGIC] == null)) {
-				  // Nothing is supplied. Clear level indicator and result item. 
-					  
-					  if (event.getInventory().getContents()[INPUT] != null) { Bukkit.getLogger().warning(event.getInventory().getContents()[INPUT].toString()); } 
-					  if (event.getInventory().getContents()[MATERIALS] != null) { Bukkit.getLogger().warning(event.getInventory().getContents()[MATERIALS].toString()); } 
-					  if (event.getInventory().getContents()[MAGIC] != null) { Bukkit.getLogger().warning(event.getInventory().getContents()[MAGIC].toString()); }
-					  
-					  if (event.getInventory().getContents()[OUTPUT] != null) { event.getInventory().getContents()[OUTPUT].setType(Material.AIR); }
-					  event.getInventory().getContents()[LEVELS].setAmount(1);
-					  Bukkit.getLogger().warning("Level indicator and output cleared.");
-				  }
-				  
-				    event.getInventory().clear();
-					event.getWhoClicked().closeInventory();
-					event.getWhoClicked().openInventory(newInventory);
-					
-			  } else {
-			  //event.setCancelled(true);
-			  }
-		  }
-	  
 	  if (event.getInventory().getName().equalsIgnoreCase("Notification Options")) {
 		  if (event.getSlotType()==SlotType.CONTAINER && (event.getSlot()==2 || event.getSlot()==6 ||
 				  event.getSlot()==11 || event.getSlot()==15 ||
@@ -10646,7 +10598,7 @@ public ItemStack getGoodie() {
 
   @EventHandler
 public void onMinecartExit(VehicleExitEvent e) {
-	  if (e.getVehicle().getType()==EntityType.MINECART) {
+	  if (e.getVehicle().getType()==EntityType.MINECART && e.getVehicle().getPassenger().getType()==EntityType.PLAYER && ((Player)e.getVehicle().getPassenger()).isOnline()) {
 		  Bukkit.getWorld("world").dropItemNaturally(e.getVehicle().getLocation(),new ItemStack(Material.MINECART));
 		  e.getVehicle().remove();
 	  }
