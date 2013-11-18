@@ -2160,6 +2160,13 @@ public class PlayerListener
 		  return true;
 	  }
 	  
+	  //Special reasons that should always happen.
+	  if (e.getSpawnReason()==SpawnReason.SPAWNER || e.getSpawnReason()==SpawnReason.BUILD_IRONGOLEM || e.getSpawnReason()==SpawnReason.BREEDING ||
+			  e.getSpawnReason()==SpawnReason.BUILD_SNOWMAN || e.getSpawnReason()==SpawnReason.BUILD_WITHER || e.getSpawnReason()==SpawnReason.LIGHTNING ||
+			  e.getSpawnReason()==SpawnReason.SPAWNER_EGG || e.getSpawnReason()==SpawnReason.VILLAGE_DEFENSE || e.getSpawnReason()==SpawnReason.VILLAGE_INVASION) {
+		  return true;
+	  }
+	  
 	  return false; //If we got down to here, allow this particular mob to spawn.
 	  
   }
@@ -6622,11 +6629,19 @@ public ItemStack getGoodie() {
 		  }
 		  if (this.plugin.inventoryFull(e.getPlayer())) {
 			  if (e.getRemaining()==0 && same) {
-				  p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+String.valueOf(mod)+".");
+          		if (special_convert(e.getItem().getItemStack().getType())) {
+          			p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+convertToItemName(e.getItem().getType().getName(),e.getItem().getItemStack().getData().getData(),e.getItem().getItemStack().getType())+".");
+          		} else {
+          			p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+String.valueOf(mod)+".");
+          		}
 			  }  
 		  } else {
 			  if (e.getRemaining()==0) {
-				  p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+String.valueOf(mod)+".");
+	          		if (special_convert(e.getItem().getItemStack().getType())) {
+	          			p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+convertToItemName(e.getItem().getType().getName(),e.getItem().getItemStack().getData().getData(),e.getItem().getItemStack().getType())+".");
+            		} else {
+            			p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+String.valueOf(mod)+".");
+            		}
 			  }
 		  }
 	  }
@@ -7611,20 +7626,6 @@ public ItemStack getGoodie() {
 					  }
 				  }
 				  final Player p = (Player) e.getDamager();
-				  if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
-					  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
-					      @Override
-					      public void run() {
-						      DecimalFormat df = new DecimalFormat("#0.0");
-						      DecimalFormat df2 = new DecimalFormat("#0");
-						      if (f.getCustomName()!=null) {
-						    	  p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth())+" damage to "+f.getCustomName()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
-						      } else {
-						    	  p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth())+" damage to "+ChatColor.WHITE+f.getType()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
-						      }
-					      }
-					  	},1);
-				  }
 				  if (p.getItemInHand().hasItemMeta() && p.getItemInHand().getItemMeta().getDisplayName()!=null && p.getItemInHand().getItemMeta().getDisplayName().contains(ChatColor.DARK_GRAY+"[BROKEN]")) {
 					  e.setDamage(0);
 					  e.setCancelled(true);
@@ -7632,7 +7633,7 @@ public ItemStack getGoodie() {
 				  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 				  //p.sendMessage("No Damage Ticks: "+f.getNoDamageTicks());
 				  ItemStack item = p.getItemInHand();
-				  double critical_chance=0,armor_pen=0,life_steal=0,attack_speed=0,dmg=0;
+				  double critical_chance=0,armor_pen=0,life_steal=0,attack_speed=0,dmg=0,armor_pen_dmg=0;
 				  if (item.getType()!=Material.BOW && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) { //Make sure this isn't a ranged weapon.
 					  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 						  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Critical Chance")) {
@@ -7717,7 +7718,8 @@ public ItemStack getGoodie() {
 					//This means some piercing can be done.
 					//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4));
 					if (f.getHealth()-(normaldmg+armor_pen)>0) {
-						f.setHealth(Warning(f,13));
+						f.setHealth(f.getHealth()-(normaldmg+armor_pen));
+						armor_pen_dmg=(normaldmg+armor_pen);
 						if (f!=null) {
 							if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
 								if (f.getCustomName()!=null) {
@@ -7795,26 +7797,27 @@ public ItemStack getGoodie() {
 						}
 					}
 				}
+				  if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+					  final double armor_dmg = armor_pen_dmg;
+					  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+					      @Override
+					      public void run() {
+						      DecimalFormat df = new DecimalFormat("#0.0");
+						      DecimalFormat df2 = new DecimalFormat("#0");
+						      if (f.getCustomName()!=null) {
+						    	  p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+f.getCustomName()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
+						      } else {
+						    	  p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+ChatColor.WHITE+f.getType()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
+						      }
+					      }
+					  	},1);
+				  }
 			  } else {
 				  if (((Projectile)e.getDamager()).getShooter()!=null && ((Projectile)e.getDamager()).getShooter().getType()==EntityType.PLAYER) {
 					  final Player p = (Player)((Projectile)e.getDamager()).getShooter();
-					  if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
-						  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
-						      @Override
-						      public void run() {
-							      DecimalFormat df = new DecimalFormat("#0.0");
-							      DecimalFormat df2 = new DecimalFormat("#0");
-							      if (f.getCustomName()!=null) {
-							    	  p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth())+" damage to "+f.getCustomName()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
-							      } else {
-							    	  p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth())+" damage to "+ChatColor.WHITE+f.getType()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
-							      }
-						      }
-						  	},1);
-					  }
 					  p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 					  ItemStack item = p.getItemInHand();
-					  double critical_chance=0,armor_pen=0,life_steal=0,attack_speed=0,dmg=0;
+					  double critical_chance=0,armor_pen=0,life_steal=0,attack_speed=0,dmg=0,armor_pen_dmg=0;
 					  if (item.getType()==Material.BOW && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) { //Make sure we are using a ranged weapon.
 						  for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 							  if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Critical Chance")) {
@@ -7919,7 +7922,8 @@ public ItemStack getGoodie() {
 						//This means some piercing can be done.
 						//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4));
 						if (f.getHealth()-(normaldmg+armor_pen)>0) {
-							f.setHealth(Warning(f.getHealth()-(normaldmg+armor_pen),17));
+							f.setHealth(f.getHealth()-(normaldmg+armor_pen));
+							armor_pen_dmg=(normaldmg+armor_pen);
 							if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
 								if (f.getCustomName()!=null) {
 									//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(normaldmg+armor_pen)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
@@ -7992,6 +7996,21 @@ public ItemStack getGoodie() {
 							}
 						}
 					}
+					  if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+							final double armor_dmg = armor_pen_dmg;
+						  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+						      @Override
+						      public void run() {
+							      DecimalFormat df = new DecimalFormat("#0.0");
+							      DecimalFormat df2 = new DecimalFormat("#0");
+							      if (f.getCustomName()!=null) {
+							    	  p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+f.getCustomName()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
+							      } else {
+							    	  p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+ChatColor.WHITE+f.getType()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
+							      }
+						      }
+						  	},1);
+					  }
 				  }
 			  }
 		  }
@@ -10072,7 +10091,11 @@ public ItemStack getGoodie() {
 	            if (newItemsCount > 0) {
 	                //Bukkit.getPlayer("AaMay").sendMessage(newItemsCount+" New Items have been detected.");
 	            	if (plugin.getAccountsConfig().getBoolean(player.getName()+".settings.notify2")) {
-	            		Bukkit.getPlayer(player.getName()).sendMessage(ChatColor.DARK_AQUA+""+ChatColor.ITALIC+"Crafted "+newItemsCount+" "+convertToItemName(compareItem.getType().name())+".");
+	            		if (special_convert(compareItem.getType())) {
+	            			Bukkit.getPlayer(player.getName()).sendMessage(ChatColor.DARK_AQUA+""+ChatColor.ITALIC+"Crafted "+newItemsCount+" "+convertToItemName(compareItem.getType().name(), compareItem.getData().getData(), compareItem.getType())+".");
+	            		} else {
+	            			Bukkit.getPlayer(player.getName()).sendMessage(ChatColor.DARK_AQUA+""+ChatColor.ITALIC+"Crafted "+newItemsCount+" "+convertToItemName(compareItem.getType().name())+".");
+	            		}
 	            	}
 	            	rewardCraft(compareItem,newItemsCount,player);
 	            }
@@ -12181,6 +12204,14 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
     else;
   }
   
+public boolean special_convert(Material mat) {
+	if (mat==Material.WOOL || mat==Material.INK_SACK || mat==Material.CARPET) {
+		return true;
+	} else {
+		return false;
+	}
+}
+  
 public String convertToItemName(String val) {
 	val=val.replace('_', ' ');
 	char[] mod = val.toCharArray();
@@ -12209,6 +12240,73 @@ public String convertToItemName(String val) {
 		  }
 	  }
 	  return String.valueOf(mod);
+}
+
+public String convertToItemName(String val, short data, Material material_id) {
+	String color = "";
+	String name = "";
+    switch (material_id) {
+	    case WOOL:{
+	    	name = "Wool";
+	    }break;
+	    case INK_SACK:{
+	    	name = "Dye";
+	    }break;
+	    case CARPET:{
+	    	name = "Carpet";
+	    }break;
+    }
+      switch (data) {
+	      case 0:{
+	    	  color = "White";
+	      }break;
+	      case 1:{
+	    	  color = "Orange";
+	      }break;
+	      case 2:{
+	    	  color = "Magenta";
+	      }break;
+	      case 3:{
+	    	  color = "Light Blue";
+	      }break;
+	      case 4:{
+	    	  color = "Yellow";
+	      }break;
+	      case 5:{
+	    	  color = "Lime";
+	      }break;
+	      case 6:{
+	    	  color = "Pink";
+	      }break;
+	      case 7:{
+	    	  color = "Gray";
+	      }break;
+	      case 8:{
+	    	  color = "Light Gray";
+	      }break;
+	      case 9:{
+	    	  color = "Cyan";
+	      }break;
+	      case 10:{
+	    	  color = "Purple";
+	      }break;
+	      case 11:{
+	    	  color = "Blue";
+	      }break;
+	      case 12:{
+	    	  color = "Brown";
+	      }break;
+	      case 13:{
+	    	  color = "Green";
+	      }break;
+	      case 14:{
+	    	  color = "Red";
+	      }break;
+	      case 15:{
+	    	  color = "Black";
+	      }break;
+      }
+	  return String.valueOf(color+" "+name);
 }
 
 @EventHandler
