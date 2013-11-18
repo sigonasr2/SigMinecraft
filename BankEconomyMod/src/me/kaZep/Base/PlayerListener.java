@@ -5810,7 +5810,7 @@ public ItemStack getGoodie() {
 			  case 9:
 			  case 10:
 			  case 11:{
-				  item = new ItemStack(Material.IRON_INGOT,(int)(Math.random()*40)+20);
+				  item = new ItemStack(Material.IRON_INGOT,(int)(Math.random()*20)+10);
 			  }break;
 			  case 1 :{
 				  item = new ItemStack(Material.IRON_BLOCK,(int)(Math.random()*2)+1);
@@ -5819,7 +5819,7 @@ public ItemStack getGoodie() {
 			  case 12:
 			  case 13:
 			  case 14:{
-				  item = new ItemStack(Material.GOLD_INGOT,(int)(Math.random()*20)+10);
+				  item = new ItemStack(Material.GOLD_INGOT,(int)(Math.random()*10)+5);
 			  }break;
 			  case 3 :{
 				  item = new ItemStack(Material.GOLD_BLOCK,(int)(Math.random()*1)+1);
@@ -5828,7 +5828,7 @@ public ItemStack getGoodie() {
 			  case 15:
 			  case 16:
 			  case 17: {
-				  item = new ItemStack(Material.LAPIS_BLOCK,(int)(Math.random()*40)+20);
+				  item = new ItemStack(Material.LAPIS_BLOCK,(int)(Math.random()*20)+10);
 			  }break;
 			  case 5 :{
 				  item = new ItemStack(Material.REDSTONE_BLOCK,(int)(Math.random()*12)+2);
