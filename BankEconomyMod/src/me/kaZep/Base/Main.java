@@ -515,10 +515,10 @@ public class Main extends JavaPlugin
     Woodcutter_job.addData("SAPLINGS", 0.015, 1, 1);
     Woodcutter_job.addData("WOOD", 0.01, 0.25, 1);
     Woodcutter_job.addData("WOODEN PLANK", 0.00, 0.10, 1);
-    Woodcutter_job.setBuffData("Saplings have a higher chance of dropping from tree leaves. (+40%)",
-    		"Axes used gain Efficiency +1 (Speed+30%)",
-    		"Saplings have a higher chance of dropping from tree leaves. (+60%), Axes used gain Efficiency +2 (Speed+60%).",
-    		"Axes that you use never break. Axes used gain Efficiency +3 (Speed+90%) 2-5 wood is dropped from each log. Saplings around you have a higher chance of growing quickly.");
+    Woodcutter_job.setBuffData("Leaves break instantly.",
+    		"Crafting planks gives 6 planks per wood instead of 4.",
+    		"Apples have a 400% higher rate of dropping from leaves. Breaking wood gives a Jump boost buff that lasts for 10 seconds. Axes last 200% longer.",
+    		"Cuts down a whole tree with one whack. Crafting planks gives 20 planks per wood. Each time you cut down a tree, you get a 4 HP boost (stacks) that lasts for one minute.");
     
     Miner_job.setJobName("Miner");
     Miner_job.setJobDescription("A miner's job is to venture into caves and collect precious minerals from within, eventually coming out with such treasures for use in other production.");
@@ -539,10 +539,10 @@ public class Main extends JavaPlugin
     Miner_job.addData("GOLD ORE", 0.0975, 12, 0);
     Miner_job.addData("DIAMOND ORE", 0.3125, 60, 0);
     Miner_job.addData("EMERALD ORE", 0.7625, 160, 0);
-    Miner_job.setBuffData("Pickaxes used gain Efficiency +1 (Speed+30%)",
-    		"Pickaxes have double the durability.", 
-    		"Pickaxes used gain Efficiency +2 (Speed+60%)", 
-    		"Pickaxes used give 240% more items from ore, have quadruple the durability, Efficiency +3 (Speed+90%). Minecart riding speed increased by 40%.");
+    Miner_job.setBuffData("Automatically mines ores next to each other when one ore is mined.",
+    		"Gain Quadruple the experience from mining ores. Pickaxes gain Efficiency III.", 
+    		"Mining out ores will mine them out 3x3 blocks at a time when using diamond pickaxes. Pickaxes used gain Efficiency VI and Unbreaking IV.", 
+    		"Mining ores will grant x2 the normal amount of minerals. Fortune is twice as effective, granting a possible total of x4 the normal minerals from ores.");
 
     Builder_job.setJobName("Builder");
     Builder_job.setJobDescription("A builder's job is to use blocks in order to create and invent new buildings using materials that look nice.");
@@ -580,10 +580,10 @@ public class Main extends JavaPlugin
     Builder_job.addData("BRICK STAIRS", 0.065, 9, 0);
     Builder_job.addData("QUARTZ BLOCK", 0.07, 14, 0);
     Builder_job.addData("BRICK", 0.075, 11, 0);
-    Builder_job.setBuffData("Every 5XP gives you one torch.",
-    		"1% of blocks placed will be replenished to your inventory.", 
-    		"5% of blocks placed will be replenished to your inventory.", 
-    		"Placing blocks gives you experience orbs. 50% of blocks placed will be replenished to your inventory.");
+    Builder_job.setBuffData("Builders gain access to the 'line' tool. Typing /line will make building in straight lines easier.",
+    		"Builders gain access to the 'rectangle' tool. Typing /rectangle will make building in rectangles easier.", 
+    		"When crafting irreversible Builder blocks, 75% of the blocks used for crafting will be restored to your inventory. When cooking Builder blocks, the block results will be doubled.", 
+    		"Builders gain the ability to fly when building. They immediately lose the ability to fly if they stop building for a moment, destroy a block, or enter combat. Every 100 Builder XP gained gives the Builder 5 Glowstone blocks and a stack of torches.");
 
     Digger_job.setJobName("Digger");
     Digger_job.setJobDescription("A digger's job is to collect blocks from the ground that are collectible with a shovel. The digger may also convert some blocks to other types for more XP and money.");
@@ -604,10 +604,10 @@ public class Main extends JavaPlugin
     Digger_job.addData("GLASS", 0.015, 3, 2);
     Digger_job.addData("BRICK", 0.04, 8, 2);
     Digger_job.addData("HARDENED CLAY", 0.04, 8, 2);
-    Digger_job.setBuffData("Shovels used gain Efficiency +1 (Speed+30%)",
-    		"Shovels have double the durability.", 
-    		"Shovels used gain Efficiency +2 (Speed+60%), Shovels have triple the durability.", 
-    		"Shovels have quadruple the durability. Blocks dug up are doubled in quantity. Shovels have Efficiency +4 (Speed+120%).");
+    Digger_job.setBuffData("Ability to discover artifacts when digging up blocks.",
+    		"Shovels gain Unbreaking V and Efficiency IV.", 
+    		"Destroying the bottom row of Sand or Gravel with a Wooden Shovel will destroy the whole stack instantly. Artifact discovery rate increased by 25%.", 
+    		"Artifacts will be able to be identified immediately with no identify tomes.");
 
     Farmer_job.setJobName("Farmer");
     Farmer_job.setJobDescription("A farmer's job is to sustain and continue to replenish what nature provides to turn them into sustainable food items and other useful things.");
@@ -872,7 +872,7 @@ public class Main extends JavaPlugin
     Explorer_job.setBuffData("Movement speed increased by 20%.",
     		"Players lose no exp on death. When taking fatal damage, you will regain all health. This effect can be used once every hour.", 
     		"Don't lose any money on death. Reviving costs 75% less.", 
-    		"When dying, you only lose 25% of your items. The rest stay in your inventory. Reviving costs 90% less. Teleporting to players costs 75% less. Movement speed increased by 40%. When dying, you will be placed back where you just died. This effect can be used once every hour.");
+    		"When holding a pickaxe, it will detect ores around you based on what the pickaxe is made of.");
 
     Support_job.setJobName("Support");
     Support_job.setJobDescription("A support's job is to provide assistance and keep others alive by providing potions to heal, materials to allow others to craft things, and being useful overall.");
