@@ -6725,6 +6725,7 @@ public ItemStack getGoodie() {
 		  if (l instanceof Player) {
 			  e.setDamage(e.getDamage()*1.45d);
 			  if (e.getDamager() instanceof Wither) {
+				  e.setDamage(e.getDamage()*2d);
 				  if (Math.random()<=0.25) {
 					  l.getWorld().spawnEntity(l.getLocation(), EntityType.CREEPER);
 				  }
