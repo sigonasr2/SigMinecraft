@@ -65,6 +65,8 @@ import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.Skeleton.SkeletonType;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Zombie;
@@ -1554,6 +1556,9 @@ public class PlayerListener
     	p.sendMessage("----------------------------");
     	p.sendMessage(ChatColor.YELLOW+"Current Money Balance: $ "+df.format(Main.economy.bankBalance(p.getName()).balance)+", Bank Balance: $"+df.format(this.plugin.getAccountsConfig().getDouble(p.getName()+".money")));
     	//Update account information for the stat point update.
+    	if (!this.plugin.getAccountsConfig().contains(p.getName() + ".bonus.witherskeleton")) {
+  	      this.plugin.getAccountsConfig().set(p.getName() + ".bonus.witherskeleton", Integer.valueOf(0));
+    	}
     	if (!this.plugin.getAccountsConfig().contains(p.getName() + ".stats.stat1")) {
     	      this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat1", Integer.valueOf(0));
     	      this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat2", Integer.valueOf(0));
@@ -2059,6 +2064,13 @@ public class PlayerListener
 					  l.setMaxHealth(l.getMaxHealth()/4);
 					  l.setHealth(l.getMaxHealth());
 				  }
+			  }
+			  if (Math.random()<=0.003 && l.getLocation().getY()>=60) {
+				  Skeleton s = (Skeleton)l;
+				  s.setSkeletonType(SkeletonType.WITHER);
+				  s.setMaxHealth(150);
+				  s.setHealth(s.getMaxHealth());
+				  s.getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD));
 			  }
 			}break;
 		case SLIME: {
@@ -5987,6 +5999,12 @@ public ItemStack getGoodie() {
 		  }
 		  if (f.getKiller()!=null && f.getKiller().getType()==EntityType.PLAYER) {
 			  Player p = f.getKiller();
+			  if (e.getEntity().getType()==EntityType.SKELETON && ((Skeleton)e.getEntity()).getSkeletonType()==SkeletonType.WITHER && p.getWorld().equals(Bukkit.getWorld("world"))) {
+				  //Award them a credit.
+				  e.setDroppedExp(50);
+				  this.plugin.getAccountsConfig().set(p.getName()+".bonus.witherskeleton", this.plugin.getAccountsConfig().getInt(p.getName()+".bonus.witherskeleton")+1);
+				  this.plugin.saveAccountsConfig();
+			  }
 			  for (int x=-10;x<10;x++) {
 				  for (int y=-3;y<3;y++) {
 					  for (int z=-10;z<10;z++) {
