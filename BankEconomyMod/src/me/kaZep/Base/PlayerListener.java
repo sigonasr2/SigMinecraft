@@ -12256,6 +12256,58 @@ public String convertToItemName(String val, short data, Material material_id) {
 	    	name = "Carpet";
 	    }break;
     }
+    if (name.equalsIgnoreCase("Dye")) {
+        switch (data) {
+	      case 0:{
+	    	  color = "Black";
+	      }break;
+	      case 1:{
+	    	  color = "Red";
+	      }break;
+	      case 2:{
+	    	  color = "Green";
+	      }break;
+	      case 3:{
+	    	  color = "Brown";
+	      }break;
+	      case 4:{
+	    	  color = "Blue";
+	      }break;
+	      case 5:{
+	    	  color = "Purple";
+	      }break;
+	      case 6:{
+	    	  color = "Cyan";
+	      }break;
+	      case 7:{
+	    	  color = "Light Gray";
+	      }break;
+	      case 8:{
+	    	  color = "Gray";
+	      }break;
+	      case 9:{
+	    	  color = "Pink";
+	      }break;
+	      case 10:{
+	    	  color = "Lime";
+	      }break;
+	      case 11:{
+	    	  color = "Yellow";
+	      }break;
+	      case 12:{
+	    	  color = "Light Blue";
+	      }break;
+	      case 13:{
+	    	  color = "Green";
+	      }break;
+	      case 14:{
+	    	  color = "Red";
+	      }break;
+	      case 15:{
+	    	  color = "Black";
+	      }break;
+    }
+    } else {
       switch (data) {
 	      case 0:{
 	    	  color = "White";
@@ -12306,6 +12358,7 @@ public String convertToItemName(String val, short data, Material material_id) {
 	    	  color = "Black";
 	      }break;
       }
+    }
 	  return String.valueOf(color+" "+name);
 }
 
