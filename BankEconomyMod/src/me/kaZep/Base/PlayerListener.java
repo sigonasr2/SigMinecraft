@@ -3680,6 +3680,24 @@ public class PlayerListener
 		  e.getPlayer().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
 		  e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(Material.MELON_BLOCK));
 	  }
+	  if (e.getBlock().getType()==Material.STEP && e.getBlock().getData()==2) {
+		  e.setCancelled(true);
+		  e.getPlayer().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
+		  ItemStack fireproof_slab = new ItemStack(Material.STEP,1,(short)2);
+		  ItemMeta meta = fireproof_slab.getItemMeta();
+		  meta.setDisplayName(ChatColor.RESET+"Fireproof Wood Slab");
+		  fireproof_slab.setItemMeta(meta);
+		  e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), fireproof_slab);
+	  } else
+	  if (e.getBlock().getType()==Material.DOUBLE_STEP && e.getBlock().getData()==2) { //Drop 2 instead.
+		  e.setCancelled(true);
+		  e.getPlayer().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
+		  ItemStack fireproof_slab = new ItemStack(Material.STEP,2,(short)2);
+		  ItemMeta meta = fireproof_slab.getItemMeta();
+		  meta.setDisplayName(ChatColor.RESET+"Fireproof Wood Slab");
+		  fireproof_slab.setItemMeta(meta);
+		  e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), fireproof_slab);
+	  }
 	  return;
   }
   
