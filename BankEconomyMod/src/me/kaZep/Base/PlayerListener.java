@@ -6726,20 +6726,30 @@ public ItemStack getGoodie() {
 			  e.setDamage(e.getDamage()*1.45d);
 			  if (e.getDamager() instanceof Wither) {
 				  e.setDamage(e.getDamage()*2d);
-				  if (Math.random()<=0.25) {
+				  if (Math.random()<=0.75) {
 					  l.getWorld().spawnEntity(l.getLocation(), EntityType.CREEPER);
+					  l.getWorld().spawnEntity(l.getLocation(), EntityType.ZOMBIE);
 				  }
 			  }
 		  }
 		  if (e.getEntity() instanceof Wither) {
-			  e.setDamage(e.getDamage()*0.2d);
+			  e.setDamage(e.getDamage()*0.075d);
+		  }
+		  if (e.getEntity().getType()==EntityType.ZOMBIE) {
+			  Zombie z = (Zombie)e.getEntity();
+			  if (z.getCustomName()==null && z.getMaxHealth()>65) {
+				  //If it's a normal zombie with too much HP, something wrong. Lower it.
+				  z.setMaxHealth(65);
+				  z.setHealth(z.getMaxHealth());
+			  }
 		  }
 		  if (e.getDamager() instanceof Projectile) {
 			  Projectile pp = (Projectile)(e.getDamager());			  
 			  if (pp.getShooter() instanceof Player && l instanceof Wither) {
 				  Player p = (Player)(pp.getShooter());
-				  if (Math.random()<=0.25) {
+				  if (Math.random()<=0.75) {
 					  l.getWorld().spawnEntity(pp.getLocation(), EntityType.CREEPER);
+					  l.getWorld().spawnEntity(l.getLocation(), EntityType.ZOMBIE);
 				  }
 			  }
 		  }
