@@ -40,10 +40,10 @@ public class EnchantLevelDatabase {
 	public List<StoreValues> iron_sword = new ArrayList<StoreValues>();
 	public List<StoreValues> gold_sword = new ArrayList<StoreValues>();
 	public List<StoreValues> diamond_sword = new ArrayList<StoreValues>();
-	public List<StoreValues> chain_helmet = new ArrayList<StoreValues>();;
-	public List<StoreValues> chain_chestplate = new ArrayList<StoreValues>();;
-	public List<StoreValues> chain_leggings = new ArrayList<StoreValues>();;
-	public List<StoreValues> chain_boots = new ArrayList<StoreValues>();;
+	public List<StoreValues> chain_helmet = new ArrayList<StoreValues>();
+	public List<StoreValues> chain_chestplate = new ArrayList<StoreValues>();
+	public List<StoreValues> chain_leggings = new ArrayList<StoreValues>();
+	public List<StoreValues> chain_boots = new ArrayList<StoreValues>();
 	public EnchantLevelDatabase() {
 		stone_hoe.add(new StoreValues(0.359,Enchantment.DURABILITY,1,5));
 		stone_shovel.add(new StoreValues(0.636,Enchantment.DIG_SPEED,1,5));
@@ -464,6 +464,5 @@ public class EnchantLevelDatabase {
 		chain_chestplate.add(new StoreValues(0.083,Enchantment.PROTECTION_PROJECTILE,2,10));
 		chain_chestplate.add(new StoreValues(0.025,Enchantment.PROTECTION_FIRE,1,10));
 		chain_chestplate.add(new StoreValues(0.019,Enchantment.THORNS,1,10));
-
 	}
 }

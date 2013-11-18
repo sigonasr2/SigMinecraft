@@ -1,6 +1,6 @@
 name: BankEconomy
 main: me.kaZep.Base.Main
-version: 261
+version: 262
 description: Bank plugin which stores money.
 commands:
   bankeconomy:
