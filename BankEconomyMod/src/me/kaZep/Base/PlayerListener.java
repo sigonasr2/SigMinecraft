@@ -6755,10 +6755,9 @@ public ItemStack getGoodie() {
 		  }
 		  if (e.getEntity().getType()==EntityType.ZOMBIE) {
 			  Zombie z = (Zombie)e.getEntity();
-			  if (z.getCustomName()==null && z.getMaxHealth()>65) {
-				  //If it's a normal zombie with too much HP, something wrong. Lower it.
-				  z.setMaxHealth(65);
-				  z.setHealth(z.getMaxHealth());
+			  if (z.getCustomName()==null && z.getHealth()>65) {
+				  //If it's a normal zombie with too much HP, something's wrong. Lower it.
+				  z.setHealth(65-z.getMaxHealth()/2);
 			  }
 		  }
 		  if (e.getDamager() instanceof Projectile) {
@@ -10329,7 +10328,7 @@ public ItemStack getGoodie() {
 
   @EventHandler
 public void onMinecartExit(VehicleExitEvent e) {
-	  if (e.getVehicle().getType()==EntityType.MINECART && e.getVehicle().getPassenger().getType()==EntityType.PLAYER && ((Player)e.getVehicle().getPassenger()).isOnline()) {
+	  if (e.getVehicle().getType()==EntityType.MINECART && e.getVehicle().getPassenger().getType()==EntityType.PLAYER) {
 		  Bukkit.getWorld("world").dropItemNaturally(e.getVehicle().getLocation(),new ItemStack(Material.MINECART));
 		  e.getVehicle().remove();
 	  }
@@ -10848,6 +10847,9 @@ public void onEntityExpode(ExplosionPrimeEvent e) {
   @EventHandler
   public void onPlayerLeave(PlayerQuitEvent e) {
     Player p = e.getPlayer();
+    if (p.isInsideVehicle()) {
+    	p.leaveVehicle();
+    }
     for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
     	if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
     	    p.removePotionEffect(PotionEffectType.SPEED);
