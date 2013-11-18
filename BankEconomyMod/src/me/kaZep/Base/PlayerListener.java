@@ -6503,6 +6503,94 @@ public ItemStack getGoodie() {
 
   @EventHandler
   public void onInventoryOpen(InventoryOpenEvent e) {
+	  
+		// Inventory override if anvil.
+		if (e.getInventory().getType() == InventoryType.ANVIL) {
+			// Bukkit.getLogger().info("If triggered.");
+
+			Inventory i = Bukkit.createInventory(e.getPlayer(), 27,
+					"Repair & Enchant");
+			ItemStack filler, temp;
+			int count = -1;
+
+			temp = new ItemStack(Material.COBBLESTONE);
+
+			ItemMeta temp_meta = temp.getItemMeta();
+			temp_meta.setDisplayName(ChatColor.YELLOW + "Item Input");
+			List<String> temp_meta_lore = new ArrayList<String>();
+			temp_meta_lore.add(ChatColor.ITALIC
+					+ "Place the item to be repaired or enchanted here.");
+			temp_meta.setLore(temp_meta_lore);
+			temp.setItemMeta(temp_meta);
+			temp.setType(Material.IRON_AXE);
+			i.setItem(count += 2, temp);
+
+			temp_meta.setDisplayName(ChatColor.YELLOW + "Item Tributes");
+			temp_meta_lore = new ArrayList<String>();
+			temp_meta_lore.add(ChatColor.ITALIC
+					+ "Place applicable item tributes here.");
+			temp_meta_lore.add(ChatColor.ITALIC + "");
+			temp_meta_lore.add(ChatColor.ITALIC + "" + ChatColor.GRAY
+					+ "Chainmail repairs with iron ingots.");
+			temp_meta.setLore(temp_meta_lore);
+			temp.setItemMeta(temp_meta);
+			temp.setType(Material.IRON_INGOT);
+			i.setItem(count += 2, temp);
+
+			temp_meta.setDisplayName(ChatColor.YELLOW + "Magical Artifacts");
+			temp_meta_lore = new ArrayList<String>();
+			temp_meta_lore.add(ChatColor.ITALIC
+					+ "Place applicable magic artifacts here.");
+			temp_meta_lore.add(ChatColor.ITALIC + "");
+			temp_meta_lore.add(ChatColor.ITALIC + "" + ChatColor.GRAY
+					+ "Includes enchanted boots and repair shards.");
+			temp_meta.setLore(temp_meta_lore);
+			temp.setItemMeta(temp_meta);
+			temp.setType(Material.WRITTEN_BOOK);
+			i.setItem(count += 2, temp);
+
+			temp_meta.setDisplayName(ChatColor.YELLOW + "Output");
+			temp_meta_lore = new ArrayList<String>();
+			temp_meta_lore.add(ChatColor.ITALIC
+					+ "Grab your finished item here!");
+			temp_meta.setLore(temp_meta_lore);
+			temp.setItemMeta(temp_meta);
+			temp.setType(Material.CHEST);
+			i.setItem(count += 2, temp);
+
+			temp_meta.setDisplayName(ChatColor.YELLOW + "Experience Cost");
+			temp_meta_lore = new ArrayList<String>();
+			temp_meta_lore.add(ChatColor.ITALIC
+					+ "Experience Cost of Enchanting.");
+			temp_meta.setLore(temp_meta_lore);
+			temp.setItemMeta(temp_meta);
+			temp.setType(Material.SLIME_BALL);
+			i.setItem(count += 15, temp);
+
+			temp_meta.setDisplayName(ChatColor.RESET + "Anvil Interface");
+			temp_meta_lore = new ArrayList<String>();
+			temp_meta_lore.add(ChatColor.GRAY + "Nothing to see here. Shoo!");
+			temp_meta.setLore(temp_meta_lore);
+			temp.setItemMeta(temp_meta);
+			temp.setType(Material.COBBLESTONE);
+			for (int c = 0; c < 27; c++) {
+				if (i.getItem(c) == null) {
+					i.setItem(c, temp);
+				}
+			}
+			i.setItem(10, new ItemStack(Material.AIR));
+			i.setItem(12, new ItemStack(Material.AIR));
+			i.setItem(14, new ItemStack(Material.AIR));
+			i.setItem(16, new ItemStack(Material.AIR));
+
+			e.setCancelled(true);
+
+			e.getPlayer().closeInventory();
+			e.getPlayer().openInventory(i);
+
+		}
+
+		
 	  // 笆�笆�(Player)e.getPlayer()).sendMessage(((Player)e.getPlayer()).getScoreboard().getPlayerTeam((OfflinePlayer)e.getPlayer()).getName());
 	  Player p = (Player)e.getPlayer();
 	  p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.DARK_GRAY+"");
@@ -9190,6 +9278,16 @@ public ItemStack getGoodie() {
 		  savefile.set(p.getName()+".settings.notify6", Boolean.valueOf(e.getInventory().getItem(24).getType()==Material.REDSTONE_TORCH_ON));
 		  this.plugin.saveAccountsConfig();
 	  }
+		if (e.getInventory().getTitle().equalsIgnoreCase("Repair & Enchant")) {
+	// We have to return the items the player placed inside the anvil
+	// interface.
+	for (int i = 10; i < 16; i += 2) {
+		if (e.getInventory().getItem(i) != null && e.getInventory().getItem(i).getType() != Material.AIR) {
+			p.getWorld().dropItemNaturally(p.getLocation(),
+					e.getInventory().getItem(i));
+		}
+	}
+}
   }
   
 
@@ -9695,6 +9793,142 @@ public ItemStack getGoodie() {
 			  }
 		  }
 	  } else
+		  
+		  if (event.getInventory().getName().equalsIgnoreCase("Repair & Enchant")) {
+			  final int INPUT = 10;
+			  final int MATERIALS = 12;
+			  final int MAGIC = 14;
+			  final int OUTPUT = 16;
+			  final int LEVELS = 22;
+			  
+			  Inventory newInventory = event.getInventory();
+			  
+			  // If click on output and it's not null
+			  if (event.getInventory().getContents()[OUTPUT] != null && event.getSlot()==OUTPUT) { 
+				  if (event.getCursor() != null)
+				  {
+					  event.setCancelled(true); // Cancel event if cursor is not empty
+					  if (event.isShiftClick()) 
+					  {
+						  // Attempts to store the item in the player's inventory. If it succeeds, remove the item from the anvil interface. 
+						  if (event.getWhoClicked().getInventory().addItem(event.getInventory().getContents()[OUTPUT]).isEmpty()) {
+							  newInventory.getContents()[OUTPUT].setType(Material.AIR);
+						  }
+					  }
+				  }
+				  
+			  }
+
+			  if (event.getSlotType()==SlotType.CONTAINER && (event.getSlot()==INPUT || 
+					  event.getSlot()==MATERIALS || event.getSlot()==MAGIC)) {
+				  // Check if operation is legal
+				  
+				  boolean valid = false;
+				  
+				  switch (event.getSlot()) {
+					  case INPUT: // Verify that it's a weapon/armor/tool piece. 
+						  
+						 // if (event.get
+						  
+						  Bukkit.getLogger().info("Case INPUT");
+						  break;
+
+					  case MATERIALS: // Verify that it's an appropriate repair material. 
+						  
+						  Bukkit.getLogger().info("Case MATERIALS");
+						  break;
+						  
+					  case MAGIC: 
+						  
+						  Bukkit.getLogger().info("Case MAGIC");
+						  break;
+						  
+					  default:
+						  Bukkit.getLogger().warning("Something terrible happened in event.getSlot() for anvils.");
+				  }
+				  
+
+				  				  
+				  // Attempt to calculate enchant/repair cost.
+				  if (event.getInventory().getContents()[INPUT] != null &&
+						  event.getInventory().getContents()[MATERIALS] != null &&
+								  event.getInventory().getContents()[MAGIC] == null) {
+				  // We are repairing an item. Calculate the repair cost. 
+					  
+					  int cost = event.getInventory().getContents()[MATERIALS].getAmount() * 2;
+					  int bonus_cost = 0;
+					  ItemStack item = event.getInventory().getContents()[INPUT];
+					  
+							  
+					  if (valid){
+						  Bukkit.getLogger().warning("Repair cost calculation valid");
+						  Map<Enchantment, Integer> enchantments = item.getEnchantments();
+						  
+						  Bukkit.getLogger().warning(enchantments.keySet().toString());
+							  for(Enchantment e : enchantments.keySet()){
+								  Bukkit.getLogger().warning("BC: " + bonus_cost + " | INCR: " + Math.round(2.5 + enchantments.get(e) * 1.3));
+								  bonus_cost += Math.round(2.5 + enchantments.get(e) * 1.3);
+							  }
+						  }
+					  cost += bonus_cost;
+					  cost = Math.min(cost, 99); // Cap cost at 99 in case some egregiously enchanted item exists
+					  
+					  Bukkit.getLogger().warning("Cost: " + cost);
+					  
+					  ItemStack orbs = event.getInventory().getContents()[LEVELS];
+					  orbs.setAmount(cost);
+					  event.getInventory().setItem(LEVELS, orbs);
+					  
+					  
+//					  event.getInventory().getContents()[OUTPUT].setType(item.getType());
+//					  event.getInventory().getContents()[OUTPUT].setData(item.getData());
+					  event.getInventory().setItem(OUTPUT, item.clone());
+					  event.getInventory().getContents()[OUTPUT].setDurability((short)(item.getDurability() - item.getType().getMaxDurability() * 0.2 * event.getInventory().getContents()[MATERIALS].getAmount()));
+				  }
+				  
+				  if (event.getInventory().getContents()[INPUT] != null &&
+						  event.getInventory().getContents()[MATERIALS] == null &&
+								  event.getInventory().getContents()[MAGIC] != null) {
+				  // We are enchanting an item. Calculate the enchant cost and valid applicable enchantments. 
+					  
+					  int cost = 5;
+					  int bonus_cost = 0;
+					  ItemStack item = event.getInventory().getContents()[INPUT];
+					  
+							  
+					  if (valid){
+						  Bukkit.getLogger().warning("Enchantment cost calculation valid");
+						  Map<Enchantment, Integer> enchantments = item.getEnchantments();
+							  for(Enchantment e : enchantments.keySet()){
+								  bonus_cost += 1 + enchantments.get(e);
+							  }
+						  }
+					  Bukkit.getLogger().warning("Cost: " + cost);
+				  }
+				  
+				  if (event.getInventory().getContents()[INPUT] == null ||
+						  (event.getInventory().getContents()[MATERIALS] == null &&
+								  event.getInventory().getContents()[MAGIC] == null)) {
+				  // Nothing is supplied. Clear level indicator and result item. 
+					  
+					  if (event.getInventory().getContents()[INPUT] != null) { Bukkit.getLogger().warning(event.getInventory().getContents()[INPUT].toString()); } 
+					  if (event.getInventory().getContents()[MATERIALS] != null) { Bukkit.getLogger().warning(event.getInventory().getContents()[MATERIALS].toString()); } 
+					  if (event.getInventory().getContents()[MAGIC] != null) { Bukkit.getLogger().warning(event.getInventory().getContents()[MAGIC].toString()); }
+					  
+					  if (event.getInventory().getContents()[OUTPUT] != null) { event.getInventory().getContents()[OUTPUT].setType(Material.AIR); }
+					  event.getInventory().getContents()[LEVELS].setAmount(1);
+					  Bukkit.getLogger().warning("Level indicator and output cleared.");
+				  }
+				  
+				    event.getInventory().clear();
+					event.getWhoClicked().closeInventory();
+					event.getWhoClicked().openInventory(newInventory);
+					
+			  } else {
+			  //event.setCancelled(true);
+			  }
+		  }
+	  
 	  if (event.getInventory().getName().equalsIgnoreCase("Notification Options")) {
 		  if (event.getSlotType()==SlotType.CONTAINER && (event.getSlot()==2 || event.getSlot()==6 ||
 				  event.getSlot()==11 || event.getSlot()==15 ||
