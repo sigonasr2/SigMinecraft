@@ -363,9 +363,9 @@ public class Main extends JavaPlugin
     Bukkit.addRecipe(chain_leggings);
     
     ShapedRecipe chain_boots = new ShapedRecipe(new ItemStack(Material.CHAINMAIL_BOOTS));
-    chain_boots.shape("b a","b a");
+    chain_boots.shape("b b","a a");
     chain_boots.setIngredient('a', Material.IRON_BLOCK);
-    chain_boots.setIngredient('a', Material.IRON_INGOT);
+    chain_boots.setIngredient('b', Material.IRON_INGOT);
     Bukkit.addRecipe(chain_boots);
     
     //Add Recipes for new Block armor crafting.
