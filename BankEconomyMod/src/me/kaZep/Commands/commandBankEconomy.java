@@ -425,7 +425,20 @@ public String convertToItemName(String val) {
     		  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
     			  p.getItemInHand().removeEnchantment(entry.getKey());
     		  }
-    		  p.sendMessage("Enchantments removed on this item.");
+    		  if (p.getItemInHand().hasItemMeta() && p.getItemInHand().getItemMeta().hasLore()) {
+        		  List<String> newlore = new ArrayList<String>();
+    			  for (int i=0;i<p.getItemInHand().getItemMeta().getLore().size();i++) {
+    				  //Remove all lore when unenchanting.
+    				  //Do not remove -400% durability.
+					  if (p.getItemInHand().getItemMeta().getLore().get(i).contains(ChatColor.RED+"-400% Durability")) {
+						  newlore.add(p.getItemInHand().getItemMeta().getLore().get(i));
+					  }
+    			  }
+    			  ItemMeta meta = p.getItemInHand().getItemMeta();
+    			  meta.setLore(newlore);
+    			  p.getItemInHand().setItemMeta(meta);
+    		  }
+    		  p.sendMessage("Enchantments and bonuses removed on this item.");
           }
           else
           if (cmd.getName().equalsIgnoreCase("ticktime")) {

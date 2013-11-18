@@ -461,7 +461,9 @@ public class PlayerListener
 				  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 					  List<String> thelore = e.getItem().getItemMeta().getLore();
 					  for (int i=0;i<thelore.size();i++) {
-						  ourLore.add(thelore.get(i));
+						  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+							  ourLore.add(thelore.get(i));
+						  }
 					  }
 				  }
 				  if (Math.random()<=0.2) {
@@ -494,7 +496,9 @@ public class PlayerListener
 					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 						  List<String> thelore = e.getItem().getItemMeta().getLore();
 						  for (int i=0;i<thelore.size();i++) {
-							  ourLore.add(thelore.get(i));
+							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								  ourLore.add(thelore.get(i));
+							  }
 						  }
 					  }
 					  if (Math.random()<=0.2) {
@@ -529,7 +533,9 @@ public class PlayerListener
 					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 						  List<String> thelore = e.getItem().getItemMeta().getLore();
 						  for (int i=0;i<thelore.size();i++) {
-							  ourLore.add(thelore.get(i));
+							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								  ourLore.add(thelore.get(i));
+							  }
 						  }
 					  }
 					  if (Math.random()<=0.2) {
@@ -561,7 +567,9 @@ public class PlayerListener
 					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 						  List<String> thelore = e.getItem().getItemMeta().getLore();
 						  for (int i=0;i<thelore.size();i++) {
-							  ourLore.add(thelore.get(i));
+							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								  ourLore.add(thelore.get(i));
+							  }
 						  }
 					  }
 					  if (Math.random()<=0.2) {
@@ -602,7 +610,9 @@ public class PlayerListener
 				  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 					  List<String> thelore = e.getItem().getItemMeta().getLore();
 					  for (int i=0;i<thelore.size();i++) {
-						  ourLore.add(thelore.get(i));
+						  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+							  ourLore.add(thelore.get(i));
+						  }
 					  }
 				  }
 				  if (Math.random()<=0.2) {
@@ -635,7 +645,9 @@ public class PlayerListener
 					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 						  List<String> thelore = e.getItem().getItemMeta().getLore();
 						  for (int i=0;i<thelore.size();i++) {
-							  ourLore.add(thelore.get(i));
+							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								  ourLore.add(thelore.get(i));
+							  }
 						  }
 					  }
 					  if (Math.random()<=0.2) {
@@ -679,7 +691,9 @@ public class PlayerListener
 					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 						  List<String> thelore = e.getItem().getItemMeta().getLore();
 						  for (int i=0;i<thelore.size();i++) {
-							ourLore.add(thelore.get(i));
+							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								  ourLore.add(thelore.get(i));
+							  }
 						  }
 					  }
 					  if (Math.random()<=0.2) {
@@ -711,7 +725,9 @@ public class PlayerListener
 					  if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 						  List<String> thelore = e.getItem().getItemMeta().getLore();
 						  for (int i=0;i<thelore.size();i++) {
-							  ourLore.add(thelore.get(i));
+							  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								  ourLore.add(thelore.get(i));
+							  }
 						  }
 					  }
 					  if (Math.random()<=0.2) {
