@@ -1852,7 +1852,7 @@ public class PlayerListener
   
   public double Warning(double hp,int id) {
 	  if (hp>65) {
-		  Bukkit.broadcastMessage("PlayerListener: HP too high for ID "+id+". HP was "+hp);
+		  //Bukkit.broadcastMessage("PlayerListener: HP too high for ID "+id+". HP was "+hp);
 	  }
 	  return hp;
   }
@@ -2260,6 +2260,36 @@ public class PlayerListener
 		  
 		  if (spawners==0 && (Math.random()<=despawnchancer || (torches+glowstone>=3))) {
 			  allow=false;
+		  } else {
+			  allow=true;
+		  }
+		  
+
+		  int totallvs=0;
+		  List<Entity> nearbylist = e.getEntity().getNearbyEntities(30, 30, 30);
+		  //Filter out all unrelated e.getEntity() types.
+		  for (int k=0;k<nearbylist.size();k++) {
+			  //See if human players are near. If so, factor that in for determining how many mobs may exist.
+			  if (nearbylist.get(k).getType()==EntityType.PLAYER) {
+				  //This is a player.
+				  Player g = (Player)nearbylist.get(k);
+				  maxgroup+=plugin.getJobTotalLvs(g)/20;
+				  totallvs+=plugin.getJobTotalLvs(g);
+	  			////Bukkit.getLogger().info("Mob maxgroup increased to "+maxgroup+" down here.");
+			  }
+			  if (nearbylist.get(k).getType()!=EntityType.SKELETON &&
+					  nearbylist.get(k).getType()!=EntityType.ZOMBIE &&
+					  nearbylist.get(k).getType()!=EntityType.CREEPER &&
+					  nearbylist.get(k).getType()!=EntityType.SPIDER &&
+					  nearbylist.get(k).getType()!=EntityType.ENDERMAN) {
+				  nearbylist.remove(k);
+				  k--;
+			  }
+		  }
+		  maxgroup/=groupmult;
+		  int currentnearby = nearbylist.size();
+		  if (currentnearby>maxgroup) {
+			  allow=false; //Too many mobs, can't have more.
 		  }
 		  
 		  if (!allow) {
@@ -2303,50 +2333,7 @@ public class PlayerListener
 					  }
 				  }
 				  
-				  int totallvs=0;
-				  List<Entity> nearbylist = e.getEntity().getNearbyEntities(30, 30, 30);
-				  //Filter out all unrelated e.getEntity() types.
-				  for (int k=0;k<nearbylist.size();k++) {
-					  //See if human players are near. If so, factor that in for determining how many mobs may exist.
-					  if (nearbylist.get(k).getType()==EntityType.PLAYER) {
-						  //This is a player.
-						  Player g = (Player)nearbylist.get(k);
-						  maxgroup+=plugin.getJobTotalLvs(g)/20;
-						  totallvs+=plugin.getJobTotalLvs(g);
-			  			////Bukkit.getLogger().info("Mob maxgroup increased to "+maxgroup+" down here.");
-					  }
-					  if (nearbylist.get(k).getType()!=EntityType.SKELETON &&
-							  nearbylist.get(k).getType()!=EntityType.ZOMBIE &&
-							  nearbylist.get(k).getType()!=EntityType.CREEPER &&
-							  nearbylist.get(k).getType()!=EntityType.SPIDER &&
-							  nearbylist.get(k).getType()!=EntityType.ENDERMAN) {
-						  nearbylist.remove(k);
-						  k--;
-					  }
-				  }
-				  maxgroup/=groupmult;
-				  int currentnearby = nearbylist.size();
-				  int k = currentnearby;
-				  if (Main.SERVER_TICK_TIME-plugin.last_mob_random_time>10) {
-					  while (k<maxgroup-currentnearby+1) {
-						  if (Math.random()<=chancer) {
-							  Location testloc = e.getEntity().getLocation().add(Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d);
-							  if (Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR) {
-								  Bukkit.getWorld("world").spawnEntity(testloc, e.getEntity().getType());
-								  plugin.last_mob_random_time=Main.SERVER_TICK_TIME;
-								  k++;
-								  //Bukkit.getPlayer("AaMay").sendMessage(ChatColor.RED+e.getEntity().getType().getName()+": Spawned extra mob.");
-								  /*int j=0;
-								  while (j<10) {
-									  Bukkit.getWorld("world").spawnEntity(testloc, e.getEntity().getType());
-									  j++;
-								  }*/
-							  }
-						  }
-						  k++;
-					  }
-				  }
-				  double levelsmult=1.5;
+				  double levelsmult=1.0;
 				  if (totallvs>20*levelsmult) {
 					  if (totallvs<40*levelsmult) {
 						  //Sometimes wear leather armor. Only for Skeletons and Zombies.
@@ -6478,6 +6465,7 @@ public ItemStack getGoodie() {
 
   final public void FatalSurvivor(Player p) {
 	  p.setHealth(p.getMaxHealth());
+	  p.setNoDamageTicks(100);
 	  p.sendMessage("You used your "+ChatColor.YELLOW+"Lv10 Fatal Survivor"+ChatColor.WHITE+" buff. Your health has been restored."+ChatColor.AQUA+" It will be recharged in one hour.");
 	  Bukkit.broadcastMessage(ChatColor.YELLOW+p.getName()+ChatColor.WHITE+" has died...and revived through sheer willpower!");
 	  p.setFireTicks(0);
@@ -6859,9 +6847,9 @@ public ItemStack getGoodie() {
 		  }
 	  }
 	  ////Bukkit.getLogger().info("Made it through 1.");
-	  if (e.getDamager().getType()==EntityType.CREEPER) {
+	  /*if (e.getDamager().getType()==EntityType.CREEPER) {
 		  e.setDamage(e.getDamage()/2.0d);
-	  }
+	  }*/
 	  if (e.getEntity().getType()==EntityType.PLAYER) {
 		  final Player p = (Player)e.getEntity();
 		  List<Entity> nearby = p.getNearbyEntities(10, 10, 10);

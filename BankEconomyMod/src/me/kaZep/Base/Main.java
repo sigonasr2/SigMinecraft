@@ -194,7 +194,7 @@ public class Main extends JavaPlugin
   
   public double Warning(double hp,int id) {
 	  if (hp>65) {
-		  Bukkit.broadcastMessage("Main: HP too high for ID "+id+". HP was "+hp);
+		  //Bukkit.broadcastMessage("Main: HP too high for ID "+id+". HP was "+hp);
 	  }
 	  return hp;
   }
@@ -2883,6 +2883,7 @@ public void checkJukeboxes() {
     					}
     				}
     			}
+    			/* Kind of an out-of-date way to spawn things. Don't need anymore.
                 //Find out how much a player is worth.
     			if (list[i].getWorld().getName().compareTo("world")==0 && list[i].getLocation().getY()<=50) {
 	    			double value=0;
@@ -3021,7 +3022,7 @@ public void checkJukeboxes() {
 		                	}break;
 	                	}
 	                }
-    			}
+    			}*/
     			list[i].getScoreboard().getTeam(list[i].getName()).setSuffix(healthbar(list[i].getHealth(),list[i].getMaxHealth(),list[i].getFoodLevel()));
     		}
           LOGGING_UPDATE_COUNTS++; //3
@@ -3999,10 +4000,6 @@ public void payDay(int time)
 		if (item.getType()==Material.IRON_AXE) {enchant_data=ENCHANTMENT_DATA.iron_axe;} else
 		if (item.getType()==Material.GOLD_SPADE) {enchant_data=ENCHANTMENT_DATA.golden_shovel;} else
 		if (item.getType()==Material.GOLD_AXE) {enchant_data=ENCHANTMENT_DATA.golden_axe;} else
-		if (item.getType()==Material.CHAINMAIL_HELMET) {enchant_data=ENCHANTMENT_DATA.chain_helmet;} else
-		if (item.getType()==Material.CHAINMAIL_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.chain_chestplate;} else
-		if (item.getType()==Material.CHAINMAIL_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.chain_leggings;} else
-		if (item.getType()==Material.CHAINMAIL_BOOTS) {enchant_data=ENCHANTMENT_DATA.chain_boots;} else
 		if (item.getType()==Material.IRON_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.iron_leggings;} else
 		if (item.getType()==Material.DIAMOND_SPADE) {enchant_data=ENCHANTMENT_DATA.diamond_shovel;} else
 		if (item.getType()==Material.GOLD_BOOTS) {enchant_data=ENCHANTMENT_DATA.golden_boots;} else
@@ -4016,6 +4013,10 @@ public void payDay(int time)
 		if (item.getType()==Material.DIAMOND_HELMET) {enchant_data=ENCHANTMENT_DATA.diamond_helmet;} else
 		if (item.getType()==Material.DIAMOND_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.diamond_leggings;} else
 		if (item.getType()==Material.DIAMOND_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.diamond_chestplate;}
+		if (item.getType()==Material.CHAINMAIL_HELMET) {enchant_data=ENCHANTMENT_DATA.chain_helmet;} else
+		if (item.getType()==Material.CHAINMAIL_CHESTPLATE) {enchant_data=ENCHANTMENT_DATA.chain_chestplate;} else
+		if (item.getType()==Material.CHAINMAIL_LEGGINGS) {enchant_data=ENCHANTMENT_DATA.chain_leggings;} else
+		if (item.getType()==Material.CHAINMAIL_BOOTS) {enchant_data=ENCHANTMENT_DATA.chain_boots;}
 		int enchantments=0;
 		int iterations=0;
 		while (enchantments==0 && iterations<100) { //Attempt to enchant it, up to 100 tries.
