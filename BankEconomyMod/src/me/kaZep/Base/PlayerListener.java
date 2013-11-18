@@ -1894,8 +1894,8 @@ public class PlayerListener
 	  }
   }
   
-  private boolean allowedToSpawn(CreatureSpawnEvent e, LivingEntity l) {
-	  //Will return true if it's allowed to spawn. False if it needs to go away.
+  private boolean isPermanentSpawn(CreatureSpawnEvent e, LivingEntity l) {
+	  //Will return true if it's something that is not allowed to despawn. False if we are allowed to get rid of it.
 	  //Basically this is the control that will determine if the mob stays or goes, before further processing is done.
 	  //If the mob is identified as a special mob...
 	  
@@ -2150,21 +2150,77 @@ public class PlayerListener
 	  }
 	  
 	  //This allows bosses to spawn.
-	  if (e.getEntity().getType()==EntityType.ENDER_DRAGON || e.getEntity().getType()==EntityType.WITHER) {
+	  if (e.getEntity().getType()==EntityType.ENDER_DRAGON || e.getEntity().getType()==EntityType.WITHER ||
+			  e.getEntity() instanceof Golem || e.getEntity() instanceof Animals) {
 		  return true;
 	  }
 	  
-	  if (e.getSpawnReason()==SpawnReason.CUSTOM || e.getSpawnReason()==SpawnReason.NATURAL) {
-		  return true; //Always return custom spawns, we have no reason not to. Natural spawning also is allowed, since it'll always make sense.
+	  //Custom bosses
+	  if (l.getCustomName()!=null && (l.getCustomName().contains(ChatColor.DARK_PURPLE+"") || l.getCustomName().contains(ChatColor.DARK_AQUA+"Polymorphed Creature"))) {
+		  return true;
 	  }
 	  
-	  return true; //If we got down to here, allow this particular mob to spawn.
+	  return false; //If we got down to here, allow this particular mob to spawn.
 	  
   }
   
 
   @EventHandler
   public void onCreatureSpawn(CreatureSpawnEvent e) {
+	  if (isPermanentSpawn(e, e.getEntity())) {
+		  e.getEntity().setRemoveWhenFarAway(false);
+		  
+		  //If this is a boss that spawns from a command block, make sure the command blocks are removed.
+		  if (e.getEntity().getCustomName()!=null && (e.getEntity().getCustomName().contains(ChatColor.DARK_PURPLE+"") || e.getEntity().getCustomName().contains(ChatColor.DARK_AQUA+"Polymorphed Creature"))) {
+			  for (int i=-2;i<3;i++) {
+				  for (int j=-2;j<3;j++) {
+					  for (int k=-2;k<3;k++) {
+						  if (Bukkit.getWorld("world").getBlockAt(e.getEntity().getLocation().add(i,j,k)).getType()==Material.COMMAND) {
+							  Bukkit.getWorld("world").getBlockAt(e.getEntity().getLocation().add(i,j,k)).setType(Material.COBBLESTONE);
+						  }
+					  }
+				  }
+			  }
+		  }
+		  
+		  //Give the wither bonuses.
+		  if (e.getEntity() instanceof Wither) {
+			  Wither w = (Wither)e.getEntity();
+			  w.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,999999,3));
+			  w.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,3));
+			  w.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,999999,3));
+			  w.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,999999,40));
+			  w.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
+			  w.setCustomName(ChatColor.GOLD+""+ChatColor.BOLD+"Mega Wither");
+			  Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule mobGriefing true");
+		  }
+		  
+	  } else {
+		  if (e.getEntity().getHealth()>65 && e.getEntity().getCustomName()==null /*Meaning it's not a special mob.*/) {
+			  e.getEntity().remove(); //Too much HP. Nothing should have this much.
+			  return;
+		  }
+		  
+		  boolean allow=false; //If this is set to true, it will not be marked for removal.
+		  
+		  //We will now determine if it is allowed to spawn due to being next to a boss or mob spawner.
+		  List<Entity> entities = e.getEntity().getWorld().getEntities();
+		  for (int i=0;i<entities.size();i++) {
+			  if (entities.get(i) instanceof LivingEntity) {
+				  LivingEntity l = (LivingEntity)entities.get(i);
+				  if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.DARK_PURPLE+"") && l.getLocation().distance(e.getEntity().getLocation())<10) {
+					  //Allow it to spawn. It's next to a boss.
+					  allow=true;
+				  }
+			  }
+		  }
+		  
+		  if (!allow) {
+			  //This is our chance to despawn it if we must.
+			  
+		  }
+		  
+	  }
 	  final CreatureSpawnEvent e2 = e;
 	  final Entity entity = e.getEntity();
 	  final Main plugin = this.plugin;
@@ -2172,63 +2228,7 @@ public class PlayerListener
 	      @Override
 	      public void run() {
 	    	  if (entity.getWorld().getName().compareTo("world")==0) {
-	    		  boolean despawn=true;
-	    		  if (entity instanceof Monster) {
-	    			  LivingEntity test = (LivingEntity)entity;
-	    			  boolean block=false;
-	    			  if (test.getCustomName()!=null && (test.getCustomName().contains(ChatColor.DARK_PURPLE+"") || test.getCustomName().contains(ChatColor.DARK_AQUA+"Polymorphed Creature"))) {
-	    				  for (int i=-2;i<3;i++) {
-	    					  for (int j=-2;j<3;j++) {
-	    						  for (int k=-2;k<3;k++) {
-	    							  if (Bukkit.getWorld("world").getBlockAt(test.getLocation().add(i,j,k)).getType()==Material.COMMAND) {
-	    								  block=true;
-	    								  Bukkit.getWorld("world").getBlockAt(test.getLocation().add(i,j,k)).setType(Material.COBBLESTONE);
-	    								  despawn=false;
-	    							  }
-	    						  }
-	    					  }
-	    				  }
-	    			  }
-	    			  List<Entity> entities = Bukkit.getWorld("world").getEntities();
-	    			  for (int i=0;i<entities.size();i++) {
-	    				  if (entities.get(i) instanceof LivingEntity) {
-	    					  LivingEntity l = (LivingEntity)entities.get(i);
-	    					  if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.DARK_PURPLE+"") && l.getLocation().distance(test.getLocation())<10) {
-	    						  despawn=false; //Allow it to spawn. It's next to a boss.
-	    					  }
-	    				  }
-	    			  }
-	    			  if (block || (test.getCustomName()!=null && (test.getCustomName().contains(ChatColor.DARK_PURPLE+"") || test.getType()==EntityType.ENDER_DRAGON || test.getCustomName().contains(ChatColor.DARK_AQUA+"") || !test.getRemoveWhenFarAway()))) {
-	    				  despawn=false;  //This is an epic boss and its healthbar. WE can't just despawn it.
-	    			  }
-	    		  }
-	    		  if (entity instanceof Golem || entity instanceof Wither || entity instanceof Animals) {
-	    			  despawn=false;
-	    			  if (entity instanceof Wither) {
-	    				  Wither w = (Wither)entity;
-	    				  w.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,999999,3));
-	    				  w.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,3));
-	    				  w.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,999999,3));
-	    				  w.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,999999,40));
-	    				  w.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
-	    				  w.setCustomName(ChatColor.GOLD+""+ChatColor.BOLD+"Mega Wither");
-	    				  Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule mobGriefing true");
-	    			  }
-	    		  }
-	    		  if (entity instanceof LivingEntity) {
-	    			  LivingEntity l = (LivingEntity)entity;
-	    			  if (!l.getRemoveWhenFarAway()) {
-	    				  despawn=false;
-	    			  }
-	    		  }
-	    		  if (despawn) {
-	    			  if (plugin.getConfig().getBoolean("halloween-enabled") && Math.random()<=0.75 && entity instanceof Monster) {
-	    				  //Just despawn it right now.
-	    				  entity.remove();
-	    				  e2.setCancelled(true);
-	    			  }
-	    			  double distancefromcity = Math.abs(1627-entity.getLocation().getX())+Math.abs((67-entity.getLocation().getY()))+Math.abs(-267-entity.getLocation().getZ());
-	    			  int maxgroup=0; //The maximum number of mobs that may be near each other and together when spawning.
+	    		  int maxgroup=0; //The maximum number of mobs that may be near each other and together when spawning.
 	    			  double chancer=1.0d; //The percent chance a duplicated mob will form.
 	    			  double despawnchancer=0.0d; //The percent chance the mob will be forced to despawn. Decreasing natural spawning.
 	    			  EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
