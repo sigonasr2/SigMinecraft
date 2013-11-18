@@ -1410,7 +1410,7 @@ public class PlayerListener
     /*//Beginner Book.
     ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
     BookMeta bookdata = (BookMeta)book.getItemMeta();
-    bookdata.setAuthor("sigonasr2");
+    bookdata.setAuthor("sigonasr2");f
     bookdata.setTitle("Guidebook to sig's Minecraft Server");
     bookdata.addPage("Welcome to sig's Minecraft! This guide has all the essential commands you need to know to play in our world!",
     		"Contents:\n\n1. Survival\n2. Cities\n3. Jobs\n4. Economy\n5. ");
@@ -2196,6 +2196,11 @@ public class PlayerListener
 		  }
 		  
 	  } else {
+		  float groupmult=1.0f; //Change this to modify the global grouping multiplier.
+		  int maxgroup=(int)(10*groupmult);
+		  double chancer=0.10d;
+		  double despawnchancer=0.25d;
+		  
 		  if (e.getEntity().getHealth()>65 && e.getEntity().getCustomName()==null /*Meaning it's not a special mob.*/) {
 			  e.getEntity().remove(); //Too much HP. Nothing should have this much.
 			  return;
@@ -2215,1058 +2220,728 @@ public class PlayerListener
 			  }
 		  }
 		  
-		  if (!allow) {
-			  //This is our chance to despawn it if we must.
-			  
+		//Get the torches/glowstone/mob spawners around this e.getEntity().
+		  int torches=0,glowstone=0,spawners=0;
+		  for (int x=-5;x<5;x++) {
+			  for (int y=-5;y<5;y++) {
+				  for (int z=-5;z<5;z++) {
+					  Block test = e.getEntity().getWorld().getBlockAt(e.getEntity().getLocation().add(x,y,z));
+					  if (test!=null) {
+						  if (test.getType()==Material.TORCH) {
+							  torches++;
+						  } else
+						  if (test.getType()==Material.GLOWSTONE) {
+							  glowstone++;
+						  } else
+						  if (test.getType()==Material.MOB_SPAWNER) {
+							  spawners++;
+					  }
+					  }
+				  }
+			  }
 		  }
 		  
-	  }
-	  final CreatureSpawnEvent e2 = e;
-	  final Entity entity = e.getEntity();
-	  final Main plugin = this.plugin;
-	  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
-	      @Override
-	      public void run() {
-	    	  if (entity.getWorld().getName().compareTo("world")==0) {
-	    		  int maxgroup=0; //The maximum number of mobs that may be near each other and together when spawning.
-	    			  double chancer=1.0d; //The percent chance a duplicated mob will form.
-	    			  double despawnchancer=0.0d; //The percent chance the mob will be forced to despawn. Decreasing natural spawning.
-	    			  EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
-	    			  boolean contains=entity instanceof Monster;
-	    			  if (contains) {
-	    				  Monster m = (Monster)entity;
-	    				  Warning(m,3);
-	    				  if (m!=null && m.isValid()) {
-	    					  m.setMaxHealth(m.getMaxHealth()*1.15d); //Increase all mobs' HP by 15%.
-	    					  Warning(m,4);
-	    					  if (m!=null && m.isValid()) {
-	    						  m.setHealth(m.getMaxHealth());
-	    					  }
-	    				  }
-	    			  }
-	    			  //Mobs have more health when they are farther away, to make the mobs harder in general.
-	    			  float groupmult=0.25f; //Change this to modify the global grouping multiplier.
-	    			 maxgroup=(int)(10*groupmult);
-	    			 chancer=0.10d;
-	    			  despawnchancer=0.25d;
-	    			  if (plugin.getConfig().getBoolean("halloween-enabled")) {
-	    				  groupmult=0.0625f;
-	    				  chancer=0.025f;
-	    				  despawnchancer=0.4375d;
-	    			  }
-	    			  if (entity.getType()==EntityType.ZOMBIE || entity.getType()==EntityType.PIG_ZOMBIE || entity.getType()==EntityType.SKELETON) {
-	    				  LivingEntity l = (LivingEntity)entity;
-	    				  EntityEquipment inven = l.getEquipment();
-	    				  if (l.getCustomName()!=null && l.getCustomName().equals(ChatColor.GOLD+"Charge Zombie II")) {
-	    					  despawnchancer/=4;
-	    					  //Destroy a huge amount around it when it spawns.
-	    					  for (int k=-4;k<5;k++) {
-	    						  for (int j=-4;j<5;j++) {
-	    							  for (int m=-1;m<5;m++) {
-	    								  if (Math.random()<=1.00-((j+4)*0.05d)) {
-		    								  Location checkloc = l.getLocation().add(k,m,j);
-		    								  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-		    								  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER || bl.getType()!=Material.COMMAND || bl.getType()!=Material.MOSSY_COBBLESTONE) {
-		    									  bl.breakNaturally();
-		    								  }
-	    								  }
-	    							  }
-	    						  }
-	    					  }
-	    				  }
-	    				  if (inven!=null) {
-	    					  inven.setBootsDropChance(0.02f);
-	    					  inven.setChestplateDropChance(0.02f);
-	    					  inven.setLeggingsDropChance(0.02f);
-	    					  inven.setHelmetDropChance(0.02f);
-	    					  inven.setItemInHandDropChance(0.02f);
-	    					  if (entity.getType()==EntityType.SKELETON) {
-	    						  inven.setItemInHand(new ItemStack(Material.BOW));
-	    					  }
-	    					  if (distancefromcity<2000) {
-	    						  if (entity.getType()==EntityType.ZOMBIE) {
-	    							  Zombie zomb = (Zombie)l;
-	    							  if (zomb.isBaby()) {
-	    								  zomb.setBaby(false);
-	    							  }
-	    						  }
-	    						  if (inven.getItemInHand()!=null && inven.getItemInHand().getType()==Material.DIAMOND_SWORD ||
-	    								  inven.getItemInHand().getType()==Material.GOLD_SWORD ||
-	    								  inven.getItemInHand().getType()==Material.IRON_SWORD) {
-	    							  inven.setItemInHand(new ItemStack(Material.WOOD_SWORD));
-	    						  }
-	    						  if (inven.getChestplate()!=null && inven.getChestplate().getType()==Material.DIAMOND_CHESTPLATE ||
-	    								  inven.getChestplate().getType()==Material.GOLD_CHESTPLATE ||
-	    								  inven.getChestplate().getType()==Material.IRON_CHESTPLATE ||
-	    								  inven.getChestplate().getType()==Material.CHAINMAIL_CHESTPLATE) {
-	    							  inven.setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
-	    						  }
-	    						  if (inven.getLeggings()!=null && inven.getLeggings().getType()==Material.DIAMOND_LEGGINGS ||
-	    								  inven.getLeggings().getType()==Material.GOLD_LEGGINGS ||
-	    								  inven.getLeggings().getType()==Material.IRON_LEGGINGS ||
-	    								  inven.getLeggings().getType()==Material.CHAINMAIL_LEGGINGS) {
-	    							  inven.setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
-	    						  }
-	    						  if (inven.getBoots()!=null && inven.getBoots().getType()==Material.DIAMOND_BOOTS ||
-	    								  inven.getBoots().getType()==Material.GOLD_BOOTS ||
-	    								  inven.getBoots().getType()==Material.IRON_BOOTS ||
-	    								  inven.getBoots().getType()==Material.CHAINMAIL_BOOTS) {
-	    							  inven.setBoots(new ItemStack(Material.LEATHER_BOOTS));
-	    						  }
-	    						  if (inven.getHelmet()!=null && inven.getHelmet().getType()==Material.DIAMOND_HELMET ||
-	    								  inven.getHelmet().getType()==Material.GOLD_HELMET ||
-	    								  inven.getHelmet().getType()==Material.IRON_HELMET ||
-	    								  inven.getHelmet().getType()==Material.CHAINMAIL_HELMET) {
-	    							  inven.setHelmet(new ItemStack(Material.LEATHER_HELMET));
-	    						  }
-	    					  }
-	    					  else if (distancefromcity<8000) {
-	    						  if (entity.getType()==EntityType.ZOMBIE) {
-	    							  Zombie zomb = (Zombie)l;
-	    							  if (zomb.isBaby()) {
-	    								  zomb.setBaby(false);
-	    							  }
-	    						  }
-	    						  if (inven.getItemInHand()!=null && inven.getItemInHand().getType()==Material.DIAMOND_SWORD ||
-	    								  inven.getItemInHand().getType()==Material.GOLD_SWORD) {
-	    							  inven.setItemInHand(new ItemStack(Material.IRON_SWORD));
-	    						  }
-	    						  if (inven.getChestplate()!=null && inven.getChestplate().getType()==Material.DIAMOND_CHESTPLATE) {
-	    							  inven.setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
-	    						  }
-	    						  if (inven.getLeggings()!=null && inven.getLeggings().getType()==Material.DIAMOND_LEGGINGS) {
-	    							  inven.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
-	    						  }
-	    						  if (inven.getBoots()!=null && inven.getBoots().getType()==Material.DIAMOND_BOOTS) {
-	    							  inven.setBoots(new ItemStack(Material.IRON_BOOTS));
-	    						  }
-	    						  if (inven.getHelmet()!=null && inven.getHelmet().getType()==Material.DIAMOND_HELMET) {
-	    							  inven.setHelmet(new ItemStack(Material.IRON_HELMET));
-	    						  }
-	    					  }
-	    				  }
-	    			  }
-	    			  //Get the torches/glowstone/mob spawners around this entity.
-	    			  int torches=0,glowstone=0,spawners=0;
-	    			  for (int x=-5;x<5;x++) {
-	    				  for (int y=-5;y<5;y++) {
-	    					  for (int z=-5;z<5;z++) {
-	    						  Block test = entity.getWorld().getBlockAt(entity.getLocation().add(x,y,z));
-	    						  if (test!=null) {
-	    							  if (test.getType()==Material.TORCH) {
-	    								  torches++;
-	    							  } else
-	    							  if (test.getType()==Material.GLOWSTONE) {
-	    								  glowstone++;
-	    							  } else
-	    							  if (test.getType()==Material.MOB_SPAWNER) {
-	    								  spawners++;
-	    						  }
-	    						  }
-	    					  }
-	    				  }
-	    			  }
-	    			  if (!plugin.harrowing_night) {
-	    				  if (Bukkit.getWorld("world").getHighestBlockYAt(entity.getLocation())>=96) {
-	    					  //This is a tall world.
-	    					  if (entity.getLocation().getBlockY()>104) {
-	    						  despawnchancer*=(Math.random()*3.0d)+1;
-	    					  } else {
-	    						  for (int i=104-entity.getLocation().getBlockY();i>0;i--) {
-	    							  despawnchancer/=1.0175d;
-	    						  }
-	    					  }
-	    				  } else {
-	    					  //This is a short world.
-	    					  if (entity.getLocation().getBlockY()>52) {
-	    						  despawnchancer*=(Math.random()*3.0d)+1;
-	    					  } else {
-	    						  for (int i=52-entity.getLocation().getBlockY();i>0;i--) {
-	    							  despawnchancer/=1.025d;
-	    						  }
-	    					  }
-	    				  }
-	    			  } else {
-	    				  for (int i=52;i>0;i--) {
-	    					  despawnchancer/=1.025d;
-	    				  }
-	    			  }
-	    			  //if (e.getSpawnReason()!=SpawnReason.NATURAL) { //If it's a natural spawn, we gotta do it. Ignore our checking stuff.
-	    			  if (contains && spawners==0) { //We only do this despawn/extra spawn chance stuff when we have an actual mob AND when there's not a spawner nearby.
-	    				  if ((Math.random()<=despawnchancer || (torches+glowstone>=3))/* && entity.getNearbyEntities(5, 5, 5).size()>50*/) {
-	    					  //if (e.getSpawnReason()!=SpawnReason.CUSTOM && e.getLocation().getBlockY()!=Bukkit.getPlayer("AaMay").getLocation().getBlockY()) {
-	    					  entity.remove();
-	    					  e2.setCancelled(true);
-	    					  //}
-	    					  //Bukkit.getPlayer("AaMay").sendMessage(ChatColor.BLUE+entity.getType().getName()+": Removed mob due to despawn chancer / special case.");
-	    				  }
-	    				  else {
-	    					  int totallvs=0;
-	    					  List<Entity> nearbylist = entity.getNearbyEntities(30, 30, 30);
-	    					  //Filter out all unrelated entity types.
-	    					  for (int k=0;k<nearbylist.size();k++) {
-	    						  //See if human players are near. If so, factor that in for determining how many mobs may exist.
-	    						  if (nearbylist.get(k).getType()==EntityType.PLAYER) {
-	    							  //This is a player.
-	    							  Player g = (Player)nearbylist.get(k);
-	    							  maxgroup+=plugin.getJobTotalLvs(g)/20;
-	    							  totallvs+=plugin.getJobTotalLvs(g);
-	    				  			////Bukkit.getLogger().info("Mob maxgroup increased to "+maxgroup+" down here.");
-	    						  }
-	    						  if (nearbylist.get(k).getType()!=EntityType.SKELETON &&
-	    								  nearbylist.get(k).getType()!=EntityType.ZOMBIE &&
-	    								  nearbylist.get(k).getType()!=EntityType.CREEPER &&
-	    								  nearbylist.get(k).getType()!=EntityType.SPIDER &&
-	    								  nearbylist.get(k).getType()!=EntityType.ENDERMAN) {
-	    							  nearbylist.remove(k);
-	    							  k--;
-	    						  }
-	    					  }
-	    					  maxgroup/=groupmult;
-	    					  int currentnearby = nearbylist.size();
-	    					  boolean keep=false;
-	    					  if (entity.getType()==EntityType.ZOMBIE || entity.getType()==EntityType.PIG_ZOMBIE || entity.getType()==EntityType.SKELETON) {
-	    						  LivingEntity l = (LivingEntity)entity;
-	    						  if (l.getCustomName()!=null && l.getCustomName().equals(ChatColor.GOLD+"Charge Zombie II")) {
-	    							  keep=false;
-	    						  }
-	    					  }
-	    					  if (currentnearby-maxgroup>1 && !keep) {
-	    						  entity.remove();
-	    						  e2.setCancelled(true);
-	    						  //Bukkit.getPlayer("AaMay").sendMessage(ChatColor.GREEN+entity.getType().getName()+": Removed mob due to too many mobs near it.");
-	    					  } else {
-	    						  //We then attempt to see if despawn chancer occurs.
-	    						  if (Math.random()<=despawnchancer) {
-	    							  entity.remove();
-	    							  e2.setCancelled(true);
-	    							  //Bukkit.getPlayer("AaMay").sendMessage(ChatColor.YELLOW+entity.getType().getName()+": Removed mob due to despawner chance.");
-	    						  } else {
-	    							  //Now we attempt to spawn more things.
-	    							  int k = currentnearby;
-	    							  while (k<maxgroup-currentnearby+1) {
-	    								  if (Main.SERVER_TICK_TIME-plugin.last_mob_random_time>10 && Math.random()<=chancer) {
-	    									  Location testloc = entity.getLocation().add(Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d);
-	    									  if (Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR) {
-	    										  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
-	    										  plugin.last_mob_random_time=Main.SERVER_TICK_TIME;
-	    										  //Bukkit.getPlayer("AaMay").sendMessage(ChatColor.RED+entity.getType().getName()+": Spawned extra mob.");
-	    										  /*int j=0;
-	    										  while (j<10) {
-	    											  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
-	    											  j++;
-	    										  }*/
-	    									  }
-	    								  }
-	    								  k++;
-	    							  }
-	    						  }
-	    					  }
-	    					  double levelsmult=1.5;
-	    					  if (totallvs>20*levelsmult) {
-	    						  if (totallvs<40*levelsmult) {
-	    							  //Sometimes wear leather armor. Only for Skeletons and Zombies.
-	    							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-	    								  LivingEntity l = (LivingEntity) entity;
-	    								  if (Math.random()>=0.15) {
-	    									  l.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
-	    									  if (Math.random()>=0.25) {
-	    										  l.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
-	    										  if (Math.random()>=0.5) {
-	    											  l.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
-	    											  if (Math.random()>=0.8) {
-	    												  l.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
-	    											  }
-	    										  }
-	    									  }
-	    								  }
-	    							  }
-	    						  } else
-	    						  if (totallvs<60*levelsmult) {
-	    							  //Wear leather armor a bit more often. Sometimes a chain piece here or there. Include a Wooden sword usually.
-	    							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-	    								  LivingEntity l = (LivingEntity) entity;
-	    								  if (entity.getType()==EntityType.ZOMBIE) {
-	    									  if (Math.random()<=0.65) {
-	    										  l.getEquipment().setItemInHand(new ItemStack(Material.WOOD_SWORD));
-	    									  }
-	    								  }
-	    								  if (entity.getType()==EntityType.SKELETON) {
-	    									  if (Math.random()<=0.65) {
-	    										  ItemStack new_bow = new ItemStack(Material.BOW);
-	    										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
-	    										  l.getEquipment().setItemInHand(new_bow);
-	    									  }
-	    								  }
-	    								  if (Math.random()>=0.25) {
-	    									  if (Math.random()<=0.75) {
-	    										  l.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
-	    									  } else {
-	    										  l.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
-	    									  }
-	    									  if (Math.random()>=0.45) {
-	    										  if (Math.random()<=0.75) {
-	    										  l.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
-	    										  } else {
-	    											  l.getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
-	    										  }
-	    										  if (Math.random()>=0.65) {
-	    											  if (Math.random()<=0.75) {
-	    											  l.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
-	    											  } else {
-	    												  l.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
-	    											  }
-	    											  if (Math.random()>=0.95) {
-	    												  if (Math.random()<=0.75) {
-	    												  l.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
-	    												  } else {
-	    													  l.getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
-	    												  }
-	    											  }
-	    										  }
-	    									  }
-	    								  }
-	    							  }
-	    						  } else
-	    						  if (totallvs<80*levelsmult) {
-	    							  //Wear chainmail armor a bit more often. Sometimes an iron piece here or there. Include an Iron sword sometimes, a wooden one usually.
-	    							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-	    								  LivingEntity l = (LivingEntity) entity;
-	    								  if (entity.getType()==EntityType.ZOMBIE) {
-	    									  if (Math.random()<=0.65) {
-	    										  if (Math.random()<=0.75) {
-	    											  l.getEquipment().setItemInHand(new ItemStack(Material.WOOD_SWORD));
-	    										  } else {
-	    											  l.getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD));
-	    										  }
-	    									  }
-	    								  } else
-	    								  if (entity.getType()==EntityType.SKELETON) {
-	    									  if (Math.random()<=0.65) {
-	    										  if (Math.random()<=0.75) {
-	    											  ItemStack new_bow = new ItemStack(Material.BOW);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
-	    											  l.getEquipment().setItemInHand(new_bow);
-	    										  } else {
-	    											  ItemStack new_bow = new ItemStack(Material.BOW);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-	    											  l.getEquipment().setItemInHand(new_bow);
-	    										  }
-	    									  }
-	    								  } else {
-	    									  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,0));
-	    								  }
-	    								  if (Math.random()>=0.25) {
-	    									  if (Math.random()<=0.75) {
-	    										  l.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
-	    									  } else {
-	    										  l.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
-	    									  }
-	    									  if (Math.random()>=0.45) {
-	    										  if (Math.random()<=0.75) {
-	    										  l.getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
-	    										  } else {
-	    											  l.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
-	    										  }
-	    										  if (Math.random()>=0.65) {
-	    											  if (Math.random()<=0.75) {
-	    											  l.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
-	    											  } else {
-	    												  l.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
-	    											  }
-	    											  if (Math.random()>=0.95) {
-	    												  if (Math.random()<=0.75) {
-	    												  l.getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
-	    												  } else {
-	    													  l.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
-	    												  }
-	    											  }
-	    										  }
-	    									  }
-	    								  }
-	    							  }
-	    						  } else
-	    						  if (totallvs<100*levelsmult) {
-	    							  //Wear iron armor a bit more often. Sometimes a diamond piece here or there. Include a Diamond sword sometimes, an iron one usually.
-	    							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-	    								  LivingEntity l = (LivingEntity) entity;
-	    								  if (entity.getType()==EntityType.ZOMBIE) {
-	    									  if (Math.random()<=0.65) {
-	    										  if (Math.random()<=0.75) {
-	    											  l.getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD));
-	    										  } else {
-	    											  l.getEquipment().setItemInHand(new ItemStack(Material.DIAMOND_SWORD));
-	    										  }
-	    									  }
-	    								  } else
-	    								  if (entity.getType()==EntityType.SKELETON) {
-	    									  if (Math.random()<=0.65) {
-	    										  if (Math.random()<=0.75) {
-	    											  ItemStack new_bow = new ItemStack(Material.BOW);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 2);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-	    											  l.getEquipment().setItemInHand(new_bow);
-	    										  } else {
-	    											  ItemStack new_bow = new ItemStack(Material.BOW);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 3);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-	    											  l.getEquipment().setItemInHand(new_bow);
-	    										  }
-	    									  }
-	    								  } else {
-	    									  if (Math.random()<=0.65) {
-	    										  if (Math.random()<=0.75) {
-	    											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,1));
-	    										  } else {
-	    											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,1));
-	    											  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,0));
-	    										  }
-	    									  }
-	    								  }
-	    								  if (Math.random()>=0.25) {
-	    									  if (Math.random()<=0.75) {
-	    										  l.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
-	    									  } else {
-	    										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-	    									  }
-	    									  if (Math.random()>=0.45) {
-	    										  if (Math.random()<=0.75) {
-	    										  l.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
-	    										  } else {
-	    											  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
-	    										  }
-	    										  if (Math.random()>=0.65) {
-	    											  if (Math.random()<=0.75) {
-	    											  l.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
-	    											  } else {
-	    												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-	    											  }
-	    											  if (Math.random()>=0.95) {
-	    												  if (Math.random()<=0.75) {
-	    												  l.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
-	    												  } else {
-	    													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-	    												  }
-	    											  }
-	    										  }
-	    									  }
-	    								  }
-	    							  }
-	    						  } else
-	    						  if (totallvs<120*levelsmult) {
-	    							  //Wear diamond armor a bit more often. Sometimes an enchanted diamond piece here or there. Include a Golden sword sometimes, a diamond one usually.
-	    							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-	    								  LivingEntity l = (LivingEntity) entity;
-	    								  if (entity.getType()==EntityType.ZOMBIE) {
-	    									  if (Math.random()<=0.65) {
-	    										  if (Math.random()<=0.75) {
-	    											  l.getEquipment().setItemInHand(new ItemStack(Material.DIAMOND_SWORD));
-	    										  } else {
-	    											  l.getEquipment().setItemInHand(new ItemStack(Material.GOLD_SWORD));
-	    										  }
-	    									  }
-	    								  } else
-	    								  if (entity.getType()==EntityType.SKELETON) {
-	    									  if (Math.random()<=0.65) {
-	    										  if (Math.random()<=0.75) {
-	    											  ItemStack new_bow = new ItemStack(Material.BOW);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 3);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-	    											  l.getEquipment().setItemInHand(new_bow);
-	    										  } else {
-	    											  ItemStack new_bow = new ItemStack(Material.BOW);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 4);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);
-	    											  l.getEquipment().setItemInHand(new_bow);
-	    										  }
-	    									  }
-	    								  } else {
-	    									  if (Math.random()<=0.65) {
-	    										  if (Math.random()<=0.75) {
-	    											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
-	    										  } else {
-	    											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
-	    											  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,0));
-	    										  }
-	    									  }
-	    								  }
-	    								  if (Math.random()>=0.25) {
-	    									  if (Math.random()<=0.75) {
-	    										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-	    									  } else {
-	    										  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
-	    										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
-	    										  l.getEquipment().setChestplate(enchanted);
-	    									  }
-	    									  if (Math.random()>=0.45) {
-	    										  if (Math.random()<=0.75) {
-	    										  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
-	    										  } else {
-	    											  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
-	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
-	    											  l.getEquipment().setLeggings(enchanted);
-	    										  }
-	    										  if (Math.random()>=0.65) {
-	    											  if (Math.random()<=0.75) {
-	    											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-	    											  } else {
-	    												  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
-	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
-	    												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-	    											  }
-	    											  if (Math.random()>=0.95) {
-	    												  if (Math.random()<=0.75) {
-	    												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-	    												  } else {
-	    													  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
-	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
-	    													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-	    												  }
-	    											  }
-	    										  }
-	    									  }
-	    								  }
-	    							  }
-	    						  } else
-	    							  if (totallvs<140*levelsmult) {
-	    							  //Well dang, your party's huge and OP.
-	    							//Wear diamond armor almost always. Enchanted diamond pieces here and there.
-	    							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-	    								  LivingEntity l = (LivingEntity) entity;
-	    								  if (entity.getType()==EntityType.ZOMBIE) {
-	    									  if (Math.random()<=0.80) {
-	    										  if (Math.random()<=0.75) {
-	    											  ItemStack enchanted = new ItemStack(Material.DIAMOND_SWORD);
-	    											  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*2.0d)+1);
-	    											  if (Math.random()<=0.5) {
-	    												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
-	    											  } else {
-	    												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*2.0d)+1);
-	    											  }
-	    											  l.getEquipment().setItemInHand(enchanted);
-	    										  } else {
-	    											  ItemStack enchanted = new ItemStack(Material.GOLD_SWORD);
-	    											  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*2.0d)+1);
-	    											  if (Math.random()<=0.5) {
-	    												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
-	    											  } else {
-	    												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*4.0d)+1);
-	    											  }
-	    											  l.getEquipment().setItemInHand(enchanted);
-	    										  }
-	    									  }
-	    								  } else
-	    								  if (entity.getType()==EntityType.SKELETON) {
-	    									  if (Math.random()<=0.65) {
-	    										  if (Math.random()<=0.75) {
-	    											  ItemStack new_bow = new ItemStack(Material.BOW);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 5);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);
-	    											  l.getEquipment().setItemInHand(new_bow);
-	    										  } else {
-	    											  ItemStack new_bow = new ItemStack(Material.BOW);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 4);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 2);
-	    											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 2);
-	    											  l.getEquipment().setItemInHand(new_bow);
-	    										  }
-	    									  }
-	    								  } else {
-	    									  if (Math.random()<=0.65) {
-	    										  if (Math.random()<=0.75) {
-	    											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
-	    											  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,0));
-	    										  } else {
-	    											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
-	    											  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,1));
-	    											  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,0));
-	    										  }
-	    									  }
-	    								  }
-	    								  if (Math.random()>=0.25) {
-	    									  if (Math.random()<=0.75) {
-	    										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-	    									  } else {
-	    										  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
-	    										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
-	    										  if (Math.random()<=0.5) {
-	    											  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*1.0d)+1);
-	    										  }
-	    										  l.getEquipment().setChestplate(enchanted);
-	    									  }
-	    									  if (Math.random()>=0.45) {
-	    										  if (Math.random()<=0.75) {
-	    										  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
-	    										  } else {
-	    											  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
-	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
-	    											  if (Math.random()<=0.5) {
-	    												  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
-	    											  }
-	    											  l.getEquipment().setLeggings(enchanted);
-	    										  }
-	    										  if (Math.random()>=0.65) {
-	    											  if (Math.random()<=0.75) {
-	    											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-	    											  } else {
-	    												  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
-	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
-	    												  if (Math.random()<=0.5) {
-	    													  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
-	    												  }
-	    												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-	    											  }
-	    											  if (Math.random()>=0.95) {
-	    												  if (Math.random()<=0.75) {
-	    												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-	    												  } else {
-	    													  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
-	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
-	    													  if (Math.random()<=0.5) {
-	    														  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
-	    													  }
-	    													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-	    												  }
-	    											  }
-	    										  }
-	    									  }
-	    								  }
-	    							  }
-	    						  } else
-	    						  if (totallvs<200*levelsmult) {
-	    							  //Well dang, your party's huge and OP.
-	    							//Wear diamond armor almost always. Enchanted diamond pieces here and there.
-	    							  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-	    								  LivingEntity l = (LivingEntity) entity;
-	    								  if (entity.getType()==EntityType.ZOMBIE) {
-	    									  if (Math.random()<=0.80) {
-	    										  if (Math.random()<=0.75) {
-	    											  ItemStack enchanted = new ItemStack(Material.DIAMOND_SWORD);
-	    											  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
-	    											  if (Math.random()<=0.5) {
-	    												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*3.0d)+1);
-	    											  } else {
-	    												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*2.0d)+1);
-	    											  }
-	    											  l.getEquipment().setItemInHand(enchanted);
-	    										  } else {
-	    											  ItemStack enchanted = new ItemStack(Material.GOLD_SWORD);
-	    											  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
-	    											  if (Math.random()<=0.5) {
-	    												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*3.0d)+1);
-	    											  } else {
-	    												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*2.0d)+1);
-	    											  }
-	    											  l.getEquipment().setItemInHand(enchanted);
-	    										  }
-	    									  }
-	    								  } else
-	    									  if (entity.getType()==EntityType.SKELETON) {
-	    										  if (Math.random()<=0.65) {
-	    											  if (Math.random()<=0.75) {
-	    												  ItemStack new_bow = new ItemStack(Material.BOW);
-	    												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 5);
-	    												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
-	    												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 2);
-	    												  l.getEquipment().setItemInHand(new_bow);
-	    											  } else {
-	    												  ItemStack new_bow = new ItemStack(Material.BOW);
-	    												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 6);
-	    												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 2);
-	    												  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 3);
-	    												  l.getEquipment().setItemInHand(new_bow);
-	    											  }
-	    										  }
-	    									  } else {
-	    										  if (Math.random()<=0.65) {
-	    											  if (Math.random()<=0.75) {
-	    												  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,3));
-	    												  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,2));
-	    												  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,1));
-	    											  } else {
-	    												  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,4));
-	    												  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,2));
-	    												  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,1));
-	    											  }
-	    										  }
-	    									  }
-	    								  if (Math.random()>=0.25) {
-	    									  if (Math.random()<=0.75) {
-	    										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-	    									  } else {
-	    										  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
-	    										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*3.0d)+1);
-	    										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*3.0d)+1);
-	    										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*3.0d)+1);
-	    										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
-	    										  if (Math.random()<=0.5) {
-	    											  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
-	    										  }
-	    										  l.getEquipment().setChestplate(enchanted);
-	    									  }
-	    									  if (Math.random()>=0.45) {
-	    										  if (Math.random()<=0.75) {
-	    										  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
-	    										  } else {
-	    											  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
-	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
-	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*2.0d)+1);
-	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
-	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
-	    											  if (Math.random()<=0.5) {
-	    												  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
-	    											  }
-	    											  l.getEquipment().setLeggings(enchanted);
-	    										  }
-	    										  if (Math.random()>=0.65) {
-	    											  if (Math.random()<=0.75) {
-	    											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-	    											  } else {
-	    												  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
-	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
-	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*2.0d)+1);
-	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
-	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
-	    												  if (Math.random()<=0.5) {
-	    													  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
-	    												  }
-	    												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-	    											  }
-	    											  if (Math.random()>=0.95) {
-	    												  if (Math.random()<=0.75) {
-	    												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-	    												  } else {
-	    													  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
-	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
-	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
-	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
-	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
-	    													  if (Math.random()<=0.5) {
-	    														  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
-	    													  }
-	    													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-	    												  }
-	    											  }
-	    										  }
-	    									  }
-	    								  }
-	    							  }
-	    						  }
-	    						  else {
-	    							  //Time to give it our all.
-	    							//Well dang, your party's huge and OP.
-	    								//Wear diamond armor almost always. Enchanted diamond pieces here and there.
-	    								  if (entity.getType()==EntityType.SKELETON || entity.getType()==EntityType.ZOMBIE) {
-	    									  LivingEntity l = (LivingEntity) entity;
-	    									  //l.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,999999,1));
-	    									  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,1));
-	    									  l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,999999,0));
-	    									  l.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,0));
-	    									  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,0));
-	    									  //l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,1));
-	    									  if (entity.getType()==EntityType.ZOMBIE) {
-	    										  if (Math.random()<=0.80) {
-	    											  if (Math.random()<=0.75) {
-	    												  ItemStack enchanted = new ItemStack(Material.DIAMOND_SWORD);
-	    												  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
-	    												  if (Math.random()<=0.5) {
-	    													  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
-	    												  } else {
-	    													  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*3.0d)+1);
-	    												  }
-	    												  l.getEquipment().setItemInHand(enchanted);
-	    											  } else {
-	    												  ItemStack enchanted = new ItemStack(Material.GOLD_SWORD);
-	    												  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
-	    												  if (Math.random()<=0.5) {
-	    													  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
-	    												  } else {
-	    													  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*3.0d)+1);
-	    												  }
-	    												  l.getEquipment().setItemInHand(enchanted);
-	    											  }
-	    										  }
-	    									  }
-	    									  if (Math.random()>=0.25) {
-	    										  if (Math.random()<=0.75) {
-	    											  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
-	    										  } else {
-	    											  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
-	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
-	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
-	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*4.0d)+1);
-	    											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*3.0d)+1);
-	    											  if (Math.random()<=0.5) {
-	    												  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
-	    											  }
-	    											  l.getEquipment().setChestplate(enchanted);
-	    										  }
-	    										  if (Math.random()>=0.45) {
-	    											  if (Math.random()<=0.75) {
-	    											  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
-	    											  } else {
-	    												  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
-	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
-	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
-	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*3.0d)+1);
-	    												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
-	    												  if (Math.random()<=0.5) {
-	    													  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
-	    												  }
-	    												  l.getEquipment().setLeggings(enchanted);
-	    											  }
-	    											  if (Math.random()>=0.65) {
-	    												  if (Math.random()<=0.75) {
-	    												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-	    												  } else {
-	    													  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
-	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
-	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
-	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
-	    													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
-	    													  if (Math.random()<=0.5) {
-	    														  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
-	    													  }
-	    													  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
-	    												  }
-	    												  if (Math.random()>=0.95) {
-	    													  if (Math.random()<=0.75) {
-	    													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-	    													  } else {
-	    														  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
-	    														  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
-	    														  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
-	    														  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*4.0d)+1);
-	    														  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*4.0d)+1);
-	    														  if (Math.random()<=0.5) {
-	    															  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
-	    														  }
-	    														  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
-	    													  }
-	    												  }
-	    											  }
-	    										  }
-	    									  }
-	    								  }
-	    						  }
-	    					  }
-	    				  }
-	    			  }
-	    			  //}
-	    			  /*
-	    			  double distancefromcity = Math.abs(1627-entity.getLocation().getX())+Math.abs((67-entity.getLocation().getY()))+Math.abs(-267-entity.getLocation().getZ());
-	    			  double chancer=1.0d, increasechancer = 0.5d, despawnchancer = 32.0d;
-	    			  if (distancefromcity>50000) {
-	    				  chancer = 0.5d;
-	    				  increasechancer=0.25d;
-	    				  despawnchancer = 16.0d;
-	    			  } else 
-	    			  if (distancefromcity>20000) {
-	    				  chancer = 0.5d;
-	    				  increasechancer=0.5d;
-	    				  despawnchancer = 16.0d;
-	    			  } else 
-	    			  if (distancefromcity>10000) {
-	    				  chancer = 0.5d;
-	    				  increasechancer=1.0d;
-	    				  despawnchancer = 4.0d;
-	    			  } else 
-	    			  if (distancefromcity>4000) {
-	    				  chancer = 1.0d;
-	    				  increasechancer=4.0d;
-	    				  despawnchancer = 2.0d;
-	    			  } else 
-	    			  if (distancefromcity>2000) {
-	    				  chancer = 2.0d;
-	    				  increasechancer=8.0d;
-	    				  despawnchancer = 1.25d;
-	    			  } else 
-	    			  if (distancefromcity>1000) {
-	    				  chancer = 2.0d;
-	    				  increasechancer=16.0d;
-	    				  despawnchancer = 1.25d;
-	    			  } else 
-	    			  if (distancefromcity>400) {
-	    				  chancer = 16.0d;
-	    				  increasechancer = 32.0d;
-	    				  despawnchancer = 1.125d;
-	    			  } else {
-	    				  chancer = 32.0d;
-	    				  increasechancer = 64.0d;
-	    				  despawnchancer = 1.025d;
-	    			  }
-	    			  if (entity.getLocation().getY()>62) {
-	    				  despawnchancer/=Math.random()*16.0d+1.0d;
-	    			  }
-	    			  if (entity.getLocation().getY()<50) {
-	    				  chancer/=1.5d;
-	    				  if (chancer<0.5d) {
-	    					  chancer=0.5d;
-	    				  }
-	    				  for (int i=50;i>entity.getLocation().getY();i--) {
-	    					  increasechancer/=1.03d;
-	    					  despawnchancer*=1.03d;
-	    				  }
-	    				  if (increasechancer<0.01d) {
-	    					  increasechancer=0.01d;
-	    				  }
-	    			  }
-	    			  EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
-	    			  boolean contains=entity instanceof Monster
-	    			  for (int i=0;i<allowedtypes.length;i++) {
-	    				  if (entity.getType()==allowedtypes[i]) {
-	    					  contains=true;
-	    					  break;
-	    				  }
-	    			  }
-	    			  if (entity.getType()==EntityType.ZOMBIE || entity.getType()==EntityType.PIG_ZOMBIE || entity.getType()==EntityType.SKELETON) {
-	    				  LivingEntity l = (LivingEntity)entity;
-	    				  EntityEquipment inven = l.getEquipment();
-	    				  if (inven!=null) {
-	    					  if (distancefromcity<2000) {
-	    						  if (entity.getType()==EntityType.ZOMBIE) {
-	    							  Zombie zomb = (Zombie)l;
-	    							  if (zomb.isBaby()) {
-	    								  zomb.setBaby(false);
-	    							  }
-	    						  }
-	    						  if (inven.getItemInHand()!=null && inven.getItemInHand().getType()==Material.DIAMOND_SWORD ||
-	    								  inven.getItemInHand().getType()==Material.GOLD_SWORD ||
-	    								  inven.getItemInHand().getType()==Material.IRON_SWORD) {
-	    							  inven.setItemInHand(new ItemStack(Material.WOOD_SWORD));
-	    						  }
-	    						  if (inven.getChestplate()!=null && inven.getChestplate().getType()==Material.DIAMOND_CHESTPLATE ||
-	    								  inven.getChestplate().getType()==Material.GOLD_CHESTPLATE ||
-	    								  inven.getChestplate().getType()==Material.IRON_CHESTPLATE ||
-	    								  inven.getChestplate().getType()==Material.CHAINMAIL_CHESTPLATE) {
-	    							  inven.setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
-	    						  }
-	    						  if (inven.getLeggings()!=null && inven.getLeggings().getType()==Material.DIAMOND_LEGGINGS ||
-	    								  inven.getLeggings().getType()==Material.GOLD_LEGGINGS ||
-	    								  inven.getLeggings().getType()==Material.IRON_LEGGINGS ||
-	    								  inven.getLeggings().getType()==Material.CHAINMAIL_LEGGINGS) {
-	    							  inven.setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
-	    						  }
-	    						  if (inven.getBoots()!=null && inven.getBoots().getType()==Material.DIAMOND_BOOTS ||
-	    								  inven.getBoots().getType()==Material.GOLD_BOOTS ||
-	    								  inven.getBoots().getType()==Material.IRON_BOOTS ||
-	    								  inven.getBoots().getType()==Material.CHAINMAIL_BOOTS) {
-	    							  inven.setBoots(new ItemStack(Material.LEATHER_BOOTS));
-	    						  }
-	    						  if (inven.getHelmet()!=null && inven.getHelmet().getType()==Material.DIAMOND_HELMET ||
-	    								  inven.getHelmet().getType()==Material.GOLD_HELMET ||
-	    								  inven.getHelmet().getType()==Material.IRON_HELMET ||
-	    								  inven.getHelmet().getType()==Material.CHAINMAIL_HELMET) {
-	    							  inven.setHelmet(new ItemStack(Material.LEATHER_HELMET));
-	    						  }
-	    					  }
-	    					  else if (distancefromcity<8000) {
-	    						  if (entity.getType()==EntityType.ZOMBIE) {
-	    							  Zombie zomb = (Zombie)l;
-	    							  if (zomb.isBaby()) {
-	    								  zomb.setBaby(false);
-	    							  }
-	    						  }
-	    						  if (inven.getItemInHand()!=null && inven.getItemInHand().getType()==Material.DIAMOND_SWORD ||
-	    								  inven.getItemInHand().getType()==Material.GOLD_SWORD) {
-	    							  inven.setItemInHand(new ItemStack(Material.IRON_SWORD));
-	    						  }
-	    						  if (inven.getChestplate()!=null && inven.getChestplate().getType()==Material.DIAMOND_CHESTPLATE) {
-	    							  inven.setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
-	    						  }
-	    						  if (inven.getLeggings()!=null && inven.getLeggings().getType()==Material.DIAMOND_LEGGINGS) {
-	    							  inven.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
-	    						  }
-	    						  if (inven.getBoots()!=null && inven.getBoots().getType()==Material.DIAMOND_BOOTS) {
-	    							  inven.setBoots(new ItemStack(Material.IRON_BOOTS));
-	    						  }
-	    						  if (inven.getHelmet()!=null && inven.getHelmet().getType()==Material.DIAMOND_HELMET) {
-	    							  inven.setHelmet(new ItemStack(Material.IRON_HELMET));
-	    						  }
-	    					  }
-	    				  }
-	    			  }
-	    			  //Get the torches/glowstone/mob spawners around this entity.
-	    			  int torches=0,glowstone=0,spawners=0;
-	    			  for (int x=-5;x<5;x++) {
-	    				  for (int y=-5;y<5;y++) {
-	    					  for (int z=-5;z<5;z++) {
-	    						  Block test = entity.getWorld().getBlockAt(entity.getLocation().add(x,y,z));
-	    						  if (test.getType()==Material.TORCH) {
-	    							  torches++;
-	    						  } else
-	    						  if (test.getType()==Material.GLOWSTONE) {
-	    							  glowstone++;
-	    						  } else
-	    						  if (test.getType()==Material.MOB_SPAWNER) {
-	    							  spawners++;
-	    						  }
-	    					  }
-	    				  }
-	    			  }
-	    			  //Bukkit.getPlayer("sigonasr2").sendMessage(entity.getType()+": Found "+torches+" torches, "+glowstone+" glowstone, "+spawners+" spawners around me.");
-	    			  if (contains && (Math.random()*despawnchancer<1.0d || (torches+glowstone>=3)) && spawners==0 && entity.getNearbyEntities(5, 5, 5).size()<50) {
-	    				  //if (e.getSpawnReason()!=SpawnReason.CUSTOM && e.getLocation().getBlockY()!=Bukkit.getPlayer("AaMay").getLocation().getBlockY()) {
-	    				  entity.remove();
-	    				  e.setCancelled(true);
-	    				  //}
-	    				  //Bukkit.getPlayer("sigonasr2").sendMessage(entity.getType()+" prevented from spawning.");
-	    			  }
-	    			  if (contains && (Main.SERVER_TICK_TIME-this.plugin.last_mob_random_time>10 || this.plugin.last_mob_random_time==0) && Math.random()*chancer<1.0d) {
-	    				  this.plugin.last_mob_random_time=Main.SERVER_TICK_TIME;
-	    				  Location testloc = entity.getLocation().add(Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d);
-	    				  if (Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR) {
-	    					  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
-	    					  /*int j=0;
-	    					  while (j<10) {
-	    						  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
-	    						  j++;
-	    					  }*/
-	    			  /*
-	    				  }
-	    				  while (Math.random()*chancer<1.0d) {
-	    					  chancer+=increasechancer;
-	    					  testloc = entity.getLocation().add(Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d);
-	    					  if (Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR && Bukkit.getWorld("world").getBlockAt(testloc.add(0,1,0)).getType()==Material.AIR) {
-	    						  Bukkit.getWorld("world").spawnEntity(testloc, entity.getType());
-	    						  /*int j=0;
-	    						  while (j<10) {
-	    							  Bukkit.getWorld("world").spawnEntity(entity.getLocation().add(Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d), entity.getType());
-	    							  j++;
-	    						  }*/
-	    					/*  }
-	    				  }
-	    			  }
-	    	  		*/
-	    			  
-	    		  }
-	    	  }
-	      }
-	  	},1);
-	  if (entity.getWorld().getName().compareTo("world_nether")==0) {
-		  if (entity.getType()==EntityType.PIG_ZOMBIE) {
-			  if (Math.random()<=0.005) {
-				  //0.5% chance of a magma cube spawning.
-				  Bukkit.getWorld("world_nether").spawnEntity(entity.getLocation(), EntityType.MAGMA_CUBE);
+		  //Decrease spawn rate the higher up we are in our world.
+		  if (Bukkit.getWorld("world").getHighestBlockYAt(e.getEntity().getLocation())>=96) {
+			  //This is a tall world.
+			  if (e.getEntity().getLocation().getBlockY()<=104) {
+				  for (int i=104-e.getEntity().getLocation().getBlockY();i>0;i--) {
+					  despawnchancer/=1.0175d;
+				  }
 			  }
-			  if (Math.random()<=0.0003125) {
-				  //0.03125% chance of a ghast spawning.
-				  Bukkit.getWorld("world_nether").spawnEntity(entity.getLocation(), EntityType.GHAST);
+		  } else {
+			  //This is a short world.
+			  if (e.getEntity().getLocation().getBlockY()<=52) {
+				  for (int i=52-e.getEntity().getLocation().getBlockY();i>0;i--) {
+					  despawnchancer/=1.025d;
+				  }
+			  }
+		  }
+		  
+		  if (spawners==0 && (Math.random()<=despawnchancer || (torches+glowstone>=3))) {
+			  allow=false;
+		  }
+		  
+		  if (!allow) {
+			  //This is our chance to despawn it if we must.
+			  e.getEntity().remove();
+		  } else {
+			//They will be allowed to spawn. Increase their base HP.
+			  e.getEntity().setMaxHealth(e.getEntity().getMaxHealth()*1.15d);
+			  e.getEntity().setHealth(e.getEntity().getMaxHealth());
+			  
+
+			  if (e.getEntity().getCustomName()!=null && e.getEntity().getCustomName().equals(ChatColor.GOLD+"Charge Zombie II")) {
+				  //Destroy an area around itself.
+				  for (int k=-4;k<5;k++) {
+					  for (int j=-4;j<5;j++) {
+						  for (int m=-1;m<5;m++) {
+							  if (Math.random()<=1.00-((j+4)*0.05d)) {
+								  Location checkloc = e.getEntity().getLocation().add(k,m,j);
+								  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+								  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER || bl.getType()!=Material.COMMAND || bl.getType()!=Material.MOSSY_COBBLESTONE) {
+									  bl.breakNaturally();
+								  }
+							  }
+						  }
+					  }
+				  }
+			  }
+			  
+			  
+			  if (e.getEntity().getType()==EntityType.ZOMBIE || e.getEntity().getType()==EntityType.PIG_ZOMBIE || e.getEntity().getType()==EntityType.SKELETON) {
+				  //Modify the difficulty of the mobs based on who is around.
+				  EntityEquipment inven = e.getEntity().getEquipment();
+				  if (inven!=null) {
+					  inven.setBootsDropChance(0.02f);
+					  inven.setChestplateDropChance(0.02f);
+					  inven.setLeggingsDropChance(0.02f);
+					  inven.setHelmetDropChance(0.02f);
+					  inven.setItemInHandDropChance(0.02f);
+					  if (e.getEntity().getType()==EntityType.SKELETON) {
+						  inven.setItemInHand(new ItemStack(Material.BOW));
+					  }
+				  }
+				  
+				  int totallvs=0;
+				  List<Entity> nearbylist = e.getEntity().getNearbyEntities(30, 30, 30);
+				  //Filter out all unrelated e.getEntity() types.
+				  for (int k=0;k<nearbylist.size();k++) {
+					  //See if human players are near. If so, factor that in for determining how many mobs may exist.
+					  if (nearbylist.get(k).getType()==EntityType.PLAYER) {
+						  //This is a player.
+						  Player g = (Player)nearbylist.get(k);
+						  maxgroup+=plugin.getJobTotalLvs(g)/20;
+						  totallvs+=plugin.getJobTotalLvs(g);
+			  			////Bukkit.getLogger().info("Mob maxgroup increased to "+maxgroup+" down here.");
+					  }
+					  if (nearbylist.get(k).getType()!=EntityType.SKELETON &&
+							  nearbylist.get(k).getType()!=EntityType.ZOMBIE &&
+							  nearbylist.get(k).getType()!=EntityType.CREEPER &&
+							  nearbylist.get(k).getType()!=EntityType.SPIDER &&
+							  nearbylist.get(k).getType()!=EntityType.ENDERMAN) {
+						  nearbylist.remove(k);
+						  k--;
+					  }
+				  }
+				  maxgroup/=groupmult;
+				  int currentnearby = nearbylist.size();
+				  int k = currentnearby;
+				  if (Main.SERVER_TICK_TIME-plugin.last_mob_random_time>10) {
+					  while (k<maxgroup-currentnearby+1) {
+						  if (Math.random()<=chancer) {
+							  Location testloc = e.getEntity().getLocation().add(Math.random()*4.0d-Math.random()*4.0d,Math.random()*4.0d,Math.random()*4.0d-Math.random()*4.0d);
+							  if (Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR) {
+								  Bukkit.getWorld("world").spawnEntity(testloc, e.getEntity().getType());
+								  plugin.last_mob_random_time=Main.SERVER_TICK_TIME;
+								  k++;
+								  //Bukkit.getPlayer("AaMay").sendMessage(ChatColor.RED+e.getEntity().getType().getName()+": Spawned extra mob.");
+								  /*int j=0;
+								  while (j<10) {
+									  Bukkit.getWorld("world").spawnEntity(testloc, e.getEntity().getType());
+									  j++;
+								  }*/
+							  }
+						  }
+						  k++;
+					  }
+				  }
+				  double levelsmult=1.5;
+				  if (totallvs>20*levelsmult) {
+					  if (totallvs<40*levelsmult) {
+						  //Sometimes wear leather armor. Only for Skeletons and Zombies.
+						  if (e.getEntity().getType()==EntityType.SKELETON || e.getEntity().getType()==EntityType.ZOMBIE) {
+							  LivingEntity l = (LivingEntity) e.getEntity();
+							  if (Math.random()>=0.15) {
+								  l.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
+								  if (Math.random()>=0.25) {
+									  l.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
+									  if (Math.random()>=0.5) {
+										  l.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
+										  if (Math.random()>=0.8) {
+											  l.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
+										  }
+									  }
+								  }
+							  }
+						  }
+					  } else
+					  if (totallvs<60*levelsmult) {
+						  //Wear leather armor a bit more often. Sometimes a chain piece here or there. Include a Wooden sword usually.
+						  if (e.getEntity().getType()==EntityType.SKELETON || e.getEntity().getType()==EntityType.ZOMBIE) {
+							  LivingEntity l = (LivingEntity) e.getEntity();
+							  if (e.getEntity().getType()==EntityType.ZOMBIE) {
+								  if (Math.random()<=0.65) {
+									  l.getEquipment().setItemInHand(new ItemStack(Material.WOOD_SWORD));
+								  }
+							  }
+							  if (e.getEntity().getType()==EntityType.SKELETON) {
+								  if (Math.random()<=0.65) {
+									  ItemStack new_bow = new ItemStack(Material.BOW);
+									  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+									  l.getEquipment().setItemInHand(new_bow);
+								  }
+							  }
+							  if (Math.random()>=0.25) {
+								  if (Math.random()<=0.75) {
+									  l.getEquipment().setChestplate(new ItemStack(Material.LEATHER_CHESTPLATE));
+								  } else {
+									  l.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
+								  }
+								  if (Math.random()>=0.45) {
+									  if (Math.random()<=0.75) {
+									  l.getEquipment().setLeggings(new ItemStack(Material.LEATHER_LEGGINGS));
+									  } else {
+										  l.getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
+									  }
+									  if (Math.random()>=0.65) {
+										  if (Math.random()<=0.75) {
+										  l.getEquipment().setHelmet(new ItemStack(Material.LEATHER_HELMET));
+										  } else {
+											  l.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
+										  }
+										  if (Math.random()>=0.95) {
+											  if (Math.random()<=0.75) {
+											  l.getEquipment().setBoots(new ItemStack(Material.LEATHER_BOOTS));
+											  } else {
+												  l.getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
+											  }
+										  }
+									  }
+								  }
+							  }
+						  }
+					  } else
+					  if (totallvs<80*levelsmult) {
+						  //Wear chainmail armor a bit more often. Sometimes an iron piece here or there. Include an Iron sword sometimes, a wooden one usually.
+						  if (e.getEntity().getType()==EntityType.SKELETON || e.getEntity().getType()==EntityType.ZOMBIE) {
+							  LivingEntity l = (LivingEntity) e.getEntity();
+							  if (e.getEntity().getType()==EntityType.ZOMBIE) {
+								  if (Math.random()<=0.65) {
+									  if (Math.random()<=0.75) {
+										  l.getEquipment().setItemInHand(new ItemStack(Material.WOOD_SWORD));
+									  } else {
+										  l.getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD));
+									  }
+								  }
+							  } else
+							  if (e.getEntity().getType()==EntityType.SKELETON) {
+								  if (Math.random()<=0.65) {
+									  if (Math.random()<=0.75) {
+										  ItemStack new_bow = new ItemStack(Material.BOW);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+										  l.getEquipment().setItemInHand(new_bow);
+									  } else {
+										  ItemStack new_bow = new ItemStack(Material.BOW);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+										  l.getEquipment().setItemInHand(new_bow);
+									  }
+								  }
+							  } else {
+								  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,0));
+							  }
+							  if (Math.random()>=0.25) {
+								  if (Math.random()<=0.75) {
+									  l.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
+								  } else {
+									  l.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+								  }
+								  if (Math.random()>=0.45) {
+									  if (Math.random()<=0.75) {
+									  l.getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
+									  } else {
+										  l.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+									  }
+									  if (Math.random()>=0.65) {
+										  if (Math.random()<=0.75) {
+										  l.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
+										  } else {
+											  l.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+										  }
+										  if (Math.random()>=0.95) {
+											  if (Math.random()<=0.75) {
+											  l.getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
+											  } else {
+												  l.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
+											  }
+										  }
+									  }
+								  }
+							  }
+						  }
+					  } else
+					  if (totallvs<100*levelsmult) {
+						  //Wear iron armor a bit more often. Sometimes a diamond piece here or there. Include a Diamond sword sometimes, an iron one usually.
+						  if (e.getEntity().getType()==EntityType.SKELETON || e.getEntity().getType()==EntityType.ZOMBIE) {
+							  LivingEntity l = (LivingEntity) e.getEntity();
+							  if (e.getEntity().getType()==EntityType.ZOMBIE) {
+								  if (Math.random()<=0.65) {
+									  if (Math.random()<=0.75) {
+										  l.getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD));
+									  } else {
+										  l.getEquipment().setItemInHand(new ItemStack(Material.DIAMOND_SWORD));
+									  }
+								  }
+							  } else
+							  if (e.getEntity().getType()==EntityType.SKELETON) {
+								  if (Math.random()<=0.65) {
+									  if (Math.random()<=0.75) {
+										  ItemStack new_bow = new ItemStack(Material.BOW);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 2);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+										  l.getEquipment().setItemInHand(new_bow);
+									  } else {
+										  ItemStack new_bow = new ItemStack(Material.BOW);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 3);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+										  l.getEquipment().setItemInHand(new_bow);
+									  }
+								  }
+							  } else {
+								  if (Math.random()<=0.65) {
+									  if (Math.random()<=0.75) {
+										  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,1));
+									  } else {
+										  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,1));
+										  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,0));
+									  }
+								  }
+							  }
+							  if (Math.random()>=0.25) {
+								  if (Math.random()<=0.75) {
+									  l.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+								  } else {
+									  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+								  }
+								  if (Math.random()>=0.45) {
+									  if (Math.random()<=0.75) {
+									  l.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+									  } else {
+										  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+									  }
+									  if (Math.random()>=0.65) {
+										  if (Math.random()<=0.75) {
+										  l.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+										  } else {
+											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+										  }
+										  if (Math.random()>=0.95) {
+											  if (Math.random()<=0.75) {
+											  l.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
+											  } else {
+												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+											  }
+										  }
+									  }
+								  }
+							  }
+						  }
+					  } else
+					  if (totallvs<120*levelsmult) {
+						  //Wear diamond armor a bit more often. Sometimes an enchanted diamond piece here or there. Include a Golden sword sometimes, a diamond one usually.
+						  if (e.getEntity().getType()==EntityType.SKELETON || e.getEntity().getType()==EntityType.ZOMBIE) {
+							  LivingEntity l = (LivingEntity) e.getEntity();
+							  if (e.getEntity().getType()==EntityType.ZOMBIE) {
+								  if (Math.random()<=0.65) {
+									  if (Math.random()<=0.75) {
+										  l.getEquipment().setItemInHand(new ItemStack(Material.DIAMOND_SWORD));
+									  } else {
+										  l.getEquipment().setItemInHand(new ItemStack(Material.GOLD_SWORD));
+									  }
+								  }
+							  } else
+							  if (e.getEntity().getType()==EntityType.SKELETON) {
+								  if (Math.random()<=0.65) {
+									  if (Math.random()<=0.75) {
+										  ItemStack new_bow = new ItemStack(Material.BOW);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 3);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+										  l.getEquipment().setItemInHand(new_bow);
+									  } else {
+										  ItemStack new_bow = new ItemStack(Material.BOW);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 4);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);
+										  l.getEquipment().setItemInHand(new_bow);
+									  }
+								  }
+							  } else {
+								  if (Math.random()<=0.65) {
+									  if (Math.random()<=0.75) {
+										  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
+									  } else {
+										  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
+										  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,0));
+									  }
+								  }
+							  }
+							  if (Math.random()>=0.25) {
+								  if (Math.random()<=0.75) {
+									  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+								  } else {
+									  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
+									  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
+									  l.getEquipment().setChestplate(enchanted);
+								  }
+								  if (Math.random()>=0.45) {
+									  if (Math.random()<=0.75) {
+									  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+									  } else {
+										  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
+										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
+										  l.getEquipment().setLeggings(enchanted);
+									  }
+									  if (Math.random()>=0.65) {
+										  if (Math.random()<=0.75) {
+										  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+										  } else {
+											  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
+											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
+											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+										  }
+										  if (Math.random()>=0.95) {
+											  if (Math.random()<=0.75) {
+											  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+											  } else {
+												  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
+												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
+												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+											  }
+										  }
+									  }
+								  }
+							  }
+						  }
+					  } else
+						  if (totallvs<140*levelsmult) {
+						  //Well dang, your party's huge and OP.
+						//Wear diamond armor almost always. Enchanted diamond pieces here and there.
+						  if (e.getEntity().getType()==EntityType.SKELETON || e.getEntity().getType()==EntityType.ZOMBIE) {
+							  LivingEntity l = (LivingEntity) e.getEntity();
+							  if (e.getEntity().getType()==EntityType.ZOMBIE) {
+								  if (Math.random()<=0.80) {
+									  if (Math.random()<=0.75) {
+										  ItemStack enchanted = new ItemStack(Material.DIAMOND_SWORD);
+										  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*2.0d)+1);
+										  if (Math.random()<=0.5) {
+											  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
+										  } else {
+											  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*2.0d)+1);
+										  }
+										  l.getEquipment().setItemInHand(enchanted);
+									  } else {
+										  ItemStack enchanted = new ItemStack(Material.GOLD_SWORD);
+										  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*2.0d)+1);
+										  if (Math.random()<=0.5) {
+											  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
+										  } else {
+											  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*4.0d)+1);
+										  }
+										  l.getEquipment().setItemInHand(enchanted);
+									  }
+								  }
+							  } else
+							  if (e.getEntity().getType()==EntityType.SKELETON) {
+								  if (Math.random()<=0.65) {
+									  if (Math.random()<=0.75) {
+										  ItemStack new_bow = new ItemStack(Material.BOW);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 5);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);
+										  l.getEquipment().setItemInHand(new_bow);
+									  } else {
+										  ItemStack new_bow = new ItemStack(Material.BOW);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 4);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 2);
+										  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 2);
+										  l.getEquipment().setItemInHand(new_bow);
+									  }
+								  }
+							  } else {
+								  if (Math.random()<=0.65) {
+									  if (Math.random()<=0.75) {
+										  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
+										  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,0));
+									  } else {
+										  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
+										  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,1));
+										  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,0));
+									  }
+								  }
+							  }
+							  if (Math.random()>=0.25) {
+								  if (Math.random()<=0.75) {
+									  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+								  } else {
+									  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
+									  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
+									  if (Math.random()<=0.5) {
+										  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*1.0d)+1);
+									  }
+									  l.getEquipment().setChestplate(enchanted);
+								  }
+								  if (Math.random()>=0.45) {
+									  if (Math.random()<=0.75) {
+									  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+									  } else {
+										  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
+										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
+										  if (Math.random()<=0.5) {
+											  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
+										  }
+										  l.getEquipment().setLeggings(enchanted);
+									  }
+									  if (Math.random()>=0.65) {
+										  if (Math.random()<=0.75) {
+										  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+										  } else {
+											  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
+											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
+											  if (Math.random()<=0.5) {
+												  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
+											  }
+											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+										  }
+										  if (Math.random()>=0.95) {
+											  if (Math.random()<=0.75) {
+											  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+											  } else {
+												  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
+												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
+												  if (Math.random()<=0.5) {
+													  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
+												  }
+												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+											  }
+										  }
+									  }
+								  }
+							  }
+						  }
+					  } else
+					  if (totallvs<200*levelsmult) {
+						  //Well dang, your party's huge and OP.
+						//Wear diamond armor almost always. Enchanted diamond pieces here and there.
+						  if (e.getEntity().getType()==EntityType.SKELETON || e.getEntity().getType()==EntityType.ZOMBIE) {
+							  LivingEntity l = (LivingEntity) e.getEntity();
+							  if (e.getEntity().getType()==EntityType.ZOMBIE) {
+								  if (Math.random()<=0.80) {
+									  if (Math.random()<=0.75) {
+										  ItemStack enchanted = new ItemStack(Material.DIAMOND_SWORD);
+										  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
+										  if (Math.random()<=0.5) {
+											  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*3.0d)+1);
+										  } else {
+											  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*2.0d)+1);
+										  }
+										  l.getEquipment().setItemInHand(enchanted);
+									  } else {
+										  ItemStack enchanted = new ItemStack(Material.GOLD_SWORD);
+										  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
+										  if (Math.random()<=0.5) {
+											  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*3.0d)+1);
+										  } else {
+											  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*2.0d)+1);
+										  }
+										  l.getEquipment().setItemInHand(enchanted);
+									  }
+								  }
+							  } else
+								  if (e.getEntity().getType()==EntityType.SKELETON) {
+									  if (Math.random()<=0.65) {
+										  if (Math.random()<=0.75) {
+											  ItemStack new_bow = new ItemStack(Material.BOW);
+											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 5);
+											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 1);
+											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 2);
+											  l.getEquipment().setItemInHand(new_bow);
+										  } else {
+											  ItemStack new_bow = new ItemStack(Material.BOW);
+											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 6);
+											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 2);
+											  new_bow.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 3);
+											  l.getEquipment().setItemInHand(new_bow);
+										  }
+									  }
+								  } else {
+									  if (Math.random()<=0.65) {
+										  if (Math.random()<=0.75) {
+											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,3));
+											  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,2));
+											  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,1));
+										  } else {
+											  ////l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,4));
+											  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,2));
+											  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,1));
+										  }
+									  }
+								  }
+							  if (Math.random()>=0.25) {
+								  if (Math.random()<=0.75) {
+									  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+								  } else {
+									  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
+									  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*3.0d)+1);
+									  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*3.0d)+1);
+									  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*3.0d)+1);
+									  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
+									  if (Math.random()<=0.5) {
+										  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
+									  }
+									  l.getEquipment().setChestplate(enchanted);
+								  }
+								  if (Math.random()>=0.45) {
+									  if (Math.random()<=0.75) {
+									  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+									  } else {
+										  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
+										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
+										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*2.0d)+1);
+										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
+										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
+										  if (Math.random()<=0.5) {
+											  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
+										  }
+										  l.getEquipment().setLeggings(enchanted);
+									  }
+									  if (Math.random()>=0.65) {
+										  if (Math.random()<=0.75) {
+										  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+										  } else {
+											  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
+											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*2.0d)+1);
+											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
+											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
+											  if (Math.random()<=0.5) {
+												  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
+											  }
+											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+										  }
+										  if (Math.random()>=0.95) {
+											  if (Math.random()<=0.75) {
+											  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+											  } else {
+												  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
+												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
+												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
+												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
+												  if (Math.random()<=0.5) {
+													  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
+												  }
+												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+											  }
+										  }
+									  }
+								  }
+							  }
+						  }
+					  }
+					  else {
+						  //Time to give it our all.
+						//Well dang, your party's huge and OP.
+							//Wear diamond armor almost always. Enchanted diamond pieces here and there.
+							  if (e.getEntity().getType()==EntityType.SKELETON || e.getEntity().getType()==EntityType.ZOMBIE) {
+								  LivingEntity l = (LivingEntity) e.getEntity();
+								  //l.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,999999,1));
+								  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,999999,1));
+								  l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,999999,0));
+								  l.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,0));
+								  //l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,999999,0));
+								  //l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,1));
+								  if (e.getEntity().getType()==EntityType.ZOMBIE) {
+									  if (Math.random()<=0.80) {
+										  if (Math.random()<=0.75) {
+											  ItemStack enchanted = new ItemStack(Material.DIAMOND_SWORD);
+											  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
+											  if (Math.random()<=0.5) {
+												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
+											  } else {
+												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*3.0d)+1);
+											  }
+											  l.getEquipment().setItemInHand(enchanted);
+										  } else {
+											  ItemStack enchanted = new ItemStack(Material.GOLD_SWORD);
+											  //enchanted.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random()*4.0d)+1);
+											  if (Math.random()<=0.5) {
+												  enchanted.addUnsafeEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()*2.0d)+1);
+											  } else {
+												  enchanted.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()*3.0d)+1);
+											  }
+											  l.getEquipment().setItemInHand(enchanted);
+										  }
+									  }
+								  }
+								  if (Math.random()>=0.25) {
+									  if (Math.random()<=0.75) {
+										  l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+									  } else {
+										  ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
+										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
+										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*4.0d)+1);
+										  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*3.0d)+1);
+										  if (Math.random()<=0.5) {
+											  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
+										  }
+										  l.getEquipment().setChestplate(enchanted);
+									  }
+									  if (Math.random()>=0.45) {
+										  if (Math.random()<=0.75) {
+										  l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+										  } else {
+											  ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
+											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
+											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*3.0d)+1);
+											  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
+											  if (Math.random()<=0.5) {
+												  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
+											  }
+											  l.getEquipment().setLeggings(enchanted);
+										  }
+										  if (Math.random()>=0.65) {
+											  if (Math.random()<=0.75) {
+											  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+											  } else {
+												  ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
+												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
+												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*2.0d)+1);
+												  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*2.0d)+1);
+												  if (Math.random()<=0.5) {
+													  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
+												  }
+												  l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+											  }
+											  if (Math.random()>=0.95) {
+												  if (Math.random()<=0.75) {
+												  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+												  } else {
+													  ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
+													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
+													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, (int)(Math.random()*4.0d)+1);
+													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, (int)(Math.random()*4.0d)+1);
+													  enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, (int)(Math.random()*4.0d)+1);
+													  if (Math.random()<=0.5) {
+														  enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
+													  }
+													  l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+												  }
+											  }
+										  }
+									  }
+								  }
+							  }
+					  }
+				  }
 			  }
 		  }
 	  }
-	  if (entity.getWorld().getName().compareTo("world_the_end")==0) {
-		  if (entity.getType()==EntityType.ENDER_DRAGON) {
-			  LivingEntity l = (LivingEntity)entity;
-			  l.setMaxHealth(Warning(l.getMaxHealth()*4,5));
-			  l.setHealth(Warning(l.getMaxHealth(),6));
-		  }
-	  }
-	  if (entity.getType()==EntityType.EXPERIENCE_ORB) {
-		  Bukkit.getWorld("world").spawnEntity(entity.getLocation(),entity.getType());
+	  if (e.getEntity().getType()==EntityType.EXPERIENCE_ORB) {
+		  Bukkit.getWorld("world").spawnEntity(e.getEntity().getLocation(),e.getEntity().getType());
 	  }
 	  if (e.getSpawnReason()==SpawnReason.BREEDING) {
 		  //Spawn reason for later spawning.
