@@ -1,4 +1,4 @@
-package src.me.kaZep.Base;
+package me.kaZep.Base;
 
 import java.util.ArrayList;
 import java.util.List;
