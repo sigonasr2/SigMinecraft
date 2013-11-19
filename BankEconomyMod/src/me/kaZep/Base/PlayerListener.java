@@ -11848,6 +11848,7 @@ implements Listener
 		int identifier=-1;
 		if (isItemCube(item_cube)) {
 			identifier = this.plugin.get_ItemCubeID(item_cube);
+			cube_type = this.plugin.get_ItemCubeType(item_cube);
 			if (identifier==-1) {
 				//This doesn't have an identifier yet. Create a new one.
 				identifier=this.plugin.getConfig().getInt("item-cube-numb");

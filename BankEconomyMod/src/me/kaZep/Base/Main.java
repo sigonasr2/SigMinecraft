@@ -4739,6 +4739,24 @@ public void payDay(int time)
 		return false;
     }
     
+    public PlayerListener.Cube get_ItemCubeType(ItemStack item_cube) {
+		if (item_cube.hasItemMeta() && item_cube.getItemMeta().hasLore()) {
+			//Check to see if the Lore contains anything.
+			for (int i=0;i<item_cube.getItemMeta().getLore().size();i++) {
+				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.")) {
+					return PlayerListener.Cube.SMALL;
+				}
+				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
+					return PlayerListener.Cube.LARGE;
+				}
+				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
+					return PlayerListener.Cube.ENDER;
+				}
+			}
+		}
+		return false;
+    }
+    
     public int get_ItemCubeID(ItemStack item_cube) {
 		if (item_cube.hasItemMeta() && item_cube.getItemMeta().hasLore()) {
 			//Check to see if the Lore contains anything.
