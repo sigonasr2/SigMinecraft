@@ -9937,6 +9937,7 @@ implements Listener
 										event.getCursor().getType() == Material.GOLD_INGOT || event.getCursor().getType() == Material.IRON_BLOCK || 
 										event.getCursor().getType() == Material.DIAMOND_BLOCK || event.getCursor().getType() == Material.DIAMOND ||
 										event.getCursor().getType() == Material.WOOD || event.getCursor().getType() == Material.COBBLESTONE || 
+										event.getCursor().getType() == Material.LOG || event.getCursor().getType() == Material.STONE || 
 										event.getCursor().getType() == Material.STRING) {
 									valid = true;
 								}
@@ -12843,7 +12844,8 @@ class updateInventoryTask implements Runnable {
 			if (!(anvilInv.getItem(MATERIALS).getType() == Material.LEATHER || anvilInv.getItem(MATERIALS).getType() == Material.IRON_INGOT || 
 					anvilInv.getItem(MATERIALS).getType() == Material.GOLD_INGOT || anvilInv.getItem(MATERIALS).getType() == Material.IRON_BLOCK || 
 					anvilInv.getItem(MATERIALS).getType() == Material.DIAMOND_BLOCK || anvilInv.getItem(MATERIALS).getType() == Material.DIAMOND ||
-					anvilInv.getItem(MATERIALS).getType() == Material.WOOD || anvilInv.getItem(MATERIALS).getType() == Material.COBBLESTONE || 
+					anvilInv.getItem(MATERIALS).getType() == Material.WOOD || anvilInv.getItem(MATERIALS).getType() == Material.COBBLESTONE ||
+					anvilInv.getItem(MATERIALS).getType() == Material.LOG || anvilInv.getItem(MATERIALS).getType() == Material.STONE ||
 					anvilInv.getItem(MATERIALS).getType() == Material.STRING)) {
 				
 				sendToInventory(MATERIALS, anvilInv.getItem(MATERIALS).getAmount(), player);
@@ -12884,6 +12886,14 @@ class updateInventoryTask implements Runnable {
 				multiplier = 0.1;
 			}
 
+			if (anvilInv.getItem(MATERIALS).getType() == Material.LOG && (anvilInv.getItem(INPUT).getType() == Material.WOOD_AXE ||
+					anvilInv.getItem(INPUT).getType() == Material.WOOD_SWORD || anvilInv.getItem(INPUT).getType() == Material.WOOD_HOE || 
+					anvilInv.getItem(INPUT).getType() == Material.WOOD_PICKAXE || anvilInv.getItem(INPUT).getType() == Material.WOOD_SPADE)) {
+
+				validCombo = true;
+				multiplier = 0;
+			}
+
 			if (anvilInv.getItem(MATERIALS).getType() == Material.STRING && (anvilInv.getItem(INPUT).getType() == Material.FISHING_ROD ||
 					anvilInv.getItem(INPUT).getType() == Material.BOW)) {
 
@@ -12897,6 +12907,14 @@ class updateInventoryTask implements Runnable {
 
 				validCombo = true;
 				multiplier = 0.2;
+			}
+
+			if (anvilInv.getItem(MATERIALS).getType() == Material.STONE && (anvilInv.getItem(INPUT).getType() == Material.STONE_AXE ||
+					anvilInv.getItem(INPUT).getType() == Material.STONE_SWORD || anvilInv.getItem(INPUT).getType() == Material.STONE_HOE || 
+					anvilInv.getItem(INPUT).getType() == Material.STONE_PICKAXE || anvilInv.getItem(INPUT).getType() == Material.STONE_SPADE)) {
+
+				validCombo = true;
+				multiplier = 0;
 			}
 
 			if (anvilInv.getItem(MATERIALS).getType() == Material.LEATHER && (anvilInv.getItem(INPUT).getType() == Material.LEATHER_BOOTS ||
