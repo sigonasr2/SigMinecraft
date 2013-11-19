@@ -65,6 +65,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -1293,9 +1294,10 @@ public void runTick() {
 										  enderdragon.setMaxHealth(200);
 										  enderdragon.setHealth(200);
 										  enderdragon.setRemoveWhenFarAway(false);
+										  enderdragon.remove();
 										  //enderdragon.teleport(new Location(p.getWorld(),p.getLocation().getBlockX()+i,-250,p.getLocation().getBlockZ()+j));
 										  //p.sendMessage(ChatColor.DARK_PURPLE+"You feel a dark presence nearby.");
-										  Bukkit.getPlayer("sigonasr2").sendMessage("Trigger this.");
+										  //Bukkit.getPlayer("sigonasr2").sendMessage("Trigger this.");
 										  zombie.setRemoveWhenFarAway(false);
 										  zombie.setMaxHealth(300);
 										  zombie.setHealth(300);
@@ -1304,7 +1306,7 @@ public void runTick() {
 										  zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,0));
 										  zombie.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,999999,0));
 										  zombie.setTicksLived(1);
-										  Iterator<EnderDragon> e_list = Bukkit.getWorld("world").getEntitiesByClass(EnderDragon.class).iterator();
+										  /*Iterator<EnderDragon> e_list = Bukkit.getWorld("world").getEntitiesByClass(EnderDragon.class).iterator();
 										  boolean first=false;
 										  while (e_list.hasNext()) {
 											  //p.sendMessage("Moving Enderdragon to "+new Location(p.getWorld(),p.getLocation().getBlockX()+i,-50,p.getLocation().getBlockZ()+j));
@@ -1314,7 +1316,7 @@ public void runTick() {
 											  } else {
 												  next.remove();
 											  }
-										  }
+										  }*/
 									  }
 								  }
 							  }

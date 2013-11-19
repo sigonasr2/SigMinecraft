@@ -2196,7 +2196,9 @@ implements Listener
 					}
 				}
 			} else {
-				return false;
+				if (l.getCustomName()!=null && !l.getCustomName().contains(ChatColor.DARK_PURPLE+"")) { //Make sure it's not a boss.
+					return false;
+				}
 			}
 			//If it's a super zombie, we're going to despawn it now.
 		}break;
@@ -6919,6 +6921,7 @@ implements Listener
 					enderdragon.setHealth(Warning(l.getHealth()/l.getMaxHealth()*200,7));
 					enderdragon.setNoDamageTicks(999999);
 					enderdragon.setRemoveWhenFarAway(false);
+					enderdragon.remove();
 				}
 				Iterator<EnderDragon> e_list = Bukkit.getWorld("world").getEntitiesByClass(EnderDragon.class).iterator();
 				boolean first=false;

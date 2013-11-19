@@ -1457,7 +1457,7 @@ public String convertToItemName(String val) {
           double deathZ = this.plugin.getAccountsConfig().getDouble(p.getName() + ".deathpointZ");
           String deathWorld = this.plugin.getAccountsConfig().getString(p.getName() + ".deathworld");
     	  //p.sendMessage("Got 1.");
-          if (this.plugin.getAccountsConfig().getBoolean(p.getName() + ".revived")==false && p.getPlayerTime()-this.plugin.getAccountsConfig().getLong(p.getName() + ".revivetime")<12000) {
+          if (this.plugin.getAccountsConfig().getBoolean(p.getName() + ".revived")==false && this.plugin.SERVER_TICK_TIME-this.plugin.getAccountsConfig().getLong(p.getName() + ".revivetime")<12000) {
         	  double mincost = this.plugin.getConfig().getDouble("revive-cost-rate");
         	  //p.sendMessage("Got 2.");
         	  if (p.getBedSpawnLocation()!=null) {
