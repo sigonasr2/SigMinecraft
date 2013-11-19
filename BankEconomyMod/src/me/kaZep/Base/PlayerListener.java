@@ -12837,7 +12837,7 @@ class updateInventoryTask implements Runnable {
 					anvilInv.getItem(INPUT).toString().toUpperCase().contains("SWORD") || anvilInv.getItem(INPUT).toString().toUpperCase().contains("FISHING") || 
 					anvilInv.getItem(INPUT).toString().toUpperCase().contentEquals("BOW")) && anvilInv.getItem(INPUT).getDurability() != 0)) {
 				
-				sendToInventory(anvilInv.getItem(INPUT), anvilInv.getItem(INPUT).getAmount(), player, player.getInventory());
+				sendToInventory(INPUT, anvilInv.getItem(INPUT).getAmount(), player);
 				Bukkit.getLogger().info("Invalid input!");
 			}
 
@@ -12848,7 +12848,7 @@ class updateInventoryTask implements Runnable {
 					anvilInv.getItem(MATERIALS).getType() == Material.WOOD || anvilInv.getItem(MATERIALS).getType() == Material.COBBLESTONE || 
 					anvilInv.getItem(MATERIALS).getType() == Material.STRING)) {
 				
-				sendToInventory(anvilInv.getItem(MATERIALS), anvilInv.getItem(MATERIALS).getAmount(), player, player.getInventory());
+				sendToInventory(MATERIALS, anvilInv.getItem(MATERIALS).getAmount(), player);
 
 				Bukkit.getLogger().info("Invalid materials!");
 			}
@@ -12955,7 +12955,7 @@ class updateInventoryTask implements Runnable {
 				if (anvilInv.getItem(MATERIALS).getAmount() > maxItemsNeeded) {
 					// Bukkit.getLogger().info("Materials exceed " + maxItemsNeeded + " stack. Dropping " + (anvilInv.getItem(MATERIALS).getAmount() - maxItemsNeeded) + " of " + anvilInv.getItem(MATERIALS).getType());
 					
-					sendToInventory(anvilInv.getItem(MATERIALS), anvilInv.getItem(MATERIALS).getAmount() - maxItemsNeeded, player, player.getInventory());
+					sendToInventory(MATERIALS, anvilInv.getItem(MATERIALS).getAmount() - maxItemsNeeded, player);
 
 					// anvilInv.getItem(MATERIALS).setAmount(maxItemsNeeded);
 			}
@@ -13023,23 +13023,28 @@ class updateInventoryTask implements Runnable {
 		}
 	}
 	
-	public void sendToInventory(ItemStack item, int number, Player player, Inventory target) {
+	public void sendToInventory(int slot, int itemCount, Player player) {
+		// Get inventories
+		Inventory anvilInventory = player.getOpenInventory().getTopInventory();
+		Inventory playerInventory = player.getOpenInventory().getBottomInventory();
 		
-		ItemStack temp = item.clone();
+		// Get a temporary item stack to transfer
+		ItemStack temp = anvilInventory.getItem(slot);
+		temp.setAmount(itemCount);
 		
-		temp.setAmount(number);
-		ItemStack leftovers = target.addItem(temp).get(0);
+		// Attempt to add to the player inventory. Store leftovers in itemstack to be dropped.
+		ItemStack leftovers = playerInventory.addItem(temp).get(0);
 		
 		if (leftovers != null) {
 			player.getWorld().dropItemNaturally(player.getLocation(), leftovers); 
 		}
 
-		item.setAmount(item.getAmount() - number);
-	
-		if (item.getAmount() - number == 0) {
-			item.setType(Material.AIR);
+		anvilInventory.getItem(slot).setAmount(anvilInventory.getItem(slot).getAmount() - itemCount);
+		
+		if (anvilInventory.getItem(slot).getAmount() == 0) {
 			
-			Bukkit.getLogger().info("Item stack size reduced to 0, " + item.getType().toString() + " removed.");
+			Bukkit.getLogger().info("Item stack size reduced to 0, " + anvilInventory.getItem(slot).getType().toString() + " removed.");
+			anvilInventory.setItem(slot, new ItemStack(Material.AIR));
 			
 		}
 		// player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(anvilInv.getItem(MATERIALS).getType(), anvilInv.getItem(MATERIALS).getAmount() - maxItemsNeeded));
