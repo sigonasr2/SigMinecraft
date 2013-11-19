@@ -6868,7 +6868,7 @@ implements Listener
 			  Zombie z = (Zombie)e.getEntity();
 			  if (z.getCustomName()==null && z.getHealth()>65) {
 				  //If it's a normal zombie with too much HP, something's wrong. Lower it.
-				  z.setHealth(65-z.getMaxHealth()/2);
+				  z.setHealth(z.getHealth()/2);
 			  }
 		  }
 			if (e.getDamager() instanceof Projectile) {
