@@ -52,6 +52,40 @@ public class PlayerBuffData {
 		  }
 		  return bar;
 	  }
+
+	public String healthbar(double curHP,double maxHP,int hunger) {
+		//笆�笆�
+		int bits=(int)(Math.ceil(curHP/maxHP*10));
+		String bar=" ";
+		if (hunger==20) {
+			if (bits>6) {
+				bar+=ChatColor.GREEN+"";
+			} else
+				if (bits>3) {
+					bar+=ChatColor.YELLOW+"";
+				} else
+				{
+					bar+=ChatColor.RED+"";
+				}
+		} else {
+			if (bits>6) {
+				bar+=ChatColor.DARK_GREEN+"";
+			} else
+				if (bits>3) {
+					bar+=ChatColor.GOLD+"";
+				} else
+				{
+					bar+=ChatColor.DARK_RED+"";
+				}
+		}
+		for (int i=0;i<bits/2;i++) {
+			bar+=Character.toString((char)0x2588);
+		}
+		if (bits%2!=0) {
+			bar+=Character.toString((char)0x258C);
+		}
+		return bar;
+	}
 	
 	public PlayerBuffData(Player p, Main thisplugin) {
 		this.p=p;
@@ -232,7 +266,7 @@ public class PlayerBuffData {
 				}
 				money_gained=0;
 			}
-			p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth()));
+			p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 		}
 	}
 }
