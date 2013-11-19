@@ -3200,7 +3200,7 @@ implements Listener
 						for (int k=2;k>-1;k--) {
 							for (int l=5;l>-6;l--) {
 								Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(20+j,k,spread+l));
-								if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE || b.getType()==Material.COMMAND || b.getType()==Material.MOSSY_COBBLESTONE && !naturalBlock(b.getType())) {
+								if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE || b.getType()==Material.COMMAND || b.getType()==Material.MOSSY_COBBLESTONE && naturalBlock(b.getType())) {
 									torch1=true;
 								}
 							}
@@ -3212,7 +3212,7 @@ implements Listener
 							for (int k=2;k>-1;k--) {
 								for (int l=lb2;l>-ub2;l--) {
 									Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(10+j,k,spread+l));
-									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && !naturalBlock(b.getType())) {
+									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
 										b.setType(Material.AIR);
 									}
 								}
@@ -3226,7 +3226,7 @@ implements Listener
 						for (int k=2;k>-1;k--) {
 							for (int l=5;l>-6;l--) {
 								Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(-10+j,k,spread+l));
-								if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE || b.getType()==Material.COMMAND || b.getType()==Material.MOSSY_COBBLESTONE && !naturalBlock(b.getType())) {
+								if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE || b.getType()==Material.COMMAND || b.getType()==Material.MOSSY_COBBLESTONE && naturalBlock(b.getType())) {
 									torch2=true;
 								}
 							}
@@ -3238,7 +3238,7 @@ implements Listener
 							for (int k=2;k>-1;k--) {
 								for (int l=lb2;l>-ub2;l--) {
 									Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(-10+j,k,spread+l));
-									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && !naturalBlock(b.getType())) {
+									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
 										b.setType(Material.AIR);
 									}
 								}
@@ -7624,17 +7624,17 @@ implements Listener
 						for (int j=-1;j<2;j++) {
 							Location checkloc = enemy.getLocation().add(k,1,j);
 							Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && !naturalBlock(bl.getType())) {
+							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && naturalBlock(bl.getType())) {
 								bl.breakNaturally();
 							}
 							bl = Bukkit.getWorld("world").getBlockAt(checkloc);
 							checkloc = enemy.getLocation().add(k,2,j);
-							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && !naturalBlock(bl.getType())) {
+							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && naturalBlock(bl.getType())) {
 								bl.breakNaturally();
 							}
 							bl = Bukkit.getWorld("world").getBlockAt(checkloc);
 							checkloc = enemy.getLocation().add(k,0,j);
-							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && !naturalBlock(bl.getType())) {
+							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && naturalBlock(bl.getType())) {
 								bl.breakNaturally();
 							}
 						}
@@ -7725,17 +7725,17 @@ implements Listener
 							for (int j=-2;j<3;j++) {
 								Location checkloc = enemy.getLocation().add(k,1,j);
 								Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && !naturalBlock(bl.getType())) {
+								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && naturalBlock(bl.getType())) {
 									bl.breakNaturally();
 								}
 								bl = Bukkit.getWorld("world").getBlockAt(checkloc);
 								checkloc = enemy.getLocation().add(k,2,j);
-								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && !naturalBlock(bl.getType())) {
+								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && naturalBlock(bl.getType())) {
 									bl.breakNaturally();
 								}
 								bl = Bukkit.getWorld("world").getBlockAt(checkloc);
 								checkloc = enemy.getLocation().add(k,0,j);
-								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && !naturalBlock(bl.getType())) {
+								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && naturalBlock(bl.getType())) {
 									bl.breakNaturally();
 								}
 							}
