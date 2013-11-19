@@ -4118,7 +4118,7 @@ public void payDay(int time)
 						  if (item.hasItemMeta() && item.getItemMeta().getLore()!=null) {
 							  List<String> thelore = item.getItemMeta().getLore();
 							  for (int i=0;i<thelore.size();i++) {
-								  if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								  if (is_PermanentProperty(thelore.get(i))) {
 									  //This is a weak piece.
 									  mult=0.10d;
 								  }
@@ -4719,19 +4719,35 @@ public void payDay(int time)
   	  return false;
     }
     
-    public boolean is_ItemCube(ItemStack i) {
-    	if (i.hasItemMeta() && i.getItemMeta().hasLore() && i.getItemMeta().getLore()!=null) {
+    public boolean is_ItemCube(ItemStack item_cube) {
+		if (item_cube.hasItemMeta() && item_cube.getItemMeta().getLore()!=null) {
 			//Check to see if the Lore contains anything.
-			for (int j=0;j<i.getItemMeta().getLore().size();j++) {
-				if (i.getItemMeta().getLore().get(j).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.")) {
+			for (int i=0;i<item_cube.getItemMeta().getLore().size();i++) {
+				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.")) {
 					return true;
 				}
-				if (i.getItemMeta().getLore().get(j).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
+				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
+					return true;
+				}
+				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
 					return true;
 				}
 			}
+		}
+		return false;
+    }
+    
+    public boolean is_PermanentProperty(String property) {
+    	//This function determines if the certain lore property is supposed to be kept on the item.
+    	//Useful for checking what to remove and not remove from lore.
+    	List<String> permanent_properties = new ArrayList<String>();
+    	permanent_properties.add(ChatColor.RED+"-400% Durability");
+    	permanent_properties.add(ChatColor.RED+"Duplicated");
+    	if (permanent_properties.contains(property)) {
+    		return true;
+    	} else {
+    		return false;
     	}
-    	return false;
     }
     
     public double getEnchantmentNumb(String s) {

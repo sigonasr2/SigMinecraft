@@ -488,7 +488,7 @@ implements Listener
 					if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 						List<String> thelore = e.getItem().getItemMeta().getLore();
 						for (int i=0;i<thelore.size();i++) {
-							if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+							if (this.plugin.is_PermanentProperty(thelore.get(i))) {
 								ourLore.add(thelore.get(i));
 							}
 						}
@@ -523,7 +523,7 @@ implements Listener
 						if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 							List<String> thelore = e.getItem().getItemMeta().getLore();
 							for (int i=0;i<thelore.size();i++) {
-								if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								if (this.plugin.is_PermanentProperty(thelore.get(i))) {
 									ourLore.add(thelore.get(i));
 								}
 							}
@@ -560,7 +560,7 @@ implements Listener
 						if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 							List<String> thelore = e.getItem().getItemMeta().getLore();
 							for (int i=0;i<thelore.size();i++) {
-								if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								if (this.plugin.is_PermanentProperty(thelore.get(i))) {
 									ourLore.add(thelore.get(i));
 								}
 							}
@@ -594,7 +594,7 @@ implements Listener
 						if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 							List<String> thelore = e.getItem().getItemMeta().getLore();
 							for (int i=0;i<thelore.size();i++) {
-								if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								if (this.plugin.is_PermanentProperty(thelore.get(i))) {
 									ourLore.add(thelore.get(i));
 								}
 							}
@@ -637,7 +637,7 @@ implements Listener
 					if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 						List<String> thelore = e.getItem().getItemMeta().getLore();
 						for (int i=0;i<thelore.size();i++) {
-							if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+							if (this.plugin.is_PermanentProperty(thelore.get(i))) {
 								ourLore.add(thelore.get(i));
 							}
 						}
@@ -672,7 +672,7 @@ implements Listener
 						if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 							List<String> thelore = e.getItem().getItemMeta().getLore();
 							for (int i=0;i<thelore.size();i++) {
-								if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								if (this.plugin.is_PermanentProperty(thelore.get(i))) {
 									ourLore.add(thelore.get(i));
 								}
 							}
@@ -718,7 +718,7 @@ implements Listener
 						if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 							List<String> thelore = e.getItem().getItemMeta().getLore();
 							for (int i=0;i<thelore.size();i++) {
-								if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								if (this.plugin.is_PermanentProperty(thelore.get(i))) {
 									ourLore.add(thelore.get(i));
 								}
 							}
@@ -752,7 +752,7 @@ implements Listener
 						if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
 							List<String> thelore = e.getItem().getItemMeta().getLore();
 							for (int i=0;i<thelore.size();i++) {
-								if (thelore.get(i).contains(ChatColor.RED+"-400% Durability")) {
+								if (this.plugin.is_PermanentProperty(thelore.get(i))) {
 									ourLore.add(thelore.get(i));
 								}
 							}
@@ -11836,21 +11836,7 @@ implements Listener
 	}
 
 	public boolean isItemCube(ItemStack item_cube) {
-		if (item_cube.hasItemMeta() && item_cube.getItemMeta().getLore()!=null) {
-			//Check to see if the Lore contains anything.
-			for (int i=0;i<item_cube.getItemMeta().getLore().size();i++) {
-				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.")) {
-					return true;
-				}
-				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
-					return true;
-				}
-				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
-					return true;
-				}
-			}
-		}
-		return false;
+		return this.plugin.is_ItemCube(item_cube);
 	}
 	
 	public void viewItemCube(Player p, ItemStack item_cube) {

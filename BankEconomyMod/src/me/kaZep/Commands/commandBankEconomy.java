@@ -430,7 +430,7 @@ public String convertToItemName(String val) {
     			  for (int i=0;i<p.getItemInHand().getItemMeta().getLore().size();i++) {
     				  //Remove all lore when unenchanting.
     				  //Do not remove -400% durability.
-					  if (p.getItemInHand().getItemMeta().getLore().get(i).contains(ChatColor.RED+"-400% Durability")) {
+					  if (this.plugin.is_PermanentProperty(p.getItemInHand().getItemMeta().getLore().get(i))) {
 						  newlore.add(p.getItemInHand().getItemMeta().getLore().get(i));
 					  }
     			  }
