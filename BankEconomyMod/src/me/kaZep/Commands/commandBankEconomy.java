@@ -1505,6 +1505,7 @@ public String convertToItemName(String val) {
 	        		  }
 	        	  }
 	        	  //p.sendMessage("Got 7.");
+	        	  p.setNoDamageTicks(100); //Give 5 seconds of invincibility to recuperate.
 	        	  Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+ChatColor.WHITE+" decided to revive.");
 	          } else {
 	        	  p.sendMessage("You cannot revive. You need to have $"+df.format(finalcost)+" to do so.");
