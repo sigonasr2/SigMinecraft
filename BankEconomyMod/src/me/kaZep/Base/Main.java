@@ -4739,6 +4739,18 @@ public void payDay(int time)
 		return false;
     }
     
+    public int get_ItemCubeID(ItemStack item_cube) {
+		if (item_cube.hasItemMeta() && item_cube.getItemMeta().hasLore()) {
+			//Check to see if the Lore contains anything.
+			for (int i=0;i<item_cube.getItemMeta().getLore().size();i++) {
+				if (item_cube.getItemMeta().getLore().get(i).contains("ID#")) {
+					return Integer.valueOf(item_cube.getItemMeta().getLore().get(i).replace("ID#", ""));
+				}
+			}
+		}
+		return -1;
+    }
+    
     public boolean is_PermanentProperty(String property) {
     	//This function determines if the certain lore property is supposed to be kept on the item.
     	//Useful for checking what to remove and not remove from lore.
