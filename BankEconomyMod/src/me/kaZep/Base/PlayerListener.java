@@ -2326,14 +2326,15 @@ implements Listener
 
 				if (e.getEntity().getCustomName()!=null && e.getEntity().getCustomName().equals(ChatColor.GOLD+"Charge Zombie II")) {
 					//Destroy an area around itself.
-					for (int k=-4;k<5;k++) {
-						for (int j=-4;j<5;j++) {
-							for (int m=-1;m<5;m++) {
-								if (Math.random()<=1.00-((j+4)*0.05d)) {
+					int size=((int)(Math.random()*5))+1;
+					for (int k=-size;k<size;k++) {
+						for (int j=-size;j<size;j++) {
+							for (int m=-1;m<size/2;m++) {
+								if (Math.random()<=1.00-((m+4)*0.05d)) {
 									Location checkloc = e.getEntity().getLocation().add(k,m,j);
 									Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
 									if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER || bl.getType()!=Material.COMMAND || bl.getType()!=Material.MOSSY_COBBLESTONE) {
-										bl.breakNaturally();
+										bl.setType(Material.AIR);
 									}
 								}
 							}
