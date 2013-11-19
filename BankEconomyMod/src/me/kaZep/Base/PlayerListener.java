@@ -13301,8 +13301,6 @@ class updateInventoryTask implements Runnable {
 
 						orbs.setAmount(cost);
 						anvilInv.setItem(LEVELS, orbs);
-
-						anvilInv.setItem(OUTPUT, anvilInv.getItem(INPUT).clone());
 						
 						// Change entry matching modified lore
 						List<String> bonusesLore = anvilInv.getItem(OUTPUT).getItemMeta().getLore();
@@ -13374,8 +13372,6 @@ class updateInventoryTask implements Runnable {
 
 						orbs.setAmount(cost);
 						anvilInv.setItem(LEVELS, orbs);
-
-						anvilInv.setItem(OUTPUT, anvilInv.getItem(INPUT).clone());
 
 						// Change entry matching modified lore
 						List<String> bonusesLore = anvilInv.getItem(OUTPUT).getItemMeta().getLore();
