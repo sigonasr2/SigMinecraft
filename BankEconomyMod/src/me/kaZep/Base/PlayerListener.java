@@ -1560,6 +1560,7 @@ implements Listener
 			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest8", Boolean.valueOf(false));
 			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest9", Boolean.valueOf(false));
 			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest10", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName()+".bonus.witherskeleton", Integer.valueOf(0));
 			this.plugin.saveAccountsConfig();
 			System.out.println("[BankEconomy] Bank account created for " + p.getName() + ".");
 			if (playerwhitelisted) {
@@ -1581,6 +1582,10 @@ implements Listener
 			p.sendMessage("----------------------------");
 			p.sendMessage(ChatColor.YELLOW+"Current Money Balance: $ "+df.format(Main.economy.bankBalance(p.getName()).balance)+", Bank Balance: $"+df.format(this.plugin.getAccountsConfig().getDouble(p.getName()+".money")));
 			//Update account information for the stat point update.
+			if (!this.plugin.getAccountsConfig().contains(p.getName() + ".bonus.witherskeleton")) {
+				this.plugin.getAccountsConfig().set(p.getName()+".bonus.witherskeleton", Integer.valueOf(0));
+				this.plugin.saveAccountsConfig();
+			}
 			if (!this.plugin.getAccountsConfig().contains(p.getName() + ".stats.stat1")) {
 				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat1", Integer.valueOf(0));
 				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat2", Integer.valueOf(0));
@@ -6040,6 +6045,9 @@ implements Listener
 			}
 			if (f.getKiller()!=null && f.getKiller().getType()==EntityType.PLAYER) {
 				Player p = f.getKiller();
+				if (f.getType()==EntityType.SKELETON && ((Skeleton)f).getSkeletonType()==SkeletonType.WITHER) {
+					this.plugin.getAccountsConfig().set(p.getName()+".bonus.witherskeleton", Integer.valueOf(this.plugin.getAccountsConfig().getInt(p.getName()+".bonus.witherskeleton"))+1);
+				}
 				for (int x=-10;x<10;x++) {
 					for (int y=-3;y<3;y++) {
 						for (int z=-10;z<10;z++) {
