@@ -3457,7 +3457,17 @@ public void updateTime() {
 	  				  }
 	  			  }
 	  		  }
-  			Bukkit.getWorld("world").setFullTime(Bukkit.getWorld("world").getFullTime()-4);
+  			//Bukkit.getWorld("world").setFullTime(Bukkit.getWorld("world").getFullTime()-4);
+	  		  if (last_world_time==0) {
+				  last_world_time = Bukkit.getWorld("world").getFullTime();
+			  } else {
+				  int raisecount=0;
+				  while (Bukkit.getWorld("world").getFullTime()-last_world_time>=2) {
+					  last_world_time+=2;
+					  raisecount++;
+				  }
+				Bukkit.getWorld("world").setFullTime(Bukkit.getWorld("world").getFullTime()-raisecount);
+			  }
     	}
     }
     , 8, 8);

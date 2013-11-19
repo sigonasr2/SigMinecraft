@@ -1279,16 +1279,16 @@ implements Listener
 		}
 	}
 
-	/*
+
   @EventHandler
   public void onPlayerWakeup(PlayerBedLeaveEvent e) {
 	Player p = e.getPlayer();
 	//p.sendMessage("Wakeup at "+Bukkit.getWorld("world").getTime());
 	if (Bukkit.getWorld("world").getTime()==0) {
-		Bukkit.getWorld("world").setTime90
+		this.plugin.last_world_time=0;
 	}
 	return;
-  }*/
+  }
 
 	@EventHandler
 	public void onPlayerSneak(PlayerToggleSneakEvent e) {
