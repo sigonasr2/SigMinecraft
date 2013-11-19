@@ -13,8 +13,8 @@ import org.bukkit.plugin.Plugin;
 //deposit, choosing the closest one.
 public class RecyclingCenterNode {
 	
-	public static double chanceincrease = 1.0; //The amount of chance that each item will increase the chest as it gets placed. Increase this for less items.
-	public static double chestdecrease = 0.2; //The amount of chance that each item will decrease the chest. Increase this for more items.
+	public static double chanceincrease = 3.0; //The amount of chance that each item will increase the chest as it gets placed. Increase this for less items.
+	public static double chestdecrease = 0.05; //The amount of chance that each item will decrease the chest. Increase this for more items.
 	List<Location> locations; //List of all chest locations for this Node.
 	int itemslot; //Stores the current item we are on in that chest. From 0-26.
 	double chance; //The chance we will let an item in. This increases over time to prevent overpopulation.
