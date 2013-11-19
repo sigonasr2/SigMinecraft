@@ -206,7 +206,30 @@ implements Listener
 	}
 
 	enum Cube { SMALL, LARGE, ENDER }
-
+	
+	public boolean naturalBlock(Material mat) {
+		List<Material> natural_mats = new ArrayList<Material>();
+		natural_mats.add(Material.DIRT);
+		natural_mats.add(Material.STONE);
+		natural_mats.add(Material.WOOD);
+		natural_mats.add(Material.FENCE);
+		natural_mats.add(Material.GRAVEL);
+		natural_mats.add(Material.SAND);
+		natural_mats.add(Material.CLAY);
+		natural_mats.add(Material.WEB);
+		natural_mats.add(Material.IRON_ORE);
+		natural_mats.add(Material.GOLD_ORE);
+		natural_mats.add(Material.DIAMOND_ORE);
+		natural_mats.add(Material.EMERALD_ORE);
+		natural_mats.add(Material.LAPIS_ORE);
+		natural_mats.add(Material.REDSTONE_ORE);
+		if (natural_mats.contains(mat)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public void updateTopSPLEEFSigns() {
 		String name[] = {"","",""};
 		int rating[] = {-9999,-9999,-9999}, wins[] = {0,0,0}, losses[] = {0,0,0};
@@ -3177,7 +3200,7 @@ implements Listener
 						for (int k=2;k>-1;k--) {
 							for (int l=5;l>-6;l--) {
 								Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(20+j,k,spread+l));
-								if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE || b.getType()==Material.COMMAND || b.getType()==Material.MOSSY_COBBLESTONE) {
+								if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE || b.getType()==Material.COMMAND || b.getType()==Material.MOSSY_COBBLESTONE && !naturalBlock(b.getType())) {
 									torch1=true;
 								}
 							}
@@ -3189,7 +3212,7 @@ implements Listener
 							for (int k=2;k>-1;k--) {
 								for (int l=lb2;l>-ub2;l--) {
 									Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(10+j,k,spread+l));
-									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME) {
+									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && !naturalBlock(b.getType())) {
 										b.setType(Material.AIR);
 									}
 								}
@@ -3203,7 +3226,7 @@ implements Listener
 						for (int k=2;k>-1;k--) {
 							for (int l=5;l>-6;l--) {
 								Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(-10+j,k,spread+l));
-								if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE || b.getType()==Material.COMMAND || b.getType()==Material.MOSSY_COBBLESTONE) {
+								if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE || b.getType()==Material.COMMAND || b.getType()==Material.MOSSY_COBBLESTONE && !naturalBlock(b.getType())) {
 									torch2=true;
 								}
 							}
@@ -3215,7 +3238,7 @@ implements Listener
 							for (int k=2;k>-1;k--) {
 								for (int l=lb2;l>-ub2;l--) {
 									Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(-10+j,k,spread+l));
-									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME) {
+									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && !naturalBlock(b.getType())) {
 										b.setType(Material.AIR);
 									}
 								}
@@ -7601,17 +7624,17 @@ implements Listener
 						for (int j=-1;j<2;j++) {
 							Location checkloc = enemy.getLocation().add(k,1,j);
 							Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && !naturalBlock(bl.getType())) {
 								bl.breakNaturally();
 							}
 							bl = Bukkit.getWorld("world").getBlockAt(checkloc);
 							checkloc = enemy.getLocation().add(k,2,j);
-							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && !naturalBlock(bl.getType())) {
 								bl.breakNaturally();
 							}
 							bl = Bukkit.getWorld("world").getBlockAt(checkloc);
 							checkloc = enemy.getLocation().add(k,0,j);
-							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && !naturalBlock(bl.getType())) {
 								bl.breakNaturally();
 							}
 						}
@@ -7702,17 +7725,17 @@ implements Listener
 							for (int j=-2;j<3;j++) {
 								Location checkloc = enemy.getLocation().add(k,1,j);
 								Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && !naturalBlock(bl.getType())) {
 									bl.breakNaturally();
 								}
 								bl = Bukkit.getWorld("world").getBlockAt(checkloc);
 								checkloc = enemy.getLocation().add(k,2,j);
-								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && !naturalBlock(bl.getType())) {
 									bl.breakNaturally();
 								}
 								bl = Bukkit.getWorld("world").getBlockAt(checkloc);
 								checkloc = enemy.getLocation().add(k,0,j);
-								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && !naturalBlock(bl.getType())) {
 									bl.breakNaturally();
 								}
 							}
@@ -9629,10 +9652,15 @@ implements Listener
 			//Regardless of the inventory, if we try to put it inside a chest, got to try to insert it in there.
 			if (event.getCurrentItem()!=null) {
 				if (event.getCursor()!=null && event.getSlotType()!=SlotType.RESULT && event.getCursor().getType()!=Material.AIR && (event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST) && event.getClick()==ClickType.LEFT) {
-					event.setCursor(insertIntoItemCube(p, event.getCurrentItem(), event.getCursor()));
-					p.updateInventory();
-					event.setCancelled(true);
-					return;
+					ItemStack extra_item = insertIntoItemCube(p, event.getCurrentItem(), event.getCursor());
+					if (!extra_item.equals(event.getCursor())) {
+						//If the items don't match, it means something happened to the items, so some got inserted into the Item Cube.
+						//If they are the same,  instead we will simply swap them. Normal functionality.
+						event.setCursor(extra_item);
+						p.updateInventory();
+						event.setCancelled(true);
+						return;
+					}
 				}
 			}
 		}
@@ -12074,7 +12102,7 @@ implements Listener
 			}
 			return ItemCube_add(p, identifier, cube_type, insert_item);
 		}
-		return new ItemStack(Material.AIR); //Something went wrong. Just return a blank item.
+		return new ItemStack(insert_item); //Something went wrong. Just return the item itself so it's back to the player. So we don't get rid of it.
 	}
 
 	@EventHandler
