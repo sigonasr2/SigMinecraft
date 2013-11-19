@@ -18,6 +18,8 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 //import net.minecraft.server.v1_4_R1.EntityWolf;
 
+
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -9751,8 +9753,11 @@ implements Listener
 					boolean anvilClicked = false;
 
 					Bukkit.getLogger().info("Anvil interface CLICK at slot #" + event.getRawSlot());
-					
-					if (event.getRawSlot() < 27) {
+
+					if (event.getRawSlot() == -999) {
+						anvilClicked = false;
+						Bukkit.getLogger().info("Window exterior clicked.");
+					} else if (event.getRawSlot() < 27) {
 						anvilClicked = true;
 						Bukkit.getLogger().info("Anvil clicked.");
 					} else {
@@ -9792,11 +9797,11 @@ implements Listener
 								} else {
 									Bukkit.getLogger().info("Player has sufficient XP.");
 									if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
-										
+
 										Bukkit.getLogger().info("Anvil OUTPUT click with non-null mouse. Mouse has: " + event.getCursor());
 
 										event.setCancelled(true); // Cancel event if cursor is not empty
-										
+
 										if (event.isShiftClick()) {
 											// Attempts to store the item in the player's inventory.
 											// If it succeeds, remove the item from the anvil
@@ -9808,9 +9813,9 @@ implements Listener
 													.addItem(
 															event.getInventory().getContents()[OUTPUT])
 															.isEmpty()) {
-												
+
 												Bukkit.getLogger().info("Can place into inventory.");
-												
+
 												event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
 												event.getInventory().setItem(MATERIALS, new ItemStack(Material.AIR));
 												event.getInventory().setItem(MAGIC, new ItemStack(Material.AIR));
@@ -9819,7 +9824,7 @@ implements Listener
 												Bukkit.getPlayer(event.getWhoClicked().getName()).setLevel(Bukkit.getPlayer(event.getWhoClicked().getName()).getLevel() - event.getInventory().getContents()[LEVELS].getAmount());
 
 												Bukkit.getLogger().info("Item is: " + event.getInventory().getItem(OUTPUT));												
-												
+
 												// Play anvil sound
 												if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("IRON") || 
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("GOLD") ||
@@ -9836,20 +9841,20 @@ implements Listener
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("FISHING")) {
 													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.ARROW_HIT, 10, 1);
 												}
-												
+
 												event.getInventory().setItem(OUTPUT, new ItemStack(Material.AIR));
 												Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
 
 											}
 										}
 									} else {
-										
+
 										Bukkit.getLogger().info("Anvil OUTPUT click with null mouse.");
 
-										
+
 										if (event.isShiftClick()) {
 											event.setCancelled(true); // Cancel event if Shift-Click, run checks
-											
+
 											// Attempts to store the item in the player's inventory.
 											// If it succeeds, remove the item from the anvil
 											// interface.
@@ -9860,9 +9865,9 @@ implements Listener
 													.addItem(
 															event.getInventory().getContents()[OUTPUT])
 															.isEmpty()) {
-												
+
 												Bukkit.getLogger().info("Can place into inventory.");
-												
+
 												event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
 												event.getInventory().setItem(MATERIALS, new ItemStack(Material.AIR));
 												event.getInventory().setItem(MAGIC, new ItemStack(Material.AIR));
@@ -9898,10 +9903,10 @@ implements Listener
 											event.getInventory().setItem(MATERIALS, new ItemStack(Material.AIR));
 											event.getInventory().setItem(MAGIC, new ItemStack(Material.AIR));
 											// event.getInventory().setItem(OUTPUT, new ItemStack(Material.AIR));
-	
+
 											// Set XP
 											Bukkit.getPlayer(event.getWhoClicked().getName()).setLevel(Bukkit.getPlayer(event.getWhoClicked().getName()).getLevel() - event.getInventory().getContents()[LEVELS].getAmount());
-											
+
 											// Play anvil sound
 											if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("IRON") || 
 													event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("GOLD") ||
@@ -9918,7 +9923,7 @@ implements Listener
 													event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("FISHING")) {
 												Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.ARROW_HIT, 10, 1);
 											}
-											
+
 											Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
 
 										}
@@ -9944,6 +9949,7 @@ implements Listener
 
 								Bukkit.getLogger().info("Anvil INPUT click with this item on mouse: " + event.getCursor().getType().toString());
 
+								/*
 								if (event.getCursor().getType().toString().toUpperCase().contains("HELMET") || event.getCursor().getType().toString().toUpperCase().contains("CHESTPLATE") || 
 										event.getCursor().getType().toString().toUpperCase().contains("LEGGINGS") || event.getCursor().getType().toString().toUpperCase().contains("BOOTS") ||
 										event.getCursor().getType().toString().toUpperCase().contains("PICKAXE") || event.getCursor().getType().toString().toUpperCase().contains("SPADE") || 
@@ -9952,12 +9958,13 @@ implements Listener
 										event.getCursor().getType().toString().toUpperCase().contentEquals("BOW")) {
 									valid = true;
 								}
-								
+
 								if (event.getCursor().getDurability() == 0)
 								{
 									// Can't put fully repaired item into input slot. 
 									valid = false;
 								}
+								 */
 							} else if (event.getSlotType() == SlotType.CONTAINER && event.getSlot() == MATERIALS) {
 
 								/* 
@@ -9967,13 +9974,16 @@ implements Listener
 
 								Bukkit.getLogger().info("Anvil MATERIALS click with this item on mouse: " + event.getCursor().getType().toString());
 
+								/*
 								if (event.getCursor().getType() == Material.LEATHER || event.getCursor().getType() == Material.IRON_INGOT || 
 										event.getCursor().getType() == Material.GOLD_INGOT || event.getCursor().getType() == Material.IRON_BLOCK || 
 										event.getCursor().getType() == Material.DIAMOND_BLOCK || event.getCursor().getType() == Material.DIAMOND ||
 										event.getCursor().getType() == Material.WOOD || event.getCursor().getType() == Material.COBBLESTONE || 
+										event.getCursor().getType() == Material.LOG || event.getCursor().getType() == Material.STONE || 
 										event.getCursor().getType() == Material.STRING) {
 									valid = true;
 								}
+								 */
 							} else if (event.getSlotType() == SlotType.CONTAINER && event.getSlot() == MAGIC) {
 
 								/* 
@@ -9992,6 +10002,7 @@ implements Listener
 								 */
 							}
 
+							/*
 							if (!valid) {
 								event.setCancelled(true);
 							} else {
@@ -9999,6 +10010,8 @@ implements Listener
 								// Set up anvil inventory update scheduler
 								Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
 							}
+							 */
+							Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
 						} else {
 							event.setCancelled(true);
 						}
@@ -10013,7 +10026,7 @@ implements Listener
 						optionsClicked = false;
 						// Bukkit.getLogger().info("Inventory clicked.");
 					}
-					
+
 					if (optionsClicked && (event.getSlot() % 9 == 2 || event.getSlot() % 9 == 6)) {
 						if (event.getInventory().getContents()[event.getSlot()].getType()==Material.REDSTONE_TORCH_OFF) {
 							event.getInventory().getContents()[event.getSlot()].setType(Material.REDSTONE_TORCH_ON);
