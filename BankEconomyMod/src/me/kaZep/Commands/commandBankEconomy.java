@@ -1496,7 +1496,7 @@ public String convertToItemName(String val) {
 	        	  for (int i=0;i<nearby.size();i++) {
 	        		  if (nearby.get(i) instanceof Monster) {
 	        			  LivingEntity l = (LivingEntity)nearby.get(i);
-	        			  if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.DARK_PURPLE+"") && l.getCustomName().contains(ChatColor.DARK_AQUA+"")) {
+	        			  if (l.getCustomName().contains(ChatColor.DARK_PURPLE+"") && l.getCustomName().contains(ChatColor.DARK_AQUA+"")) {
 	        				  
 	        			  } else {
 	        				  nearby.get(i).remove();
