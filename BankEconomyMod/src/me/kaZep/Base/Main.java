@@ -4722,7 +4722,7 @@ public void payDay(int time)
     }
     
     public boolean is_ItemCube(ItemStack item_cube) {
-		if (item_cube.hasItemMeta() && item_cube.getItemMeta().getLore()!=null) {
+		if (item_cube.hasItemMeta() && item_cube.getItemMeta().hasLore()) {
 			//Check to see if the Lore contains anything.
 			for (int i=0;i<item_cube.getItemMeta().getLore().size();i++) {
 				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.")) {

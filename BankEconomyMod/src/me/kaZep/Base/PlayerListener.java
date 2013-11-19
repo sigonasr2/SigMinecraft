@@ -9688,7 +9688,7 @@ implements Listener
 		}
 		if (event.getInventory().getType()==InventoryType.CRAFTING /*|| event.getInventory().getType()==InventoryType.CHEST*//*Buggy for some reason. We can't open chests in chests.*/) {
 			if (event.getCurrentItem()!=null) {
-				if ((event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST) && event.getClick()==ClickType.RIGHT && event.getCurrentItem().hasItemMeta()) {
+				if (isItemCube(event.getCurrentItem()) && event.getClick()==ClickType.RIGHT && event.getCurrentItem().hasItemMeta()) {
 					if (isItemCube(event.getCurrentItem())) {
 						//Only cancel the event and view the Item Cube if it actually is one.
 						viewItemCube(p, event.getCurrentItem());
@@ -12182,7 +12182,7 @@ implements Listener
 				e.setCancelled(true);
 				return;
 			}
-			if (p.getItemInHand()!=null && (p.getItemInHand().getType()==Material.CHEST || p.getItemInHand().getType()==Material.TRAPPED_CHEST || p.getItemInHand().getType()==Material.ENDER_CHEST)) {
+			if (p.getItemInHand()!=null && isItemCube(p.getItemInHand())) {
 				viewItemCube(p, p.getItemInHand());
 				e.setCancelled(true);
 				return;
