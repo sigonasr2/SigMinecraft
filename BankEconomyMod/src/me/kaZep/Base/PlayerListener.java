@@ -9715,7 +9715,10 @@ implements Listener
 
 					Bukkit.getLogger().info("Anvil interface CLICK at slot #" + event.getRawSlot());
 					
-					if (event.getRawSlot() < 27) {
+					if (event.getRawSlot() == -999) {
+						anvilClicked = false;
+						Bukkit.getLogger().info("Window exterior clicked.");
+					} else if (event.getRawSlot() < 27) {
 						anvilClicked = true;
 						Bukkit.getLogger().info("Anvil clicked.");
 					} else {
@@ -12818,30 +12821,25 @@ class updateInventoryTask implements Runnable {
 		final int LEVELS = 22;
 
 
-
+		// Redundant validation code for verification
 		
-		if (anvilInv.getItem(INPUT) == null || anvilInv.getItem(MATERIALS) == null) {
-			// No valid combo, set XP orb to stack size 1 and remove output. 
-			anvilInv.getItem(LEVELS).setAmount(1);
-			anvilInv.setItem(OUTPUT, new ItemStack(Material.AIR));
-		}
-		else
-		{
-			// Redundant validation code for verification
-			
-
-			if (!((anvilInv.getItem(INPUT).toString().toUpperCase().contains("HELMET") || anvilInv.getItem(INPUT).toString().toUpperCase().contains("CHESTPLATE") || 
-					anvilInv.getItem(INPUT).toString().toUpperCase().contains("LEGGINGS") || anvilInv.getItem(INPUT).toString().toUpperCase().contains("BOOTS") ||
-					anvilInv.getItem(INPUT).toString().toUpperCase().contains("PICKAXE") || anvilInv.getItem(INPUT).toString().toUpperCase().contains("SPADE") || 
-					anvilInv.getItem(INPUT).toString().toUpperCase().contains("HOE") || anvilInv.getItem(INPUT).toString().toUpperCase().contains("AXE") ||
-					anvilInv.getItem(INPUT).toString().toUpperCase().contains("SWORD") || anvilInv.getItem(INPUT).toString().toUpperCase().contains("FISHING") || 
-					anvilInv.getItem(INPUT).toString().toUpperCase().contentEquals("BOW")) && anvilInv.getItem(INPUT).getDurability() != 0)) {
+		if (anvilInv.getItem(INPUT) != null) {
+			if (!((anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("HELMET") || anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("CHESTPLATE") || 
+					anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("LEGGINGS") || anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("BOOTS") ||
+					anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("PICKAXE") || anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("SPADE") || 
+					anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("HOE") || anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("AXE") ||
+					anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("SWORD") || anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("FISHING") || 
+					anvilInv.getItem(INPUT).getType().toString().toUpperCase().contentEquals("BOW")) && anvilInv.getItem(INPUT).getDurability() != 0)) {
 				
 				sendToInventory(INPUT, anvilInv.getItem(INPUT).getAmount(), player);
 				Bukkit.getLogger().info("Invalid input!");
+			} else {
+				Bukkit.getLogger().info("Valid input, " + anvilInv.getItem(INPUT).toString().toUpperCase() + " with durability " + anvilInv.getItem(INPUT).getDurability());
 			}
+		}
 
 
+		if (anvilInv.getItem(MATERIALS) != null) {
 			if (!(anvilInv.getItem(MATERIALS).getType() == Material.LEATHER || anvilInv.getItem(MATERIALS).getType() == Material.IRON_INGOT || 
 					anvilInv.getItem(MATERIALS).getType() == Material.GOLD_INGOT || anvilInv.getItem(MATERIALS).getType() == Material.IRON_BLOCK || 
 					anvilInv.getItem(MATERIALS).getType() == Material.DIAMOND_BLOCK || anvilInv.getItem(MATERIALS).getType() == Material.DIAMOND ||
@@ -12851,8 +12849,29 @@ class updateInventoryTask implements Runnable {
 				sendToInventory(MATERIALS, anvilInv.getItem(MATERIALS).getAmount(), player);
 
 				Bukkit.getLogger().info("Invalid materials!");
+			} else {
+				Bukkit.getLogger().info("Valid materials, " + anvilInv.getItem(MATERIALS).toString().toUpperCase() + " with durability " + anvilInv.getItem(MATERIALS).getDurability());
 			}
+		}
+		
+		if (anvilInv.getItem(INPUT) == null || anvilInv.getItem(MATERIALS) == null) {
+			// No valid combo, set XP orb to stack size 1 and remove output. 
+			anvilInv.setItem(OUTPUT, new ItemStack(Material.AIR));
+			ItemStack orbs = new ItemStack(Material.SLIME_BALL);
+			ItemMeta temp_meta = orbs.getItemMeta();
+			temp_meta.setDisplayName(ChatColor.YELLOW + "Experience Cost");
+			List<String> temp_meta_lore = new ArrayList<String>();
+			temp_meta_lore.add(ChatColor.ITALIC	+ "Experience Cost of Enchanting.");			
+			temp_meta.setLore(temp_meta_lore);
+			orbs.setItemMeta(temp_meta);
+			anvilInv.setItem(LEVELS, orbs);
 			
+			// TRY EVERYTHING
+			player.getInventory().setContents(player.getInventory().getContents());
+			anvilInv.setContents(anvilInv.getContents());
+			player.updateInventory();
+		} else {
+			// Both repair slots are populated.
 			// Verify the right material is combined with the source item.
 			boolean validCombo = false;
 			double multiplier = 0;
@@ -13019,17 +13038,20 @@ class updateInventoryTask implements Runnable {
 			player.getInventory().setContents(player.getInventory().getContents());
 			anvilInv.setContents(anvilInv.getContents());
 			player.updateInventory();
-
 		}
 	}
 	
 	public void sendToInventory(int slot, int itemCount, Player player) {
+		Bukkit.getLogger().info("Slot: " + slot);
+		Bukkit.getLogger().info("Item Count: " + itemCount);
+		Bukkit.getLogger().info("Player: " + player.getDisplayName());
+
 		// Get inventories
 		Inventory anvilInventory = player.getOpenInventory().getTopInventory();
 		Inventory playerInventory = player.getOpenInventory().getBottomInventory();
 		
 		// Get a temporary item stack to transfer
-		ItemStack temp = anvilInventory.getItem(slot);
+		ItemStack temp = anvilInventory.getItem(slot).clone();
 		temp.setAmount(itemCount);
 		
 		// Attempt to add to the player inventory. Store leftovers in itemstack to be dropped.
@@ -13039,13 +13061,18 @@ class updateInventoryTask implements Runnable {
 			player.getWorld().dropItemNaturally(player.getLocation(), leftovers); 
 		}
 
-		anvilInventory.getItem(slot).setAmount(anvilInventory.getItem(slot).getAmount() - itemCount);
+
+		Bukkit.getLogger().info("Slot stack size is " + anvilInventory.getItem(slot).getAmount());
+
 		
-		if (anvilInventory.getItem(slot).getAmount() == 0) {
-			
+		if (anvilInventory.getItem(slot).getAmount() - itemCount == 0) {
+			// Should reduce stack count to zero, meaning item needs to be removed. 
 			Bukkit.getLogger().info("Item stack size reduced to 0, " + anvilInventory.getItem(slot).getType().toString() + " removed.");
-			anvilInventory.setItem(slot, new ItemStack(Material.AIR));
-			
+			anvilInventory.setItem(slot, new ItemStack(Material.AIR));			
+		} else {
+			// Should set stack size. 
+			Bukkit.getLogger().info("Reduced stack size from " + anvilInventory.getItem(slot).getAmount() + " by " + itemCount);
+			anvilInventory.getItem(slot).setAmount(anvilInventory.getItem(slot).getAmount() - itemCount);
 		}
 		// player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(anvilInv.getItem(MATERIALS).getType(), anvilInv.getItem(MATERIALS).getAmount() - maxItemsNeeded));
 
