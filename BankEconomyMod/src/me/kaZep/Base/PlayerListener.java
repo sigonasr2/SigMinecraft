@@ -10584,7 +10584,7 @@ implements Listener
 			}
 
 			//There is a small chance we can swap items between two centers.
-			if (Math.random()<=0.20) {
+			if (Math.random()<=0.01) {
 				//Get the first center. It's randomly picked.
 				if (this.plugin.recycling_center_list.size()<=2) {
 					//If there are only two centers in the list, it has to be those two...
