@@ -65,6 +65,8 @@ import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.Skeleton.SkeletonType;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Zombie;
@@ -2083,6 +2085,13 @@ implements Listener
 					l.setHealth(l.getMaxHealth());
 				}
 			}
+		  if (Math.random()<=0.003 && l.getLocation().getY()>=60) {
+			  Skeleton s = (Skeleton)l;
+			  s.setSkeletonType(SkeletonType.WITHER);
+			  s.setMaxHealth(150);
+			  s.setHealth(s.getMaxHealth());
+			  s.getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD));
+		  }
 		}break;
 		case SLIME: {
 		}break;
