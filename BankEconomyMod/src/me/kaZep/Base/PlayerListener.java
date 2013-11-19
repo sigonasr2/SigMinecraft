@@ -10588,6 +10588,9 @@ implements Listener
 				)) {
 			allow=false;
 		}
+		if (i.getItemStack().getType()==Material.BEDROCK) { //Add a hard check.
+			allow=false;
+		}
 		//p.sendMessage("Item "+i.getItemStack().getItemMeta().getDisplayName()+" despawned.");// <-- CHECK THIS FOR NULL TO DETERMINE IF IT'S A REAL ITEM.
 		//String metastring = "Has name: "+i.getItemStack().getItemMeta().hasDisplayName();
 		//p.sendMessage(metastring);

@@ -1,7 +1,9 @@
-package me.kaZep.Base;
+package src.me.kaZep.Base;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import me.kaZep.Base.Main;
 
 import org.bukkit.Location;
 import org.bukkit.block.Chest;
