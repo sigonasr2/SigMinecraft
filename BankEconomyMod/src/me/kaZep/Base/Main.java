@@ -1261,10 +1261,6 @@ public void runTick() {
 													  //ev.setTicksLived(0);
 													  exists=true;
 												  }
-											  } else {
-												  if (Math.random()<=0.5) {
-													  ev.remove();
-												  }
 											  }
 										  }
 									  }
@@ -1289,11 +1285,10 @@ public void runTick() {
 										  meta.setOwner("MHF_Enderman");
 										  skull.setItemMeta(meta);
 										  zombie.getEquipment().setHelmet(skull);
+										  
 										  enderdragon.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
-										  enderdragon.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,127,999999));
 										  enderdragon.setMaxHealth(200);
 										  enderdragon.setHealth(200);
-										  enderdragon.setRemoveWhenFarAway(false);
 										  enderdragon.remove();
 										  //enderdragon.teleport(new Location(p.getWorld(),p.getLocation().getBlockX()+i,-250,p.getLocation().getBlockZ()+j));
 										  //p.sendMessage(ChatColor.DARK_PURPLE+"You feel a dark presence nearby.");
@@ -2862,28 +2857,6 @@ public void checkJukeboxes() {
 	    				z4.setCustomNameVisible(false);
 	    				z4.setTarget(list[i]);
     				}*/
-    			}
-    			if (list[i].getWorld().getName().compareTo("world_the_end")==0) {
-    				List<Entity> ents = Bukkit.getWorld("world_the_end").getEntities();
-    				int enderdragoncount=0;
-    				for (int j=0;j<ents.size();j++) {
-    					if (ents.get(j).getType()==EntityType.ENDER_DRAGON) {
-    						if (enderdragoncount==0) {
-    							enderdragoncount=1;
-    						} else {
-    							ents.get(j).remove();
-    						}
-    					}
-    				}
-    			}
-    			if (list[i].getWorld().getName().compareTo("world")==0) {
-    				List<Entity> ents = Bukkit.getWorld("world").getEntities();
-    				int enderdragoncount=0;
-    				for (int j=0;j<ents.size();j++) {
-    					if (ents.get(j).getType()==EntityType.ENDER_DRAGON) {
-    							ents.get(j).remove();
-    					}
-    				}
     			}
     			/* Kind of an out-of-date way to spawn things. Don't need anymore.
                 //Find out how much a player is worth.

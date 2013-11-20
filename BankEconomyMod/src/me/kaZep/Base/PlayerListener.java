@@ -2219,7 +2219,8 @@ implements Listener
 		//Special reasons that should always happen.
 		if (e.getSpawnReason()==SpawnReason.SPAWNER || e.getSpawnReason()==SpawnReason.BUILD_IRONGOLEM || e.getSpawnReason()==SpawnReason.BREEDING ||
 				e.getSpawnReason()==SpawnReason.BUILD_SNOWMAN || e.getSpawnReason()==SpawnReason.BUILD_WITHER || e.getSpawnReason()==SpawnReason.LIGHTNING ||
-				e.getSpawnReason()==SpawnReason.SPAWNER_EGG || e.getSpawnReason()==SpawnReason.VILLAGE_DEFENSE || e.getSpawnReason()==SpawnReason.VILLAGE_INVASION) {
+				e.getSpawnReason()==SpawnReason.SPAWNER_EGG || e.getSpawnReason()==SpawnReason.VILLAGE_DEFENSE || e.getSpawnReason()==SpawnReason.VILLAGE_INVASION ||
+				e.getSpawnReason()==SpawnReason.CUSTOM) {
 			return true;
 		}
 
@@ -6635,9 +6636,16 @@ implements Listener
 		}
 	}
 
-	final public void FatalSurvivor(Player p) {
+	final public void FatalSurvivor(final Player p) {
 		p.setHealth(p.getMaxHealth());
+		p.setMaximumNoDamageTicks(100);
 		p.setNoDamageTicks(100);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+			@Override
+			public void run() { //After 5 seconds, set the no Damage Ticks back to normal.
+				p.setMaximumNoDamageTicks(20);
+			}
+		},100);
 		p.sendMessage("You used your "+ChatColor.YELLOW+"Lv10 Fatal Survivor"+ChatColor.WHITE+" buff. Your health has been restored."+ChatColor.AQUA+" It will be recharged in one hour.");
 		Bukkit.broadcastMessage(ChatColor.YELLOW+p.getName()+ChatColor.WHITE+" has died...and revived through sheer willpower!");
 		p.setFireTicks(0);
@@ -6703,7 +6711,6 @@ implements Listener
 					}
 				}
 			}
-			//e.getCause()==DamageCause.
 			final double player_starthp = p.getHealth();
 			if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify5") && e.getCause()!=DamageCause.ENTITY_ATTACK && e.getCause()!=DamageCause.ENTITY_EXPLOSION && e.getDamage()!=0) {
 				final Main plugin = this.plugin;
@@ -6915,11 +6922,7 @@ implements Listener
 				if (l.getHealth()>=1) {
 					LivingEntity enderdragon = (LivingEntity)Bukkit.getWorld("world").spawnEntity(new Location(l.getWorld(),l.getLocation().getBlockX(),-250,l.getLocation().getBlockZ()),EntityType.ENDER_DRAGON);
 					enderdragon.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
-					enderdragon.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,127,999999));
-					enderdragon.setMaxHealth(200);
 					enderdragon.setHealth(Warning(l.getHealth()/l.getMaxHealth()*200,7));
-					enderdragon.setNoDamageTicks(999999);
-					enderdragon.setRemoveWhenFarAway(false);
 					enderdragon.remove();
 				}
 				Iterator<EnderDragon> e_list = Bukkit.getWorld("world").getEntitiesByClass(EnderDragon.class).iterator();
