@@ -1942,11 +1942,10 @@ implements Listener
 		}
 	}
 
-	private boolean isPermanentSpawn(CreatureSpawnEvent e, LivingEntity l) {
+	public boolean isPermanentSpawn(CreatureSpawnEvent e, LivingEntity l) {
 		//Will return true if it's something that is not allowed to despawn. False if we are allowed to get rid of it.
 		//Basically this is the control that will determine if the mob stays or goes, before further processing is done.
 		//If the mob is identified as a special mob...
-
 		EntityType type = l.getType();
 
 		//heightmodifier determines if it's a super tall chunk or a normal sized one.
@@ -8868,6 +8867,7 @@ implements Listener
 			e.setCancelled(true);
 		}
 		if (e.getItemInHand().getType()==Material.getMaterial(127)) {
+			p.updateInventory();
 			e.setCancelled(true);
 		}
 		if (this.plugin.is_ItemCube(e.getItemInHand())) {
