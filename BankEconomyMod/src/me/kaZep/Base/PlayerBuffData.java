@@ -191,7 +191,7 @@ public class PlayerBuffData {
 			}
 			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat2")>0) {
 				p.removePotionEffect(PotionEffectType.FAST_DIGGING);
-				p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,399,this.plugin.getStatBonus(1, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat2")/4)/20-1));
+				p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,399,this.plugin.getStatBonus(1, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat2")/5)/20-1));
 			}
 			//p.sendMessage("Health: "+p.getHealth()+"/"+p.getMaxHealth()+" Base HP Level: "+base_hplv);
 			if (p.getHealth()>p.getMaxHealth()) {

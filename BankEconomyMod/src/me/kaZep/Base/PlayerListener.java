@@ -8203,6 +8203,27 @@ implements Listener
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent e) {
 		Player p = e.getPlayer();
+		if (e.getItemInHand().getType()==Material.HOPPER) {
+			//Check surrounding blocks to verify it's not a chest.
+			for (int i=-1;i<2;i++) {
+				for (int j=0;j<2;j++) {
+					for (int k=-1;k<2;k++) {
+						if (p.getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(i,j,k)).getType()==Material.CHEST) {
+							//Check to see if it's a recycling center chest.
+							for (int l=0;l<this.plugin.recycling_center_list.size();l++) {
+								for (int m=0;m<this.plugin.recycling_center_list.get(l).locations.size();m++) {
+									if (this.plugin.recycling_center_list.get(l).locations.get(m).getBlock().equals(p.getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(i,j,k)))) {
+										e.setCancelled(true);
+										p.updateInventory();
+										return;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 		if (e.getItemInHand().getType()==Material.PUMPKIN) {
 			if (e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-1,0)).getType()==Material.SNOW_BLOCK &&
 					e.getBlockPlaced().getWorld().getBlockAt(e.getBlockPlaced().getLocation().add(0,-2,0)).getType()==Material.SNOW_BLOCK) {
