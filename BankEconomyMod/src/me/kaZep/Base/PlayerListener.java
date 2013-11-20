@@ -11530,6 +11530,23 @@ implements Listener
 					for (int i=0;i<e.getDrops().size();i++) {
 						drops.add(e.getDrops().get(i));  
 					}
+					final ItemStack helmet_slot = p.getEquipment().getHelmet();
+					final ItemStack chestplate_slot = p.getEquipment().getChestplate();
+					final ItemStack leggings_slot = p.getEquipment().getLeggings();
+					final ItemStack boots_slot = p.getEquipment().getBoots();
+					//Remove them from the drops list, since they will be placed on the player's equipment slots.
+					if (drops.contains(helmet_slot)) {
+						drops.remove(helmet_slot);
+					}
+					if (drops.contains(chestplate_slot)) {
+						drops.remove(chestplate_slot);
+					}
+					if (drops.contains(leggings_slot)) {
+						drops.remove(leggings_slot);
+					}
+					if (drops.contains(boots_slot)) {
+						drops.remove(boots_slot);
+					}
 					//Bukkit.broadcastMessage("Added in "+drops.size()+" drops.");
 					Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 						@Override
@@ -11537,6 +11554,10 @@ implements Listener
 							for (int i=0;i<drops.size();i++) {
 								//Bukkit.broadcastMessage("Giving back "+drops.get(i).getType()+"x"+drops.get(i).getAmount());
 								p.getInventory().addItem(drops.get(i));
+								p.getEquipment().setBoots(boots_slot);
+								p.getEquipment().setChestplate(chestplate_slot);
+								p.getEquipment().setLeggings(leggings_slot);
+								p.getEquipment().setHelmet(helmet_slot);
 							}
 						}
 					},5);

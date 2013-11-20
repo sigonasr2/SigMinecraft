@@ -4754,7 +4754,7 @@ public void payDay(int time)
 				}
 			}
 		}
-		return false;
+		return null;
     }
     
     public int get_ItemCubeID(ItemStack item_cube) {
