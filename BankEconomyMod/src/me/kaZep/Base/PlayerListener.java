@@ -2265,7 +2265,7 @@ implements Listener
 			double chancer=0.10d;
 			double despawnchancer=0.25d;
 
-			if (e.getEntity().getHealth()>65 && e.getEntity().getCustomName()==null /*Meaning it's not a special mob.*/) {
+			if (e.getEntity().getHealth()>65 /*Meaning it's not a special mob.*/) {
 				e.getEntity().remove(); //Too much HP. Nothing should have this much.
 				return;
 			}
@@ -6893,7 +6893,9 @@ implements Listener
 			}
 		  if (e.getEntity().getType()==EntityType.ZOMBIE) {
 			  Zombie z = (Zombie)e.getEntity();
-			  if (z.getCustomName()==null && z.getHealth()>65) {
+			  if ((z.getCustomName()==null || (
+					  z.getCustomName()!=null && (z.getCustomName().contains("II") ||
+							  z.getCustomName().contains("Ninja")))) && z.getHealth()>65) {
 				  //If it's a normal zombie with too much HP, something's wrong. Lower it.
 				  z.setHealth(z.getHealth()/2);
 			  }
