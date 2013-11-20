@@ -1580,11 +1580,19 @@ public String convertToItemName(String val) {
 				        		  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 				        		      @Override
 				        		      public void run() {
-				        		    	  p2.teleport(target2);
+				        		    	  if (target2.isInsideVehicle()) {
+				        		    		  p2.teleport(target2.getLocation().add(0,1,0));
+				        		    	  } else {
+				        		    		  p2.teleport(target2);
+				        		    	  }
 				        		      }
 				        		  	},5);
 				        	  } else {
-				        		  p.teleport(target);
+				        		  if (target.isInsideVehicle()) {
+				        			  p.teleport(target.getLocation().add(0,1,0));
+				        		  } else {
+				        			  p.teleport(target);
+				        		  }
 				        	  }
 			            	} else {
 					          p.sendMessage("You need $"+ChatColor.YELLOW+df.format(finalcost)+" in the bank to teleport to "+ChatColor.GREEN+target.getName()+ChatColor.WHITE+"!");
