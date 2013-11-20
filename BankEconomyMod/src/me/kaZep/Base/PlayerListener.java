@@ -1346,7 +1346,7 @@ implements Listener
 		//笆�笆�
 		int bits=(int)(Math.ceil(curHP/maxHP*10));
 		String bar=" ";
-		if (hunger==20) {
+		if (hunger>=17) {
 			if (bits>6) {
 				bar+=ChatColor.GREEN+"";
 			} else
@@ -7887,6 +7887,10 @@ implements Listener
 					if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat7")>0) {
 						e.setDamage(e.getDamage()+(this.plugin.getStatBonus(6, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat7"))/2));
 					}
+					//Add Armor penetration from the stat point, if any.
+					if (this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4)>0) {
+						armor_pen+=this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4);
+					}
 					if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && armor_pen>0) {
 						double normaldmg=(this.plugin.DMGCALC.getDamage(f.getEquipment().getHelmet(), f.getEquipment().getChestplate(), f.getEquipment().getLeggings(), f.getEquipment().getBoots(), e.getDamage(), DamageCause.ENTITY_ATTACK, false));
 						double throughdmg=(this.plugin.DMGCALC.getDamage(new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), e.getDamage(), DamageCause.ENTITY_ATTACK, false));
@@ -7911,7 +7915,8 @@ implements Listener
 						} else {
 							//This means piercing would do extra damage. Just subtract throughdmg.
 							if (f.getHealth()-throughdmg>0) {
-								f.setHealth(Warning(f,14));
+								f.setHealth(f.getHealth()-throughdmg);
+								armor_pen_dmg=throughdmg;
 								if (f!=null) {
 									if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
 										if (f.getCustomName()!=null) {
@@ -7919,43 +7924,6 @@ implements Listener
 										} else {
 											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getType().getName())+".");
 										}
-									}
-								}
-							} else {
-								f.setHealth(0);
-							}
-						}
-						e.setDamage(0);
-					}
-
-					if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")>0) {
-						//e.setDamage(e.getDamage()+(this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5"))/4));
-						double normaldmg=(this.plugin.DMGCALC.getDamage(f.getEquipment().getHelmet(), f.getEquipment().getChestplate(), f.getEquipment().getLeggings(), f.getEquipment().getBoots(), e.getDamage(), DamageCause.ENTITY_ATTACK, false));
-						double throughdmg=(this.plugin.DMGCALC.getDamage(new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), e.getDamage(), DamageCause.ENTITY_ATTACK, false));
-						if (throughdmg>normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4)) {
-							//This means some piercing can be done.
-							//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4));
-							if (f.getHealth()-(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4))>0) {
-								f.setHealth(Warning(f.getHealth()-(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4)),15));
-								if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
-									if (f.getCustomName()!=null) {
-										//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4))+" damage to "+convertToItemName(f.getCustomName())+".");
-									} else {
-										//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4))+" damage to "+convertToItemName(f.getType().getName())+".");
-									}
-								}
-							} else {
-								f.setHealth(0);
-							}
-						} else {
-							//This means piercing would do extra damage. Just subtract throughdmg.
-							if (f.getHealth()-throughdmg>0) {
-								f.setHealth(Warning(f.getHealth()-throughdmg,16));
-								if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
-									if (f.getCustomName()!=null) {
-										//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
-									} else {
-										//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getType().getName())+".");
 									}
 								}
 							} else {
@@ -8043,6 +8011,10 @@ implements Listener
 						if (dmg>0) {
 							e.setDamage(e.getDamage()+dmg);
 						}
+						//Add Armor penetration from the stat point, if any.
+						if (this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4)>0) {
+							armor_pen+=this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4);
+						}
 						if (e.getEntity() instanceof LivingEntity) {
 							LivingEntity enemy = (LivingEntity)e.getEntity();
 							if (enemy.getCustomName()!=null && (enemy.getCustomName().compareTo(ChatColor.GRAY+"Zombie Ninja")==0)) {
@@ -8113,43 +8085,8 @@ implements Listener
 							} else {
 								//This means piercing would do extra damage. Just subtract throughdmg.
 								if (f.getHealth()-throughdmg>0) {
-									f.setHealth(Warning(f.getHealth()-throughdmg,18));
-									if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
-										if (f.getCustomName()!=null) {
-											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
-										} else {
-											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getType().getName())+".");
-										}
-									}
-								} else {
-									f.setHealth(0);
-								}
-							}
-							e.setDamage(0);
-						}
-						if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")>0) {
-							//e.setDamage(e.getDamage()+(this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5"))/4));
-							double normaldmg=(this.plugin.DMGCALC.getDamage(f.getEquipment().getHelmet(), f.getEquipment().getChestplate(), f.getEquipment().getLeggings(), f.getEquipment().getBoots(), e.getDamage(), DamageCause.ENTITY_ATTACK, false));
-							double throughdmg=(this.plugin.DMGCALC.getDamage(new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), e.getDamage(), DamageCause.ENTITY_ATTACK, false));
-							if (throughdmg>normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4)) {
-								//This means some piercing can be done.
-								//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4));
-								if (f.getHealth()-(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4))>0) {
-									f.setHealth(Warning(f.getHealth()-(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4)),19));
-									if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
-										if (f.getCustomName()!=null) {
-											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4))+" damage to "+convertToItemName(f.getCustomName())+".");
-										} else {
-											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4))+" damage to "+convertToItemName(f.getType().getName())+".");
-										}
-									}
-								} else {
-									f.setHealth(0);
-								}
-							} else {
-								//This means piercing would do extra damage. Just subtract throughdmg.
-								if (f.getHealth()-throughdmg>0) {
-									f.setHealth(Warning(f.getHealth()-throughdmg,20));
+									f.setHealth(f.getHealth()-throughdmg);
+									armor_pen_dmg=throughdmg;
 									if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
 										if (f.getCustomName()!=null) {
 											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");

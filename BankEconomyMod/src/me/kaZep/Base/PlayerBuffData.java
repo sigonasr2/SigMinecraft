@@ -57,7 +57,7 @@ public class PlayerBuffData {
 		//笆�笆�
 		int bits=(int)(Math.ceil(curHP/maxHP*10));
 		String bar=" ";
-		if (hunger==20) {
+		if (hunger>=17) {
 			if (bits>6) {
 				bar+=ChatColor.GREEN+"";
 			} else
