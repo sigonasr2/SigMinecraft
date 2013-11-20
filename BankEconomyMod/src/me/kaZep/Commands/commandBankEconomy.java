@@ -1122,7 +1122,7 @@ public String convertToItemName(String val) {
 					    } else {
 					    	Bukkit.getLogger().warning(("File does not exist."));
 					    }
-					    this.plugin.last_boss_dungeon_time=Bukkit.getWorld("world").getFullTime()+12000;
+					    this.plugin.last_boss_dungeon_time=this.plugin.SERVER_TICK_TIME+12000;
 				  }
 			  if (args[0].equalsIgnoreCase("fatal_survivor") && args[1].equalsIgnoreCase("reset")) {
 				  boolean survivor=false;
@@ -1778,7 +1778,7 @@ public String convertToItemName(String val) {
     					  for (int j=0;j<this.plugin.explorers.size();j++) {
     						  if (this.plugin.explorers.get(j).name.compareToIgnoreCase(p.getName())==0 && this.plugin.explorers.get(j).event==0) {
     							  discovered=true;
-    							  timeleft=this.plugin.explorers.get(j).expiretime-Bukkit.getWorld("world").getFullTime();
+    							  timeleft=this.plugin.explorers.get(j).expiretime-this.plugin.SERVER_TICK_TIME;
     						  }
     					  }
     					  //Add-on message for explorer buff cooldown.
@@ -1812,7 +1812,7 @@ public String convertToItemName(String val) {
 	    					  for (int j=0;j<this.plugin.explorers.size();j++) {
 	    						  if (this.plugin.explorers.get(j).name.compareToIgnoreCase(Bukkit.getPlayer(args[1]).getName())==0 && this.plugin.explorers.get(j).event==0) {
 	    							  discovered=true;
-	    							  timeleft=this.plugin.explorers.get(j).expiretime-Bukkit.getWorld("world").getFullTime();
+	    							  timeleft=this.plugin.explorers.get(j).expiretime-this.plugin.SERVER_TICK_TIME;
 	    						  }
 	    					  }
 	    					  //Add-on message for explorer buff cooldown.
@@ -1847,7 +1847,7 @@ public String convertToItemName(String val) {
 	    					  for (int j=0;j<this.plugin.explorers.size();j++) {
 	    						  if (this.plugin.explorers.get(j).name.compareToIgnoreCase(q.getName())==0 && this.plugin.explorers.get(j).event==0) {
 	    							  discovered=true;
-	    							  timeleft=this.plugin.explorers.get(j).expiretime-Bukkit.getWorld("world").getFullTime();
+	    							  timeleft=this.plugin.explorers.get(j).expiretime-this.plugin.SERVER_TICK_TIME;
 	    						  }
 	    					  }
 	    					  //Add-on message for explorer buff cooldown.

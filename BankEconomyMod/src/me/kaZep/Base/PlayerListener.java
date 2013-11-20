@@ -9141,6 +9141,7 @@ implements Listener
 	@EventHandler
 	public void onInventoryCloseEvent(InventoryCloseEvent e) {
 		Player p = (Player)e.getPlayer();
+		//Bukkit.getLogger().info("GEt close inventory event.");
 		p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.WHITE+"");
 		if (p.hasPermission("group.moderator")) {
 			p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.GREEN+"");
@@ -11222,6 +11223,9 @@ implements Listener
 	    if (p.isInsideVehicle()) {
    		 	p.leaveVehicle();
   		  }
+	    if (p.getOpenInventory()!=null) {
+	    	p.closeInventory();
+	    }
 		for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
 			if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
 				p.removePotionEffect(PotionEffectType.SPEED);
