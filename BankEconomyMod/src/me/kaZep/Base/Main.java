@@ -518,7 +518,9 @@ public class Main extends JavaPlugin
     Woodcutter_job.addData("WOODEN PLANK", 0.00, 0.10, 1);
     Woodcutter_job.setBuffData("Leaves break instantly.",
     		"Crafting planks gives 6 planks per wood instead of 4.",
-    		"Apples have a 400% higher rate of dropping from leaves. Breaking wood gives a Jump boost buff that lasts for 10 seconds. Axes last 200% longer.",
+    		"Apples have a x4 higher rate of dropping from leaves. Breaking wood gives a Jump boost buff that lasts for 10 seconds. Axes last 200% longer.",
+    		"Axes you use will never break. Making them viable weapons as well.",
+    		"Crafting planks gives 10 planks per wood instead of 4. Saplings placed down will instantly grow trees.",
     		"Cuts down a whole tree with one whack. Crafting planks gives 20 planks per wood. Each time you cut down a tree, you get a 4 HP boost (stacks) that lasts for one minute.");
     
     Miner_job.setJobName("Miner");
@@ -542,7 +544,8 @@ public class Main extends JavaPlugin
     Miner_job.addData("EMERALD ORE", 0.7625, 160, 0);
     Miner_job.setBuffData("Automatically mines ores next to each other when one ore is mined.",
     		"Gain Quadruple the experience from mining ores. Pickaxes gain Efficiency III.", 
-    		"Mining out ores will mine them out 3x3 blocks at a time when using diamond pickaxes. Pickaxes used gain Efficiency VI and Unbreaking IV.", 
+    		"Mining out ores will mine them out 3x3 blocks at a time when using diamond pickaxes. Pickaxes used gain Efficiency VI and Unbreaking IV.",
+    		""
     		"Mining ores will grant x2 the normal amount of minerals. Fortune is twice as effective, granting a possible total of x4 the normal minerals from ores.");
 
     Builder_job.setJobName("Builder");
