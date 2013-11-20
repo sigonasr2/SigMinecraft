@@ -1505,7 +1505,15 @@ public String convertToItemName(String val) {
 	        		  }
 	        	  }
 	        	  //p.sendMessage("Got 7.");
-	        	  p.setNoDamageTicks(100); //Give 5 seconds of invincibility to recuperate.
+	        	  final Player p2 = p;
+		      		p.setMaximumNoDamageTicks(100);
+		    		p.setNoDamageTicks(100);
+		    		Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+		    			@Override
+		    			public void run() { //After 5 seconds, set the no Damage Ticks back to normal.
+		    				p2.setMaximumNoDamageTicks(20);
+		    			}
+		    		},100);
 	        	  Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+ChatColor.WHITE+" decided to revive.");
 	          } else {
 	        	  p.sendMessage("You cannot revive. You need to have $"+df.format(finalcost)+" to do so.");
