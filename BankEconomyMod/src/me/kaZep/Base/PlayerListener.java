@@ -12271,7 +12271,7 @@ class updateInventoryTask implements Runnable {
 				sendToInventory(MATERIALS, anvilInv.getItem(MATERIALS).getAmount(), player);
 
 				// Bukkit.getLogger().info("Invalid materials!");
-			} else if (anvilInv.getItem(MATERIALS).getType() == Material.ENCHANTED_BOOK && anvilInv.getItem(MAGIC) == null) {
+			} else if ((anvilInv.getItem(MATERIALS).getType() == Material.ENCHANTED_BOOK || anvilInv.getItem(MATERIALS).getType() == Material.BOOK) && anvilInv.getItem(MAGIC) == null) {
 				anvilInv.setItem(MAGIC, anvilInv.getItem(MATERIALS).clone());
 				anvilInv.setItem(MATERIALS, new ItemStack(Material.AIR));
 				// Bukkit.getLogger().info("Valid materials, " + anvilInv.getItem(MATERIALS).toString().toUpperCase() + " with durability " + anvilInv.getItem(MATERIALS).getDurability());
@@ -12407,11 +12407,11 @@ class updateInventoryTask implements Runnable {
 				multiplier = 0.3;
 			}
 
-			if (anvilInv.getItem(MATERIALS).getType() == Material.DIAMOND && (anvilInv.getItem(INPUT).getType() == Material.DIAMOND_BOOTS ||
+			if ((anvilInv.getItem(MATERIALS).getType() == Material.DIAMOND && (anvilInv.getItem(INPUT).getType() == Material.DIAMOND_BOOTS ||
 					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_HELMET || 
 					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_LEGGINGS || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_AXE ||
 					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_SWORD || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_HOE || 
-					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_PICKAXE || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_SPADE &&
+					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_PICKAXE || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_SPADE) &&
 					!isHalloweenItem)) {
 
 				validCombo = true;
@@ -12879,9 +12879,12 @@ class updateInventoryTask implements Runnable {
 				player.updateInventory();
 			} else if (anvilInv.getItem(MAGIC).getType() == Material.BOOK && anvilInv.getItem(INPUT).getType() != Material.ENCHANTED_BOOK) {
 				// Magic slot is a book. Unenchanting logic goes here.
-				anvilInv.setItem(OUTPUT, anvilInv.getItem(INPUT).clone());
+				anvilInv.setItem(OUTPUT, new ItemStack(Material.ENCHANTED_BOOK));
 				anvilInv.getItem(OUTPUT).setType(Material.ENCHANTED_BOOK);
-				anvilInv.getItem(OUTPUT).setDurability((short)0);
+				
+				ItemMeta bookMeta = anvilInv.getItem(INPUT).getItemMeta();
+				bookMeta.setDisplayName(null);
+				anvilInv.getItem(OUTPUT).setItemMeta(bookMeta);
 				
 				// If books stacked past 1, return all but 1 book to player inventory. 
 
