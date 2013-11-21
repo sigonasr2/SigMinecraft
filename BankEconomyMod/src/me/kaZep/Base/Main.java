@@ -3652,7 +3652,7 @@ public void payDay(int time)
     		return;
     	}
     	if (PlayerinJob(p,job)) {
-	    	getAccountsConfig().set(p.getName()+".jobs.ultimate", String.valueOf(ValidJobs[matchedjob]));
+	    	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.ultimate", String.valueOf(ValidJobs[matchedjob]));
 	    	saveAccountsConfig();
 	    	p.sendMessage(ChatColor.YELLOW+"Set Declared Ultimate job to "+job);
     	} else {
@@ -3717,9 +3717,9 @@ public void payDay(int time)
     	    hunterplayers.add(p);
     	}
 		Bukkit.getLogger().info("Added extra job pieces when joining.");
-    	getAccountsConfig().set(p.getName()+".jobs.job"+(openslot+1), String.valueOf(ValidJobs[matchedjob]));
-    	getAccountsConfig().set(p.getName()+".jobs.job"+(openslot+1)+"lv", Integer.valueOf(1));
-    	getAccountsConfig().set(p.getName()+".jobs.job"+(openslot+1)+"exp", Double.valueOf(0));
+    	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(openslot+1), String.valueOf(ValidJobs[matchedjob]));
+    	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(openslot+1)+"lv", Integer.valueOf(1));
+    	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(openslot+1)+"exp", Double.valueOf(0));
     	saveAccountsConfig();
 		Bukkit.getLogger().info("Set job data.");
     	Bukkit.broadcastMessage(p.getName()+" has joined the "+JobColors[matchedjob]+ValidJobs[matchedjob]+ChatColor.WHITE+" job!");
@@ -3780,7 +3780,7 @@ public void payDay(int time)
 		  double val=0;
 		val = economy.getBalance(p.getName());
 		  economy.withdrawPlayer(p.getName(), val);
-		getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"exp", Double.valueOf(newexp));
+		getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp", Double.valueOf(newexp));
 		saveAccountsConfig();
 	}
 
@@ -3807,16 +3807,16 @@ public void payDay(int time)
 		}
 		JobsDataInfo info = Jobsinfo[getJobSlot(job)];
 		economy.depositPlayer(p.getName(), amount*(1d+(info.moneymult*getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv"))));
-		getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")+exp));
+		getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")+exp));
 		if (getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")<0) {
 			//It can't be negative.
-			getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"exp", Double.valueOf(0.0));
+			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp", Double.valueOf(0.0));
 		}
 		//Check for lv up.
 		if (getJobLv(job,p)<40 && getJobExp(job,getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv"))<=getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")) {
 			//Level up! Level up! YEAH!
-			getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")-getJobExp(job,getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv"))));
-			getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv")+1));
+			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")-getJobExp(job,getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv"))));
+			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv")+1));
 			Bukkit.broadcastMessage(p.getName()+" is now a Level "+getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
 			if (getJobTotalLvs(p)%5==0) {
 				Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+" has reached Level "+getJobTotalLvs(p)+"!");
@@ -3852,7 +3852,7 @@ public void payDay(int time)
 			if (slot!=-1) {
 				JobsDataInfo info = Jobsinfo[getJobSlot(job)];
 				if (getJobLv(job,p)<40) {
-				getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv")+1));
+				getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv")+1));
 				Bukkit.broadcastMessage(p.getName()+" is now a Level "+getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
 				if (getJobTotalLvs(p)%5==0) {
 					Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+" has reached Level "+getJobTotalLvs(p)+"!");
@@ -4630,9 +4630,9 @@ public void payDay(int time)
         	saveConfig();
     		//Remove from job 1.
         	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName()+".jobs.job1"))+getAccountsConfig().getString(p.getName()+".jobs.job1")+ChatColor.WHITE+" job!");
-        	getAccountsConfig().set(p.getName()+".jobs.job1", String.valueOf("None"));
-        	getAccountsConfig().set(p.getName()+".jobs.job1lv", Integer.valueOf(0));
-        	getAccountsConfig().set(p.getName()+".jobs.job1exp", Double.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1", String.valueOf("None"));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1lv", Integer.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1exp", Double.valueOf(0));
         	saveAccountsConfig();
         	return true;
     	} else
@@ -4642,9 +4642,9 @@ public void payDay(int time)
         	saveConfig();
     		//Remove from job 2.
         	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName()+".jobs.job2"))+getAccountsConfig().getString(p.getName()+".jobs.job2")+ChatColor.WHITE+" job!");
-        	getAccountsConfig().set(p.getName()+".jobs.job2", String.valueOf("None"));
-        	getAccountsConfig().set(p.getName()+".jobs.job2lv", Integer.valueOf(0));
-        	getAccountsConfig().set(p.getName()+".jobs.job2exp", Double.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2", String.valueOf("None"));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2lv", Integer.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2exp", Double.valueOf(0));
         	saveAccountsConfig();
         	return true;
     	} else
@@ -4654,9 +4654,9 @@ public void payDay(int time)
         	saveConfig();
     		//Remove from job 3.
         	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName()+".jobs.job3"))+getAccountsConfig().getString(p.getName()+".jobs.job3")+ChatColor.WHITE+" job!");
-        	getAccountsConfig().set(p.getName()+".jobs.job3", String.valueOf("None"));
-        	getAccountsConfig().set(p.getName()+".jobs.job3lv", Integer.valueOf(0));
-        	getAccountsConfig().set(p.getName()+".jobs.job3exp", Double.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3", String.valueOf("None"));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3lv", Integer.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3exp", Double.valueOf(0));
         	saveAccountsConfig();
         	return true;
     	}

@@ -321,7 +321,7 @@ implements Listener
 		if (this.plugin.getAccountsConfig().getBoolean("halloween-enabled")) {
 			e.setAmount(e.getAmount()*2);
 		}
-		if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify3")) {
+		if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify3")) {
 			p.sendMessage(ChatColor.DARK_GREEN+""+ChatColor.ITALIC+"Gained "+e.getAmount()+" exp.");
 		}
 	}
@@ -1517,50 +1517,50 @@ implements Listener
 			//This is a brand new player.
 			Main.economy.withdrawPlayer(p.getName(), Main.economy.getBalance(p.getName()));
 			Main.economy.depositPlayer(p.getName(), 70);
-			this.plugin.getAccountsConfig().set(p.getName() + ".status", Boolean.valueOf(true));
-			this.plugin.getAccountsConfig().set(p.getName() + ".money", Double.valueOf(this.plugin.getConfig().getDouble("start-balance")));
-			this.plugin.getAccountsConfig().set(p.getName() + ".revived", Boolean.valueOf(true));
-			this.plugin.getAccountsConfig().set(p.getName() + ".spleefrating", Double.valueOf(1000.0d));
-			this.plugin.getAccountsConfig().set(p.getName() + ".spleefwins", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".spleeflosses", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job1", String.valueOf("None"));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job1lv", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job1exp", Double.valueOf(0.0d));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job2", String.valueOf("None"));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job2lv", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job2exp", Double.valueOf(0.0d));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job3", String.valueOf("None"));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job3lv", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job3exp", Double.valueOf(0.0d));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.ultimate", String.valueOf("None"));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.ultimatesealed", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat1", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat2", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat3", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat4", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat5", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat6", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat7", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat8", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat9", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat10", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify1", Boolean.valueOf(true));
-			this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify2", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify3", Boolean.valueOf(true));
-			this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify4", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify5", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify6", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest1", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest2", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest3", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest4", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest5", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest6", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest7", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest8", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest9", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest10", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName()+".bonus.witherskeleton", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".status", Boolean.valueOf(true));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".money", Double.valueOf(this.plugin.getConfig().getDouble("start-balance")));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".revived", Boolean.valueOf(true));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".spleefrating", Double.valueOf(1000.0d));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".spleefwins", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".spleeflosses", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job1", String.valueOf("None"));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job1lv", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job1exp", Double.valueOf(0.0d));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job2", String.valueOf("None"));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job2lv", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job2exp", Double.valueOf(0.0d));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job3", String.valueOf("None"));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job3lv", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job3exp", Double.valueOf(0.0d));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimate", String.valueOf("None"));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimatesealed", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat1", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat2", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat3", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat4", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat5", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat6", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat7", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat8", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat9", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat10", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify1", Boolean.valueOf(true));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify2", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify3", Boolean.valueOf(true));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify4", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify5", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify6", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest1", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest2", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest3", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest4", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest5", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest6", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest7", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest8", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest9", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest10", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".bonus.witherskeleton", Integer.valueOf(0));
 			this.plugin.saveAccountsConfig();
 			System.out.println("[BankEconomy] Bank account created for " + p.getName() + ".");
 			if (playerwhitelisted) {
@@ -1580,34 +1580,34 @@ implements Listener
 			DecimalFormat df = new DecimalFormat("#0.00");
 			p.sendMessage(ChatColor.DARK_AQUA+"For a list of all changes made to this server, visit: http://z-gamers.net/changelog.html");
 			p.sendMessage("----------------------------");
-			p.sendMessage(ChatColor.YELLOW+"Current Money Balance: $ "+df.format(Main.economy.bankBalance(p.getName()).balance)+", Bank Balance: $"+df.format(this.plugin.getAccountsConfig().getDouble(p.getName()+".money")));
+			p.sendMessage(ChatColor.YELLOW+"Current Money Balance: $ "+df.format(Main.economy.bankBalance(p.getName()).balance)+", Bank Balance: $"+df.format(this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase()+".money")));
 			//Update account information for the stat point update.
 			if (!this.plugin.getAccountsConfig().contains(p.getName() + ".bonus.witherskeleton")) {
-				this.plugin.getAccountsConfig().set(p.getName()+".bonus.witherskeleton", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".bonus.witherskeleton", Integer.valueOf(0));
 				this.plugin.saveAccountsConfig();
 			}
 			if (!this.plugin.getAccountsConfig().contains(p.getName() + ".stats.stat1")) {
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat1", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat2", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat3", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat4", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat5", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat6", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat7", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat8", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat9", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat10", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat1", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat2", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat3", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat4", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat5", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat6", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat7", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat8", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat9", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat10", Integer.valueOf(0));
 				this.plugin.saveAccountsConfig();
 				System.out.println("Updated " + p.getName() + "'s data with stat point update.");
 			}
 			//Update account information for notification settings.
 			if (!this.plugin.getAccountsConfig().contains(p.getName() + ".settings.notify1")) {
-				this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify1", Boolean.valueOf(true));
-				this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify2", Boolean.valueOf(false));
-				this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify3", Boolean.valueOf(true));
-				this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify4", Boolean.valueOf(false));
-				this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify5", Boolean.valueOf(false));
-				this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify6", Boolean.valueOf(false));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify1", Boolean.valueOf(true));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify2", Boolean.valueOf(false));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify3", Boolean.valueOf(true));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify4", Boolean.valueOf(false));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify5", Boolean.valueOf(false));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify6", Boolean.valueOf(false));
 				this.plugin.saveAccountsConfig();
 				System.out.println("Updated " + p.getName() + "'s data with nofitications update.");
 			}
@@ -1623,7 +1623,7 @@ implements Listener
 				}
 				if (!full) {
 					if (!this.plugin.getAccountsConfig().contains(p.getName() + ".join.halloween_book")) {
-						this.plugin.getAccountsConfig().set(p.getName() + ".join.halloween_book", Boolean.valueOf(true));
+						this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".join.halloween_book", Boolean.valueOf(true));
 						this.plugin.saveAccountsConfig();
 						System.out.println("Updated " + p.getName() + "'s data with a Halloween Book.");
 						ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
@@ -1641,7 +1641,7 @@ implements Listener
 						p.getInventory().addItem(book);
 					}
 					if (!this.plugin.getAccountsConfig().contains(p.getName() + ".join.halloween_vote_signs")) {
-						this.plugin.getAccountsConfig().set(p.getName() + ".join.halloween_vote_signs", Boolean.valueOf(true));
+						this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".join.halloween_vote_signs", Boolean.valueOf(true));
 						this.plugin.saveAccountsConfig();
 						ItemStack sign = new ItemStack(Material.SIGN,2);
 						ItemMeta meta = sign.getItemMeta();
@@ -1656,25 +1656,25 @@ implements Listener
 					}
 				}
 				if (!this.plugin.getAccountsConfig().contains(p.getName() + ".halloween.chest1")) {
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest1", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest2", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest3", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest4", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest5", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest6", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest7", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest8", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest9", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest10", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest1", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest2", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest3", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest4", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest5", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest6", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest7", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest8", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest9", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest10", Boolean.valueOf(false));
 					this.plugin.saveAccountsConfig();
 				}
 				if (!this.plugin.getAccountsConfig().contains(p.getName() + ".jobs.ultimate")) {
-					this.plugin.getAccountsConfig().set(p.getName() + ".jobs.ultimate", String.valueOf("None"));
-					this.plugin.getAccountsConfig().set(p.getName() + ".jobs.ultimatesealed", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimate", String.valueOf("None"));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimatesealed", Boolean.valueOf(false));
 					this.plugin.saveAccountsConfig();
 				}
 				if (!this.plugin.getAccountsConfig().contains(p.getName() + ".halloween.wand")) {
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.wand", Long.valueOf(Main.SERVER_TICK_TIME));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.wand", Long.valueOf(Main.SERVER_TICK_TIME));
 					this.plugin.saveAccountsConfig();
 				}
 			}
@@ -1685,8 +1685,8 @@ implements Listener
 				p.sendMessage(ChatColor.GOLD+"");
 			}
 			//Set Stat Point specific stuff here.
-			if (this.plugin.getAccountsConfig().getInt(p.getName() + ".stats.stat10")>0) {
-				p.setMaximumAir(300+this.plugin.getStatBonus(9, this.plugin.getAccountsConfig().getInt(p.getName() + ".stats.stat10"))*20);
+			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase() + ".stats.stat10")>0) {
+				p.setMaximumAir(300+this.plugin.getStatBonus(9, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase() + ".stats.stat10"))*20);
 			}
 			if (p.getLocation().getY()>78.0d && p.getLocation().getZ()>53.0d && p.getLocation().getZ()<64.0d && p.getLocation().getX()<1627.0d && p.getLocation().getX()>1616.0d) {
 				//In a spleef zone. Kick this player out.
@@ -5102,47 +5102,6 @@ implements Listener
 	  Player p = e.getPlayer();
 	  Bukkit.getPlayer("sigonasr2").sendMessage("Extacting "+e.getItemAmount()+" "+e.getItemType());
   }*/
-	@EventHandler
-	public void onLeafDecay(LeavesDecayEvent e) {
-		Player[] list = Bukkit.getOnlinePlayers();
-		for (int i=0;i<list.length;i++) {
-			double distance=Math.abs(list[i].getLocation().getX()-e.getBlock().getX())+Math.abs(list[i].getLocation().getY()-e.getBlock().getY())+Math.abs(list[i].getLocation().getZ()-e.getBlock().getZ());
-			if (distance<50) {
-				if (this.plugin.PlayerinJob(list[i], "Woodcutter") && this.plugin.getJobLv("Woodcutter", list[i])>=20) {
-					//Increase sapling drops by 64%.
-					if (e.getBlock().getData()!=3) {
-						//This is not a jungle leaf block.
-						if (Math.random()*100<=25) {
-							//Produce a sapling.
-							Bukkit.getWorld("world").dropItem(e.getBlock().getLocation(), new ItemStack(Material.SAPLING,1,e.getBlock().getData()));
-							//list[i].sendMessage("You got an extra spawned sapling.");
-						}
-					} else {
-						if (Math.random()*100<=12.5) {
-							//Produce a sapling.
-							Bukkit.getWorld("world").dropItem(e.getBlock().getLocation(), new ItemStack(Material.SAPLING,1,e.getBlock().getData()));
-						}
-					}
-				} else
-					if (this.plugin.PlayerinJob(list[i], "Woodcutter") && this.plugin.getJobLv("Woodcutter", list[i])>=5) {
-						//Increase sapling drops by 40%.
-						if (e.getBlock().getData()!=3) {
-							//This is not a jungle leaf block.
-							if (Math.random()*100<=12) {
-								//Produce a sapling.
-								Bukkit.getWorld("world").dropItem(e.getBlock().getLocation(), new ItemStack(Material.SAPLING,1,e.getBlock().getData()));
-								//list[i].sendMessage("You got an extra spawned sapling.");
-							}
-						} else {
-							if (Math.random()*100<=6) {
-								//Produce a sapling.
-								Bukkit.getWorld("world").dropItem(e.getBlock().getLocation(), new ItemStack(Material.SAPLING,1,e.getBlock().getData()));
-							}
-						}
-					}
-			}
-		}
-	}
 
 	@EventHandler
 	public void onItemChange(PlayerItemHeldEvent e) {
@@ -5211,19 +5170,6 @@ implements Listener
 				ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
 				if (!currentitem.containsEnchantment(Enchantment.getByName("FIRE_ASPECT"))) { 
 					currentitem.addEnchantment(Enchantment.getByName("FIRE_ASPECT"), 2);
-				}
-			}
-		}
-		if (this.plugin.PlayerinJob(p, "Woodcutter") && this.plugin.getJobLv("Woodcutter", p)>=10) {
-			if (p.getInventory().getContents()[e.getNewSlot()]!=null && 
-					(p.getInventory().getContents()[e.getNewSlot()].getType()==Material.WOOD_AXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.IRON_AXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.GOLD_AXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.DIAMOND_AXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.STONE_AXE)) {
-				ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
-				if (!currentitem.containsEnchantment(Enchantment.getByName("DIG_SPEED"))) {
-					currentitem.addEnchantment(Enchantment.getByName("DIG_SPEED"), 1);
 				}
 			}
 		}
@@ -6048,7 +5994,7 @@ implements Listener
 			if (f.getKiller()!=null && f.getKiller().getType()==EntityType.PLAYER) {
 				Player p = f.getKiller();
 				if (f.getType()==EntityType.SKELETON && ((Skeleton)f).getSkeletonType()==SkeletonType.WITHER) {
-					this.plugin.getAccountsConfig().set(p.getName()+".bonus.witherskeleton", Integer.valueOf(this.plugin.getAccountsConfig().getInt(p.getName()+".bonus.witherskeleton"))+1);
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".bonus.witherskeleton", Integer.valueOf(this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".bonus.witherskeleton"))+1);
 				}
 				for (int x=-10;x<10;x++) {
 					for (int y=-3;y<3;y++) {
@@ -6157,7 +6103,7 @@ implements Listener
 						this.plugin.gainMoneyExp(p,"Hunter",275.00,7800);
 					}
 				}
-				if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify3")) {
+				if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify3")) {
 					p.sendMessage(ChatColor.DARK_GREEN+""+ChatColor.ITALIC+"Gained "+e.getDroppedExp()+" exp.");
 				}
 				if (this.plugin.getConfig().getBoolean("halloween-enabled") && p.getWorld().getName().equalsIgnoreCase("world") && (e.getEntity() instanceof Sheep)) {
@@ -6199,8 +6145,8 @@ implements Listener
 					p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 				}
 			},5);
-			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat9")>0) {
-				if (Math.random()<=this.plugin.getStatBonus(8, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat9"))/100.0d) {
+			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat9")>0) {
+				if (Math.random()<=this.plugin.getStatBonus(8, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat9"))/100.0d) {
 					e.setFoodLevel(e.getFoodLevel()+1);
 				}
 			}
@@ -6538,13 +6484,13 @@ implements Listener
 				if (e.getInventory().getContents()[m]!=null && e.getInventory().getContents()[m].getType()==Material.PUMPKIN_PIE) { 
 					if (e.getInventory().getContents()[m].getItemMeta().getDisplayName()!=null && e.getInventory().getContents()[m].getItemMeta().getDisplayName().contains("Pie ")) {
 						int numb = Integer.valueOf(e.getInventory().getContents()[m].getItemMeta().getDisplayName().replace("Pie ",""));
-						if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".halloween.chest"+numb)) {
+						if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".halloween.chest"+numb)) {
 							p.closeInventory();
 							p.sendMessage("You already got this magic pie!");
 							e.setCancelled(true);
 						} else {
 							//Show the user a fake inventory containing the magic pie.
-							this.plugin.getAccountsConfig().set(p.getName()+".halloween.chest"+numb, Boolean.valueOf(true));
+							this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".halloween.chest"+numb, Boolean.valueOf(true));
 							this.plugin.saveAccountsConfig();
 							p.closeInventory();
 							e.setCancelled(true);
@@ -6712,7 +6658,7 @@ implements Listener
 				}
 			}
 			final double player_starthp = p.getHealth();
-			if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify5") && e.getCause()!=DamageCause.ENTITY_ATTACK && e.getCause()!=DamageCause.ENTITY_EXPLOSION && e.getDamage()!=0) {
+			if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5") && e.getCause()!=DamageCause.ENTITY_ATTACK && e.getCause()!=DamageCause.ENTITY_EXPLOSION && e.getDamage()!=0) {
 				final Main plugin = this.plugin;
 				Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 					@Override
@@ -6823,8 +6769,8 @@ implements Listener
 	public void onPlayerOnFire(EntityCombustEvent e) {
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			Player p = (Player)e.getEntity();
-			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat6")>0) {
-				p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, (this.plugin.getStatBonus(5, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat6"))/3)*20, 0));
+			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat6")>0) {
+				p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, (this.plugin.getStatBonus(5, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat6"))/3)*20, 0));
 			}
 		}
 	}
@@ -6868,8 +6814,8 @@ implements Listener
 					}, 1L);
 				}
 			}
-			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat1")>0) {
-				e.setAmount(e.getAmount()+this.plugin.getStatBonus(0, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat1")/6));
+			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat1")>0) {
+				e.setAmount(e.getAmount()+this.plugin.getStatBonus(0, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat1")/6));
 			}
 		}
 	}
@@ -7060,7 +7006,7 @@ implements Listener
 			if (e.getDamager() instanceof LivingEntity) {
 				final double player_starthp = p.getHealth();
 				final LivingEntity l = (LivingEntity)e.getDamager();
-				if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify5")) {
+				if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
 					final Main plug = this.plugin;
 					Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 						@Override
@@ -7493,9 +7439,9 @@ implements Listener
 			}
 			//Bukkit.getLogger().info("Made it through 4.");
 			p.updateInventory();
-			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat3")>0) {
+			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat3")>0) {
 				double olddmg=e.getDamage();
-				e.setDamage(e.getDamage()*(((100-this.plugin.getStatBonus(2, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat3")/4))/100.0d)));
+				e.setDamage(e.getDamage()*(((100-this.plugin.getStatBonus(2, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat3")/4))/100.0d)));
 				//p.sendMessage("Damage set from "+olddmg+" to "+e.getDamage());
 			}
 		}
@@ -7575,7 +7521,7 @@ implements Listener
 				if (throughdmg>e.getDamage()/2) {
 					if (p.getHealth()-throughdmg>0) {
 						p.setHealth(p.getHealth()-throughdmg);
-						if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify5") && e.getDamage()!=0) {
+						if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5") && e.getDamage()!=0) {
 							//p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"You were hurt for "+Math.round(throughdmg*10)/10+" damage from "+convertToItemName(e.getCause().name())+".");
 						}
 					} else {
@@ -7608,7 +7554,7 @@ implements Listener
 				} else {
 					if (p.getHealth()-e.getDamage()/2>0) {
 						p.setHealth(p.getHealth()-e.getDamage()/2);
-						if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify5") && e.getDamage()!=0) {
+						if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5") && e.getDamage()!=0) {
 							//p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"You were hurt for "+Math.round(e.getDamage()/2*10)/10+" damage from "+convertToItemName(e.getCause().name())+".");
 						}
 					} else {
@@ -7672,7 +7618,7 @@ implements Listener
 					if (throughdmg>e.getDamage()) {
 						if (p.getHealth()-throughdmg>0) {
 							p.setHealth(p.getHealth()-throughdmg);
-							if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify5") && e.getDamage()!=0) {
+							if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5") && e.getDamage()!=0) {
 								//p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"You were hurt for "+Math.round(throughdmg*10)/10+" damage from "+convertToItemName(e.getCause().name())+".");
 							}
 						} else {
@@ -7710,7 +7656,7 @@ implements Listener
 					} else {
 						if (p.getHealth()-e.getDamage()>0) {
 							p.setHealth(p.getHealth()-e.getDamage());
-							if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify5") && e.getDamage()!=0) {
+							if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5") && e.getDamage()!=0) {
 								//p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"You were hurt for "+Math.round(e.getDamage()*10)/10+" damage from "+convertToItemName(e.getCause().name())+".");
 							}
 						} else {
@@ -7889,24 +7835,24 @@ implements Listener
 						//Deal 2 extra damage.
 						e.setDamage(e.getDamage()+2);
 					}
-					if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat7")>0) {
-						e.setDamage(e.getDamage()+(this.plugin.getStatBonus(6, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat7"))/2));
+					if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat7")>0) {
+						e.setDamage(e.getDamage()+(this.plugin.getStatBonus(6, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat7"))/2));
 					}
 					//Add Armor penetration from the stat point, if any.
-					if (this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4)>0) {
-						armor_pen+=this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4);
+					if (this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat5")/4)>0) {
+						armor_pen+=this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat5")/4);
 					}
 					if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && armor_pen>0) {
 						double normaldmg=(this.plugin.DMGCALC.getDamage(f.getEquipment().getHelmet(), f.getEquipment().getChestplate(), f.getEquipment().getLeggings(), f.getEquipment().getBoots(), e.getDamage(), DamageCause.ENTITY_ATTACK, false));
 						double throughdmg=(this.plugin.DMGCALC.getDamage(new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), e.getDamage(), DamageCause.ENTITY_ATTACK, false));
 						if (throughdmg>normaldmg+armor_pen) {
 							//This means some piercing can be done.
-							//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4));
+							//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat5")/4));
 							if (f.getHealth()-(normaldmg+armor_pen)>0) {
 								f.setHealth(f.getHealth()-(normaldmg+armor_pen));
 								armor_pen_dmg=(normaldmg+armor_pen);
 								if (f!=null) {
-									if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+									if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 										if (f.getCustomName()!=null) {
 											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(normaldmg+armor_pen)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
 										} else {
@@ -7923,7 +7869,7 @@ implements Listener
 								f.setHealth(f.getHealth()-throughdmg);
 								armor_pen_dmg=throughdmg;
 								if (f!=null) {
-									if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+									if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 										if (f.getCustomName()!=null) {
 											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
 										} else {
@@ -7938,7 +7884,7 @@ implements Listener
 						e.setDamage(0);
 					}
 					if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && e.getDamage()!=0) {
-						if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+						if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 							if (f.getCustomName()!=null) {
 								//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round((this.plugin.DMGCALC.getDamage(f.getEquipment().getHelmet(), f.getEquipment().getChestplate(), f.getEquipment().getLeggings(), f.getEquipment().getBoots(), e.getDamage(), DamageCause.ENTITY_ATTACK, false)))*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
 							} else {
@@ -7946,7 +7892,7 @@ implements Listener
 							}
 						}
 					}
-					if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+					if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 						final double armor_dmg = armor_pen_dmg;
 						Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 							@Override
@@ -8017,8 +7963,8 @@ implements Listener
 							e.setDamage(e.getDamage()+dmg);
 						}
 						//Add Armor penetration from the stat point, if any.
-						if (this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4)>0) {
-							armor_pen+=this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4);
+						if (this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat5")/4)>0) {
+							armor_pen+=this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat5")/4);
 						}
 						if (e.getEntity() instanceof LivingEntity) {
 							LivingEntity enemy = (LivingEntity)e.getEntity();
@@ -8063,8 +8009,8 @@ implements Listener
 							//Deal 2 extra damage.
 							e.setDamage(e.getDamage()+2);
 						}
-						if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat7")>0) {
-							e.setDamage(e.getDamage()+(this.plugin.getStatBonus(6, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat7"))/2));
+						if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat7")>0) {
+							e.setDamage(e.getDamage()+(this.plugin.getStatBonus(6, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat7"))/2));
 						}
 						if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && armor_pen>0) {
 							double normaldmg=(this.plugin.DMGCALC.getDamage(f.getEquipment().getHelmet(), f.getEquipment().getChestplate(), f.getEquipment().getLeggings(), f.getEquipment().getBoots(), e.getDamage(), DamageCause.ENTITY_ATTACK, false));
@@ -8073,11 +8019,11 @@ implements Listener
 
 							if (throughdmg>normaldmg+armor_pen) {
 								//This means some piercing can be done.
-								//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4));
+								//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat5")/4));
 								if (f.getHealth()-(normaldmg+armor_pen)>0) {
 									f.setHealth(f.getHealth()-(normaldmg+armor_pen));
 									armor_pen_dmg=(normaldmg+armor_pen);
-									if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+									if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 										if (f.getCustomName()!=null) {
 											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(normaldmg+armor_pen)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
 										} else {
@@ -8092,7 +8038,7 @@ implements Listener
 								if (f.getHealth()-throughdmg>0) {
 									f.setHealth(f.getHealth()-throughdmg);
 									armor_pen_dmg=throughdmg;
-									if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+									if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 										if (f.getCustomName()!=null) {
 											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
 										} else {
@@ -8106,7 +8052,7 @@ implements Listener
 							e.setDamage(0);
 						}
 						if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && e.getDamage()!=0) {
-							if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+							if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 								if (f.getCustomName()!=null) {
 									//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round((this.plugin.DMGCALC.getDamage(f.getEquipment().getHelmet(), f.getEquipment().getChestplate(), f.getEquipment().getLeggings(), f.getEquipment().getBoots(), e.getDamage(), DamageCause.ENTITY_ATTACK, false)))*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
 								} else {
@@ -8114,7 +8060,7 @@ implements Listener
 								}
 							}
 						}
-						if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+						if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 							final double armor_dmg = armor_pen_dmg;
 							Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 								@Override
@@ -11298,8 +11244,8 @@ implements Listener
 				list[i].playSound(list[i].getLocation(), Sound.NOTE_PLING, 8, 0.7f);
 			}
 		}
-		if (!this.plugin.getAccountsConfig().getBoolean(p.getName()+".revived")) {
-			this.plugin.getAccountsConfig().set(p.getName() + ".revived", Boolean.valueOf(true));
+		if (!this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".revived")) {
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".revived", Boolean.valueOf(true));
 			this.plugin.saveAccountsConfig();
 		}
 		if (this.plugin.getConfig().getBoolean("spleefinsession") && (p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))==0 || p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestbplayer"))==0)) {
@@ -12161,8 +12107,8 @@ implements Listener
 		Action blockAction = e.getAction();
 		String currencySG = Main.economy.currencyNameSingular();
 		String currencyPL = Main.economy.currencyNamePlural();
-		boolean stats = this.plugin.getAccountsConfig().getBoolean(p.getName() + ".status");
-		double actMon = this.plugin.getAccountsConfig().getDouble(p.getName() + ".money");
+		boolean stats = this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase() + ".status");
+		double actMon = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase() + ".money");
 		int actHand = (int)Main.economy.getBalance(p.getName());
 		if (this.plugin.PlayerinJob(p, "Explorer")) {
 			for (int i=0;i<this.plugin.explorerlist.size();i++) {
@@ -12617,7 +12563,7 @@ implements Listener
 									/*double value = Double.parseDouble(arg0);
               double total = actMon + value;
               if (value <= actHand) {
-                this.plugin.getAccountsConfig().set(p.getName() + ".money", Double.valueOf(total));
+                this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".money", Double.valueOf(total));
                 this.plugin.saveAccountsConfig();
                 if (value <= 1)
                   p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " You added " + value + " " + currencySG + " to your bank account.");
@@ -12643,7 +12589,7 @@ implements Listener
 									/*int value = Integer.parseInt(sign.getLine(2));
               double total = actMon - value;
               if (value <= actMon) {
-                this.plugin.getAccountsConfig().set(p.getName() + ".money", Double.valueOf(total));
+                this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".money", Double.valueOf(total));
                 this.plugin.saveAccountsConfig();
                 if (value <= 1)
                   p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " You withdrawn " + value + " " + currencySG + " from your bank account.");
