@@ -174,7 +174,7 @@ public class Main extends JavaPlugin
   
 
 	public String[] ValidJobs = {"Woodcutter","Miner","Builder","Digger","Hunter","Fisherman","Weaponsmith","Blacksmith","Cook","Brewer","Enchanter","Breeder","Explorer","Support"};
-	public ChatColor[] JobColors = {ChatColor.GREEN,ChatColor.GRAY,ChatColor.WHITE,ChatColor.GOLD,ChatColor.BLUE,ChatColor.RED,ChatColor.AQUA,ChatColor.DARK_PURPLE,ChatColor.GOLD,
+	public ChatColor[] JobColors = {ChatColor.GREEN,ChatColor.GRAY,ChatColor.WHITE,ChatColor.GOLD,ChatColor.RED,ChatColor.AQUA,ChatColor.DARK_PURPLE,ChatColor.GOLD,
 			ChatColor.YELLOW,ChatColor.LIGHT_PURPLE,ChatColor.DARK_BLUE,ChatColor.DARK_GREEN,ChatColor.WHITE,ChatColor.DARK_RED};
 
   private FileConfiguration accountsConfig = null;

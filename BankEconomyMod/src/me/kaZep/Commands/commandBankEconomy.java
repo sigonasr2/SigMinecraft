@@ -1690,7 +1690,7 @@ public String convertToItemName(String val) {
     	  this.plugin.leaveJob(p,args[1]);
       } else
       if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 2 && args[0].equalsIgnoreCase("members")) {
-    	  JobsDataInfo[] Jobsinfo = {this.plugin.Woodcutter_job,this.plugin.Miner_job,this.plugin.Builder_job,this.plugin.Digger_job,this.plugin.Farmer_job,this.plugin.Hunter_job,this.plugin.Fisherman_job,this.plugin.Weaponsmith_job,this.plugin.Blacksmith_job,this.plugin.Cook_job,this.plugin.Brewer_job,this.plugin.Enchanter_job,this.plugin.Breeder_job,this.plugin.Explorer_job,this.plugin.Support_job};
+    	  JobsDataInfo[] Jobsinfo = {this.plugin.Woodcutter_job,this.plugin.Miner_job,this.plugin.Builder_job,this.plugin.Digger_job,this.plugin.Hunter_job,this.plugin.Fisherman_job,this.plugin.Weaponsmith_job,this.plugin.Blacksmith_job,this.plugin.Cook_job,this.plugin.Brewer_job,this.plugin.Enchanter_job,this.plugin.Breeder_job,this.plugin.Explorer_job,this.plugin.Support_job};
     	  boolean found=false;
     	  String job = "";
     	  ChatColor job_color = null;
@@ -1738,7 +1738,7 @@ public String convertToItemName(String val) {
     	  }
       } else
       if (cmd.getName().equalsIgnoreCase("jobs") && (args.length == 2 || args.length==3) && args[0].equalsIgnoreCase("info")) {
-    	  JobsDataInfo[] Jobsinfo = {this.plugin.Woodcutter_job,this.plugin.Miner_job,this.plugin.Builder_job,this.plugin.Digger_job,this.plugin.Farmer_job,this.plugin.Hunter_job,this.plugin.Fisherman_job,this.plugin.Weaponsmith_job,this.plugin.Blacksmith_job,this.plugin.Cook_job,this.plugin.Brewer_job,this.plugin.Enchanter_job,this.plugin.Breeder_job,this.plugin.Explorer_job,this.plugin.Support_job};
+    	  JobsDataInfo[] Jobsinfo = {this.plugin.Woodcutter_job,this.plugin.Miner_job,this.plugin.Builder_job,this.plugin.Digger_job,this.plugin.Hunter_job,this.plugin.Fisherman_job,this.plugin.Weaponsmith_job,this.plugin.Blacksmith_job,this.plugin.Cook_job,this.plugin.Brewer_job,this.plugin.Enchanter_job,this.plugin.Breeder_job,this.plugin.Explorer_job,this.plugin.Support_job};
     	  boolean found=false;
     	  int matchedjob=0;
     	  boolean error=false;
@@ -1792,7 +1792,7 @@ public String convertToItemName(String val) {
 		  p.sendMessage("");
       } else
       if (cmd.getName().equalsIgnoreCase("jobs") && (args.length == 2) && args[0].equalsIgnoreCase("buffs")) {
-    	  JobsDataInfo[] Jobsinfo = {this.plugin.Woodcutter_job,this.plugin.Miner_job,this.plugin.Builder_job,this.plugin.Digger_job,this.plugin.Farmer_job,this.plugin.Hunter_job,this.plugin.Fisherman_job,this.plugin.Weaponsmith_job,this.plugin.Blacksmith_job,this.plugin.Cook_job,this.plugin.Brewer_job,this.plugin.Enchanter_job,this.plugin.Breeder_job,this.plugin.Explorer_job,this.plugin.Support_job};
+    	  JobsDataInfo[] Jobsinfo = {this.plugin.Woodcutter_job,this.plugin.Miner_job,this.plugin.Builder_job,this.plugin.Digger_job,this.plugin.Hunter_job,this.plugin.Fisherman_job,this.plugin.Weaponsmith_job,this.plugin.Blacksmith_job,this.plugin.Cook_job,this.plugin.Brewer_job,this.plugin.Enchanter_job,this.plugin.Breeder_job,this.plugin.Explorer_job,this.plugin.Support_job};
     	  boolean found=false;
     	  int slot=0;
     	  for (int i=0;i<this.plugin.ValidJobs.length;i++) {
