@@ -1706,25 +1706,25 @@ public String convertToItemName(String val) {
     		  if (this.plugin.getConfig().contains("jobs."+job+"_members")) {
     			  p.sendMessage("Players in the "+job_color+job+" job:");
     			  String[] players = this.plugin.getConfig().getString("jobs."+job+"_members").split(", ");
-    			  char lowest = 'z'+1;
+    			  int highest = 0;
     			  List<String> sorted_players = new ArrayList<String>();
     			  for (int i=0;i<players.length;i++) {
     				  sorted_players.add(players[i]); //Add everyone to the list.
     			  }
     			  //Sort them.
     			  List<String> sorted_list_players = new ArrayList<String>();
-    			  int lowest_slot = -1;
+    			  int highest_slot = -1;
     			  while (sorted_players.size()>0) {
     				  for (int i=0;i<sorted_players.size();i++) {
-    					  if (sorted_players.get(i).toCharArray()[0]<lowest) {
-    						  lowest=sorted_players.get(i).toCharArray()[0];
-    						  lowest_slot=i;
+    					  if (this.plugin.getJobLv(job, sorted_players.get(i))>highest) {
+    						  highest=this.plugin.getJobLv(job, sorted_players.get(i));
+    						  highest_slot=i;
     					  }
     				  }
-    				  sorted_list_players.add(sorted_players.get(lowest_slot));
-    				  sorted_players.remove(lowest_slot);
-    				  lowest_slot=-1;
-    				  lowest='z'+1;
+    				  sorted_list_players.add(sorted_players.get(highest_slot));
+    				  sorted_players.remove(highest_slot);
+    				  highest_slot=-1;
+    				  highest=0;
     			  }
     			  for (int i=0;i<sorted_list_players.size();i++) {
     				  OfflinePlayer q = Bukkit.getOfflinePlayer(sorted_list_players.get(i));

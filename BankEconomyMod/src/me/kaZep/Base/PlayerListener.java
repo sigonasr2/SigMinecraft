@@ -914,11 +914,6 @@ implements Listener
 				this.plugin.gainMoneyExp(owner,"Cook",0.20,80);
 				crafteditem=true;
 			}
-			if (this.plugin.getJobLv("Cook", owner)>=20 && crafteditem) {
-				ItemStack result = e.getResult();
-				result.setAmount(result.getAmount()+1);
-				e.setResult(result);
-			}
 		}
 	}
 
@@ -3421,21 +3416,6 @@ implements Listener
 				}
 			}
 			if (this.plugin.PlayerinJob(p, "Miner")) {
-				if (this.plugin.getJobLv("Miner", p)>=10) {
-					//Half chance to set the durability back by one.
-					if (p.getItemInHand().getType()==Material.WOOD_PICKAXE ||
-							p.getItemInHand().getType()==Material.STONE_PICKAXE ||
-							p.getItemInHand().getType()==Material.GOLD_PICKAXE ||
-							p.getItemInHand().getType()==Material.IRON_PICKAXE ||
-							p.getItemInHand().getType()==Material.DIAMOND_PICKAXE) {
-						if (p.getItemInHand().getDurability()>0) {
-							if (Math.random()>=0.5) {
-								p.getItemInHand().setDurability((short)(p.getItemInHand().getDurability()-1));
-								p.updateInventory();
-							}
-						}
-					}
-				}
 				if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
 					if (e.getBlock().getType()==Material.STONE) {
 						this.plugin.gainMoneyExp(p,"Miner",0.0025,1);
@@ -3485,36 +3465,6 @@ implements Listener
 				}
 			}
 			if (this.plugin.PlayerinJob(p, "Digger")) {
-				if (this.plugin.getJobLv("Digger", p)>=20) {
-					//Half chance to set the durability back by one.
-					if (p.getItemInHand().getType()==Material.WOOD_SPADE ||
-							p.getItemInHand().getType()==Material.STONE_SPADE ||
-							p.getItemInHand().getType()==Material.GOLD_SPADE ||
-							p.getItemInHand().getType()==Material.IRON_SPADE ||
-							p.getItemInHand().getType()==Material.DIAMOND_SPADE) {
-						if (p.getItemInHand().getDurability()>0) {
-							if (Math.random()>=0.66) {
-								p.getItemInHand().setDurability((short)(p.getItemInHand().getDurability()-1));
-								p.updateInventory();
-							}
-						}
-					}
-				} else
-					if (this.plugin.getJobLv("Digger", p)>=10) {
-						//Half chance to set the durability back by one.
-						if (p.getItemInHand().getType()==Material.WOOD_SPADE ||
-								p.getItemInHand().getType()==Material.STONE_SPADE ||
-								p.getItemInHand().getType()==Material.GOLD_SPADE ||
-								p.getItemInHand().getType()==Material.IRON_SPADE ||
-								p.getItemInHand().getType()==Material.DIAMOND_SPADE) {
-							if (p.getItemInHand().getDurability()>0) {
-								if (Math.random()>=0.5) {
-									p.getItemInHand().setDurability((short)(p.getItemInHand().getDurability()-1));
-									p.updateInventory();
-								}
-							}
-						}
-					}
 				if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
 					if (e.getBlock().getType()==Material.DIRT) {
 						this.plugin.gainMoneyExp(p,"Digger",0.005,1);
@@ -5104,79 +5054,12 @@ implements Listener
 	  Player p = e.getPlayer();
 	  Bukkit.getPlayer("sigonasr2").sendMessage("Extacting "+e.getItemAmount()+" "+e.getItemType());
   }*/
-
+/*
 	@EventHandler
 	public void onItemChange(PlayerItemHeldEvent e) {
 		Player p = e.getPlayer();
-		if (this.plugin.PlayerinJob(p, "Miner") && this.plugin.getJobLv("Miner", p)>=20) {
-			if (p.getInventory().getContents()[e.getNewSlot()]!=null && 
-					(p.getInventory().getContents()[e.getNewSlot()].getType()==Material.WOOD_PICKAXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.IRON_PICKAXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.GOLD_PICKAXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.DIAMOND_PICKAXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.STONE_PICKAXE)) {
-				ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
-				if (!currentitem.containsEnchantment(Enchantment.getByName("DIG_SPEED"))) {
-					currentitem.addEnchantment(Enchantment.getByName("DIG_SPEED"), 2);
-				} else {
-					//if (currentitem.getEnchantmentLevel())
-				}
-			}
-		} else
-			if (this.plugin.PlayerinJob(p, "Miner") && this.plugin.getJobLv("Miner", p)>=5) {
-				if (p.getInventory().getContents()[e.getNewSlot()]!=null && 
-						(p.getInventory().getContents()[e.getNewSlot()].getType()==Material.WOOD_PICKAXE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.IRON_PICKAXE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.GOLD_PICKAXE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.DIAMOND_PICKAXE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.STONE_PICKAXE)) {
-					ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
-					if (!currentitem.containsEnchantment(Enchantment.getByName("DIG_SPEED"))) {
-						currentitem.addEnchantment(Enchantment.getByName("DIG_SPEED"), 1);
-					}
-				}
-			}
-		if (this.plugin.PlayerinJob(p, "Digger") && this.plugin.getJobLv("Digger", p)>=5) {
-			if (p.getInventory().getContents()[e.getNewSlot()]!=null && 
-					(p.getInventory().getContents()[e.getNewSlot()].getType()==Material.WOOD_SPADE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.IRON_SPADE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.GOLD_SPADE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.DIAMOND_SPADE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.STONE_SPADE)) {
-				ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
-				if (!currentitem.containsEnchantment(Enchantment.getByName("DIG_SPEED"))) {
-					currentitem.addEnchantment(Enchantment.getByName("DIG_SPEED"), 1);
-				}
-			}
-		} else
-			if (this.plugin.PlayerinJob(p, "Digger") && this.plugin.getJobLv("Digger", p)>=20) {
-				if (p.getInventory().getContents()[e.getNewSlot()]!=null && 
-						(p.getInventory().getContents()[e.getNewSlot()].getType()==Material.WOOD_SPADE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.IRON_SPADE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.GOLD_SPADE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.DIAMOND_SPADE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.STONE_SPADE)) {
-					ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
-					if (!currentitem.containsEnchantment(Enchantment.getByName("DIG_SPEED"))) {
-						currentitem.addEnchantment(Enchantment.getByName("DIG_SPEED"), 2);
-					}
-				}
-			}
-		if (this.plugin.PlayerinJob(p, "Hunter") && this.plugin.getJobLv("Hunter", p)>=20) {
-			if (p.getInventory().getContents()[e.getNewSlot()]!=null && 
-					(p.getInventory().getContents()[e.getNewSlot()].getType()==Material.WOOD_SWORD ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.IRON_SWORD ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.GOLD_SWORD ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.DIAMOND_SWORD ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.STONE_SWORD)) {
-				ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
-				if (!currentitem.containsEnchantment(Enchantment.getByName("FIRE_ASPECT"))) { 
-					currentitem.addEnchantment(Enchantment.getByName("FIRE_ASPECT"), 2);
-				}
-			}
-		}
 	}
-
+*/
 	public ItemStack getGoodie() {
 		ItemStack item = null;
 		if (Math.random()<0.33) {
@@ -7835,7 +7718,7 @@ implements Listener
 					}
 					if (this.plugin.PlayerinJob((Player)e.getDamager(), "Hunter") && this.plugin.getJobLv("Hunter", (Player)e.getDamager())>=5) {
 						//Deal 2 extra damage.
-						e.setDamage(e.getDamage()+2);
+						e.setDamage(e.getDamage()+4);
 					}
 					if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat7")>0) {
 						e.setDamage(e.getDamage()+(this.plugin.getStatBonus(6, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat7"))/2));
@@ -8009,7 +7892,7 @@ implements Listener
 						}
 						if (this.plugin.PlayerinJob((Player)((Projectile)e.getDamager()).getShooter(), "Hunter") && this.plugin.getJobLv("Hunter", (Player)((Projectile)e.getDamager()).getShooter())>=5) {
 							//Deal 2 extra damage.
-							e.setDamage(e.getDamage()+2);
+							e.setDamage(e.getDamage()+4);
 						}
 						if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat7")>0) {
 							e.setDamage(e.getDamage()+(this.plugin.getStatBonus(6, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat7"))/2));
@@ -8307,374 +8190,126 @@ implements Listener
 		}
 		if (this.plugin.PlayerinJob(p, "Builder")) {
 			if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
-				if (this.plugin.getJobLv("Builder", p)>=20) {
-					if (Math.random()<=0.05) {
-						ItemStack replenishitem = e.getItemInHand().clone();
-						replenishitem.setAmount(1);
-						p.getInventory().addItem(replenishitem);
-						p.updateInventory();
-					}
-				} else
-					if (this.plugin.getJobLv("Builder", p)>=10) {
-						if (Math.random()<=0.01) {
-							ItemStack replenishitem = e.getItemInHand().clone();
-							replenishitem.setAmount(1);
-							p.getInventory().addItem(replenishitem);
-							p.updateInventory();
-						}
-					}
 				if (e.getBlockPlaced().getType()==Material.COBBLESTONE) {
 					this.plugin.gainMoneyExp(p,"Builder",0.005,1);
-					if (this.plugin.getJobLv("Builder", p)>=5 && (int)this.plugin.getcurrentJobExp("Builder", p)%5==0) {
-						//Give a torch to the player.
-						p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.WOOD) {
 					this.plugin.gainMoneyExp(p,"Builder",0.005,2);
-					for (int i=0;i<2;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.LOG) {
 					this.plugin.gainMoneyExp(p,"Builder",0.01,3);
-					for (int i=0;i<3;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.WOOD_STEP) {
 					this.plugin.gainMoneyExp(p,"Builder",0.015,3);
-					for (int i=0;i<2;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.COBBLESTONE_STAIRS) {
 					this.plugin.gainMoneyExp(p,"Builder",0.015,3);
-					for (int i=0;i<2;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.STONE) {
 					this.plugin.gainMoneyExp(p,"Builder",0.015,4);
-					for (int i=0;i<4;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.FENCE) {
 					this.plugin.gainMoneyExp(p,"Builder",0.015,3);
-					for (int i=0;i<3;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.STEP) {
 					switch (e.getBlockPlaced().getData()) {
 					case 0:{
 						this.plugin.gainMoneyExp(p,"Builder",0.02,4);
-						for (int i=0;i<4;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					case 1:{
 						this.plugin.gainMoneyExp(p,"Builder",0.025,4);
-						for (int i=0;i<4;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					case 3:{
 						this.plugin.gainMoneyExp(p,"Builder",0.015,3);
-						for (int i=0;i<3;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					case 4:{
 						this.plugin.gainMoneyExp(p,"Builder",0.05,9);
-						for (int i=0;i<9;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					case 5:{
 						this.plugin.gainMoneyExp(p,"Builder",0.03,5);
-						for (int i=0;i<5;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					case 6:{
 						this.plugin.gainMoneyExp(p,"Builder",0.03,5);
-						for (int i=0;i<5;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					case 7:{
 						this.plugin.gainMoneyExp(p,"Builder",0.06,12);
-						for (int i=0;i<12;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					case 8:{
 						this.plugin.gainMoneyExp(p,"Builder",0.02,4);
-						for (int i=0;i<4;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					case 9:{
 						this.plugin.gainMoneyExp(p,"Builder",0.025,4);
-						for (int i=0;i<4;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					case 10:{
 						this.plugin.gainMoneyExp(p,"Builder",0.015,3);
-						for (int i=0;i<3;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					case 11:{
 						this.plugin.gainMoneyExp(p,"Builder",0.015,3);
-						for (int i=0;i<3;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					case 12:{
 						this.plugin.gainMoneyExp(p,"Builder",0.05,9);
-						for (int i=0;i<9;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					case 13:{
 						this.plugin.gainMoneyExp(p,"Builder",0.03,5);
-						for (int i=0;i<5;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					case 14:{
 						this.plugin.gainMoneyExp(p,"Builder",0.03,5);
-						for (int i=0;i<5;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					case 15:{
 						this.plugin.gainMoneyExp(p,"Builder",0.06,12);
-						for (int i=0;i<12;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
 					}break;
 					}
 				}
 				if (e.getBlockPlaced().getType()==Material.WOOD_STAIRS) {
 					this.plugin.gainMoneyExp(p,"Builder",0.02,4);
-					for (int i=0;i<4;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.LAPIS_BLOCK) {
 					this.plugin.gainMoneyExp(p,"Builder",0.02,3);
-					for (int i=0;i<3;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.COBBLE_WALL) {
 					this.plugin.gainMoneyExp(p,"Builder",0.025,5);
-					for (int i=0;i<5;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.NETHER_BRICK_STAIRS) {
 					this.plugin.gainMoneyExp(p,"Builder",0.025,5);
-					for (int i=0;i<5;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.NETHER_BRICK) {
 					this.plugin.gainMoneyExp(p,"Builder",0.03,5);
-					for (int i=0;i<5;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.NETHER_FENCE) {
 					this.plugin.gainMoneyExp(p,"Builder",0.03,6);
-					for (int i=0;i<6;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.WOOL) {
 					this.plugin.gainMoneyExp(p,"Builder",0.035,7);
-					for (int i=0;i<7;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.getMaterial(109)) {
 					this.plugin.gainMoneyExp(p,"Builder",0.04,8);
-					for (int i=0;i<8;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.getMaterial(98)) {
 					this.plugin.gainMoneyExp(p,"Builder",0.04,8);
-					for (int i=0;i<8;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.GLASS) {
 					this.plugin.gainMoneyExp(p,"Builder",0.04,8);
-					for (int i=0;i<8;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.GLOWSTONE) {
 					this.plugin.gainMoneyExp(p,"Builder",0.05,10);
-					for (int i=0;i<10;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.HARD_CLAY) {
 					this.plugin.gainMoneyExp(p,"Builder",0.05,10);
-					for (int i=0;i<10;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.STAINED_CLAY) {
 					this.plugin.gainMoneyExp(p,"Builder",0.05,10);
-					for (int i=0;i<10;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.SANDSTONE_STAIRS) {
 					this.plugin.gainMoneyExp(p,"Builder",0.05,10);
-					for (int i=0;i<10;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.SANDSTONE) {
 					this.plugin.gainMoneyExp(p,"Builder",0.06,10);
-					for (int i=0;i<10;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.QUARTZ_STAIRS) {
 					this.plugin.gainMoneyExp(p,"Builder",0.06,12);
-					for (int i=0;i<12;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.IRON_FENCE) {
 					this.plugin.gainMoneyExp(p,"Builder",0.06,12);
-					for (int i=0;i<12;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.BRICK_STAIRS) {
 					this.plugin.gainMoneyExp(p,"Builder",0.065,9);
@@ -8687,21 +8322,9 @@ implements Listener
 				}
 				if (e.getBlockPlaced().getType()==Material.QUARTZ_BLOCK) {
 					this.plugin.gainMoneyExp(p,"Builder",0.07,14);
-					for (int i=0;i<14;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 				if (e.getBlockPlaced().getType()==Material.BRICK) {
 					this.plugin.gainMoneyExp(p,"Builder",0.075,11);
-					for (int i=0;i<11;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
 				}
 			}
 		}
@@ -8820,294 +8443,6 @@ implements Listener
 			}
 		}
 	}
-
-	/*
-  @EventHandler
-  public void onInventoryMove(InventoryClickEvent e) {
-	  if (e.getView().getPlayer()!=null) {
-		  Player p = (Player)e.getView().getPlayer();
-		  if ((e.getView().getPlayer().getOpenInventory().getType()==InventoryType.WORKBENCH || e.getView().getPlayer().getOpenInventory().getType()==InventoryType.CRAFTING) && e.getSlotType()==SlotType.RESULT) {
-			  //This is something we just crafted.
-			  //Bukkit.getPlayer("sigonasr2").sendMessage("Inventory Type: "+e.getView().getPlayer().getOpenInventory().getType()+" Action:"+e.getAction().name());
-
-			  //this.plugin.tempinventory = Bukkit.getPlayer(e.getWhoClicked().getName()).getInventory().getContents();
-			  ItemStack result = e.getCurrentItem();
-			  int craftamt = e.getCurrentItem().getAmount();
-			  //Bukkit.getPlayer("sigonasr2").sendMessage("Resulting item is "+result.getResult().getAmount()+" "+result.getResult().getType());
-			  if (this.plugin.PlayerinJob(p,"Digger")) {
-				  if (result.getType()==Material.SANDSTONE) {
-					  this.plugin.gainMoneyExp(p,"Digger",0.02*craftamt,6*craftamt);
-				  }
-				  if (result.getType()==Material.BRICK) {
-					  this.plugin.gainMoneyExp(p,"Digger",0.04*craftamt,8*craftamt);
-				  }
-			  }
-			  if (this.plugin.PlayerinJob(p,"Weaponsmith")) {
-				  boolean crafteditem=false;
-				  if (result.getType()==Material.ARROW) {
-					  this.plugin.gainMoneyExp(p,"Weaponsmith",0.025*craftamt,4*craftamt);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.WOOD_SWORD) {
-					  this.plugin.gainMoneyExp(p,"Weaponsmith",0.05*craftamt,10*craftamt);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.FLINT_AND_STEEL) {
-					  this.plugin.gainMoneyExp(p,"Weaponsmith",0.06*craftamt,12*craftamt);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.BOW) {
-					  this.plugin.gainMoneyExp(p,"Weaponsmith",0.075*craftamt,12*craftamt);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.IRON_SWORD) {
-					  this.plugin.gainMoneyExp(p,"Weaponsmith",0.375*craftamt,75*craftamt);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.GOLD_SWORD) {
-					  this.plugin.gainMoneyExp(p,"Weaponsmith",0.50*craftamt,100*craftamt);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.DIAMOND_SWORD) {
-					  this.plugin.gainMoneyExp(p,"Weaponsmith",0.975*craftamt,175*craftamt);
-					  crafteditem=true;
-				  }
-			  }
-			  if (this.plugin.PlayerinJob(p,"Blacksmith")) {
-				  boolean crafteditem=false;
-				  if (result.getType()==Material.STONE_HOE) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.04*craftamt,7*craftamt);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.STONE_SPADE) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.05,8);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.STONE_PICKAXE) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.075,15);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.LEATHER_BOOTS) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.125,8);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.LEATHER_HELMET) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.15,14);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.LEATHER_LEGGINGS) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.175,15);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.LEATHER_CHESTPLATE) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.20,18);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.IRON_SPADE) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.25,18);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.IRON_HOE) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.325,24);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.IRON_BOOTS) {
-					  int mult=1;
-					  if ((result.getItemMeta().getDisplayName()!=null && !result.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || result.getItemMeta().getDisplayName()==null) {
-						  mult=8;
-					  }
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.375*mult,27*mult);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.IRON_PICKAXE) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.40,30);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.IRON_HELMET) {
-					  int mult=1;
-					  if ((result.getItemMeta().getDisplayName()!=null && !result.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || result.getItemMeta().getDisplayName()==null) {
-						  mult=8;
-					  }
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.50*mult,45*mult);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.GOLD_SPADE) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.625,55);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.GOLD_HOE) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.65,60);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.IRON_LEGGINGS) {
-					  int mult=1;
-					  if ((result.getItemMeta().getDisplayName()!=null && !result.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || result.getItemMeta().getDisplayName()==null) {
-						  mult=8;
-					  }
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.725*mult,60*mult);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.DIAMOND_SPADE) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.75,65);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.DIAMOND_HOE) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.80,70);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.GOLD_BOOTS) {
-					  int mult=1;
-					  if ((result.getItemMeta().getDisplayName()!=null && !result.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || result.getItemMeta().getDisplayName()==null) {
-						  mult=8;
-					  }
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.825*mult,50*mult);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.IRON_CHESTPLATE) {
-					  int mult=1;
-					  if ((result.getItemMeta().getDisplayName()!=null && !result.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || result.getItemMeta().getDisplayName()==null) {
-						  mult=8;
-					  }
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.875*mult,70*mult);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.GOLD_HELMET) {
-					  int mult=1;
-					  if ((result.getItemMeta().getDisplayName()!=null && !result.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || result.getItemMeta().getDisplayName()==null) {
-						  mult=8;
-					  }
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.925*mult,80*mult);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.DIAMOND_PICKAXE) {
-					  this.plugin.gainMoneyExp(p,"Blacksmith",0.925,80);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.DIAMOND_BOOTS) {
-					  int mult=1;
-					  if ((result.getItemMeta().getDisplayName()!=null && !result.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || result.getItemMeta().getDisplayName()==null) {
-						  mult=8;
-					  }
-					  this.plugin.gainMoneyExp(p,"Blacksmith",1.00*mult,85*mult);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.GOLD_LEGGINGS) {
-					  int mult=1;
-					  if ((result.getItemMeta().getDisplayName()!=null && !result.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || result.getItemMeta().getDisplayName()==null) {
-						  mult=8;
-					  }
-					  this.plugin.gainMoneyExp(p,"Blacksmith",1.025*mult,100*mult);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.GOLD_CHESTPLATE) {
-					  int mult=1;
-					  if ((result.getItemMeta().getDisplayName()!=null && !result.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || result.getItemMeta().getDisplayName()==null) {
-						  mult=8;
-					  }
-					  this.plugin.gainMoneyExp(p,"Blacksmith",1.15*mult,130*mult);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.DIAMOND_HELMET) {
-					  int mult=1;
-					  if ((result.getItemMeta().getDisplayName()!=null && !result.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || result.getItemMeta().getDisplayName()==null) {
-						  mult=8;
-					  }
-					  this.plugin.gainMoneyExp(p,"Blacksmith",1.15*mult,125*mult);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.DIAMOND_LEGGINGS) {
-					  int mult=1;
-					  if ((result.getItemMeta().getDisplayName()!=null && !result.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || result.getItemMeta().getDisplayName()==null) {
-						  mult=8;
-					  }
-					  this.plugin.gainMoneyExp(p,"Blacksmith",1.325*mult,145*mult);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.DIAMOND_CHESTPLATE) {
-					  int mult=1;
-					  if ((result.getItemMeta().getDisplayName()!=null && !result.getItemMeta().getDisplayName().contains(ChatColor.DARK_AQUA+"Weak ")) || result.getItemMeta().getDisplayName()==null) {
-						  mult=8;
-					  }
-					  this.plugin.gainMoneyExp(p,"Blacksmith",1.50*mult,175*mult);
-					  crafteditem=true;
-				  }
-			  }
-			  if (this.plugin.PlayerinJob(p,"Cook")) {
-				  boolean crafteditem=false;
-				  if (result.getType()==Material.BREAD) {
-					  this.plugin.gainMoneyExp(p,"Cook",0.0125,5);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.MUSHROOM_SOUP) {
-					  this.plugin.gainMoneyExp(p,"Cook",0.0375,15);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.COOKIE) {
-					  this.plugin.gainMoneyExp(p,"Cook",0.0675,25);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.GOLDEN_CARROT) {
-					  this.plugin.gainMoneyExp(p,"Cook",0.0875,35);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.GOLDEN_APPLE) {
-					  this.plugin.gainMoneyExp(p,"Cook",0.1125,45);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.PUMPKIN_PIE) {
-					  this.plugin.gainMoneyExp(p,"Cook",0.15,60);
-					  crafteditem=true;
-				  }
-				  if (result.getType()==Material.CAKE) {
-					  this.plugin.gainMoneyExp(p,"Cook",0.2125,85);
-					  crafteditem=true;
-				  }
-				  if (this.plugin.getJobLv("Cook", p)>=10 && crafteditem==true) {
-					  ItemStack resultingitem = result;
-					  resultingitem.setAmount(resultingitem.getAmount()*2);
-				  }
-			  }
-			  if (this.plugin.PlayerinJob(p,"Support")) {
-				  if (result.getType()==Material.BREAD) {
-					  this.plugin.gainMoneyExp(p,"Support",0.015,2);
-				  }
-				  if (result.getType()==Material.MUSHROOM_SOUP) {
-					  this.plugin.gainMoneyExp(p,"Support",0.015,2);
-				  }
-				  if (result.getType()==Material.COOKIE) {
-					  this.plugin.gainMoneyExp(p,"Support",0.015,2);
-				  }
-				  if (result.getType()==Material.GOLDEN_CARROT) {
-					  this.plugin.gainMoneyExp(p,"Support",0.015,2);
-				  }
-				  if (result.getType()==Material.GOLDEN_APPLE) {
-					  this.plugin.gainMoneyExp(p,"Support",0.015,2);
-				  }
-				  if (result.getType()==Material.PUMPKIN_PIE) {
-					  this.plugin.gainMoneyExp(p,"Support",0.015,2);
-				  }
-				  if (result.getType()==Material.CAKE) {
-					  this.plugin.gainMoneyExp(p,"Support",0.015,2);
-				  }
-				  if (result.getType()==Material.IRON_SWORD) {
-					  this.plugin.gainMoneyExp(p,"Support",0.015,3);
-				  }
-				  if (result.getType()==Material.IRON_CHESTPLATE || result.getType()==Material.IRON_HELMET || result.getType()==Material.IRON_BOOTS || result.getType()==Material.IRON_LEGGINGS) {
-					  this.plugin.gainMoneyExp(p,"Support",0.025,5);
-				  }
-				  if (result.getType()==Material.DIAMOND_SWORD) {
-					  this.plugin.gainMoneyExp(p,"Support",0.075,8);
-				  }
-				  if (result.getType()==Material.DIAMOND_CHESTPLATE || result.getType()==Material.DIAMOND_HELMET || result.getType()==Material.DIAMOND_BOOTS || result.getType()==Material.DIAMOND_LEGGINGS) {
-					  this.plugin.gainMoneyExp(p,"Support",0.20,20);
-				  }
-				  if (result.getType()==Material.CAKE) {
-					  this.plugin.gainMoneyExp(p,"Support",0.03,2);
-				  }
-			  }
-		  }
-	  }
-  }*/
 
 	@EventHandler
 	public void onInventoryCloseEvent(InventoryCloseEvent e) {
@@ -10355,11 +9690,6 @@ implements Listener
 			if (item.getType()==Material.GOLDEN_APPLE) {
 				this.plugin.gainMoneyExp(p,"Cook",0.1125*amount,45*amount);
 				crafteditem=true;
-			}
-			if (this.plugin.getJobLv("Cook", p)>=10 && crafteditem==true) {
-				//This is an ugly fix for the problem...But it works somehow.
-				//Player newp = Bukkit.getPlayer(p.getName());
-				p.getInventory().addItem(new ItemStack(item.getType(),amount,item.getDurability(),item.getData().getData()));
 			}
 		}
 		/*

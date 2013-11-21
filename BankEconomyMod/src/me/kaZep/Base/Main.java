@@ -3784,7 +3784,7 @@ public void payDay(int time)
 	}
 	
 	public String[] getJobs(String p) {
-		String[] string= {getAccountsConfig().getString(p+".jobs.job1"),getAccountsConfig().getString(p+".jobs.job2"),getAccountsConfig().getString(p+".jobs.job3")};
+		String[] string= {getAccountsConfig().getString(p.toLowerCase()+".jobs.job1"),getAccountsConfig().getString(p.toLowerCase()+".jobs.job2"),getAccountsConfig().getString(p.toLowerCase()+".jobs.job3")};
 		return string;
 	}
 	
@@ -3820,7 +3820,7 @@ public void payDay(int time)
 	public void setMoneyExp(Player p,String job,double newamount,double newexp) {
 		String[] jobs = getJobs(p);
 		int slot=-1;
-		JobsDataInfo[] Jobsinfo = {Woodcutter_job,Miner_job,Builder_job,Digger_job,Farmer_job,Hunter_job,Fisherman_job,Weaponsmith_job,Blacksmith_job,Cook_job,Brewer_job,Enchanter_job,Breeder_job,Explorer_job,Support_job};
+		JobsDataInfo[] Jobsinfo = {Woodcutter_job,Miner_job,Builder_job,Digger_job,Hunter_job,Fisherman_job,Weaponsmith_job,Blacksmith_job,Cook_job,Brewer_job,Enchanter_job,Breeder_job,Explorer_job,Support_job};
 		for (int i=0;i<jobs.length;i++) {
 			if (job.equalsIgnoreCase(jobs[i])) {
 				slot=i;
@@ -3849,7 +3849,7 @@ public void payDay(int time)
 				break;
 			}
 		}
-		JobsDataInfo[] Jobsinfo = {Woodcutter_job,Miner_job,Builder_job,Digger_job,Farmer_job,Hunter_job,Fisherman_job,Weaponsmith_job,Blacksmith_job,Cook_job,Brewer_job,Enchanter_job,Breeder_job,Explorer_job,Support_job};
+		JobsDataInfo[] Jobsinfo = {Woodcutter_job,Miner_job,Builder_job,Digger_job,Hunter_job,Fisherman_job,Weaponsmith_job,Blacksmith_job,Cook_job,Brewer_job,Enchanter_job,Breeder_job,Explorer_job,Support_job};
 		for (int i=0;i<jobs.length;i++) {
 			if (job.equalsIgnoreCase(jobs[i])) {
 				slot=i;
@@ -4237,13 +4237,13 @@ public void payDay(int time)
 			int slot=-1;
 			//Check which slot contains our job.
 			for (int i=0;i<3;i++) {
-				if (getAccountsConfig().getString(p+".jobs.job"+(i+1)).equalsIgnoreCase(job)) {
+				if (getAccountsConfig().getString(p.toLowerCase()+".jobs.job"+(i+1)).equalsIgnoreCase(job)) {
 					slot=i;
 					break;
 				}
 			}
 			if (slot!=-1) {
-				return getAccountsConfig().getInt(p+".jobs.job"+(slot+1)+"lv");
+				return getAccountsConfig().getInt(p.toLowerCase()+".jobs.job"+(slot+1)+"lv");
 			} else {
 				return 0;
 			}
