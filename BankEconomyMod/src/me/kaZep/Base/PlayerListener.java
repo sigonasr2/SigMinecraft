@@ -10303,7 +10303,7 @@ implements Listener
 				crafteditem=true;
 			}
 			if (item.getType()==Material.COOKIE) {
-				this.plugin.gainMoneyExp(p,"Cook",0.016875*amount,1.50*amount);
+				this.plugin.gainMoneyExp(p,"Cook",0.016875*amount,0.45*amount);
 				crafteditem=true;
 			}
 			if (item.getType()==Material.MUSHROOM_SOUP) {

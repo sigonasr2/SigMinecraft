@@ -456,7 +456,6 @@ public String convertToItemName(String val) {
 			  p.sendMessage(ChatColor.GOLD+" Digger ("+config.getInt("jobs.Digger")+"/"+MAXJOBS+")");
 			  p.sendMessage(ChatColor.DARK_BLUE+" Enchanter ("+config.getInt("jobs.Enchanter")+"/"+MAXJOBS+")");
 			  p.sendMessage(ChatColor.WHITE+" Explorer ("+config.getInt("jobs.Explorer")+"/"+MAXJOBS+")");
-			  p.sendMessage(ChatColor.BLUE+" Farmer ("+config.getInt("jobs.Farmer")+"/"+MAXJOBS+")");
 			  p.sendMessage(ChatColor.AQUA+" Fisherman ("+config.getInt("jobs.Fisherman")+"/"+MAXJOBS+")");
 			  p.sendMessage(ChatColor.RED+" Hunter ("+config.getInt("jobs.Hunter")+"/"+MAXJOBS+")");
 			  p.sendMessage(ChatColor.GRAY+" Miner ("+config.getInt("jobs.Miner")+"/"+MAXJOBS+")");

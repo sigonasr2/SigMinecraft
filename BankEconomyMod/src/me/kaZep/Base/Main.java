@@ -173,7 +173,7 @@ public class Main extends JavaPlugin
   long GLOBAL_villagetimer=0,GLOBAL_templetimer=0,GLOBAL_cavetimer=0,GLOBAL_undergroundtimer=0,GLOBAL_nethertimer=0;
   
 
-	public String[] ValidJobs = {"Woodcutter","Miner","Builder","Digger","Farmer","Hunter","Fisherman","Weaponsmith","Blacksmith","Cook","Brewer","Enchanter","Breeder","Explorer","Support"};
+	public String[] ValidJobs = {"Woodcutter","Miner","Builder","Digger","Hunter","Fisherman","Weaponsmith","Blacksmith","Cook","Brewer","Enchanter","Breeder","Explorer","Support"};
 	public ChatColor[] JobColors = {ChatColor.GREEN,ChatColor.GRAY,ChatColor.WHITE,ChatColor.GOLD,ChatColor.BLUE,ChatColor.RED,ChatColor.AQUA,ChatColor.DARK_PURPLE,ChatColor.GOLD,
 			ChatColor.YELLOW,ChatColor.LIGHT_PURPLE,ChatColor.DARK_BLUE,ChatColor.DARK_GREEN,ChatColor.WHITE,ChatColor.DARK_RED};
 
@@ -545,7 +545,8 @@ public class Main extends JavaPlugin
     Miner_job.setBuffData("Automatically mines ores next to each other when one ore is mined.",
     		"Gain Quadruple the experience from mining ores. Pickaxes gain Efficiency III.", 
     		"Mining out ores will mine them out 3x3 blocks at a time when using diamond pickaxes. Pickaxes used gain Efficiency VI and Unbreaking IV.",
-    		""
+    		"When holding a pickaxe, mobs that hit you only deal 25% damage.",
+    		"Mining multiple ores will stack a haste buff up to Haste V for 10 seconds.",
     		"Mining ores will grant x2 the normal amount of minerals. Fortune is twice as effective, granting a possible total of x4 the normal minerals from ores.");
 
     Builder_job.setJobName("Builder");
@@ -586,7 +587,9 @@ public class Main extends JavaPlugin
     Builder_job.addData("BRICK", 0.075, 11, 0);
     Builder_job.setBuffData("Builders gain access to the 'line' tool. Typing /line will make building in straight lines easier.",
     		"Builders gain access to the 'rectangle' tool. Typing /rectangle will make building in rectangles easier.", 
-    		"When crafting irreversible Builder blocks, 75% of the blocks used for crafting will be restored to your inventory. When cooking Builder blocks, the block results will be doubled.", 
+    		"When crafting irreversible Builder blocks, 75% of the blocks used for crafting will be restored to your inventory. When cooking Builder blocks, the block results will be doubled.",
+    		"Gain experience orbs (equivalent to the job XP you get) as you build.",
+    		"Building will stack a jump boost buff up to Jump Boost seconds.",
     		"Builders gain the ability to fly when building. They immediately lose the ability to fly if they stop building for a moment, destroy a block, or enter combat. Every 100 Builder XP gained gives the Builder 5 Glowstone blocks and a stack of torches.");
 
     Digger_job.setJobName("Digger");
@@ -610,9 +613,12 @@ public class Main extends JavaPlugin
     Digger_job.addData("HARDENED CLAY", 0.04, 8, 2);
     Digger_job.setBuffData("Ability to discover artifacts when digging up blocks.",
     		"Shovels gain Unbreaking V and Efficiency IV.", 
-    		"Destroying the bottom row of Sand or Gravel with a Wooden Shovel will destroy the whole stack instantly. Artifact discovery rate increased by 25%.", 
+    		"Destroying the bottom row of Sand or Gravel with a Wooden Shovel will destroy the whole stack instantly. Artifact discovery rate increased by 25%.",
+    		"Shovels you use will not break.",
+    		"Diggers can craft a Battle Shovel (Use a Lapis block with sticks to build it). Any blocks you destroy with it will shoot 10 arrows rapidly from the destroyed block's position in the direction you are facing.",
     		"Artifacts will be able to be identified immediately with no identify tomes.");
-
+    
+    /*
     Farmer_job.setJobName("Farmer");
     Farmer_job.setJobDescription("A farmer's job is to sustain and continue to replenish what nature provides to turn them into sustainable food items and other useful things.");
     Farmer_job.setAction(0, "BREAK");
@@ -637,7 +643,8 @@ public class Main extends JavaPlugin
     		"Killing skeletons yields triple the amount of bones.", 
     		"Nearby crops grow 30% faster.", 
     		"Nearby crops grow 200% faster. Bonemeal grows things instantly. (Just like before the bonemeal nerf) in one use.");
-
+	*/
+    
     Hunter_job.setJobName("Hunter");
     Hunter_job.setJobDescription("A hunter's job is to take care of the threats at night and protect others who may be in danger. Hunters that kill innocent creatures will be punished, thus they must resort to other methods for food.");
     Hunter_job.setAction(0, "HURT");
@@ -648,8 +655,15 @@ public class Main extends JavaPlugin
     Hunter_job.addData("ZOMBIE", 0.01, 2, 0);
     Hunter_job.addData("SPIDER", 0.01, 2, 0);
     Hunter_job.addData("SKELETON", 0.015, 3, 0);
+    Hunter_job.addData("CHARGE ZOMBIE", 0.02, 4, 0);
+    Hunter_job.addData("ZOMBIE NINJA", 0.025, 5, 0);
+    Hunter_job.addData("SNIPER", 0.025, 5, 0);
     Hunter_job.addData("CREEPER", 0.025, 5, 0);
+    Hunter_job.addData("VENOMOUS SPIDER", 0.025, 5, 0);
+    Hunter_job.addData("SNARING SPIDER", 0.025, 5, 0);
     Hunter_job.addData("PIG ZOMBIE", 0.03, 6, 0);
+    Hunter_job.addData("EXPLOSIVE CREEPER", 0.035, 7, 0);
+    Hunter_job.addData("DESTRUCTIVE CREEPER", 0.035, 7, 0);
     Hunter_job.addData("GHAST", 0.04, 8, 0);
     Hunter_job.addData("ENDERMAN", 0.04, 8, 0);
     Hunter_job.addData("BLAZE", 0.05, 10, 0);
@@ -667,16 +681,25 @@ public class Main extends JavaPlugin
     Hunter_job.addData("SPIDER", 0.02, 4, 1);
     Hunter_job.addData("ZOMBIE", 0.025, 5, 1);
     Hunter_job.addData("SKELETON", 0.035, 7, 1);
+    Hunter_job.addData("CHARGE ZOMBIE", 0.05, 10, 1);
+    Hunter_job.addData("ZOMBIE NINJA", 0.05, 10, 1);
+    Hunter_job.addData("SNIPER", 0.05, 10, 1);
+    Hunter_job.addData("VENOMOUS SPIDER", 0.05, 10, 1);
+    Hunter_job.addData("SNARING SPIDER", 0.05, 10, 1);
     Hunter_job.addData("CREEPER", 0.05, 10, 1);
     Hunter_job.addData("PIG ZOMBIE", 0.08, 16, 1);
+    Hunter_job.addData("EXPLOSIVE CREEPER", 0.08, 16, 1);
+    Hunter_job.addData("DESTRUCTIVE CREEPER", 0.08, 16, 1);
     Hunter_job.addData("GHAST", 0.10, 12, 1);
     Hunter_job.addData("ENDERMAN", 0.125, 16, 1);
     Hunter_job.addData("BLAZE", 0.15, 20, 1);
     Hunter_job.addData("ENDER DRAGON", 100.00, 3000, 1);
     Hunter_job.addData("WITHER", 550.00, 7800, 1);
-    Hunter_job.setBuffData("Damage dealt increased by 2.",
-    		"Sneaking gives you invisibility.", 
-    		"Swords gain Fire Aspect II. Movement speed increased by 20%.", 
+    Hunter_job.setBuffData("Damage dealt increased by 4.",
+    		"Sneaking gives you invisibility. Anything targeting you loses aggro.", 
+    		"Swords inflict Poison II on mobs. Movement speed increased by 20%.", 
+    		"Each time you get hit, the next hit has a 10% stacking chance of blocking for 10 seconds.",
+    		"Attacks deal an additional 10 armor penetration damage.",
     		"Damage dealt increased by 4, damage taken decreased by 30%, at night you are invisible. Health increased by 20.");
 
     Fisherman_job.setJobName("Fisherman");
@@ -688,7 +711,9 @@ public class Main extends JavaPlugin
     Fisherman_job.addData("COOKED FISH", 0.125, 2, 1);
     Fisherman_job.setBuffData("Fishing rods have double the durability.",
     		"Fish give double the exp orbs, two fish can be caught at the same time (25% chance)", 
-    		"Up to four fish can be caught at one time. Sometimes fish will be automatically cooked. (Will gain exp and money for the cooked ones as well)", 
+    		"Up to four fish can be caught at one time. Sometimes fish will be automatically cooked. (Will gain exp and money for the cooked ones as well)",
+    		"Fish Catching Rate increased by 30%. You will always catch at least two fish (And gain the amount of money and xp earned for them). Fishing rods last 4x as long.",
+    		"Each successful catch will increase the fishing catch rate multiplicatively by 5%. Missing a fish will reset this rate.",
     		"Fishing rods do 10 damage when hooking an enemy mob. Fishing rods do not run out of durability. Chance of catching fish increased by 50%. Holding a fishing rod gives the ability to fly for 5 seconds at a time.");
     
     Weaponsmith_job.setJobName("Weaponsmith");
@@ -704,7 +729,9 @@ public class Main extends JavaPlugin
     Weaponsmith_job.addData("DIAMOND SWORD", 3.60, 280, 0);
     Weaponsmith_job.setBuffData("Crafting Weaponsmith items have a 10% chance of preserving materials used.",
     		"Weapons crafted gain a free level 5 enchantment.", 
-    		"Crafting Weaponsmith items have a 25% chance of preserving materials used.", 
+    		"Crafting Weaponsmith items have a 25% chance of preserving materials used.",
+    		"All weaponsmith items crafted gain +X Damage bonus enchantments. (Increases by weaponsmithing level)",
+    		"All weaponsmith items have your name engraved on your weapons, and your soul implanted in them...",
     		"Weapons crafted gain free level 25 enchantments. Materials used in crafting have a 50% chance of being preserved. Weapons crafted have a 30% chance of stacking (duplicated), and 30% chance for every extra addition to the weapon stack.");
 
     Blacksmith_job.setJobName("Blacksmith");
@@ -759,16 +786,18 @@ public class Main extends JavaPlugin
     Blacksmith_job.addData("DIAMOND CHESTPLATE", 1.50*10, 750*10, 0);
     Blacksmith_job.setBuffData("All crafted items are buffed with a Lv5 enchantment.",
     		"All crafted items are buffed with a Lv10 enchantment.", 
-    		"Crafting Blacksmith items have a 30% chance of preserving materials used.", 
+    		"Crafting Blacksmith items have a 30% chance of preserving materials used.",
+    		"All blacksmith items crafted gain +4 Health bonus enchantments. (Increases by +4 per blacksmithing level after 30.)",
+    		"Blacksmiths gain the ability to craft armor they find back into ingots / materials, based on the remaining durability. (About 50% lossy)",
     		"All crafted Blacksmith items stack between 2 and 5 of the same item, effectively multiplying the amount you craft. Items are buffed with a Lv20 enchantment and have a 50% chance to be enchanted with a level 30 enchantment.");
 
     Cook_job.setJobName("Cook");
     Cook_job.setJobDescription("A cook's job is to provide food for others and themselves through cooking and crafting together ingredients.");
     Cook_job.setAction(0, "CRAFT");
     Cook_job.setAction(1, "SMELT");
-    Cook_job.setExp(250, 200, 40, 1.04);
+    Cook_job.setExp(400, 250, 40, 1.04);
     Cook_job.addData("BREAD", 0.003125, 1.25, 0);
-    Cook_job.addData("COOKIE", 0.016875, 1.50, 0);
+    Cook_job.addData("COOKIE", 0.016875, 0.45, 0);
     Cook_job.addData("MUSHROOM SOUP", 0.009375, 3.75, 0);
     Cook_job.addData("PUMPKIN PIE", 0.0375, 15, 0);
     Cook_job.addData("GOLDEN CARROT", 0.0875, 35, 0);
@@ -782,6 +811,8 @@ public class Main extends JavaPlugin
     Cook_job.setBuffData("Double the amount of cooking time with one fuel item in the furnace.",
     		"Results of crafting food is double the normal amount.", 
     		"Results of cooking food is double the normal amount.", 
+    		"Increases buff strength of all food items by 1.",
+    		"Increases bonus effect duration of all food items by x4.",
     		"Cooking and crafting food gives 4x the normal amount. Cooking and crafting food gives exp orbs and has a chance of giving Golden Apples and Golden Carrots sometimes. (15% per crafted/cooked item.)");
 
     Brewer_job.setJobName("Brewer");
@@ -803,6 +834,8 @@ public class Main extends JavaPlugin
     Brewer_job.setBuffData("Decrease brewing wait time by half.",
     		"Potions obtained are doubled. (Stacks of two)", 
     		"Potions created by you have double the duration.", 
+    		"Gain the ability to brew Night Vision and Invisibility potions.",
+    		"Potions created by you stack to 8.",
     		"Potions created by you last for 30 minutes. Potions automatically stack up together in your inventory when grabbed. Splash potions provide full power regardless of how far from the splash the affected entities are. Potions obtained are quadrupled. Brewing wait time decreased by 4x the normal time.");
 
     Enchanter_job.setJobName("Enchanter");
@@ -836,7 +869,9 @@ public class Main extends JavaPlugin
     Enchanter_job.addData("SILK TOUCH", 0.50, 40, 0);
     Enchanter_job.setBuffData("Whenever you gain experience, the amount you gain is doubled.",
     		"Enchantments consume 25% less of your exp. (Lv20 enchantment costs 15 levels) Enchantments gain an extra stat enchantment bonus.", 
-    		"Enchantments are more potent. (Gain extra enchantments, bonus enchantments, and higher levels than normal.)", 
+    		"Enchantments are more potent. (Gain extra enchantments, bonus enchantments, and higher levels than normal.)",
+    		"Gain the ability to choose one type of enchantment/bonus enchantment to add to an item when enchanting.",
+    		"Gain the ability to enchant legendary-tier items. (Has an unusually higher level of enchantment than normal)",
     		"Enchanters receive quadruple the amount of experience from orbs. Enchanting consumes 75% less of your exp. (Lv20 enchantment costs 5 levels) Enchantments are at least level 5 or higher. Extra bonus enchantments are very likely, and super enchantments are added as well.");
 
     Breeder_job.setJobName("Breeder");
@@ -860,6 +895,8 @@ public class Main extends JavaPlugin
     Breeder_job.setBuffData("Nearby Sheep and Chickens reproduce wool and eggs at double the rate.",
     		"Breeding animals may yield twins and triplets half the time.", 
     		"Feeding animals will give you the item back half the time.", 
+    		"Animals will become enticed by you whenever you are nearby, requiring no food to breed animals. Animals will be able to breed again at double the normal rate.",
+    		"Wolves and horses you tame gain +150 Health, making these companions much more useful in fighting, and surviving longer. Feeding them one time will heal them completely. For each wolf and horse near you, you gain +2 Health.",
     		"Breeding animals will give between 2-5 of that animal, all of them will be grown up. Sheep will always regrow their wool instantly after shearing them, shears do not break. Chickens will give 64 eggs if you kill one. Cows and Pigs drop a stack of meat when killing them. Feeding pigs will give them a saddle.");
 
     Explorer_job.setJobName("Explorer");
@@ -875,7 +912,9 @@ public class Main extends JavaPlugin
     Explorer_job.addData("Creating maps and uncovering new areas on them (Underground rewards more!): ", 0.01, 8, 0);
     Explorer_job.setBuffData("Movement speed increased by 20%.",
     		"Players lose no exp on death. When taking fatal damage, you will regain all health. This effect can be used once every hour.", 
-    		"Don't lose any money on death. Reviving costs 75% less.", 
+    		"Don't lose any money on death. Reviving costs 75% less.",
+    		"When crafting maps, you will also gain 32 paper to zoom the map out completely. (Or use to create more maps.)",
+    		"Increased movement speed to 40%.",
     		"When holding a pickaxe, it will detect ores around you based on what the pickaxe is made of.");
 
     Support_job.setJobName("Support");
@@ -913,8 +952,10 @@ public class Main extends JavaPlugin
     Support_job.addData("-Dousing or using a fire resistance potion on someone burning.", 4.80, 240, 0);
     Support_job.setBuffData("Everyone around you gains +2 Armor.",
     		"Everyone around you gains +10 more Maximum Health.", 
-    		"Everyone around you gains +4 Armor. Everyone's hunger degrades at half the speed. Players with 8 HP or less take half the damage from hits.", 
-    		"Everyone around you gains Regeneration. You gain +10 Armor. Everyone around you gains +20 more Maximum Health. You gain +50 more maximum health. Everyone around you including yourself moves 20% faster.");
+    		"Everyone around you gains +4 Armor. Everyone's hunger degrades at half the speed. Players with 8 HP or less take half the damage from hits.",
+    		"When a nearby player is low in health, if you have health splash potions, one of your potions will be automatically consumed to heal them.",
+    		"Provide a Fire Resistance buff to everyone around you.",
+    		"Everyone around you gains Regeneration. You gain +5 Armor. Everyone around you gains +20 more Health. You gain +10 more health. Everyone around you including yourself moves 20% faster.");
   }
 
   public void onDisable()
