@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class JobsDataInfo {
+	enum Job {JOB5,JOB10,JOB20,JOB30A,JOB30B,JOB40};
 	String jobname;
 	String introstring;
 	String actionname1;
@@ -22,6 +23,8 @@ public class JobsDataInfo {
 	String lv5buff;
 	String lv10buff;
 	String lv20buff;
+	String lv30_1buff;
+	String lv30_2buff;
 	String lv40buff;
 	List<Double> dataprice1;
 	List<Double> dataprice2;
@@ -50,6 +53,8 @@ public class JobsDataInfo {
 		lv5buff = "";
 		lv10buff = "";
 		lv20buff = "";
+		lv30_1buff = "";
+		lv30_2buff = "";
 		lv40buff = "";
 		dataprice1 = new ArrayList<Double>();
 		dataprice2 = new ArrayList<Double>();
@@ -73,6 +78,7 @@ public class JobsDataInfo {
 	public void addExtraData(String info) {
 		extrainfo.add(info);
 	}
+	@Deprecated
 	public String getBuffData(int lv) {
 		switch (lv) {
 			case 5:{
@@ -90,10 +96,42 @@ public class JobsDataInfo {
 		}
 		return "";
 	}
+	public String getBuffData(Job job) {
+		switch (job) {
+			case JOB5:{
+				return this.lv5buff;
+			}
+			case JOB10:{
+				return this.lv10buff;
+			}
+			case JOB20:{
+				return this.lv20buff;
+			}
+			case JOB30A:{
+				return this.lv30_1buff;
+			}
+			case JOB30B:{
+				return this.lv30_2buff;
+			}
+			case JOB40:{
+				return this.lv40buff;
+			}
+		}
+		return "";
+	}
+	@Deprecated
 	public void setBuffData(String lv5,String lv10,String lv20,String lv40) {
 		this.lv5buff=lv5;
 		this.lv10buff=lv10;
 		this.lv20buff=lv20;
+		this.lv40buff=lv40;
+	}
+	public void setBuffData(String lv5,String lv10,String lv20,String lv30_1,String lv30_2,String lv40) {
+		this.lv5buff=lv5;
+		this.lv10buff=lv10;
+		this.lv20buff=lv20;
+		this.lv30_1buff=lv30_1;
+		this.lv30_2buff=lv30_1;
 		this.lv40buff=lv40;
 	}
 	public void setAction(int numb, String name) {

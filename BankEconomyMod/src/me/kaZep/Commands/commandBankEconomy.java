@@ -1816,6 +1816,10 @@ public String convertToItemName(String val) {
     		  p.sendMessage("");
     		  p.sendMessage(ChatColor.GOLD+"Lv20 BUFF: "+ChatColor.WHITE+Jobsinfo[slot].lv20buff);
     		  p.sendMessage("");
+    		  p.sendMessage(ChatColor.LIGHT_PURPLE+"Lv30 BUFF A: "+ChatColor.WHITE+Jobsinfo[slot].lv30_1buff);
+    		  p.sendMessage(ChatColor.YELLOW+""+ChatColor.BOLD+"  - OR -");
+    		  p.sendMessage(ChatColor.LIGHT_PURPLE+"Lv30 BUFF B: "+ChatColor.WHITE+Jobsinfo[slot].lv30_2buff);
+    		  p.sendMessage("");
     		  p.sendMessage(ChatColor.RED+"Lv40 ULTI: "+ChatColor.WHITE+Jobsinfo[slot].lv40buff);
     		  p.sendMessage("");
     		  p.sendMessage(ChatColor.ITALIC+"Note that only one ultimate buff can be chosen. And CANNOT BE CHANGED.");
