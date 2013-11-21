@@ -9137,12 +9137,12 @@ implements Listener
 			if (e.getInventory().getTitle().equalsIgnoreCase("Notification Options")) {
 				//We have to save the notification settings for this player.
 				FileConfiguration savefile = this.plugin.getAccountsConfig();
-				savefile.set(p.getName()+".settings.notify1", Boolean.valueOf(e.getInventory().getItem(2).getType()==Material.REDSTONE_TORCH_ON));
-				savefile.set(p.getName()+".settings.notify2", Boolean.valueOf(e.getInventory().getItem(6).getType()==Material.REDSTONE_TORCH_ON));
-				savefile.set(p.getName()+".settings.notify3", Boolean.valueOf(e.getInventory().getItem(11).getType()==Material.REDSTONE_TORCH_ON));
-				savefile.set(p.getName()+".settings.notify4", Boolean.valueOf(e.getInventory().getItem(15).getType()==Material.REDSTONE_TORCH_ON));
-				savefile.set(p.getName()+".settings.notify5", Boolean.valueOf(e.getInventory().getItem(20).getType()==Material.REDSTONE_TORCH_ON));
-				savefile.set(p.getName()+".settings.notify6", Boolean.valueOf(e.getInventory().getItem(24).getType()==Material.REDSTONE_TORCH_ON));
+				savefile.set(p.getName().toLowerCase()+".settings.notify1", Boolean.valueOf(e.getInventory().getItem(2).getType()==Material.REDSTONE_TORCH_ON));
+				savefile.set(p.getName().toLowerCase()+".settings.notify2", Boolean.valueOf(e.getInventory().getItem(6).getType()==Material.REDSTONE_TORCH_ON));
+				savefile.set(p.getName().toLowerCase()+".settings.notify3", Boolean.valueOf(e.getInventory().getItem(11).getType()==Material.REDSTONE_TORCH_ON));
+				savefile.set(p.getName().toLowerCase()+".settings.notify4", Boolean.valueOf(e.getInventory().getItem(15).getType()==Material.REDSTONE_TORCH_ON));
+				savefile.set(p.getName().toLowerCase()+".settings.notify5", Boolean.valueOf(e.getInventory().getItem(20).getType()==Material.REDSTONE_TORCH_ON));
+				savefile.set(p.getName().toLowerCase()+".settings.notify6", Boolean.valueOf(e.getInventory().getItem(24).getType()==Material.REDSTONE_TORCH_ON));
 				this.plugin.saveAccountsConfig();
 			}
 		if (e.getInventory().getTitle().equalsIgnoreCase("Repair and Enchant")) {
