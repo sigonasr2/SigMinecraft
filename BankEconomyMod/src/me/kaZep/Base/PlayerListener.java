@@ -33,6 +33,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BrewingStand;
@@ -165,6 +166,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Pumpkin;
+import org.bukkit.material.Tree;
 import org.bukkit.material.Wool;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
@@ -186,6 +188,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.schematic.SchematicFormat;
+import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 
 import me.kaZep.Base.BrewingStandData;
 import me.kaZep.Base.FurnaceData;
@@ -200,6 +203,7 @@ import me.kaZep.Base.PersistentExplorerList;
 import me.kaZep.Base.PlayerData;
 import me.kaZep.Base.SupportEntity;
 import me.kaZep.Base.SupportPlayer;
+import me.kaZep.Commands.JobsDataInfo.Job;
 
 public class PlayerListener
 implements Listener
@@ -1375,7 +1379,7 @@ implements Listener
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
-		Player p = e.getPlayer();
+		final Player p = e.getPlayer();
 		Team tempteam;
 		if (this.plugin.getConfig().getBoolean("halloween-enabled")) {
 			Bukkit.getWorld("world").setDifficulty(Difficulty.EASY);
@@ -1486,31 +1490,10 @@ implements Listener
 				playerwhitelisted=true;
 			}
 		}
-		/*
-    //Boss platform is created +,+ coordinates from the location specified.
-    File file = new File("plugins/WorldEdit/schematics/boss.schematic");
-    if (file.exists()) {
-        try {
-            com.sk89q.worldedit.Vector v = new com.sk89q.worldedit.Vector(p.getLocation().getX()-8, p.getLocation().getY(), p.getLocation().getZ()-8);
-            World worldf = Bukkit.getWorld("world");
-            BukkitWorld BWf = new BukkitWorld(worldf);
-            EditSession es = new EditSession(BWf, 2000000);
-            CuboidClipboard c1 = SchematicFormat.MCEDIT.load(file);
-            c1.place(es, v, true);
-        } catch (DataException ex) {
-            Bukkit.getLogger().warning("DataException while trying to create structure.");
-        } catch (IOException ex) {
-        	Bukkit.getLogger().warning("IOException while trying to create structure.");
-        } catch (MaxChangedBlocksException ex) {
-        	Bukkit.getLogger().warning("MaxChangedBlocksException while trying to create structure.");
-        }
-    } else {
-    	Bukkit.getLogger().warning(("File does not exist."));
-    }
-		 */
+		
 		//System.out.println("Whitelisted Players: "+playerslist);
 		//System.out.println("Maximum Air: "+p.getMaximumAir());
-		if (!this.plugin.getAccountsConfig().contains(p.getName())) {
+		if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase().toLowerCase())) {
 			//This is a brand new player.
 			Main.economy.withdrawPlayer(p.getName(), Main.economy.getBalance(p.getName()));
 			Main.economy.depositPlayer(p.getName(), 70);
@@ -1523,12 +1506,15 @@ implements Listener
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job1", String.valueOf("None"));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job1lv", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job1exp", Double.valueOf(0.0d));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job1_30", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job2", String.valueOf("None"));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job2lv", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job2exp", Double.valueOf(0.0d));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job2_30", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job3", String.valueOf("None"));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job3lv", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job3exp", Double.valueOf(0.0d));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job3_30", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimate", String.valueOf("None"));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimatesealed", Boolean.valueOf(false));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat1", Integer.valueOf(0));
@@ -1579,11 +1565,19 @@ implements Listener
 			p.sendMessage("----------------------------");
 			p.sendMessage(ChatColor.YELLOW+"Current Money Balance: $ "+df.format(Main.economy.bankBalance(p.getName()).balance)+", Bank Balance: $"+df.format(this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase()+".money")));
 			//Update account information for the stat point update.
-			if (!this.plugin.getAccountsConfig().contains(p.getName() + ".bonus.witherskeleton")) {
+			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".jobs.job1_30")) {
+				//Update account information for Jobs 2.1
+				Bukkit.getLogger().info("Update player "+p.getName()+" to Jobs 2.1 account format.");
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1_30", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2_30", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3_30", Integer.valueOf(0));
+				this.plugin.saveAccountsConfig();
+			}
+			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".bonus.witherskeleton")) {
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".bonus.witherskeleton", Integer.valueOf(0));
 				this.plugin.saveAccountsConfig();
 			}
-			if (!this.plugin.getAccountsConfig().contains(p.getName() + ".stats.stat1")) {
+			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".stats.stat1")) {
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat1", Integer.valueOf(0));
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat2", Integer.valueOf(0));
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat3", Integer.valueOf(0));
@@ -1598,7 +1592,7 @@ implements Listener
 				System.out.println("Updated " + p.getName() + "'s data with stat point update.");
 			}
 			//Update account information for notification settings.
-			if (!this.plugin.getAccountsConfig().contains(p.getName() + ".settings.notify1")) {
+			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".settings.notify1")) {
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify1", Boolean.valueOf(true));
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify2", Boolean.valueOf(false));
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify3", Boolean.valueOf(true));
@@ -1619,7 +1613,7 @@ implements Listener
 					}
 				}
 				if (!full) {
-					if (!this.plugin.getAccountsConfig().contains(p.getName() + ".join.halloween_book")) {
+					if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".join.halloween_book")) {
 						this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".join.halloween_book", Boolean.valueOf(true));
 						this.plugin.saveAccountsConfig();
 						System.out.println("Updated " + p.getName() + "'s data with a Halloween Book.");
@@ -1637,7 +1631,7 @@ implements Listener
 						book.setItemMeta(bookdata);
 						p.getInventory().addItem(book);
 					}
-					if (!this.plugin.getAccountsConfig().contains(p.getName() + ".join.halloween_vote_signs")) {
+					if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".join.halloween_vote_signs")) {
 						this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".join.halloween_vote_signs", Boolean.valueOf(true));
 						this.plugin.saveAccountsConfig();
 						ItemStack sign = new ItemStack(Material.SIGN,2);
@@ -1648,11 +1642,11 @@ implements Listener
 						p.sendMessage("You have received 2 vote signs. Go vote at the Pumpkin Patch for the best pumpkin! (Note that voting for yourself does not count. Please vote the best of the others' pumpkins.)");
 					}
 				} else {
-					if (!this.plugin.getAccountsConfig().contains(p.getName() + ".join.halloween_vote_signs")) {
+					if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".join.halloween_vote_signs")) {
 						p.sendMessage("You do not have enough room in your inventory to receive Pumpkin vote signs. Clear some of your inventory and then rejoin.");
 					}
 				}
-				if (!this.plugin.getAccountsConfig().contains(p.getName() + ".halloween.chest1")) {
+				if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".halloween.chest1")) {
 					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest1", Boolean.valueOf(false));
 					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest2", Boolean.valueOf(false));
 					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest3", Boolean.valueOf(false));
@@ -1665,12 +1659,12 @@ implements Listener
 					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest10", Boolean.valueOf(false));
 					this.plugin.saveAccountsConfig();
 				}
-				if (!this.plugin.getAccountsConfig().contains(p.getName() + ".jobs.ultimate")) {
+				if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".jobs.ultimate")) {
 					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimate", String.valueOf("None"));
 					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimatesealed", Boolean.valueOf(false));
 					this.plugin.saveAccountsConfig();
 				}
-				if (!this.plugin.getAccountsConfig().contains(p.getName() + ".halloween.wand")) {
+				if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".halloween.wand")) {
 					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.wand", Long.valueOf(Main.SERVER_TICK_TIME));
 					this.plugin.saveAccountsConfig();
 				}
@@ -1737,6 +1731,9 @@ implements Listener
 			Bukkit.getLogger().warning("Potion Effect Collection not accessible while trying to slow down player.");
 		}
 		updateTopSPLEEFSigns();
+		
+
+		this.plugin.notifyBuffMessages(p);
 	}
 
 	/*
@@ -3175,6 +3172,60 @@ implements Listener
 			}
 		}
 	}
+	
+	private void destroyNearbyTree(World w, Location treeNode, Location checkloc, byte type, boolean silk_touch) {
+		//treeNode is where the original tree is located. checkloc is the current checking location.
+		//Code for destroying a tree. This iterates on itself. Using a base point to determine how far out it can go.
+		if (treeNode.distance(checkloc)<3) {
+			//Loop around and find all leaves/logs.
+			Location newloc = null;
+			for (int i=-1;i<2;i++) {
+				for (int j=-1;j<2;j++) {
+					for (int k=-1;k<2;k++) {
+						newloc = checkloc.clone().add(i,j,k);
+						if (w.getBlockAt(newloc).getType()==Material.LOG && w.getBlockAt(newloc).getData()%4==type) {
+							//logs.add(newloc.getBlock());
+							w.dropItemNaturally(newloc, new ItemStack(w.getBlockAt(newloc).getType(),1,(short)(w.getBlockAt(newloc).getData()%4)));
+							newloc.getBlock().setType(Material.AIR);
+							destroyNearbyTree(w, newloc, newloc, type, silk_touch);
+						} else
+						if (w.getBlockAt(newloc).getType()==Material.LEAVES && w.getBlockAt(newloc).getData()%4==type) {
+							//leaves.add(newloc.getBlock());
+							//Emulate apples / saplings dropping.
+							if (w.getBlockAt(newloc).getData()==3) {
+								//Jungle sapling.
+								if (silk_touch) {
+									w.dropItemNaturally(newloc, new ItemStack(Material.LEAVES,1));
+								} else 
+								if (Math.random()<=0.025) {
+									ItemStack item = new ItemStack(Material.SAPLING,1);
+									item.setDurability((short)(w.getBlockAt(newloc).getData()%4));
+									w.dropItemNaturally(newloc, item);
+								}
+							} else {
+								if (w.getBlockAt(newloc).getData()%4==0) {
+									//Chance to drop an apple.
+									if (Math.random()<=0.02) {
+										w.dropItemNaturally(newloc, new ItemStack(Material.APPLE,1));
+									}
+								}
+								if (silk_touch) {
+									w.dropItemNaturally(newloc, new ItemStack(Material.LEAVES,1));
+								} else 
+								if (Math.random()<=0.05) {
+									ItemStack item = new ItemStack(Material.SAPLING,1);
+									item.setDurability((short)(w.getBlockAt(newloc).getData()%4));
+									w.dropItemNaturally(newloc, item);
+								}
+							}
+							newloc.getBlock().setType(Material.AIR);
+							destroyNearbyTree(w, treeNode, newloc, type, silk_touch);
+						}
+					}
+				}
+			}
+		}
+	}
 
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent e) {
@@ -3182,6 +3233,51 @@ implements Listener
 		//p.sendMessage("Block broke.");
 		//p.sendMessage("Has name: "+p.getItemInHand().getItemMeta().hasDisplayName());
 		//p.sendMessage("Name is: "+p.getItemInHand().getItemMeta().getDisplayName());
+		
+		//*******************************//Job Buffs Begin here!
+		if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB20)) {
+			if (p.getItemInHand().getType().name().toLowerCase().contains("axe") && !p.getItemInHand().getType().name().toLowerCase().contains("pickaxe")) {
+				//Make sure it's not a pickaxe before reducing durability.
+				if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB30A)) {
+					p.getItemInHand().setDurability((short)0);
+				} else {
+					if (Math.random()<=0.5) {
+						p.getItemInHand().setDurability((short)(p.getItemInHand().getDurability()>=1?p.getItemInHand().getDurability()-1:0));
+					}
+				}
+			}
+			if ((e.getBlock().getType()==Material.LOG || e.getBlock().getType()==Material.WOOD)) {
+				p.removePotionEffect(PotionEffectType.JUMP);
+				p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,200,10));
+			}
+		}
+		if (e.getBlock().getType()==Material.LOG && this.plugin.hasJobBuff("Woodcutter", p, Job.JOB40)) {
+			//Cut down the whole tree if you hit a log. Make sure it's a tree.
+			boolean findleaves=false;
+			boolean findground=false;
+			Location currentpos = e.getBlock().getLocation();
+			//Look straight up, look on the sides for leaves.
+			while (!findleaves && currentpos.getWorld().getBlockAt(currentpos).getType()==Material.LOG) {
+				Location checktemp = currentpos.clone().add(0,1,0);
+				if (e.getBlock().getWorld().getBlockAt(checktemp).getType()==Material.LEAVES ||
+						e.getBlock().getWorld().getBlockAt(checktemp).getType()==Material.LEAVES ||
+						e.getBlock().getWorld().getBlockAt(checktemp).getType()==Material.LEAVES ||
+						e.getBlock().getWorld().getBlockAt(checktemp).getType()==Material.LEAVES ||
+						e.getBlock().getWorld().getBlockAt(checktemp).getType()==Material.LEAVES ||
+						e.getBlock().getWorld().getBlockAt(checktemp).getType()==Material.LEAVES) {
+					findleaves=true; //This is considered a tree. Make sure the ground below it is dirt.
+					//Bukkit.getLogger().info("Found leaves.");
+				}
+				currentpos=currentpos.add(0,1,0);
+			}
+			if (findleaves) {
+				//This is definitely a tree we can chop down. Destroy it then.
+				//Bukkit.getLogger().info("Identified as tree. Start Destroying.");
+				destroyNearbyTree(e.getBlock().getWorld() ,e.getBlock().getLocation(), e.getBlock().getLocation(), (byte)(e.getBlock().getData()%4), p.getItemInHand().getEnchantmentLevel(Enchantment.SILK_TOUCH)>0);
+			}
+		}
+		//*******************************//Job Buffs end here!
+		
 		int myData=this.plugin.getPlayerDataSlot(p);
 		boolean has_silktouch=false;
 		if (!p.getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH)) {
@@ -4002,8 +4098,38 @@ implements Listener
 	}
 
 	@EventHandler
+	public void onLeavesDecay(LeavesDecayEvent e) {
+		if (e.getBlock().getData()==0/*Has to be oak.*/) {
+			//We will check for nearby players.
+			for (int i=0;i<Bukkit.getOnlinePlayers().length;i++) {
+				Player p = Bukkit.getOnlinePlayers()[i];
+				if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB20) && p.getLocation().distanceSquared(e.getBlock().getLocation())<=900) {
+					//There is a chance to drop an apple!
+					if (Math.random()<=0.02) { //Reduced from 1/200 to 1/50 chance.
+						p.getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(Material.APPLE));
+					}
+				}
+			}
+		}
+	}
+
+	@EventHandler
 	public void onItemPrepareCraft(PrepareItemCraftEvent e) {
 		CraftingInventory result = e.getInventory();
+		
+		//*********************************// Job Buffs section
+		if (result.getResult().getType()==Material.WOOD) {
+			if (this.plugin.hasJobBuff("Woodcutter", e.getView().getPlayer().getName(), Job.JOB40)) {
+				result.setResult(new ItemStack(Material.WOOD,20,result.getResult().getData().getData()));
+			} else
+			if (this.plugin.hasJobBuff("Woodcutter", e.getView().getPlayer().getName(), Job.JOB30B)) {
+				result.setResult(new ItemStack(Material.WOOD,10,result.getResult().getData().getData()));
+			} else
+			if (this.plugin.hasJobBuff("Woodcutter", e.getView().getPlayer().getName(), Job.JOB10)) {
+				result.setResult(new ItemStack(Material.WOOD,6,result.getResult().getData().getData()));
+			}
+		}
+		//*********************************// End Job Buffs section
 
 		// Disable melon crafting recipe
 		if (result.getResult().getType()==Material.MELON_BLOCK) {
@@ -5057,7 +5183,13 @@ implements Listener
 /*
 	@EventHandler
 	public void onItemChange(PlayerItemHeldEvent e) {
-		Player p = e.getPlayer();
+		final Player p = e.getPlayer();
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+			@Override
+			public void run() {
+				p.sendMessage("Item Data: "+p.getItemInHand().getData().toString());
+			}
+		},5);
 	}
 */
 	public ItemStack getGoodie() {
@@ -6494,6 +6626,11 @@ implements Listener
 		final EntityDamageEvent f = e;
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			final Player p = (Player)e.getEntity();
+			if (e.getCause()==DamageCause.FALL && p.hasPotionEffect(PotionEffectType.JUMP)) {
+				//Jump boost fall damage is just stupid. Remove it if you have jump boost.
+				e.setDamage(0);
+				e.setCancelled(true);
+			}
 			if (e.getCause()==DamageCause.ENTITY_EXPLOSION || e.getCause()==DamageCause.BLOCK_EXPLOSION) {
 				e.setDamage(e.getDamage()*2);
 			}
@@ -6707,6 +6844,16 @@ implements Listener
 
 	@EventHandler
 	public void onEnemyHit(EntityDamageByEntityEvent e) {
+		
+		//**********************************//Player buffs begin
+		if (e.getDamager() instanceof Player) {
+			Player p = (Player)e.getDamager();
+			if (p.getItemInHand().getType().name().toLowerCase().contains("axe") && !p.getItemInHand().getType().name().toLowerCase().contains("pickaxe") && this.plugin.hasJobBuff("Woodcutter", p, Job.JOB30A)) {
+				p.getItemInHand().setDurability((short)0);
+			}
+		}
+		//**********************************//Player buffs end
+		
 		if (e.getEntity() instanceof LivingEntity) {
 			final LivingEntity l = (LivingEntity)e.getEntity();
 			if (l instanceof Player) {
@@ -8034,6 +8181,12 @@ implements Listener
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent e) {
 		Player p = e.getPlayer();
+		
+		//******************************//Job Buffs go here.
+		
+		//******************************//Job buffs stop going here.
+		
+		
 		if (e.getItemInHand().getType()==Material.HOPPER) {
 			//Check surrounding blocks to verify it's not a chest.
 			for (int i=-1;i<2;i++) {
@@ -11528,6 +11681,112 @@ implements Listener
     		p.sendMessage("This block at "+e.getClickedBlock().getLocation());
     	}
     }*/
+		/*
+		if (e.getAction()==Action.RIGHT_CLICK_BLOCK) {
+			p.getWorld().generateTree(e.getClickedBlock().getLocation(), TreeType.TREE);
+		}*/
+		
+		//******************// Job Buffs
+		if (e.getAction()==Action.LEFT_CLICK_BLOCK && this.plugin.hasJobBuff("Woodcutter", p, Job.JOB5)) {
+			if (e.getClickedBlock().getType()==Material.LEAVES) {
+				if ((e.getClickedBlock().getData()<4 || e.getClickedBlock().getData()>7) && e.getClickedBlock().getData()%4==0) {
+					//This is Oak Leaves that were NOT placed by a player.
+					//Bukkit.getLogger().info("A Valid oak leaf! Apple!");
+					if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB20)) {
+						if (Math.random()<=0.02) {
+							p.getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), new ItemStack(Material.APPLE));
+						}
+					}
+				}
+				e.getClickedBlock().setType(Material.AIR);
+				p.playSound(e.getClickedBlock().getLocation(), Sound.DIG_GRASS, 1, 1);
+				p.getWorld().playEffect(e.getClickedBlock().getLocation(), Effect.STEP_SOUND, Material.LEAVES.getId());
+				//Randomly drop a sapling based on type.
+				if (e.getClickedBlock().getData()%4==3) {
+					//This is a jungle leaf.
+					if (Math.random()<=0.025) {
+						e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), new ItemStack(Material.SAPLING,1,(short)(e.getClickedBlock().getData()%4)));
+					}
+				} else {
+					if (Math.random()<=0.05) {
+						e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), new ItemStack(Material.SAPLING,1,(short)(e.getClickedBlock().getData()%4)));
+					}
+				}
+			}
+		}
+		if (e.getAction()==Action.RIGHT_CLICK_BLOCK && p.getItemInHand().getType()==Material.SAPLING && (e.getClickedBlock().getType()==Material.GRASS || e.getClickedBlock().getType()==Material.DIRT) && this.plugin.hasJobBuff("Woodcutter", p, Job.JOB30B)) {
+			//Instantly grow the tree!
+			//Check out the data value of the sapling.
+			Byte data = p.getItemInHand().getData().getData();
+			//Bukkit.getLogger().info("Data value for this sapling: "+data.toString());
+			int tries=0;
+            BukkitWorld BWf = new BukkitWorld(p.getWorld());
+            EditSession es = new EditSession(BWf, 1000); //STart a new editing session to create trees.
+			switch (data) {
+				case (byte)0: {
+					//This is a normal sapling. see if we're in a swamp biome.
+					//Bukkit.getLogger().info("This is a normal sapling!");
+					if (e.getClickedBlock().getWorld().getBiome(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockZ())==Biome.SWAMPLAND) {
+						if (Math.random()<=0.90) {
+							while (tries<100) {
+								//e.getClickedBlock().getWorld().generateTree(e.getClickedBlock().getLocation().add(0,1,0), TreeType.SWAMP);
+								BWf.generateTree(TreeType.SWAMP, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+								tries++;
+							}
+						} else {
+							while (tries<100) {
+								BWf.generateTree(TreeType.TREE, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+								tries++;
+							}
+						}
+					} else {
+						if (Math.random()<=0.90) {
+							while (tries<100) {
+								BWf.generateTree(TreeType.TREE, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+								tries++;
+							}
+						} else {
+							while (tries<100) {
+								BWf.generateTree(TreeType.BIG_TREE, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+								tries++;
+							}
+						}
+					}
+				}break;
+				case (byte)1: {
+					while (tries<100) {
+						/*
+						e.getClickedBlock().getWorld().generateTree(e.getClickedBlock().getLocation().add(0,1,0), TreeType.REDWOOD);
+						e.getClickedBlock().getWorld().generateTree(e.getClickedBlock().getLocation().add(0,1,0), com.sk89q.worldedit.blocks.tr);*/
+						BWf.generateTree(TreeType.PINE, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+						BWf.generateTree(TreeType.REDWOOD, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+						BWf.generateTree(TreeType.TALL_REDWOOD, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+						tries++;
+					}
+				}break;
+				case (byte)2: {
+					while (tries<100) {
+						BWf.generateTree(TreeType.BIRCH, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+						tries++;
+					}
+				}break;
+				case (byte)3: {
+					if (Math.random()<=0.90) {
+						while (tries<100) {
+							BWf.generateTree(TreeType.SHORT_JUNGLE, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+							tries++;
+						}
+					} else {
+						while (tries<100) {
+							BWf.generateTree(TreeType.JUNGLE, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+							tries++;
+						}
+					}
+				}break;
+			}
+		}
+		//*****************// End Job Buffs section.
+		
 		if (e.getAction()==Action.RIGHT_CLICK_AIR || e.getAction()==Action.RIGHT_CLICK_BLOCK) {
 			if (p.getItemInHand()!=null && (p.getItemInHand().getType()==Material.FLINT_AND_STEEL || p.getItemInHand().getType()==Material.LAVA_BUCKET)) {
 				if (this.plugin.PlayerinJob(p, "Support")) {

@@ -8,7 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class JobsDataInfo {
-	enum Job {JOB5,JOB10,JOB20,JOB30A,JOB30B,JOB40};
+	public enum Job {JOB5,JOB10,JOB20,JOB30A,JOB30B,JOB40};
 	String jobname;
 	String introstring;
 	String actionname1;
@@ -131,7 +131,7 @@ public class JobsDataInfo {
 		this.lv10buff=lv10;
 		this.lv20buff=lv20;
 		this.lv30_1buff=lv30_1;
-		this.lv30_2buff=lv30_1;
+		this.lv30_2buff=lv30_2;
 		this.lv40buff=lv40;
 	}
 	public void setAction(int numb, String name) {

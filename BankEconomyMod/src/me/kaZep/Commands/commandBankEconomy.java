@@ -1936,7 +1936,11 @@ public String convertToItemName(String val) {
     			  p.sendMessage(ChatColor.GOLD+"Could not find player!");
     		  }
     	  }
-      }
+      } else
+	    if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 2) {
+		  //Attempt to set the level 30 aspect of the job.
+	  	  this.plugin.setLv30Choice(p,args[0],args[1]);
+	    } 
       else {
           p.sendMessage(this.invARGT2);
         }

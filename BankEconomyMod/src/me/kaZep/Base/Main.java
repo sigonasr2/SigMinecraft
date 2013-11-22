@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import java.text.*;
 
 import me.kaZep.Commands.JobsDataInfo;
+import me.kaZep.Commands.JobsDataInfo.Job;
 import me.kaZep.Commands.commandBankEconomy;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -3696,9 +3697,19 @@ public void payDay(int time)
     		return;
     	}
     	if (PlayerinJob(p,job)) {
-	    	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.ultimate", String.valueOf(ValidJobs[matchedjob]));
-	    	saveAccountsConfig();
-	    	p.sendMessage(ChatColor.YELLOW+"Set Declared Ultimate job to "+job);
+    		if (getJobLv(job,p)>=40) {
+		    	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.ultimate", String.valueOf(ValidJobs[matchedjob]));
+		    	saveAccountsConfig();
+		    	p.sendMessage(ChatColor.YELLOW+"Set Declared Ultimate job to "+job);
+		    	p.sendMessage("");
+		    	p.sendMessage(ChatColor.GOLD+""+ChatColor.ITALIC+"Unlike other buffs, you do not just receive the buff immediately. You have to earn it.");
+		    	p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Earn enough job exp to be proven worthy, and then search mob drops for a special trinket. The more exp you have built up, the better the chance you'll find one.");
+		    	p.sendMessage("");
+		    	p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"(Note you can still change your declared ultimate at any time during this time.)");
+    		} else {
+        		p.sendMessage(ChatColor.GOLD+"Sorry, you are not a high enough level in that job yet!");
+        		return;
+    		}
     	} else {
     		p.sendMessage(ChatColor.GOLD+"Sorry, you are not in that job!");
     		return;
@@ -3779,8 +3790,7 @@ public void payDay(int time)
     }
 	
 	public String[] getJobs(Player p) {
-		String[] string= {getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"),getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"),getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")};
-		return string;
+		return getJobs(p.getName());
 	}
 	
 	public String[] getJobs(String p) {
@@ -3799,13 +3809,7 @@ public void payDay(int time)
 	}
 	
 	public boolean PlayerinJob(Player p,String job) {
-		String[] jobs = getJobs(p);
-		for (int i=0;i<jobs.length;i++) {
-			if (job.equalsIgnoreCase(jobs[i])) {
-				return true;
-			}
-		}
-		return false;
+		return PlayerinJob(p.getName(), job);
 	}
 	
 	public void gainMoneyExp(String p,String job,double amount,double exp) {
@@ -4251,6 +4255,76 @@ public void payDay(int time)
 		return 0;
 	}
 	
+	public boolean hasJobBuff(String job, Player p, Job j) {
+		return hasJobBuff(job, p.getName(), j);
+	}
+	
+	public boolean hasJobBuff(String job, String p, Job j) {
+		if (PlayerinJob(p,job)) {
+			int slot=-1;
+			//Check which slot contains our job.
+			for (int i=0;i<3;i++) {
+				if (getAccountsConfig().getString(p.toLowerCase()+".jobs.job"+(i+1)).equalsIgnoreCase(job)) {
+					slot=i;
+					break;
+				}
+			}
+			if (slot!=-1) {
+				int level = getAccountsConfig().getInt(p.toLowerCase()+".jobs.job"+(slot+1)+"lv");
+				switch (j) {
+					case JOB5: {
+						if (level>=5) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					case JOB10: {
+						if (level>=10) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					case JOB20: {
+						if (level>=20) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					case JOB30A: {
+						if (level>=30 && getAccountsConfig().getInt(p.toLowerCase()+".jobs.job"+(slot+1)+"_30")==1) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					case JOB30B: {
+						if (level>=30 && getAccountsConfig().getInt(p.toLowerCase()+".jobs.job"+(slot+1)+"_30")==2) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					case JOB40: {
+						if (level>=40 && getAccountsConfig().getString(p.toLowerCase()+".jobs.ultimate").equalsIgnoreCase(job) && getAccountsConfig().getBoolean(p.toLowerCase()+".jobs.ultimatesealed")) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					default: {
+						return false;
+					}
+				}
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+	
 	public int getPlayerDataSlot(Player p) {
 		  //Find my data.
 		  for (int i=0;i<playerdata_list.size();i++) {
@@ -4687,6 +4761,7 @@ public void payDay(int time)
         	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+ChatColor.WHITE+" job!");
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1", String.valueOf("None"));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1lv", Integer.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1_30", Integer.valueOf(0));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1exp", Double.valueOf(0));
         	saveAccountsConfig();
         	return true;
@@ -4703,6 +4778,7 @@ public void payDay(int time)
         	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+ChatColor.WHITE+" job!");
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2", String.valueOf("None"));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2lv", Integer.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2_30", Integer.valueOf(0));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2exp", Double.valueOf(0));
         	saveAccountsConfig();
         	return true;
@@ -4719,6 +4795,7 @@ public void payDay(int time)
         	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+ChatColor.WHITE+" job!");
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3", String.valueOf("None"));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3lv", Integer.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3_30", Integer.valueOf(0));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3exp", Double.valueOf(0));
         	saveAccountsConfig();
         	return true;
@@ -4828,5 +4905,112 @@ public void payDay(int time)
   	  } else {
   		  return 0;
   	  }
+    }
+    
+    public void setLv30Choice(Player p, String arg1, String arg2) {
+    	if (getJobLv(arg1, p)>=30) {
+	    	if (arg2.equals("1") || arg2.equals("2")) {
+	    		if (getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(getJobSlot(arg1)+1)+"_30")==0) {
+		    		//We are making a valid choice.
+	    			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(getJobSlot(arg1)+1)+"_30",Integer.valueOf(arg2));
+	    			saveAccountsConfig();
+	        		p.sendMessage(ChatColor.GREEN+"You have set your Lv30 Buff choice for your "+arg1+" job to the "+((Integer.valueOf(arg2)==1)?"first":"second")+" version.");
+	    		} else {
+	        		p.sendMessage(ChatColor.RED+"Sorry, you already picked your Lv30 Buff Choice for that job! You can't change it.");
+	    		}
+	    	} else {
+	  		  p.sendMessage("Usage: "+ChatColor.GREEN+"/jobs [JobName] 1"+ChatColor.WHITE+" or "+ChatColor.GREEN+"/jobs [JobName] 2"+ChatColor.WHITE+" - Set Lv30 Buff Choice.");
+	    	}
+    	} else {
+    		p.sendMessage(ChatColor.RED+"Sorry, you are not a high enough level in that job to set your buff choice yet!");
+    	}
+    }
+    
+    public void notifyBuffMessages(Player p) {
+    	notifyBuffMessages(p, 20);
+    }
+    
+    public void notifyBuffMessages(final Player p, int tick_delay) {
+    	//Same as notifyBuffMessages(), but waits a number of ticks before displaying it.
+    	//See which messages we have to display.
+    	int total_tick_delay=tick_delay;
+    	if (getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job1lv")>=30 && getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job1_30")==0) {
+    		//Have not selected first job's buff.
+	    	Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+		      @Override
+		      public void run() {
+		    	  String job = getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1");
+		    	  int color_slot = 0;
+		    	  for (int i=0;i<ValidJobs.length;i++) {
+		    		  if (job.equalsIgnoreCase(ValidJobs[i])) {color_slot=i; break;}
+		    	  }
+		    	  p.sendMessage(ChatColor.AQUA+"You have not selected your Lv30 Buff for the "+JobColors[color_slot]+job+" job yet!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Don't know what they are? Type "+ChatColor.RESET+ChatColor.YELLOW+"/jobs buffs "+job+"!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Once you decided one, type "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 1'"+ChatColor.RESET+ChatColor.ITALIC+" or "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 2'"+ChatColor.RESET+ChatColor.ITALIC+" to pick!");
+		      }
+		  	},total_tick_delay+=tick_delay);
+    	}
+    	if (getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job2lv")>=30 && getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job2_30")==0) {
+    		//Have not selected first job's buff.
+	    	Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+		      @Override
+		      public void run() {
+		    	  String job = getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2");
+		    	  int color_slot = 0;
+		    	  for (int i=0;i<ValidJobs.length;i++) {
+		    		  if (job.equalsIgnoreCase(ValidJobs[i])) {color_slot=i; break;}
+		    	  }
+		    	  p.sendMessage(ChatColor.AQUA+"You have not selected your Lv30 Buff for the "+JobColors[color_slot]+job+" job yet!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Don't know what they are? Type "+ChatColor.RESET+ChatColor.YELLOW+"/jobs buffs "+job+"!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Once you decided one, type "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 1'"+ChatColor.RESET+ChatColor.ITALIC+" or "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 2'"+ChatColor.RESET+ChatColor.ITALIC+" to pick!");
+		      }
+		  	},total_tick_delay+=tick_delay);
+    	}
+    	if (getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job3lv")>=30 && getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job3_30")==0) {
+    		//Have not selected first job's buff.
+	    	Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+		      @Override
+		      public void run() {
+		    	  String job = getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3");
+		    	  int color_slot = 0;
+		    	  for (int i=0;i<ValidJobs.length;i++) {
+		    		  if (job.equalsIgnoreCase(ValidJobs[i])) {color_slot=i; break;}
+		    	  }
+		    	  p.sendMessage(ChatColor.AQUA+"You have not selected your Lv30 Buff for the "+JobColors[color_slot]+job+" job yet!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Don't know what they are? Type "+ChatColor.RESET+ChatColor.YELLOW+"/jobs buffs "+job+"!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Once you decided one, type "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 1'"+ChatColor.RESET+ChatColor.ITALIC+" or "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 2'"+ChatColor.RESET+ChatColor.ITALIC+" to pick!");
+		      }
+		  	},total_tick_delay+=tick_delay);
+    	}
+    	if (getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job3lv")>=30 && getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job3_30")==0) {
+    		//Have not selected first job's buff.
+	    	Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+		      @Override
+		      public void run() {
+		    	  String job = getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3");
+		    	  int color_slot = 0;
+		    	  for (int i=0;i<ValidJobs.length;i++) {
+		    		  if (job.equalsIgnoreCase(ValidJobs[i])) {color_slot=i; break;}
+		    	  }
+		    	  p.sendMessage(ChatColor.AQUA+"You have not selected your Lv30 Buff for the "+JobColors[color_slot]+job+" job yet!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Don't know what they are? Type "+ChatColor.RESET+ChatColor.YELLOW+"/jobs buffs "+job+ChatColor.RESET+ChatColor.ITALIC+"!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Once you decided one, type "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 1'"+ChatColor.RESET+ChatColor.ITALIC+" or "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 2'"+ChatColor.RESET+ChatColor.ITALIC+" to pick!");
+		      }
+		  	},total_tick_delay+=tick_delay);
+    	}
+    	if ((getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job1lv")>=40 || getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job2lv")>=40 || getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job3lv")>=40) && !getAccountsConfig().getBoolean(p.getName().toLowerCase()+".jobs.ultimate")) {
+	    	Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			      @Override
+			      public void run() {
+			    	  String job = getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3");
+			    	  int color_slot = 0;
+			    	  for (int i=0;i<ValidJobs.length;i++) {
+			    		  if (job.equalsIgnoreCase(ValidJobs[i])) {color_slot=i; break;}
+			    	  }
+			    	  p.sendMessage(ChatColor.AQUA+"You have not selected your Lv40 Ultimate Buff yet!");
+			    	  p.sendMessage(ChatColor.ITALIC+"Type "+ChatColor.RESET+ChatColor.YELLOW+"/jobs ultimate <job>"+ChatColor.RESET+ChatColor.ITALIC+" replacing it with the ultimate job you want!");
+			      }
+			  	},total_tick_delay+=tick_delay);
+    	}
     }
 }
