@@ -242,7 +242,7 @@ public class Main extends JavaPlugin
     SERVER_TICK_TIME = getConfig().getLong("server-tick-time");
 
     getAccountsConfig().options().copyDefaults(true);
-    saveAccountsConfig();
+    //saveAccountsConfig() //Commented out;
     
     getConfig().set("spleefrequestatime", Integer.valueOf(0));
     getConfig().set("spleefrequestbtime", Integer.valueOf(0));
@@ -545,9 +545,9 @@ public class Main extends JavaPlugin
     Miner_job.addData("EMERALD ORE", 0.7625, 160, 0);
     Miner_job.setBuffData("Automatically mines ores next to each other when one ore is mined.",
     		"Gain Quadruple the experience from mining ores. Pickaxes gain Efficiency III.", 
-    		"Mining out ores will mine them out 3x3 blocks at a time when using diamond pickaxes. Pickaxes used gain Efficiency VI and Unbreaking IV.",
+    		"Mining with a diamond pickaxe will mine out 3x3 blocks at a time when using diamond pickaxes. Pickaxes used gain Efficiency VI and Unbreaking IV.",
     		"When holding a pickaxe, mobs that hit you only deal 25% damage.",
-    		"Mining multiple ores will stack a haste buff up to Haste V for 10 seconds.",
+    		"Mining blocks will stack a haste buff up to Haste V for 10 seconds.",
     		"Mining ores will grant x2 the normal amount of minerals. Fortune is twice as effective, granting a possible total of x4 the normal minerals from ores.");
 
     Builder_job.setJobName("Builder");
@@ -963,6 +963,7 @@ public class Main extends JavaPlugin
   {
 	  getConfig().set("server-tick-time", Long.valueOf(SERVER_TICK_TIME));
 	  saveConfig();
+	  saveAccountsConfig();
     PluginDescriptionFile pdf = getDescription();
     System.out.println("[" + pdf.getName() + "] The plugin has been disabled succesfully.");
   }
@@ -1918,6 +1919,7 @@ public void runTick() {
 				  }
 			  }
 			  if (Main.SERVER_TICK_TIME%600==0) {
+				  saveAccountsConfig();
 				  if (turnedon==false && Bukkit.getWorld("world").getTime()>13000) {
 					  //Bukkit.getPlayer("sigonasr2").sendMessage("It's night now...");
 					  turnedon=true;
@@ -2330,7 +2332,7 @@ public void runTick() {
 							  newloc.setZ(51.65d);
 							  winningplayer.teleport(newloc);
 							  updateTopSPLEEFSigns();
-							  saveAccountsConfig();
+							  //saveAccountsConfig() //Commented out;
 						  } else {
 							  //We're player B.
 							  //Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+getConfig().getString("spleefrequestaplayer")+" is the winner of this spleef game! "+getConfig().getString("spleefrequestbplayer")+" loses.");
@@ -2380,7 +2382,7 @@ public void runTick() {
 							  newloc.setZ(51.65d);
 							  winningplayer.teleport(newloc);
 							  updateTopSPLEEFSigns();
-							  saveAccountsConfig();
+							  //saveAccountsConfig() //Commented out;
 						  }
 						  //Look for the special shovel.
 						  /*
@@ -3515,7 +3517,7 @@ public void payDay(int time)
         	}
             //Main.economy.depositPlayer(allOnlineP.getName(), (Main.this.getConfig().getDouble("payday.amount")*Main.economy.bankBalance(allOnlineP.getName()).balance));
         }
-        saveAccountsConfig();
+        //saveAccountsConfig() //Commented out;
         List<UUID> expired_uuids = new ArrayList<UUID>();
         String moblist = getConfig().getString("fed.mobs");
 		String finalstring = "";
@@ -3699,7 +3701,7 @@ public void payDay(int time)
     	if (PlayerinJob(p,job)) {
     		if (getJobLv(job,p)>=40) {
 		    	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.ultimate", String.valueOf(ValidJobs[matchedjob]));
-		    	saveAccountsConfig();
+		    	//saveAccountsConfig() //Commented out;
 		    	p.sendMessage(ChatColor.YELLOW+"Set Declared Ultimate job to "+job);
 		    	p.sendMessage("");
 		    	p.sendMessage(ChatColor.GOLD+""+ChatColor.ITALIC+"Unlike other buffs, you do not just receive the buff immediately. You have to earn it.");
@@ -3782,7 +3784,7 @@ public void payDay(int time)
     	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(openslot+1), String.valueOf(ValidJobs[matchedjob]));
     	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(openslot+1)+"lv", Integer.valueOf(1));
     	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(openslot+1)+"exp", Double.valueOf(0));
-    	saveAccountsConfig();
+    	//saveAccountsConfig() //Commented out;
 		Bukkit.getLogger().info("Set job data.");
     	Bukkit.broadcastMessage(p.getName()+" has joined the "+JobColors[matchedjob]+ValidJobs[matchedjob]+ChatColor.WHITE+" job!");
     	p.sendMessage("You can check out your job progress anytime with "+ChatColor.GOLD+"/jobs stats"+ChatColor.WHITE+".");
@@ -3836,7 +3838,7 @@ public void payDay(int time)
 		val = economy.getBalance(p.getName());
 		  economy.withdrawPlayer(p.getName(), val);
 		getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp", Double.valueOf(newexp));
-		saveAccountsConfig();
+		//saveAccountsConfig() //Commented out;
 	}
 
 	public void gainMoneyExp(Player p,String job,double amount,double exp) {
@@ -3880,7 +3882,7 @@ public void payDay(int time)
 				}
 			}
 		}
-		saveAccountsConfig();
+		//saveAccountsConfig() //Commented out;
 	}
 	
 	public void levelUpJob(Player p, String job) {
@@ -3915,7 +3917,7 @@ public void payDay(int time)
 						p.sendMessage(ChatColor.GOLD+"You have earned 1 stat point! You now have "+(((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))+" stat point"+((((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))==1?"":"s")+" to spend. "+ChatColor.ITALIC+ChatColor.BLUE+" Type /sp to spend them!");
 					}
 				}
-				saveAccountsConfig();
+				//saveAccountsConfig() //Commented out;
 				p.getInventory().removeItem(j);
 				} else {
 		    		p.sendMessage(ChatColor.GOLD+"You can't level this job. It is already at max level.");
@@ -4260,7 +4262,8 @@ public void payDay(int time)
 	}
 	
 	public boolean hasJobBuff(String job, String p, Job j) {
-		if (PlayerinJob(p,job)) {
+		if (PlayerinJob(p,job) || j==Job.JOB40) {
+			//Bukkit.getLogger().info("Inside 1.");
 			int slot=-1;
 			//Check which slot contains our job.
 			for (int i=0;i<3;i++) {
@@ -4269,7 +4272,8 @@ public void payDay(int time)
 					break;
 				}
 			}
-			if (slot!=-1) {
+			if (slot!=-1 || j==Job.JOB40) {
+				//Bukkit.getLogger().info("Inside 2. j is "+j.toString()+". ultimate: "+getAccountsConfig().getString(p.toLowerCase()+".jobs.ultimate")+", Sealed ulti:"+ getAccountsConfig().getBoolean(p.toLowerCase()+".jobs.ultimatesealed"));
 				int level = getAccountsConfig().getInt(p.toLowerCase()+".jobs.job"+(slot+1)+"lv");
 				switch (j) {
 					case JOB5: {
@@ -4308,7 +4312,8 @@ public void payDay(int time)
 						}
 					}
 					case JOB40: {
-						if (level>=40 && getAccountsConfig().getString(p.toLowerCase()+".jobs.ultimate").equalsIgnoreCase(job) && getAccountsConfig().getBoolean(p.toLowerCase()+".jobs.ultimatesealed")) {
+						if (getAccountsConfig().getString(p.toLowerCase()+".jobs.ultimate").equalsIgnoreCase(job) && getAccountsConfig().getBoolean(p.toLowerCase()+".jobs.ultimatesealed")) {
+							//Bukkit.getLogger().info("Inside 3.");
 							return true;
 						} else {
 							return false;
@@ -4751,9 +4756,9 @@ public void payDay(int time)
     	//We can remove them from this job.
     	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))) {
     		//Remove from job members list.
-    		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+"_members").replace(", "+p.getName().toLowerCase(), ""));
+    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members").replace(", "+p.getName().toLowerCase(), ""));
     		/*Try again in case it's the only entry.*/
-    		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+"_members").replace(p.getName().toLowerCase(), ""));
+    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members").replace(p.getName().toLowerCase(), ""));
         	//Remove 1 from main config.
         	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))-1));
         	saveConfig();
@@ -4763,14 +4768,14 @@ public void payDay(int time)
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1lv", Integer.valueOf(0));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1_30", Integer.valueOf(0));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1exp", Double.valueOf(0));
-        	saveAccountsConfig();
+        	//saveAccountsConfig() //Commented out;
         	return true;
     	} else
     	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))) {
     		//Remove from job members list.
-    		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+"_members").replace(", "+p.getName().toLowerCase(), ""));
+    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members").replace(", "+p.getName().toLowerCase(), ""));
     		/*Try again in case it's the only entry.*/
-    		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+"_members").replace(p.getName().toLowerCase(), ""));
+    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members").replace(p.getName().toLowerCase(), ""));
         	//Remove 1 from main config.
         	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))-1));
         	saveConfig();
@@ -4780,14 +4785,14 @@ public void payDay(int time)
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2lv", Integer.valueOf(0));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2_30", Integer.valueOf(0));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2exp", Double.valueOf(0));
-        	saveAccountsConfig();
+        	//saveAccountsConfig() //Commented out;
         	return true;
     	} else
     	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))) {
     		//Remove from job members list.
-    		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+"_members").replace(", "+p.getName().toLowerCase(), ""));
+    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members").replace(", "+p.getName().toLowerCase(), ""));
     		/*Try again in case it's the only entry.*/
-    		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+"_members").replace(p.getName().toLowerCase(), ""));
+    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members").replace(p.getName().toLowerCase(), ""));
         	//Remove 1 from main config.
         	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))-1));
         	saveConfig();
@@ -4797,7 +4802,7 @@ public void payDay(int time)
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3lv", Integer.valueOf(0));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3_30", Integer.valueOf(0));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3exp", Double.valueOf(0));
-        	saveAccountsConfig();
+        	//saveAccountsConfig() //Commented out;
         	return true;
     	}
 		Bukkit.broadcastMessage(ChatColor.RED+"[SEVERE]An internal error occurred, triggered by "+p.getName().toLowerCase()+".");
@@ -4913,7 +4918,7 @@ public void payDay(int time)
 	    		if (getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(getJobSlot(arg1)+1)+"_30")==0) {
 		    		//We are making a valid choice.
 	    			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(getJobSlot(arg1)+1)+"_30",Integer.valueOf(arg2));
-	    			saveAccountsConfig();
+	    			//saveAccountsConfig() //Commented out;
 	        		p.sendMessage(ChatColor.GREEN+"You have set your Lv30 Buff choice for your "+arg1+" job to the "+((Integer.valueOf(arg2)==1)?"first":"second")+" version.");
 	    		} else {
 	        		p.sendMessage(ChatColor.RED+"Sorry, you already picked your Lv30 Buff Choice for that job! You can't change it.");

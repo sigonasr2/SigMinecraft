@@ -1544,7 +1544,7 @@ implements Listener
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest9", Boolean.valueOf(false));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest10", Boolean.valueOf(false));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".bonus.witherskeleton", Integer.valueOf(0));
-			this.plugin.saveAccountsConfig();
+			//this.plugin.saveAccountsConfig() //Commented out;
 			System.out.println("[BankEconomy] Bank account created for " + p.getName() + ".");
 			if (playerwhitelisted) {
 				Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE+"New player "+ChatColor.ITALIC+ChatColor.GOLD+p.getName()+ChatColor.RESET+ChatColor.LIGHT_PURPLE+" has joined the game.");
@@ -1571,11 +1571,11 @@ implements Listener
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1_30", Integer.valueOf(0));
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2_30", Integer.valueOf(0));
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3_30", Integer.valueOf(0));
-				this.plugin.saveAccountsConfig();
+				//this.plugin.saveAccountsConfig() //Commented out;
 			}
 			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".bonus.witherskeleton")) {
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".bonus.witherskeleton", Integer.valueOf(0));
-				this.plugin.saveAccountsConfig();
+				//this.plugin.saveAccountsConfig() //Commented out;
 			}
 			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".stats.stat1")) {
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat1", Integer.valueOf(0));
@@ -1588,7 +1588,7 @@ implements Listener
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat8", Integer.valueOf(0));
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat9", Integer.valueOf(0));
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat10", Integer.valueOf(0));
-				this.plugin.saveAccountsConfig();
+				//this.plugin.saveAccountsConfig() //Commented out;
 				System.out.println("Updated " + p.getName() + "'s data with stat point update.");
 			}
 			//Update account information for notification settings.
@@ -1599,7 +1599,7 @@ implements Listener
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify4", Boolean.valueOf(false));
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify5", Boolean.valueOf(false));
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify6", Boolean.valueOf(false));
-				this.plugin.saveAccountsConfig();
+				//this.plugin.saveAccountsConfig() //Commented out;
 				System.out.println("Updated " + p.getName() + "'s data with nofitications update.");
 			}
 			if (this.plugin.getConfig().getBoolean("halloween-enabled")) {
@@ -1615,7 +1615,7 @@ implements Listener
 				if (!full) {
 					if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".join.halloween_book")) {
 						this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".join.halloween_book", Boolean.valueOf(true));
-						this.plugin.saveAccountsConfig();
+						//this.plugin.saveAccountsConfig() //Commented out;
 						System.out.println("Updated " + p.getName() + "'s data with a Halloween Book.");
 						ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
 						BookMeta bookdata = (BookMeta)book.getItemMeta();
@@ -1633,7 +1633,7 @@ implements Listener
 					}
 					if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".join.halloween_vote_signs")) {
 						this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".join.halloween_vote_signs", Boolean.valueOf(true));
-						this.plugin.saveAccountsConfig();
+						//this.plugin.saveAccountsConfig() //Commented out;
 						ItemStack sign = new ItemStack(Material.SIGN,2);
 						ItemMeta meta = sign.getItemMeta();
 						meta.setDisplayName(ChatColor.BLUE+p.getName());
@@ -1657,16 +1657,16 @@ implements Listener
 					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest8", Boolean.valueOf(false));
 					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest9", Boolean.valueOf(false));
 					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest10", Boolean.valueOf(false));
-					this.plugin.saveAccountsConfig();
+					//this.plugin.saveAccountsConfig() //Commented out;
 				}
 				if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".jobs.ultimate")) {
 					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimate", String.valueOf("None"));
 					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimatesealed", Boolean.valueOf(false));
-					this.plugin.saveAccountsConfig();
+					//this.plugin.saveAccountsConfig() //Commented out;
 				}
 				if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".halloween.wand")) {
 					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.wand", Long.valueOf(Main.SERVER_TICK_TIME));
-					this.plugin.saveAccountsConfig();
+					//this.plugin.saveAccountsConfig() //Commented out;
 				}
 			}
 			//Check if this player has unallocated stat points.
@@ -3172,6 +3172,215 @@ implements Listener
 			}
 		}
 	}
+
+	private void breakOreBlock(Player p, Block b) {
+		breakOreBlock(p, b, false);
+	}
+
+	private void breakOreBlock(Player p, Block b, boolean silk_touch) {
+		breakOreBlock(p, b, false, 1);
+	}
+	
+	private void breakOreBlock(Player p, Block b, boolean silk_touch, double xp_mult) {
+		if (this.plugin.PlayerinJob(p, "Miner")) {
+			Bukkit.getLogger().info("This player is a miner.");
+			int myData=this.plugin.getPlayerDataSlot(p);
+			if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
+				Bukkit.getLogger().info("Good interact.");
+				if (b.getType()==Material.STONE) {
+					this.plugin.gainMoneyExp(p,"Miner",0.0025,1);
+				} else
+				if (b.getType()==Material.NETHERRACK) {
+					this.plugin.gainMoneyExp(p,"Miner",0.005,1);
+				} else
+				if (b.getType()==Material.COAL_ORE && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.0125,3);
+					Bukkit.getLogger().info("Coal Ore.");
+				} else
+				if (b.getType()==Material.GLOWSTONE && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.015,3);
+				} else
+				if (b.getType()==Material.SANDSTONE) {
+					this.plugin.gainMoneyExp(p,"Miner",0.015,4);
+				} else
+				if (b.getType()==Material.NETHER_BRICK) {
+					this.plugin.gainMoneyExp(p,"Miner",0.02,3);
+				} else
+				if (b.getType()==Material.QUARTZ_ORE && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.025,4);
+				} else
+				if (b.getType()==Material.LAPIS_ORE && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.03,5);
+				} else
+				if (b.getType()==Material.MOSSY_COBBLESTONE) {
+					this.plugin.gainMoneyExp(p,"Miner",0.0375,8);
+				} else
+				if (b.getType()==Material.IRON_ORE && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.0375,6);
+				} else
+				if ((b.getType()==Material.REDSTONE_ORE || b.getType()==Material.GLOWING_REDSTONE_ORE) && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.05,9);
+				} else
+				if (b.getType()==Material.OBSIDIAN) {
+					this.plugin.gainMoneyExp(p,"Miner",0.0625,10);
+				} else
+				if (b.getType()==Material.GOLD_ORE && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.0975,12);
+				} else
+				if (b.getType()==Material.DIAMOND_ORE && !silk_touch) {
+						this.plugin.gainMoneyExp(p,"Miner",0.3125,60);
+				} else
+				if (b.getType()==Material.EMERALD_ORE && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.7625,160);
+				}
+			}
+		}
+		Material[] fortune_materials = {Material.EMERALD_ORE,Material.COAL_ORE,Material.DIAMOND_ORE,Material.REDSTONE_ORE,Material.GLOWING_REDSTONE_ORE,Material.LAPIS_ORE,Material.QUARTZ_ORE}; //An array of all blocks that multiply via fortune.
+		Material[] result_materials = {Material.EMERALD,Material.COAL,Material.DIAMOND,Material.REDSTONE,Material.REDSTONE,Material.INK_SACK,Material.QUARTZ}; //The resulting materials corresponding to the fortune blocks being broken.
+		boolean fortune_material=false;
+		int fortune_material_slot=0;
+		int mult = 1;
+		short WOOD_PICKAXE = 0, STONE_PICKAXE = 1, GOLD_PICKAXE = 2, IRON_PICKAXE = 3, DIAMOND_PICKAXE = 4; //Constants that define the pickaxe strength.
+		
+		short[] material_pickaxe_requirements = {IRON_PICKAXE,WOOD_PICKAXE,IRON_PICKAXE,IRON_PICKAXE,IRON_PICKAXE,STONE_PICKAXE,WOOD_PICKAXE};
+		
+		short my_pickaxe_strength=-1; //-1 is some other random item / your hand.
+		switch (p.getItemInHand().getType()) {
+			case WOOD_PICKAXE:{my_pickaxe_strength = WOOD_PICKAXE;}break;
+			case STONE_PICKAXE:{my_pickaxe_strength = STONE_PICKAXE;}break;
+			case GOLD_PICKAXE:{my_pickaxe_strength = GOLD_PICKAXE;}break;
+			case IRON_PICKAXE:{my_pickaxe_strength = IRON_PICKAXE;}break;
+			case DIAMOND_PICKAXE:{my_pickaxe_strength = DIAMOND_PICKAXE;}break;
+		}
+		for (int i=0;i<fortune_materials.length;i++) {
+			if (fortune_materials[i].equals(b.getType())) {
+				fortune_material=true;
+				fortune_material_slot=i;
+				break;
+			}
+		}
+		if (!silk_touch) {
+			if (b.getType()==Material.COAL_ORE && my_pickaxe_strength>=WOOD_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(1*xp_mult));
+			}
+			if (b.getType()==Material.IRON_ORE && my_pickaxe_strength>=STONE_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(1*xp_mult));
+			}
+			if (b.getType()==Material.GOLD_ORE && my_pickaxe_strength>=IRON_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(1*xp_mult));
+			}
+			if ((b.getType()==Material.REDSTONE_ORE || b.getType()==Material.GLOWING_REDSTONE_ORE) && my_pickaxe_strength>=IRON_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(3*xp_mult));
+			}
+			if (b.getType()==Material.LAPIS_ORE && my_pickaxe_strength>=STONE_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(3*xp_mult));
+			}
+			if (b.getType()==Material.DIAMOND_ORE && my_pickaxe_strength>=IRON_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(12*xp_mult));
+			}
+			if (b.getType()==Material.EMERALD_ORE && my_pickaxe_strength>=IRON_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(28*xp_mult));
+			}
+			if (b.getType()==Material.QUARTZ_ORE && my_pickaxe_strength>=WOOD_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(4*xp_mult));
+			}
+		}
+		if (this.plugin.hasJobBuff("Miner", p, Job.JOB40)) {
+			mult=2;
+		}
+		if (p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)>0) { //Check if the player has fortune.
+			if (fortune_material && my_pickaxe_strength>=material_pickaxe_requirements[fortune_material_slot]) { //If this is a fortune material, we have to account for the new fortune enchantment algorithm. Make sure we have a good enough pickaxe too.
+				//e.setCancelled(true);
+				p.getWorld().getBlockAt(b.getLocation()).setType(Material.AIR);
+				int fortune_level = p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
+				int drop_chance=50;
+				for (int i=1;i<fortune_level;i++) {
+					drop_chance += (100-drop_chance)/2;
+				}
+				boolean drop_extra=false;
+				if (Math.random()*100d<=drop_chance) {
+					drop_extra=true;
+				}
+				if (result_materials[fortune_material_slot]!=Material.REDSTONE &&
+						result_materials[fortune_material_slot]!=Material.INK_SACK) {
+					//This is an item that actually just drops one of per ore. Drop normally.
+					p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(result_materials[fortune_material_slot],((drop_extra)?2:1)*mult));
+				} else {
+					if (result_materials[fortune_material_slot]==Material.REDSTONE) { //Drop redstone
+						p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(result_materials[fortune_material_slot],((drop_extra)?(((int)(Math.random()*2))+4)*2:((int)(Math.random()*2))+4)*mult));
+					} else {//Drop Lapis.
+						Item lapis = p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(result_materials[fortune_material_slot],((drop_extra)?(((int)(Math.random()*5))+4)*2:((int)(Math.random()*5))+4)*mult,(byte)4));
+					}
+				}
+			}
+		} else {
+			if (fortune_material && my_pickaxe_strength>=material_pickaxe_requirements[fortune_material_slot]) {
+				//Bukkit.getLogger().info("No fortune, drop "+result_materials[fortune_material_slot].name()+" manually.");
+				p.getWorld().getBlockAt(b.getLocation()).setType(Material.AIR);
+				boolean drop_extra=false;
+				if (result_materials[fortune_material_slot]!=Material.REDSTONE &&
+						result_materials[fortune_material_slot]!=Material.INK_SACK) {
+					//This is an item that actually just drops one of per ore. Drop normally.
+					p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(result_materials[fortune_material_slot],((drop_extra)?2:1)*mult));
+				} else {
+					if (result_materials[fortune_material_slot]==Material.REDSTONE) { //Drop redstone
+						p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(result_materials[fortune_material_slot],((drop_extra)?(((int)(Math.random()*2))+4)*2:((int)(Math.random()*2))+4)*mult));
+					} else {//Drop Lapis.
+						Item lapis = p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(result_materials[fortune_material_slot],((drop_extra)?(((int)(Math.random()*5))+4)*2:((int)(Math.random()*5))+4)*mult,(byte)4));
+					}
+				}
+			}
+		}
+		if (b.getType()==Material.IRON_ORE && !silk_touch) {
+			//e.setCancelled(true);
+			p.getWorld().getBlockAt(b.getLocation()).setType(Material.AIR);
+			if (my_pickaxe_strength>=STONE_PICKAXE) {
+				p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(Material.IRON_INGOT));
+			}
+		}
+		if (b.getType()==Material.GOLD_ORE && !silk_touch) {
+			//e.setCancelled(true);
+			p.getWorld().getBlockAt(b.getLocation()).setType(Material.AIR);
+			if (my_pickaxe_strength>=IRON_PICKAXE) {
+				p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(Material.GOLD_INGOT));
+			}
+		}
+	}
+	
+	private void destroyNearbyOres(World w, Player p, Location currentloc) {
+		destroyNearbyOres(w, p, currentloc, false, 1);
+	}
+	
+	private void destroyNearbyOres(World w, Player p, Location currentloc, boolean silk_touch, double xp_mult) {
+		//Check surrounding ores.
+		if (w.getBlockAt(currentloc).getType().name().toLowerCase().contains("ore")) {
+			breakOreBlock(p, w.getBlockAt(currentloc), silk_touch, xp_mult);
+		}
+		Location newloc = null;
+		for (int x=-1;x<2;x++) {
+			for (int y=-1;y<2;y++) {
+				for (int z=-1;z<2;z++) {
+					if (x!=0 || y!=0 || z!=0) {
+						//Bukkit.getLogger().info("Destroy block.");
+						newloc = currentloc.clone().add(x,y,z);
+						if (w.getBlockAt(newloc).getType().name().toLowerCase().contains("ore")) {
+							//Bukkit.getLogger().info("New ore, set block break.");
+							breakOreBlock(p, w.getBlockAt(newloc), silk_touch, xp_mult);
+							destroyNearbyOres(w, p, newloc, silk_touch, xp_mult);
+						}
+					}
+				}
+			}
+		}
+	}
 	
 	private void destroyNearbyTree(World w, Location treeNode, Location checkloc, byte type, boolean silk_touch) {
 		//treeNode is where the original tree is located. checkloc is the current checking location.
@@ -3195,7 +3404,7 @@ implements Listener
 							if (w.getBlockAt(newloc).getData()==3) {
 								//Jungle sapling.
 								if (silk_touch) {
-									w.dropItemNaturally(newloc, new ItemStack(Material.LEAVES,1));
+									w.dropItemNaturally(newloc, new ItemStack(Material.LEAVES,1,(short)(w.getBlockAt(newloc).getData()%4)));
 								} else 
 								if (Math.random()<=0.025) {
 									ItemStack item = new ItemStack(Material.SAPLING,1);
@@ -3210,7 +3419,7 @@ implements Listener
 									}
 								}
 								if (silk_touch) {
-									w.dropItemNaturally(newloc, new ItemStack(Material.LEAVES,1));
+									w.dropItemNaturally(newloc, new ItemStack(Material.LEAVES,1,(short)(w.getBlockAt(newloc).getData()%4)));
 								} else 
 								if (Math.random()<=0.05) {
 									ItemStack item = new ItemStack(Material.SAPLING,1);
@@ -3233,6 +3442,13 @@ implements Listener
 		//p.sendMessage("Block broke.");
 		//p.sendMessage("Has name: "+p.getItemInHand().getItemMeta().hasDisplayName());
 		//p.sendMessage("Name is: "+p.getItemInHand().getItemMeta().getDisplayName());
+		
+		boolean has_silktouch=false;
+		if (!p.getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH)) {
+			has_silktouch=false;
+		} else {
+			has_silktouch=true;
+		}
 		
 		//*******************************//Job Buffs Begin here!
 		if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB20)) {
@@ -3293,15 +3509,104 @@ implements Listener
 				destroyNearbyTree(e.getBlock().getWorld() ,e.getBlock().getLocation(), e.getBlock().getLocation(), (byte)(e.getBlock().getData()%4), p.getItemInHand().getEnchantmentLevel(Enchantment.SILK_TOUCH)>0);
 			}
 		}
+		
+
+		if (this.plugin.hasJobBuff("Miner", p, Job.JOB5)) {
+			if (e.getBlock().getType().name().toLowerCase().contains("ore")) {
+				//Break all consecutive ores next to this ore. 
+				//Bukkit.getLogger().info("Destroy nearby");
+				e.setCancelled(true);
+				if (this.plugin.hasJobBuff("Miner", p, Job.JOB10)) {
+					destroyNearbyOres(e.getBlock().getWorld(), p, e.getBlock().getLocation(), has_silktouch, 4);
+				} else {
+					destroyNearbyOres(e.getBlock().getWorld(), p, e.getBlock().getLocation(), has_silktouch, 1);
+				}
+				if (this.plugin.hasJobBuff("Miner", p, Job.JOB30B)) {
+					try {
+						Iterator<PotionEffect> effects = p.getActivePotionEffects().iterator();
+						//Figure out potion effects when player joins.
+						while (effects.hasNext()) {
+							PotionEffect nexteffect = effects.next();
+							if (nexteffect.getType().getName().compareTo(PotionEffectType.FAST_DIGGING.getName())==0 && nexteffect.getAmplifier()<4) {
+								p.removePotionEffect(PotionEffectType.FAST_DIGGING);
+								p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 200, nexteffect.getAmplifier()+1, true));
+							}
+							/*if (nexteffect.getType().getName().compareTo(PotionEffectType.JUMP.getName())==0) {
+								p.removePotionEffect(PotionEffectType.JUMP);
+								p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 360000, nexteffect.getAmplifier()+2, true));
+							}*/
+							effects.remove();
+						}
+					} catch (ConcurrentModificationException ex_e) {
+						Bukkit.getLogger().warning("Potion Effect Collection not accessible while initializing player speed.");
+					}
+					p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 200, 0, true));
+				}
+			} else {
+				if (e.getBlock().getType()==Material.STONE || e.getBlock().getType()==Material.COBBLESTONE) {
+					if (this.plugin.hasJobBuff("Miner", p, Job.JOB30B)) {
+						try {
+							Iterator<PotionEffect> effects = p.getActivePotionEffects().iterator();
+							//Figure out potion effects when player joins.
+							while (effects.hasNext()) {
+								PotionEffect nexteffect = effects.next();
+								if (nexteffect.getType().getName().compareTo(PotionEffectType.FAST_DIGGING.getName())==0 && nexteffect.getAmplifier()<4) {
+									p.removePotionEffect(PotionEffectType.FAST_DIGGING);
+									p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 200, nexteffect.getAmplifier()+1, true));
+								}
+								/*if (nexteffect.getType().getName().compareTo(PotionEffectType.JUMP.getName())==0) {
+									p.removePotionEffect(PotionEffectType.JUMP);
+									p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 360000, nexteffect.getAmplifier()+2, true));
+								}*/
+								effects.remove();
+							}
+						} catch (ConcurrentModificationException ex_e) {
+							Bukkit.getLogger().warning("Potion Effect Collection not accessible while initializing player speed.");
+						}
+						p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 200, 0, true));
+					}
+				}
+				if (this.plugin.hasJobBuff("Miner", p, Job.JOB20)) {
+					if (p.getItemInHand().getType()==Material.DIAMOND_PICKAXE && (e.getBlock().getType()==Material.STONE || e.getBlock().getType()==Material.COBBLESTONE)) {
+						for (int i=-1;i<2;i++) {
+							for (int j=-1;j<2;j++) {
+								for (int k=-1;k<2;k++) {
+									if (e.getBlock().getLocation().add(i,j,k).getBlock().getType().name().toLowerCase().contains("ore")) {
+										destroyNearbyOres(e.getBlock().getWorld(), p, e.getBlock().getLocation(), has_silktouch, 4);
+									} else {
+										if (this.plugin.PlayerinJob(p, "Miner")) {
+											int myData=this.plugin.getPlayerDataSlot(p);
+											if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
+												if (e.getBlock().getType()==Material.STONE) {
+													this.plugin.gainMoneyExp(p,"Miner",0.0025,1);
+												}
+											}
+										}
+										if (e.getBlock().getLocation().add(i,j,k).getBlock().getType()==Material.STONE || e.getBlock().getLocation().add(i,j,k).getBlock().getType()==Material.COBBLESTONE) {
+											if (has_silktouch) {
+												e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(i,j,k), new ItemStack(e.getBlock().getLocation().add(i,j,k).getBlock().getType()));
+											} else {
+												e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(i,j,k), new ItemStack(Material.COBBLESTONE));
+											}
+											e.getBlock().getLocation().add(i,j,k).getBlock().setType(Material.AIR);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		} else {
+			if (e.getBlock().getType().name().toLowerCase().contains("ore")) {
+				//Mine it out normally for other players.
+				e.setCancelled(true);
+				breakOreBlock(p, e.getBlock(), has_silktouch);
+			}
+		}
 		//*******************************//Job Buffs end here!
 		
 		int myData=this.plugin.getPlayerDataSlot(p);
-		boolean has_silktouch=false;
-		if (!p.getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH)) {
-			has_silktouch=false;
-		} else {
-			has_silktouch=true;
-		}
 		if (p!=null) {
 			if (e.getBlock().getType()==Material.COMMAND) {
 				e.setCancelled(true);
@@ -3518,13 +3823,15 @@ implements Listener
 				this.plugin.playerdata_list.get(myData).BadInteract(e.getBlock().getType());
 			}
 			if (this.plugin.PlayerinJob(p, "Woodcutter")) {
-				if (e.getBlock().getType()==Material.LOG) {
-					if (p.getItemInHand().getType()==Material.WOOD_AXE || p.getItemInHand().getType()==Material.STONE_AXE || p.getItemInHand().getType()==Material.IRON_AXE || p.getItemInHand().getType()==Material.GOLD_AXE || p.getItemInHand().getType()==Material.DIAMOND_AXE) {
-						//p.sendMessage("Cut down wood w/axe.");
-						this.plugin.gainMoneyExp(p,"Woodcutter",0.025,2);
-					} else {
-						//p.sendMessage("Cut down wood.");
-						this.plugin.gainMoneyExp(p,"Woodcutter",0.01,1);
+				if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
+					if (e.getBlock().getType()==Material.LOG) {
+						if (p.getItemInHand().getType()==Material.WOOD_AXE || p.getItemInHand().getType()==Material.STONE_AXE || p.getItemInHand().getType()==Material.IRON_AXE || p.getItemInHand().getType()==Material.GOLD_AXE || p.getItemInHand().getType()==Material.DIAMOND_AXE) {
+							//p.sendMessage("Cut down wood w/axe.");
+							this.plugin.gainMoneyExp(p,"Woodcutter",0.025,2);
+						} else {
+							//p.sendMessage("Cut down wood.");
+							this.plugin.gainMoneyExp(p,"Woodcutter",0.01,1);
+						}
 					}
 				}
 			}
@@ -3667,7 +3974,6 @@ implements Listener
 						}*/
 						effects.remove();
 					}
-
 				} catch (ConcurrentModificationException ex_e) {
 					Bukkit.getLogger().warning("Potion Effect Collection not accessible while initializing player speed.");
 				}
@@ -3705,83 +4011,6 @@ implements Listener
 				//p.sendMessage("Got in.");
 				p.updateInventory();
 			}
-		}
-		Material[] fortune_materials = {Material.EMERALD_ORE,Material.COAL_ORE,Material.DIAMOND_ORE,Material.REDSTONE_ORE,Material.LAPIS_ORE,Material.QUARTZ_ORE}; //An array of all blocks that multiply via fortune.
-		Material[] result_materials = {Material.EMERALD,Material.COAL,Material.DIAMOND,Material.REDSTONE,Material.INK_SACK,Material.QUARTZ}; //The resulting materials corresponding to the fortune blocks being broken.
-		boolean fortune_material=false;
-		int fortune_material_slot=0;
-		for (int i=0;i<fortune_materials.length;i++) {
-			if (fortune_materials[i].equals(e.getBlock().getType())) {
-				fortune_material=true;
-				fortune_material_slot=i;
-				break;
-			}
-		}
-		if (!has_silktouch) {
-			if (e.getBlock().getType()==Material.IRON_ORE) {
-				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
-				exp.setExperience(1);
-			}
-			if (e.getBlock().getType()==Material.GOLD_ORE) {
-				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
-				exp.setExperience(1);
-			}
-			if (e.getBlock().getType()==Material.REDSTONE_ORE) {
-				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
-				exp.setExperience(3);
-			}
-			if (e.getBlock().getType()==Material.LAPIS_ORE) {
-				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
-				exp.setExperience(3);
-			}
-			if (e.getBlock().getType()==Material.DIAMOND_ORE) {
-				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
-				exp.setExperience(12);
-			}
-			if (e.getBlock().getType()==Material.EMERALD_ORE) {
-				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
-				exp.setExperience(28);
-			}
-			if (e.getBlock().getType()==Material.QUARTZ_ORE) {
-				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
-				exp.setExperience(4);
-			}
-		}
-		if (p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)>0) { //Check if the player has fortune.
-			if (fortune_material) { //If this is a fortune material, we have to account for the new fortune enchantment algorithm.
-				e.setCancelled(true);
-				e.getPlayer().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
-				int fortune_level = p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
-				int drop_chance=50;
-				for (int i=1;i<fortune_level;i++) {
-					drop_chance += (100-drop_chance)/2;
-				}
-				boolean drop_extra=false;
-				if (Math.random()*100d<=drop_chance) {
-					drop_extra=true;
-				}
-				if (result_materials[fortune_material_slot]!=Material.REDSTONE &&
-						result_materials[fortune_material_slot]!=Material.INK_SACK) {
-					//This is an item that actually just drops one of per ore. Drop normally.
-					e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(result_materials[fortune_material_slot],(drop_extra)?2:1));
-				} else {
-					if (result_materials[fortune_material_slot]==Material.REDSTONE) { //Drop redstone
-						e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(result_materials[fortune_material_slot],(drop_extra)?(((int)(Math.random()*2))+4)*2:((int)(Math.random()*2))+4));
-					} else {//Drop Lapis.
-						Item lapis = e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(result_materials[fortune_material_slot],(drop_extra)?(((int)(Math.random()*5))+4)*2:((int)(Math.random()*5))+4,(byte)4));
-					}
-				}
-			}
-		}
-		if (e.getBlock().getType()==Material.IRON_ORE && !has_silktouch) {
-			e.setCancelled(true);
-			e.getPlayer().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
-			e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(Material.IRON_INGOT));
-		}
-		if (e.getBlock().getType()==Material.GOLD_ORE && !has_silktouch) {
-			e.setCancelled(true);
-			e.getPlayer().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
-			e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(Material.GOLD_INGOT));
 		}
 		if (e.getBlock().getType()==Material.MELON_BLOCK) {
 			e.setCancelled(true);
@@ -5198,18 +5427,41 @@ implements Listener
 	  Player p = e.getPlayer();
 	  Bukkit.getPlayer("sigonasr2").sendMessage("Extacting "+e.getItemAmount()+" "+e.getItemType());
   }*/
-/*
+	
 	@EventHandler
 	public void onItemChange(PlayerItemHeldEvent e) {
 		final Player p = e.getPlayer();
-		Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
-			@Override
-			public void run() {
-				p.sendMessage("Item Data: "+p.getItemInHand().getData().toString());
-			}
-		},5);
+
+		//*****************************// Job Buff stuff.
+		if (this.plugin.hasJobBuff("Miner", p, Job.JOB20)) {
+			Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+				@Override
+				public void run() {
+					if (p.getItemInHand().getType().name().toLowerCase().contains("pickaxe")) {
+						if (p.getItemInHand().getEnchantmentLevel(Enchantment.DIG_SPEED)<6) {
+							p.getItemInHand().addUnsafeEnchantment(Enchantment.DIG_SPEED, 6);
+						}
+						if (p.getItemInHand().getEnchantmentLevel(Enchantment.DURABILITY)<4) {
+							p.getItemInHand().addUnsafeEnchantment(Enchantment.DURABILITY, 4);
+						}
+					}
+				}
+			},5);
+		} else
+		if (this.plugin.hasJobBuff("Miner", p, Job.JOB10)) {
+			Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+				@Override
+				public void run() {
+					if (p.getItemInHand().getType().name().toLowerCase().contains("pickaxe")) {
+						if (p.getItemInHand().getEnchantmentLevel(Enchantment.DIG_SPEED)<3) {
+							p.getItemInHand().addEnchantment(Enchantment.DIG_SPEED, 3);
+						}
+					}
+				}
+			},5);
+		}
+		//****************************// End Job Buff stuff.
 	}
-*/
 	public ItemStack getGoodie() {
 		ItemStack item = null;
 		if (Math.random()<0.33) {
@@ -6526,7 +6778,7 @@ implements Listener
 						} else {
 							//Show the user a fake inventory containing the magic pie.
 							this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".halloween.chest"+numb, Boolean.valueOf(true));
-							this.plugin.saveAccountsConfig();
+							//this.plugin.saveAccountsConfig() //Commented out;
 							p.closeInventory();
 							e.setCancelled(true);
 							Inventory a = Bukkit.createInventory(p, 9);
@@ -6644,6 +6896,9 @@ implements Listener
 		final EntityDamageEvent f = e;
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			final Player p = (Player)e.getEntity();
+			if (p.getItemInHand().getType().name().toLowerCase().contains("pickaxe") && this.plugin.hasJobBuff("Miner", p, Job.JOB30A)) {
+				e.setDamage(e.getDamage()*0.25);
+			}
 			if (e.getCause()==DamageCause.FALL && p.hasPotionEffect(PotionEffectType.JUMP)) {
 				//Jump boost fall damage is just stupid. Remove it if you have jump boost.
 				e.setDamage(0);
@@ -8651,7 +8906,7 @@ implements Listener
 				savefile.set(p.getName().toLowerCase()+".settings.notify4", Boolean.valueOf(e.getInventory().getItem(15).getType()==Material.REDSTONE_TORCH_ON));
 				savefile.set(p.getName().toLowerCase()+".settings.notify5", Boolean.valueOf(e.getInventory().getItem(20).getType()==Material.REDSTONE_TORCH_ON));
 				savefile.set(p.getName().toLowerCase()+".settings.notify6", Boolean.valueOf(e.getInventory().getItem(24).getType()==Material.REDSTONE_TORCH_ON));
-				this.plugin.saveAccountsConfig();
+				//this.plugin.saveAccountsConfig() //Commented out;
 			}
 		if (e.getInventory().getTitle().equalsIgnoreCase("Repair and Enchant")) {
 			// We have to return the items the player placed inside the anvil
@@ -10685,7 +10940,7 @@ implements Listener
 				  newloc.setZ(51.65d);
 				  winningplayer.teleport(newloc);
 				  updateTopSPLEEFSigns();
-				  this.plugin.saveAccountsConfig();
+				  //this.plugin.saveAccountsConfig() //Commented out;
 			  } else {
 				  //We're player B.
 				  //Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+this.plugin.getConfig().getString("spleefrequestaplayer")+" is the winner of this spleef game! "+this.plugin.getConfig().getString("spleefrequestbplayer")+" loses.");
@@ -10735,7 +10990,7 @@ implements Listener
 				  newloc.setZ(51.65d);
 				  winningplayer.teleport(newloc);
 				  updateTopSPLEEFSigns();
-				  this.plugin.saveAccountsConfig();
+				  //this.plugin.saveAccountsConfig() //Commented out;
 			  }
 			  //Look for the special shovel.
 			  Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequestaplayer")).getInventory().clear();
@@ -10810,7 +11065,7 @@ implements Listener
 		}
 		if (!this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".revived")) {
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".revived", Boolean.valueOf(true));
-			this.plugin.saveAccountsConfig();
+			//this.plugin.saveAccountsConfig() //Commented out;
 		}
 		if (this.plugin.getConfig().getBoolean("spleefinsession") && (p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))==0 || p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestbplayer"))==0)) {
 			//This player was in spleef. End the spleef session as if this player lost.
@@ -10865,7 +11120,7 @@ implements Listener
 				newloc.setZ(51.65d);
 				winningplayer.teleport(newloc);
 				updateTopSPLEEFSigns();
-				this.plugin.saveAccountsConfig();
+				//this.plugin.saveAccountsConfig() //Commented out;
 			} else {
 				//We're player B.
 				winningplayer=Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequestaplayer"));
@@ -10913,7 +11168,7 @@ implements Listener
 				newloc.setZ(51.65d);
 				winningplayer.teleport(newloc);
 				updateTopSPLEEFSigns();
-				this.plugin.saveAccountsConfig();
+				//this.plugin.saveAccountsConfig() //Commented out;
 			}
 
 			//Look for the special shovel.
@@ -11123,7 +11378,7 @@ implements Listener
 			plugin.getAccountsConfig().set(p.getName() + ".deathworld",String.valueOf(deathWorld));
 			plugin.getAccountsConfig().set(p.getName() + ".revived",Boolean.valueOf(false));
 			plugin.getAccountsConfig().set(p.getName() + ".revivetime",Long.valueOf(Main.SERVER_TICK_TIME));
-			plugin.saveAccountsConfig();
+			//plugin.saveAccountsConfig();
 			double mincost = plugin.getConfig().getDouble("revive-cost-rate");
 			if (p.getBedSpawnLocation()!=null) {
 				mincost *= Math.abs(p.getBedSpawnLocation().getX()-deathX)+Math.abs(p.getBedSpawnLocation().getY()-deathY)+Math.abs(p.getBedSpawnLocation().getZ()-deathZ);
@@ -11287,7 +11542,7 @@ implements Listener
 				this.plugin.economy.withdrawPlayer(e.getPlayer().getName(), val);
 				double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money");
 				this.plugin.getAccountsConfig().set(e.getPlayer().getName() + ".money", Double.valueOf(mymoney+val));
-				this.plugin.saveAccountsConfig();
+				//this.plugin.saveAccountsConfig() //Commented out;
 				e.getPlayer().sendMessage(ChatColor.GREEN+"Deposited $" + df.format(val) + " into your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")));
 				this.plugin.last_bank_deposit_use_time=0;
 			} else {
@@ -11300,7 +11555,7 @@ implements Listener
 						this.plugin.economy.withdrawPlayer(e.getPlayer().getName(), val);
 						double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money");
 						this.plugin.getAccountsConfig().set(e.getPlayer().getName() + ".money", Double.valueOf(mymoney+val));
-						this.plugin.saveAccountsConfig();
+						//this.plugin.saveAccountsConfig() //Commented out;
 						e.getPlayer().sendMessage(ChatColor.GREEN+"Deposited $" + df.format(val) + " into your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")));
 						this.plugin.last_bank_deposit_use_time=0;
 					} else {
@@ -11321,7 +11576,7 @@ implements Listener
 					//Withdraw all the money in their account.
 					val = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money");
 					this.plugin.getAccountsConfig().set(e.getPlayer().getName() + ".money", Double.valueOf(0));
-					this.plugin.saveAccountsConfig();
+					//this.plugin.saveAccountsConfig() //Commented out;
 					this.plugin.economy.depositPlayer(e.getPlayer().getName(), val);
 					e.getPlayer().sendMessage(ChatColor.GREEN+"Withdrawed $" + df.format(val) + " from your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")));
 					this.plugin.last_bank_withdraw_use_time=0;
@@ -11335,7 +11590,7 @@ implements Listener
 							this.plugin.economy.depositPlayer(e.getPlayer().getName(), val);
 							double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money");
 							this.plugin.getAccountsConfig().set(e.getPlayer().getName() + ".money", Double.valueOf(mymoney-val));
-							this.plugin.saveAccountsConfig();
+							//this.plugin.saveAccountsConfig() //Commented out;
 							e.getPlayer().sendMessage(ChatColor.GREEN+"Withdrawed $" + df.format(val) + " from your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")));
 							this.plugin.last_bank_withdraw_use_time=0;
 						} else {
@@ -12153,7 +12408,7 @@ implements Listener
 										}
 									}
 									this.plugin.saveConfig();
-									this.plugin.saveAccountsConfig();
+									//this.plugin.saveAccountsConfig() //Commented out;
 								}
 							} else
 								if (sign.getBlock().getX()==1620 && sign.getBlock().getY()==83 && sign.getBlock().getZ()==45) { //Side B Request.
@@ -12224,7 +12479,7 @@ implements Listener
 											}
 										}
 										this.plugin.saveConfig();
-										this.plugin.saveAccountsConfig();
+										//this.plugin.saveAccountsConfig() //Commented out;
 									}
 								}
 						if (stats) {
@@ -12234,7 +12489,7 @@ implements Listener
               double total = actMon + value;
               if (value <= actHand) {
                 this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".money", Double.valueOf(total));
-                this.plugin.saveAccountsConfig();
+                //this.plugin.saveAccountsConfig() //Commented out;
                 if (value <= 1)
                   p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " You added " + value + " " + currencySG + " to your bank account.");
                 else {
@@ -12260,7 +12515,7 @@ implements Listener
               double total = actMon - value;
               if (value <= actMon) {
                 this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".money", Double.valueOf(total));
-                this.plugin.saveAccountsConfig();
+                //this.plugin.saveAccountsConfig() //Commented out;
                 if (value <= 1)
                   p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " You withdrawn " + value + " " + currencySG + " from your bank account.");
                 else {
