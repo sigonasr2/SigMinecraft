@@ -3273,6 +3273,23 @@ implements Listener
 			if (findleaves) {
 				//This is definitely a tree we can chop down. Destroy it then.
 				//Bukkit.getLogger().info("Identified as tree. Start Destroying.");
+				try {
+					Iterator<PotionEffect> effects = p.getActivePotionEffects().iterator();
+						//Figure out potion effects when player joins.
+						while (effects.hasNext()) {
+							PotionEffect nexteffect = effects.next();
+							if (nexteffect.getType().getName().compareTo(PotionEffectType.HEALTH_BOOST.getName())==0) {
+								double myhealth = p.getHealth();
+								p.removePotionEffect(PotionEffectType.HEALTH_BOOST);
+								p.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,1200,nexteffect.getAmplifier()+1));
+								p.setHealth(myhealth);
+							}
+							effects.remove();
+						}
+				  } catch (ConcurrentModificationException ex_e) {
+					  Bukkit.getLogger().warning("Potion Effect Collection not accessible while initializing player speed.");
+				  }
+				p.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,1200,0));
 				destroyNearbyTree(e.getBlock().getWorld() ,e.getBlock().getLocation(), e.getBlock().getLocation(), (byte)(e.getBlock().getData()%4), p.getItemInHand().getEnchantmentLevel(Enchantment.SILK_TOUCH)>0);
 			}
 		}
@@ -3640,8 +3657,9 @@ implements Listener
 							p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 360000, nexteffect.getAmplifier()+2, true));
 						}
 						if (nexteffect.getType().getName().compareTo(PotionEffectType.HEALTH_BOOST.getName())==0) {
-							p.removePotionEffect(PotionEffectType.HEALTH_BOOST);
+							double myhealth = p.getHealth();
 							p.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 360000, nexteffect.getAmplifier()+1, true));
+							p.setHealth(myhealth);
 						}
 						/*if (nexteffect.getType().getName().compareTo(PotionEffectType.JUMP.getName())==0) {
 							p.removePotionEffect(PotionEffectType.JUMP);
