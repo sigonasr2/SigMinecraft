@@ -1124,10 +1124,12 @@ public void runTick() {
 				  for (int i=0;i<world_entities.size();i++) {
 					  if (world_entities.get(i).getType()==EntityType.WITHER) {
 						  Wither l = (Wither)world_entities.get(i);
-						  if (l.getMaxHealth()<l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth()))) {
-						      DecimalFormat df = new DecimalFormat("#0.0");
-							  l.setHealth(l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth())));
-							  //Bukkit.broadcastMessage("Healed "+(+5+(0.2*(l.getMaxHealth()/l.getHealth())))+" health. "+df.format(l.getHealth())+"/"+l.getMaxHealth()+" HP");
+						  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE+"Mythical Wither")) {
+							  if (l.getMaxHealth()>l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth()))) {
+							      DecimalFormat df = new DecimalFormat("#0.0");
+							      //Bukkit.broadcastMessage("Healing for "+(+5+(0.2*(l.getMaxHealth()/l.getHealth())))+" health. "+df.format(l.getHealth())+"/"+l.getMaxHealth()+" HP");
+								  l.setHealth(l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth())));
+							  }
 						  }
 					  }
 				  }

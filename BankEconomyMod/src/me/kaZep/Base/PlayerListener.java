@@ -2248,13 +2248,25 @@ implements Listener
 			//Give the wither bonuses.
 			if (e.getEntity() instanceof Wither) {
 				Wither w = (Wither)e.getEntity();
-				w.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,999999,3));
-				w.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,3));
-				w.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,999999,3));
-				w.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,999999,40));
-				w.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
-				w.setCustomName(ChatColor.GOLD+""+ChatColor.BOLD+"Mega Wither");
-				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule mobGriefing true");
+				if (Math.random()<=0.05) {
+					w.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,999999,3));
+					w.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,3));
+					w.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,999999,3));
+					w.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,999999,40));
+					w.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
+					w.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,999999,1));
+					w.setCustomName(ChatColor.GOLD+""+ChatColor.LIGHT_PURPLE+"Mythical Wither");
+					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule mobGriefing true");
+				} else {
+					w.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,999999,3));
+					w.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,3));
+					w.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,999999,3));
+					w.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,999999,40));
+					w.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,999999,2));
+					w.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,999999,1));
+					w.setCustomName(ChatColor.GOLD+""+ChatColor.BOLD+"Mega Wither");
+					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule mobGriefing true");
+				}
 			}
 
 		} else {
@@ -5228,6 +5240,10 @@ implements Listener
 	}
 
 	public ItemStack getGoodie() {
+		return getGoodie(0);
+	}
+	
+	public ItemStack getGoodie(int rar /*1=Mythical 0=Normal*/) {
 		ItemStack item = null;
 		if (Math.random()<0.33) {
 			//Add a weapon/armor piece.
@@ -5264,6 +5280,9 @@ implements Listener
 			case 19:{
 				rarity=3;
 			}break;
+			}
+			if (rar==1) {
+				rarity=3;
 			}
 			switch (rand) {
 			case 0: {
@@ -6016,6 +6035,27 @@ implements Listener
 						for (int i=0;i<27;i++) {
 							ItemStack item = null;
 							if (Math.random()<=0.3) {
+								item = getGoodie();
+								c.getBlockInventory().setItem(i, item);
+							}
+						}
+					}
+					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule mobGriefing false");
+				}
+				if (f.getCustomName().contains("Mythical Wither")) {
+					e.setDroppedExp(e.getDroppedExp()*4000);
+					boolean dropMythical=false;
+					for (int j=0;j<10;j++) {
+						Location dd = f.getLocation().add(Math.random()*4,Math.random()*4,Math.random()*4);
+						Bukkit.getWorld("world").getBlockAt(dd).setType(Material.CHEST);
+						Chest c=(Chest)Bukkit.getWorld("world").getBlockAt(dd).getState();
+						for (int i=0;i<27;i++) {
+							ItemStack item = null;
+							if (Math.random()<=0.05 && !dropMythical) {
+								dropMythical=true;
+								item = getGoodie(2);
+							}
+							if (Math.random()<=0.2) {
 								item = getGoodie();
 								c.getBlockInventory().setItem(i, item);
 							}
@@ -6887,7 +6927,61 @@ implements Listener
 				}
 			}
 			if (e.getEntity() instanceof Wither) {
-				e.setDamage(e.getDamage()*0.075d);
+				if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE+"Mythical Wither")) {
+					e.setDamage(e.getDamage()*0.045d);
+				} else {
+					e.setDamage(e.getDamage()*0.065d);
+				}
+				try {
+					Iterator<PotionEffect> effects = l.getActivePotionEffects().iterator();
+					//Figure out potion effects when player joins.
+					while (effects.hasNext()) {
+						PotionEffect nexteffect = effects.next();
+						if (nexteffect.getType().getName().compareTo(PotionEffectType.NIGHT_VISION.getName())==0 && l.getHealth()<l.getMaxHealth()/2) {
+							l.removePotionEffect(PotionEffectType.NIGHT_VISION);
+							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,999999,2));
+							LivingEntity zombie = (LivingEntity)Bukkit.getWorld("world").spawnEntity(e.getEntity().getLocation(),EntityType.ZOMBIE);
+							  LivingEntity enderdragon = (LivingEntity)Bukkit.getWorld("world").spawnEntity(e.getEntity().getLocation(),EntityType.ENDER_DRAGON);
+							  //Bukkit.getWorld("world").spawn(e.getEntity().getLocation(), enderdragon.getClass());
+							  zombie.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
+							  zombie.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
+							  zombie.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+							  zombie.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+							  zombie.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,999999,3));
+							  ItemStack sword = new ItemStack(Material.IRON_SWORD);
+							  sword.addEnchantment(Enchantment.DAMAGE_ALL, 3);
+							  zombie.getEquipment().setItemInHand(sword);
+							  ItemStack skull = new ItemStack(397);
+							  skull.setDurability((short)3);
+							  SkullMeta meta = (SkullMeta)skull.getItemMeta();
+							  meta.setOwner("MHF_Enderman");
+							  skull.setItemMeta(meta);
+							  zombie.getEquipment().setHelmet(skull);
+							  
+							  enderdragon.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
+							  enderdragon.setMaxHealth(200);
+							  enderdragon.setHealth(200);
+							  enderdragon.remove();
+							  //enderdragon.teleport(new Location(p.getWorld(),p.getLocation().getBlockX()+i,-250,p.getLocation().getBlockZ()+j));
+							  //p.sendMessage(ChatColor.DARK_PURPLE+"You feel a dark presence nearby.");
+							  //Bukkit.getPlayer("sigonasr2").sendMessage("Trigger this.");
+							  zombie.setRemoveWhenFarAway(false);
+							  zombie.setMaxHealth(300);
+							  zombie.setHealth(300);
+							  zombie.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,999999,0));
+							  zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,0));
+							  zombie.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,999999,0));
+							  zombie.setTicksLived(1);
+						}
+						/*if (nexteffect.getType().getName().compareTo(PotionEffectType.JUMP.getName())==0) {
+							p.removePotionEffect(PotionEffectType.JUMP);
+							p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 360000, nexteffect.getAmplifier()+2, true));
+						}*/
+						effects.remove();
+					}
+				} catch (ConcurrentModificationException ex_e) {
+					Bukkit.getLogger().warning("Potion Effect Collection not accessible while trying to hurt entity.");
+				}
 			}
 		  if (e.getEntity().getType()==EntityType.ZOMBIE) {
 			  Zombie z = (Zombie)e.getEntity();
