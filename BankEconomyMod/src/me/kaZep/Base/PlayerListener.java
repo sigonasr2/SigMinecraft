@@ -873,6 +873,20 @@ implements Listener
 				break;
 			}
 		}
+		
+		//*************************//Job Buffies here.
+		if (this.plugin.hasJobBuff("Builder", owner, Job.JOB20)) {
+			if (e.getResult().getType()==Material.NETHER_BRICK_ITEM ||
+					e.getResult().getType()==Material.GLASS ||
+					e.getResult().getType()==Material.HARD_CLAY ||
+					e.getResult().getType()==Material.BRICK) {
+				ItemStack result = e.getResult();
+				result.setAmount(result.getAmount()+1);
+				e.setResult(result);
+			}
+		}
+		//*************************//Not Job Buffies below.
+		
 		if (this.plugin.PlayerinJob(owner, "Digger")) {
 			if (e.getResult().getType()==Material.GLASS) {
 				this.plugin.gainMoneyExp(owner,"Digger",0.015,3);
@@ -3469,6 +3483,10 @@ implements Listener
 		}
 
 		//*******************************//Job Buffs Begin here!
+		if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && p.getAllowFlight()) {
+			p.setAllowFlight(false);
+			p.sendMessage(ChatColor.DARK_RED+""+ChatColor.ITALIC+"Flight disabled...");
+		}
 		if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB20)) {
 			if (p.getItemInHand().getType().name().toLowerCase().contains("axe") && !p.getItemInHand().getType().name().toLowerCase().contains("pickaxe")) {
 				//Make sure it's not a pickaxe before reducing durability.
@@ -4750,7 +4768,7 @@ implements Listener
 		 */
 	}
 	
-	private void restoreItems(CraftingInventory craft, ClickType click, Player p) {
+	private void restoreItems(CraftingInventory craft, ClickType click, Player p, double restore_chance) {
 		ItemStack[] crafteditems = craft.getMatrix();
 		if (click==ClickType.SHIFT_RIGHT || click==ClickType.SHIFT_LEFT) {
 			int lowestamt=9999;
@@ -4764,7 +4782,7 @@ implements Listener
 			for (int i=0;i<crafteditems.length;i++) {
 				if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
 					for (int j=0;j<lowestamt;j++) {
-						if (Math.random()<=0.25) {
+						if (Math.random()<=restore_chance) {
 							//p.sendMessage("Restored an item.");
 							ItemStack replenishitem = crafteditems[i].clone();
 							replenishitem.setAmount(1);
@@ -4776,7 +4794,7 @@ implements Listener
 		} else {
 			for (int i=0;i<crafteditems.length;i++) {
 				if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
-					if (Math.random()<=0.25) {
+					if (Math.random()<=restore_chance) {
 						//p.sendMessage("Restored an item.");
 						ItemStack replenishitem = crafteditems[i].clone();
 						replenishitem.setAmount(1);
@@ -4797,7 +4815,19 @@ implements Listener
 		
 		//***********************************//Job buff stuff
 		if (this.plugin.hasJobBuff("Builder", p, Job.JOB20)) {
-			
+			if (result.getResult().getType()==Material.WOOD ||
+					result.getResult().getType().name().toLowerCase().contains("stairs") ||
+					result.getResult().getType()==Material.FENCE ||
+					result.getResult().getType()==Material.NETHER_BRICK ||
+					result.getResult().getType()==Material.NETHER_FENCE ||
+					result.getResult().getType()==Material.WOOL ||
+					result.getResult().getType()==Material.BRICK ||
+					result.getResult().getType()==Material.SMOOTH_BRICK ||
+					result.getResult().getType()==Material.STAINED_CLAY ||
+					result.getResult().getType()==Material.SANDSTONE ||
+					result.getResult().getType()==Material.QUARTZ_BLOCK) {
+				restoreItems(e.getInventory(), e.getClick(), p, 0.75);
+			}
 		}
 		//***********************************//End job buff stuff
 		
@@ -7269,6 +7299,13 @@ implements Listener
 				p.getItemInHand().setDurability((short)0);
 			}
 		}
+		if (e.getEntity() instanceof Player) {
+			Player p = (Player)e.getEntity();
+			if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && p.getAllowFlight()) {
+				p.setAllowFlight(false);
+				p.sendMessage(ChatColor.DARK_RED+""+ChatColor.ITALIC+"Flight disabled...");
+			}
+		}
 		//**********************************//Player buffs end
 
 		if (e.getEntity() instanceof LivingEntity) {
@@ -8663,6 +8700,46 @@ implements Listener
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent e) {
 		Player p = e.getPlayer();
+		//***********************************//JOB BUFFFS!!! HYPE
+		if (this.plugin.PlayerinJob(p, "Builder")) {
+			if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && !p.getAllowFlight()) {
+				p.setAllowFlight(true);
+				p.sendMessage(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"Flight enabled...");
+				this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
+			} else {
+				if (this.plugin.hasJobBuff("Builder", p, Job.JOB40)) {
+					this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
+				}
+			}
+			if (this.plugin.hasJobBuff("Builder", p, Job.JOB30B)) {
+				try {
+					Iterator<PotionEffect> effects = p.getActivePotionEffects().iterator();
+					//Figure out potion effects when player joins.
+					while (effects.hasNext()) {
+						PotionEffect nexteffect = effects.next();
+						if (nexteffect.getType().getName().compareTo(PotionEffectType.JUMP.getName())==0 && nexteffect.getAmplifier()<9) {
+							p.removePotionEffect(PotionEffectType.JUMP);
+							p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 200, nexteffect.getAmplifier()+1, true));
+						}
+						/*if (nexteffect.getType().getName().compareTo(PotionEffectType.JUMP.getName())==0) {
+							p.removePotionEffect(PotionEffectType.JUMP);
+							p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 360000, nexteffect.getAmplifier()+2, true));
+						}*/
+						effects.remove();
+					}
+				} catch (ConcurrentModificationException ex_e) {
+					Bukkit.getLogger().warning("Potion Effect Collection not accessible while initializing player speed.");
+				}
+			}
+			p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,200,0));
+			int expbefore = (int)this.plugin.getPlayerCurrentJobExp(p, "Builder");
+			getBuilderCredit(e.getBlockPlaced(), p);
+			if ((int)this.plugin.getPlayerCurrentJobExp(p, "Builder")-expbefore>0 && this.plugin.hasJobBuff("Builder", p, Job.JOB30A)) {
+				ExperienceOrb orb = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlockPlaced().getLocation().add(0,1,0), EntityType.EXPERIENCE_ORB);
+				orb.setExperience((int)this.plugin.getPlayerCurrentJobExp(p, "Builder")-expbefore);
+			}
+		}
+		//***********************************//No Job Buff Hype :(
 		if (e.getItemInHand().getType()==Material.HOPPER) {
 			//Check surrounding blocks to verify it's not a chest.
 			for (int i=-1;i<2;i++) {
@@ -12279,6 +12356,7 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 	void getBuilderCredit(Block b, Player p) {
 		int myData = this.plugin.getPlayerDataSlot(p);
 		if (this.plugin.PlayerinJob(p, "Builder")) {
+			int beforeexp = (int)this.plugin.getPlayerCurrentJobExp(p, "Builder");
 			if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
 				if (b.getType()==Material.COBBLESTONE) {
 					this.plugin.gainMoneyExp(p,"Builder",0.005,1);
@@ -12411,6 +12489,14 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 					this.plugin.gainMoneyExp(p,"Builder",0.075,11);
 				}
 			}
+			if (this.plugin.hasJobBuff("Builder", p, Job.JOB40)) {
+				for (int i=beforeexp;i<(int)this.plugin.getPlayerCurrentJobExp(p, "Builder");i++) {
+					if (i%100==0) {
+						//Give the player 5 glowstone + 64 torches.
+						p.getInventory().addItem(new ItemStack(Material.GLOWSTONE,5),new ItemStack(Material.TORCH,64));
+					}
+				}
+			}
 		}
 	}
 
@@ -12428,6 +12514,19 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 		//******************************//All Job Buff related items go in here.
 		if (e.getAction()==Action.LEFT_CLICK_BLOCK || e.getAction()==Action.RIGHT_CLICK_AIR) {
 			if (this.plugin.hasJobBuff("Builder", p, Job.JOB10)) {
+				if (this.plugin.hasJobBuff("Builder", p, Job.JOB30B)) {
+					p.removePotionEffect(PotionEffectType.JUMP);
+					p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,200,9));
+				}
+				if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && !p.getAllowFlight()) {
+					p.setAllowFlight(true);
+					p.sendMessage(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"Flight enabled...");
+					this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
+				} else {
+					if (this.plugin.hasJobBuff("Builder", p, Job.JOB40)) {
+						this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
+					}
+				}
 				//See if they are holding a line tool.
 				if (p.getItemInHand().getType()==Material.getMaterial(142)) {
 					//Check to see if this is the first block they clicked.
@@ -12446,6 +12545,7 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 						if (pd.GetClickedBlock().distance(checkblock.getLocation())<=500) {//Make sure the range is small enough.
 							//Compare the blocks and see if they are the same.
 							boolean successful=true;
+							int expbefore = (int)this.plugin.getPlayerCurrentJobExp(p, "Builder");
 							if (pd.GetClickedBlock().getBlock().getType().getId()==checkblock.getType().getId() &&
 									pd.GetClickedBlock().getBlock().getData()==checkblock.getData()) {
 								boolean ranOutOfBlocks=false;
@@ -12456,12 +12556,12 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 									int xdiff=pt2.getBlockX()-pt1.getBlockX();
 									int ydiff=pt2.getBlockY()-pt1.getBlockY();
 									int zdiff=pt2.getBlockZ()-pt1.getBlockZ();
-									Bukkit.getLogger().info("xdiff:"+xdiff+", ydiff:"+ydiff+", zdiff:"+zdiff);
+									//Bukkit.getLogger().info("xdiff:"+xdiff+", ydiff:"+ydiff+", zdiff:"+zdiff);
 									for (int x=0;x<Math.abs(xdiff)+1;x++) {
 										for (int y=0;y<Math.abs(ydiff)+1;y++) {
 											for (int z=0;z<Math.abs(zdiff)+1;z++) {
 												//Iterate through all blocks, making sure we are on an outline.
-												Bukkit.getLogger().info("Check Loc: "+pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff)).toString());
+												//Bukkit.getLogger().info("Check Loc: "+pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff)).toString());
 												if (((x==0 || x==Math.abs(xdiff)) &&
 														(y==0 || y==Math.abs(ydiff))) ||
 													((x==0 || x==Math.abs(xdiff)) &&
@@ -12470,7 +12570,7 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 															(z==0 || z==Math.abs(zdiff)))) {
 													if (e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).getType()==Material.AIR) {
 														if (e.getPlayer().getInventory().containsAtLeast(new ItemStack(pd.GetClickedBlock().getBlock().getType(),1,(short)pd.GetClickedBlock().getBlock().getData()), 1)) {
-															Bukkit.getLogger().info("    Was AIR. Block has been changed.");
+															//Bukkit.getLogger().info("    Was AIR. Block has been changed.");
 															//Get the amount holding. Then remove it and add one back for the player.
 															ItemStack[] items = e.getPlayer().getInventory().getContents();
 															//Loop through items until we find the right type.
@@ -12493,7 +12593,7 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 															successful=false;
 														}
 													} else {
-														Bukkit.getLogger().info("    Was "+e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).getType().name()+". Skipping...");
+														//Bukkit.getLogger().info("    Was "+e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).getType().name()+". Skipping...");
 													}
 												}
 											}
@@ -12508,10 +12608,10 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 										for (int y=0;y<Math.abs(ydiff)+1;y++) {
 											for (int z=0;z<Math.abs(zdiff)+1;z++) {
 												//Iterate through all blocks.
-												Bukkit.getLogger().info("Check Loc: "+pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff)).toString());
+												//Bukkit.getLogger().info("Check Loc: "+pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff)).toString());
 												if (e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).getType()==Material.AIR) {
 													if (e.getPlayer().getInventory().containsAtLeast(new ItemStack(pd.GetClickedBlock().getBlock().getType(),1,(short)pd.GetClickedBlock().getBlock().getData()), 1)) {
-														Bukkit.getLogger().info("    Was AIR. Block has been changed.");
+														//Bukkit.getLogger().info("    Was AIR. Block has been changed.");
 														//Get the amount holding. Then remove it and add one back for the player.
 														ItemStack[] items = e.getPlayer().getInventory().getContents();
 														//Loop through items until we find the right type.
@@ -12534,7 +12634,7 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 														successful=false;
 													}
 												} else {
-													Bukkit.getLogger().info("    Was "+e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).getType().name()+". Skipping...");
+													//Bukkit.getLogger().info("    Was "+e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).getType().name()+". Skipping...");
 												}
 											}
 										}
@@ -12549,6 +12649,12 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 										p.sendMessage(ChatColor.GOLD+"You ran out of blocks! Stopped mid-way through building.");
 										p.updateInventory();
 									}
+								}
+								
+								//Check exp
+								if ((int)this.plugin.getPlayerCurrentJobExp(p, "Builder")-expbefore>0 && this.plugin.hasJobBuff("Builder", p, Job.JOB30A)) {
+									ExperienceOrb orb = (ExperienceOrb)p.getWorld().spawnEntity(e.getClickedBlock().getLocation().add(0,1,0), EntityType.EXPERIENCE_ORB);
+									orb.setExperience((int)this.plugin.getPlayerCurrentJobExp(p, "Builder")-expbefore);
 								}
 							} else {
 								//If they are not, set it as the new target block.
@@ -12565,6 +12671,19 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 				}
 			}
 			if (e.getAction()==Action.LEFT_CLICK_BLOCK && this.plugin.hasJobBuff("Builder", p, Job.JOB5)) {
+				if (this.plugin.hasJobBuff("Builder", p, Job.JOB30B)) {
+					p.removePotionEffect(PotionEffectType.JUMP);
+					p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,200,9));
+				}
+				if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && !p.getAllowFlight()) {
+					p.setAllowFlight(true);
+					p.sendMessage(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"Flight enabled...");
+					this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
+				} else {
+					if (this.plugin.hasJobBuff("Builder", p, Job.JOB40)) {
+						this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
+					}
+				}
 				//See if they are holding a line tool.
 				if (p.getItemInHand().getType()==Material.getMaterial(141)) {
 					//Check to see if this is the first block they clicked.
@@ -12574,6 +12693,7 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 						pd.SetClickedBlock(e.getClickedBlock().getLocation());
 					} else {
 						if (pd.GetClickedBlock().distance(e.getClickedBlock().getLocation())<=500) {//Make sure the range is small enough.
+							int expbefore = (int)this.plugin.getPlayerCurrentJobExp(p, "Builder");
 							//Compare the blocks and see if they are the same.
 							boolean successful=true;
 							if (pd.GetClickedBlock().getBlock().getType().getId()==e.getClickedBlock().getType().getId() &&
@@ -12608,8 +12728,8 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 								if ((int)Math.signum(ystep)!=(int)Math.signum(ydiff)) {ystep*=-1;}
 								if ((int)Math.signum(zstep)!=(int)Math.signum(zdiff)) {zstep*=-1;}
 		
-								Bukkit.getLogger().info("Line Drawer: Initialized mode "+mode+". xstep="+xstep+", ystep="+ystep+", zstep="+zstep+" | xdiff="+xdiff+", ydiff="+ydiff+", zdiff="+zdiff+".");
-								Bukkit.getLogger().info("Going from: "+pt1+" to "+pt2);
+								//Bukkit.getLogger().info("Line Drawer: Initialized mode "+mode+". xstep="+xstep+", ystep="+ystep+", zstep="+zstep+" | xdiff="+xdiff+", ydiff="+ydiff+", zdiff="+zdiff+".");
+								//Bukkit.getLogger().info("Going from: "+pt1+" to "+pt2);
 								
 								boolean ranOutOfBlocks = false; //Turns true if the player runs out of building blocks.
 								
@@ -12617,12 +12737,12 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 								while ((pt1.clone().add(xcur,ycur,zcur).getBlockX()!=pt2.getBlockX() ||
 										pt1.clone().add(xcur,ycur,zcur).getBlockY()!=pt2.getBlockY() ||
 										pt1.clone().add(xcur,ycur,zcur).getBlockZ()!=pt2.getBlockZ()) && !ranOutOfBlocks) {
-									Bukkit.getLogger().info("  Location: ("+pt1.clone().add(xcur,ycur,zcur).toString()+")");
+									//Bukkit.getLogger().info("  Location: ("+pt1.clone().add(xcur,ycur,zcur).toString()+")");
 									//Get the block at this location. Make sure it's AIR, and then see if the block is in the player's inventory.
 									//If it is, we can place one down and subtract one from the inventory.
 									if (e.getPlayer().getWorld().getBlockAt(pt1.clone().add(xcur,ycur,zcur)).getType()==Material.AIR) {
 										if (e.getPlayer().getInventory().containsAtLeast(new ItemStack(pd.GetClickedBlock().getBlock().getType(),1,(short)pd.GetClickedBlock().getBlock().getData()), 1)) {
-											Bukkit.getLogger().info("    Was AIR. Block has been changed.");
+											//Bukkit.getLogger().info("    Was AIR. Block has been changed.");
 											//Get the amount holding. Then remove it and add one back for the player.
 											ItemStack[] items = e.getPlayer().getInventory().getContents();
 											//Loop through items until we find the right type.
@@ -12640,7 +12760,7 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 											e.getPlayer().getWorld().getBlockAt(pt1.clone().add(xcur,ycur,zcur)).setData(pd.GetClickedBlock().getBlock().getData());
 											getBuilderCredit(pd.GetClickedBlock().getBlock(),p);
 										} else {
-											Bukkit.getLogger().info("====Cannot continue. Ran out of blocks. Exiting.");
+											//Bukkit.getLogger().info("====Cannot continue. Ran out of blocks. Exiting.");
 											ranOutOfBlocks=true;
 											successful=false;
 										}
@@ -12651,7 +12771,7 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 									ycur+=ystep;
 									zcur+=zstep;
 								}
-								Bukkit.getLogger().info("====Operation completed. Resetting clicked block.");
+								//Bukkit.getLogger().info("====Operation completed. Resetting clicked block.");
 								pd.SetClickedBlock(null);
 								if (successful) {
 									p.sendMessage(ChatColor.YELLOW+"Line Build completed successfully!");
@@ -12666,6 +12786,12 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 								//If they are not, set it as the new target block.
 								p.sendMessage("Set first block. Left-click another block of the same type to build a line of that block between them. "+ChatColor.GRAY+ChatColor.ITALIC+"If you wish to cancel, right-click or swap items.");
 								pd.SetClickedBlock(e.getClickedBlock().getLocation());
+							}
+
+							//Check exp
+							if ((int)this.plugin.getPlayerCurrentJobExp(p, "Builder")-expbefore>0 && this.plugin.hasJobBuff("Builder", p, Job.JOB30A)) {
+								ExperienceOrb orb = (ExperienceOrb)p.getWorld().spawnEntity(e.getClickedBlock().getLocation().add(0,1,0), EntityType.EXPERIENCE_ORB);
+								orb.setExperience((int)this.plugin.getPlayerCurrentJobExp(p, "Builder")-expbefore);
 							}
 						} else {
 							p.sendMessage(ChatColor.RED+"The distance of building is larger than 500 blocks! You cannot build that far.");

@@ -13,11 +13,13 @@ public class PlayerData {
 	int minestreak=0;
 	Location clickedblock1=null; //Stores the location of a clicked block.
 	Player data=null;
+	long lastflighttime=0;
 	public PlayerData(Player p) {
 		this.data=p;
 		this.lastblocktype=Material.DIRT;
 		lastinteracttime=Main.SERVER_TICK_TIME;
 		lastminetime=Main.SERVER_TICK_TIME;
+		lastflighttime=Main.SERVER_TICK_TIME;
 		minestreak=0;
 	}
 	public boolean CheckMineStreak() {

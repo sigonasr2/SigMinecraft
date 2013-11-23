@@ -593,7 +593,7 @@ public class Main extends JavaPlugin
     		"Builders gain access to the 'rectangle' tool. Typing /rectangle will make building in rectangles easier.", 
     		"When crafting irreversible Builder blocks, 75% of the materials used for crafting will be restored to your inventory. When cooking Builder blocks, the block results will be doubled.",
     		"Gain experience orbs (equivalent to the job XP you get) as you build.",
-    		"Building will stack a jump boost buff up to Jump Boost seconds.",
+    		"Building will stack a jump boost buff up to Jump Boost X for 10 seconds.",
     		"Builders gain the ability to fly when building. They immediately lose the ability to fly if they stop building for a moment, destroy a block, or enter combat. Every 100 Builder XP gained gives the Builder 5 Glowstone blocks and a stack of torches.");
 
     Digger_job.setJobName("Digger");
@@ -2601,6 +2601,10 @@ public void checkJukeboxes() {
           LOGGING_UPDATE_COUNTS++; //2
     		Player[] list = Bukkit.getOnlinePlayers();
     		for (int i=0;i<list.length;i++) {
+    			if (list[i].getAllowFlight() && hasJobBuff("Builder", list[i], Job.JOB40) && SERVER_TICK_TIME-getPlayerData(list[i]).lastflighttime>=200) {
+    				list[i].setAllowFlight(false);
+    				list[i].sendMessage(ChatColor.DARK_RED+""+ChatColor.ITALIC+"Flight disabled...");
+    			}
     			if (Math.random()<0.5) {
 				  if (!list[i].isDead() && PlayerinJob(list[i], "Breeder") && getJobLv("Breeder", list[i])>=5) {
 					  List<Entity> entities = list[i].getNearbyEntities(10, 10, 10);
@@ -3618,6 +3622,22 @@ public void payDay(int time)
 		getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp", Double.valueOf(newexp));
 		//saveAccountsConfig() //Commented out;
 	}
+	
+	public double getPlayerCurrentJobExp(Player p, String job) {
+		if (PlayerinJob(p, job)) {
+			int slot = -1;
+			String[] joblist = getJobs(p);
+			for (int i=0;i<joblist.length;i++) {
+				if (joblist[i].equalsIgnoreCase(job)) {
+					slot=i;
+					break;
+				}
+			}
+			return getAccountsConfig().getDouble(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp");
+		} else {
+			return 0;
+		}
+	}
 
 	public void gainMoneyExp(Player p,String job,double amount,double exp) {
 		String[] jobs = getJobs(p);
@@ -3653,6 +3673,7 @@ public void payDay(int time)
 			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp")-getJobExp(job,getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv"))));
 			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv")+1));
 			Bukkit.broadcastMessage(p.getName()+" is now a Level "+getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
+			notifyBuffMessages(p);
 			if (getJobTotalLvs(p)%5==0) {
 				Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+" has reached Level "+getJobTotalLvs(p)+"!");
 				if ((((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))>0) {
@@ -3689,6 +3710,7 @@ public void payDay(int time)
 				if (getJobLv(job,p)<40) {
 				getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv")+1));
 				Bukkit.broadcastMessage(p.getName()+" is now a Level "+getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
+				notifyBuffMessages(p);
 				if (getJobTotalLvs(p)%5==0) {
 					Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+" has reached Level "+getJobTotalLvs(p)+"!");
 					if ((((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))>0) {
