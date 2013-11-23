@@ -3195,13 +3195,171 @@ implements Listener
 		//p.sendMessage("Block broke.");
 		//p.sendMessage("Has name: "+p.getItemInHand().getItemMeta().hasDisplayName());
 		//p.sendMessage("Name is: "+p.getItemInHand().getItemMeta().getDisplayName());
-		int myData=this.plugin.getPlayerDataSlot(p);
+		
 		boolean has_silktouch=false;
 		if (!p.getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH)) {
 			has_silktouch=false;
 		} else {
 			has_silktouch=true;
 		}
+		
+		//*******************************//Job Buffs Begin here!
+		if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB20)) {
+			if (p.getItemInHand().getType().name().toLowerCase().contains("axe") && !p.getItemInHand().getType().name().toLowerCase().contains("pickaxe")) {
+				//Make sure it's not a pickaxe before reducing durability.
+				if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB30A)) {
+					p.getItemInHand().setDurability((short)0);
+				} else {
+					if (Math.random()<=0.5) {
+						p.getItemInHand().setDurability((short)(p.getItemInHand().getDurability()>=1?p.getItemInHand().getDurability()-1:0));
+					}
+				}
+			}
+			if ((e.getBlock().getType()==Material.LOG || e.getBlock().getType()==Material.WOOD)) {
+				p.removePotionEffect(PotionEffectType.JUMP);
+				p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,200,10));
+			}
+		}
+		if (e.getBlock().getType()==Material.LOG && this.plugin.hasJobBuff("Woodcutter", p, Job.JOB40)) {
+			//Cut down the whole tree if you hit a log. Make sure it's a tree.
+			boolean findleaves=false;
+			boolean findground=false;
+			Location currentpos = e.getBlock().getLocation();
+			//Look straight up, look on the sides for leaves.
+			while (!findleaves && currentpos.getWorld().getBlockAt(currentpos).getType()==Material.LOG) {
+				Location checktemp = currentpos.clone().add(0,1,0);
+				if (e.getBlock().getWorld().getBlockAt(checktemp).getType()==Material.LEAVES ||
+						e.getBlock().getWorld().getBlockAt(checktemp).getType()==Material.LEAVES ||
+						e.getBlock().getWorld().getBlockAt(checktemp).getType()==Material.LEAVES ||
+						e.getBlock().getWorld().getBlockAt(checktemp).getType()==Material.LEAVES ||
+						e.getBlock().getWorld().getBlockAt(checktemp).getType()==Material.LEAVES ||
+						e.getBlock().getWorld().getBlockAt(checktemp).getType()==Material.LEAVES) {
+					findleaves=true; //This is considered a tree. Make sure the ground below it is dirt.
+					//Bukkit.getLogger().info("Found leaves.");
+				}
+				currentpos=currentpos.add(0,1,0);
+			}
+			if (findleaves) {
+				//This is definitely a tree we can chop down. Destroy it then.
+				//Bukkit.getLogger().info("Identified as tree. Start Destroying.");
+				try {
+					Iterator<PotionEffect> effects = p.getActivePotionEffects().iterator();
+						//Figure out potion effects when player joins.
+						while (effects.hasNext()) {
+							PotionEffect nexteffect = effects.next();
+							if (nexteffect.getType().getName().compareTo(PotionEffectType.HEALTH_BOOST.getName())==0) {
+								double myhealth = p.getHealth();
+								p.removePotionEffect(PotionEffectType.HEALTH_BOOST);
+								p.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,1200,nexteffect.getAmplifier()+1));
+								p.setHealth(myhealth);
+							}
+							effects.remove();
+						}
+				  } catch (ConcurrentModificationException ex_e) {
+					  Bukkit.getLogger().warning("Potion Effect Collection not accessible while initializing player speed.");
+				  }
+				p.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST,1200,0));
+				destroyNearbyTree(e.getBlock().getWorld() ,e.getBlock().getLocation(), e.getBlock().getLocation(), (byte)(e.getBlock().getData()%4), p.getItemInHand().getEnchantmentLevel(Enchantment.SILK_TOUCH)>0);
+			}
+		}
+		
+
+		if (this.plugin.hasJobBuff("Miner", p, Job.JOB5)) {
+			if (e.getBlock().getType().name().toLowerCase().contains("ore")) {
+				//Break all consecutive ores next to this ore. 
+				//Bukkit.getLogger().info("Destroy nearby");
+				e.setCancelled(true);
+				if (this.plugin.hasJobBuff("Miner", p, Job.JOB10)) {
+					destroyNearbyOres(e.getBlock().getWorld(), p, e.getBlock().getLocation(), has_silktouch, 4);
+				} else {
+					destroyNearbyOres(e.getBlock().getWorld(), p, e.getBlock().getLocation(), has_silktouch, 1);
+				}
+				if (this.plugin.hasJobBuff("Miner", p, Job.JOB30B)) {
+					try {
+						Iterator<PotionEffect> effects = p.getActivePotionEffects().iterator();
+						//Figure out potion effects when player joins.
+						while (effects.hasNext()) {
+							PotionEffect nexteffect = effects.next();
+							if (nexteffect.getType().getName().compareTo(PotionEffectType.FAST_DIGGING.getName())==0 && nexteffect.getAmplifier()<4) {
+								p.removePotionEffect(PotionEffectType.FAST_DIGGING);
+								p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 200, nexteffect.getAmplifier()+1, true));
+							}
+							/*if (nexteffect.getType().getName().compareTo(PotionEffectType.JUMP.getName())==0) {
+								p.removePotionEffect(PotionEffectType.JUMP);
+								p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 360000, nexteffect.getAmplifier()+2, true));
+							}*/
+							effects.remove();
+						}
+					} catch (ConcurrentModificationException ex_e) {
+						Bukkit.getLogger().warning("Potion Effect Collection not accessible while initializing player speed.");
+					}
+					p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 200, 0, true));
+				}
+			} else {
+				if (e.getBlock().getType()==Material.STONE || e.getBlock().getType()==Material.COBBLESTONE) {
+					if (this.plugin.hasJobBuff("Miner", p, Job.JOB30B)) {
+						try {
+							Iterator<PotionEffect> effects = p.getActivePotionEffects().iterator();
+							//Figure out potion effects when player joins.
+							while (effects.hasNext()) {
+								PotionEffect nexteffect = effects.next();
+								if (nexteffect.getType().getName().compareTo(PotionEffectType.FAST_DIGGING.getName())==0 && nexteffect.getAmplifier()<4) {
+									p.removePotionEffect(PotionEffectType.FAST_DIGGING);
+									p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 200, nexteffect.getAmplifier()+1, true));
+								}
+								/*if (nexteffect.getType().getName().compareTo(PotionEffectType.JUMP.getName())==0) {
+									p.removePotionEffect(PotionEffectType.JUMP);
+									p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 360000, nexteffect.getAmplifier()+2, true));
+								}*/
+								effects.remove();
+							}
+						} catch (ConcurrentModificationException ex_e) {
+							Bukkit.getLogger().warning("Potion Effect Collection not accessible while initializing player speed.");
+						}
+						p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 200, 0, true));
+					}
+				}
+				if (this.plugin.hasJobBuff("Miner", p, Job.JOB20)) {
+					if (p.getItemInHand().getType()==Material.DIAMOND_PICKAXE && (e.getBlock().getType()==Material.STONE || e.getBlock().getType()==Material.COBBLESTONE)) {
+						for (int i=-1;i<2;i++) {
+							for (int j=-1;j<2;j++) {
+								for (int k=-1;k<2;k++) {
+									if (e.getBlock().getLocation().add(i,j,k).getBlock().getType().name().toLowerCase().contains("ore")) {
+										destroyNearbyOres(e.getBlock().getWorld(), p, e.getBlock().getLocation(), has_silktouch, 4);
+									} else {
+										if (this.plugin.PlayerinJob(p, "Miner")) {
+											int myData=this.plugin.getPlayerDataSlot(p);
+											if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
+												if (e.getBlock().getType()==Material.STONE) {
+													this.plugin.gainMoneyExp(p,"Miner",0.0025,1);
+												}
+											}
+										}
+										if (e.getBlock().getLocation().add(i,j,k).getBlock().getType()==Material.STONE || e.getBlock().getLocation().add(i,j,k).getBlock().getType()==Material.COBBLESTONE) {
+											if (has_silktouch) {
+												e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(i,j,k), new ItemStack(e.getBlock().getLocation().add(i,j,k).getBlock().getType()));
+											} else {
+												e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(i,j,k), new ItemStack(Material.COBBLESTONE));
+											}
+											e.getBlock().getLocation().add(i,j,k).getBlock().setType(Material.AIR);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		} else {
+			if (e.getBlock().getType().name().toLowerCase().contains("ore")) {
+				//Mine it out normally for other players.
+				e.setCancelled(true);
+				breakOreBlock(p, e.getBlock(), has_silktouch);
+			}
+		}
+		//*******************************//Job Buffs end here!
+		
+		int myData=this.plugin.getPlayerDataSlot(p);
 		if (p!=null) {
 			if (e.getBlock().getType()==Material.COMMAND) {
 				e.setCancelled(true);
@@ -3418,32 +3576,19 @@ implements Listener
 				this.plugin.playerdata_list.get(myData).BadInteract(e.getBlock().getType());
 			}
 			if (this.plugin.PlayerinJob(p, "Woodcutter")) {
-				if (e.getBlock().getType()==Material.LOG) {
-					if (p.getItemInHand().getType()==Material.WOOD_AXE || p.getItemInHand().getType()==Material.STONE_AXE || p.getItemInHand().getType()==Material.IRON_AXE || p.getItemInHand().getType()==Material.GOLD_AXE || p.getItemInHand().getType()==Material.DIAMOND_AXE) {
-						//p.sendMessage("Cut down wood w/axe.");
-						this.plugin.gainMoneyExp(p,"Woodcutter",0.025,2);
-					} else {
-						//p.sendMessage("Cut down wood.");
-						this.plugin.gainMoneyExp(p,"Woodcutter",0.01,1);
+				if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
+					if (e.getBlock().getType()==Material.LOG) {
+						if (p.getItemInHand().getType()==Material.WOOD_AXE || p.getItemInHand().getType()==Material.STONE_AXE || p.getItemInHand().getType()==Material.IRON_AXE || p.getItemInHand().getType()==Material.GOLD_AXE || p.getItemInHand().getType()==Material.DIAMOND_AXE) {
+							//p.sendMessage("Cut down wood w/axe.");
+							this.plugin.gainMoneyExp(p,"Woodcutter",0.025,2);
+						} else {
+							//p.sendMessage("Cut down wood.");
+							this.plugin.gainMoneyExp(p,"Woodcutter",0.01,1);
+						}
 					}
 				}
 			}
 			if (this.plugin.PlayerinJob(p, "Miner")) {
-				if (this.plugin.getJobLv("Miner", p)>=10) {
-					//Half chance to set the durability back by one.
-					if (p.getItemInHand().getType()==Material.WOOD_PICKAXE ||
-							p.getItemInHand().getType()==Material.STONE_PICKAXE ||
-							p.getItemInHand().getType()==Material.GOLD_PICKAXE ||
-							p.getItemInHand().getType()==Material.IRON_PICKAXE ||
-							p.getItemInHand().getType()==Material.DIAMOND_PICKAXE) {
-						if (p.getItemInHand().getDurability()>0) {
-							if (Math.random()>=0.5) {
-								p.getItemInHand().setDurability((short)(p.getItemInHand().getDurability()-1));
-								p.updateInventory();
-							}
-						}
-					}
-				}
 				if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
 					if (e.getBlock().getType()==Material.STONE) {
 						this.plugin.gainMoneyExp(p,"Miner",0.0025,1);
@@ -3493,36 +3638,6 @@ implements Listener
 				}
 			}
 			if (this.plugin.PlayerinJob(p, "Digger")) {
-				if (this.plugin.getJobLv("Digger", p)>=20) {
-					//Half chance to set the durability back by one.
-					if (p.getItemInHand().getType()==Material.WOOD_SPADE ||
-							p.getItemInHand().getType()==Material.STONE_SPADE ||
-							p.getItemInHand().getType()==Material.GOLD_SPADE ||
-							p.getItemInHand().getType()==Material.IRON_SPADE ||
-							p.getItemInHand().getType()==Material.DIAMOND_SPADE) {
-						if (p.getItemInHand().getDurability()>0) {
-							if (Math.random()>=0.66) {
-								p.getItemInHand().setDurability((short)(p.getItemInHand().getDurability()-1));
-								p.updateInventory();
-							}
-						}
-					}
-				} else
-					if (this.plugin.getJobLv("Digger", p)>=10) {
-						//Half chance to set the durability back by one.
-						if (p.getItemInHand().getType()==Material.WOOD_SPADE ||
-								p.getItemInHand().getType()==Material.STONE_SPADE ||
-								p.getItemInHand().getType()==Material.GOLD_SPADE ||
-								p.getItemInHand().getType()==Material.IRON_SPADE ||
-								p.getItemInHand().getType()==Material.DIAMOND_SPADE) {
-							if (p.getItemInHand().getDurability()>0) {
-								if (Math.random()>=0.5) {
-									p.getItemInHand().setDurability((short)(p.getItemInHand().getDurability()-1));
-									p.updateInventory();
-								}
-							}
-						}
-					}
 				if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
 					if (e.getBlock().getType()==Material.DIRT) {
 						this.plugin.gainMoneyExp(p,"Digger",0.005,1);
@@ -3602,8 +3717,9 @@ implements Listener
 							p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 360000, nexteffect.getAmplifier()+2, true));
 						}
 						if (nexteffect.getType().getName().compareTo(PotionEffectType.HEALTH_BOOST.getName())==0) {
-							p.removePotionEffect(PotionEffectType.HEALTH_BOOST);
+							double myhealth = p.getHealth();
 							p.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 360000, nexteffect.getAmplifier()+1, true));
+							p.setHealth(myhealth);
 						}
 						/*if (nexteffect.getType().getName().compareTo(PotionEffectType.JUMP.getName())==0) {
 							p.removePotionEffect(PotionEffectType.JUMP);
@@ -3611,7 +3727,6 @@ implements Listener
 						}*/
 						effects.remove();
 					}
-
 				} catch (ConcurrentModificationException ex_e) {
 					Bukkit.getLogger().warning("Potion Effect Collection not accessible while initializing player speed.");
 				}
@@ -3649,83 +3764,6 @@ implements Listener
 				//p.sendMessage("Got in.");
 				p.updateInventory();
 			}
-		}
-		Material[] fortune_materials = {Material.EMERALD_ORE,Material.COAL_ORE,Material.DIAMOND_ORE,Material.REDSTONE_ORE,Material.LAPIS_ORE,Material.QUARTZ_ORE}; //An array of all blocks that multiply via fortune.
-		Material[] result_materials = {Material.EMERALD,Material.COAL,Material.DIAMOND,Material.REDSTONE,Material.INK_SACK,Material.QUARTZ}; //The resulting materials corresponding to the fortune blocks being broken.
-		boolean fortune_material=false;
-		int fortune_material_slot=0;
-		for (int i=0;i<fortune_materials.length;i++) {
-			if (fortune_materials[i].equals(e.getBlock().getType())) {
-				fortune_material=true;
-				fortune_material_slot=i;
-				break;
-			}
-		}
-		if (!has_silktouch) {
-			if (e.getBlock().getType()==Material.IRON_ORE) {
-				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
-				exp.setExperience(1);
-			}
-			if (e.getBlock().getType()==Material.GOLD_ORE) {
-				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
-				exp.setExperience(1);
-			}
-			if (e.getBlock().getType()==Material.REDSTONE_ORE) {
-				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
-				exp.setExperience(3);
-			}
-			if (e.getBlock().getType()==Material.LAPIS_ORE) {
-				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
-				exp.setExperience(3);
-			}
-			if (e.getBlock().getType()==Material.DIAMOND_ORE) {
-				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
-				exp.setExperience(12);
-			}
-			if (e.getBlock().getType()==Material.EMERALD_ORE) {
-				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
-				exp.setExperience(28);
-			}
-			if (e.getBlock().getType()==Material.QUARTZ_ORE) {
-				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(e.getBlock().getLocation(), EntityType.EXPERIENCE_ORB);
-				exp.setExperience(4);
-			}
-		}
-		if (p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)>0) { //Check if the player has fortune.
-			if (fortune_material) { //If this is a fortune material, we have to account for the new fortune enchantment algorithm.
-				e.setCancelled(true);
-				e.getPlayer().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
-				int fortune_level = p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
-				int drop_chance=50;
-				for (int i=1;i<fortune_level;i++) {
-					drop_chance += (100-drop_chance)/2;
-				}
-				boolean drop_extra=false;
-				if (Math.random()*100d<=drop_chance) {
-					drop_extra=true;
-				}
-				if (result_materials[fortune_material_slot]!=Material.REDSTONE &&
-						result_materials[fortune_material_slot]!=Material.INK_SACK) {
-					//This is an item that actually just drops one of per ore. Drop normally.
-					e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(result_materials[fortune_material_slot],(drop_extra)?2:1));
-				} else {
-					if (result_materials[fortune_material_slot]==Material.REDSTONE) { //Drop redstone
-						e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(result_materials[fortune_material_slot],(drop_extra)?(((int)(Math.random()*2))+4)*2:((int)(Math.random()*2))+4));
-					} else {//Drop Lapis.
-						Item lapis = e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(result_materials[fortune_material_slot],(drop_extra)?(((int)(Math.random()*5))+4)*2:((int)(Math.random()*5))+4,(byte)4));
-					}
-				}
-			}
-		}
-		if (e.getBlock().getType()==Material.IRON_ORE && !has_silktouch) {
-			e.setCancelled(true);
-			e.getPlayer().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
-			e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(Material.IRON_INGOT));
-		}
-		if (e.getBlock().getType()==Material.GOLD_ORE && !has_silktouch) {
-			e.setCancelled(true);
-			e.getPlayer().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
-			e.getPlayer().getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(Material.GOLD_INGOT));
 		}
 		if (e.getBlock().getType()==Material.MELON_BLOCK) {
 			e.setCancelled(true);
@@ -6086,7 +6124,7 @@ implements Listener
 			if (f.getKiller()!=null && f.getKiller().getType()==EntityType.PLAYER) {
 				Player p = f.getKiller();
 				if (f.getType()==EntityType.SKELETON && ((Skeleton)f).getSkeletonType()==SkeletonType.WITHER) {
-					this.plugin.getAccountsConfig().set(p.getName()+".bonus.witherskeleton", Integer.valueOf(this.plugin.getAccountsConfig().getInt(p.getName()+".bonus.witherskeleton"))+1);
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".bonus.witherskeleton", Integer.valueOf(this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".bonus.witherskeleton"))+1);
 				}
 				for (int x=-10;x<10;x++) {
 					for (int y=-3;y<3;y++) {
@@ -6914,6 +6952,16 @@ implements Listener
 
 	@EventHandler
 	public void onEnemyHit(EntityDamageByEntityEvent e) {
+		
+		//**********************************//Player buffs begin
+		if (e.getDamager() instanceof Player) {
+			Player p = (Player)e.getDamager();
+			if (p.getItemInHand().getType().name().toLowerCase().contains("axe") && !p.getItemInHand().getType().name().toLowerCase().contains("pickaxe") && this.plugin.hasJobBuff("Woodcutter", p, Job.JOB30A)) {
+				p.getItemInHand().setDurability((short)0);
+			}
+		}
+		//**********************************//Player buffs end
+		
 		if (e.getEntity() instanceof LivingEntity) {
 			final LivingEntity l = (LivingEntity)e.getEntity();
 			if (l instanceof Player) {
@@ -7152,7 +7200,7 @@ implements Listener
 			if (e.getDamager() instanceof LivingEntity) {
 				final double player_starthp = p.getHealth();
 				final LivingEntity l = (LivingEntity)e.getDamager();
-				if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify5")) {
+				if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
 					final Main plug = this.plugin;
 					Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 						@Override
@@ -7596,9 +7644,9 @@ implements Listener
 			}
 			//Bukkit.getLogger().info("Made it through 4.");
 			p.updateInventory();
-			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat3")>0) {
+			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat3")>0) {
 				double olddmg=e.getDamage();
-				e.setDamage(e.getDamage()*(((100-this.plugin.getStatBonus(2, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat3")/4))/100.0d)));
+				e.setDamage(e.getDamage()*(((100-this.plugin.getStatBonus(2, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat3")/4))/100.0d)));
 				//p.sendMessage("Damage set from "+olddmg+" to "+e.getDamage());
 			}
 		}
@@ -7678,7 +7726,7 @@ implements Listener
 				if (throughdmg>e.getDamage()/2) {
 					if (p.getHealth()-throughdmg>0) {
 						p.setHealth(p.getHealth()-throughdmg);
-						if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify5") && e.getDamage()!=0) {
+						if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5") && e.getDamage()!=0) {
 							//p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"You were hurt for "+Math.round(throughdmg*10)/10+" damage from "+convertToItemName(e.getCause().name())+".");
 						}
 					} else {
@@ -7711,7 +7759,7 @@ implements Listener
 				} else {
 					if (p.getHealth()-e.getDamage()/2>0) {
 						p.setHealth(p.getHealth()-e.getDamage()/2);
-						if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify5") && e.getDamage()!=0) {
+						if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5") && e.getDamage()!=0) {
 							//p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"You were hurt for "+Math.round(e.getDamage()/2*10)/10+" damage from "+convertToItemName(e.getCause().name())+".");
 						}
 					} else {
@@ -7775,7 +7823,7 @@ implements Listener
 					if (throughdmg>e.getDamage()) {
 						if (p.getHealth()-throughdmg>0) {
 							p.setHealth(p.getHealth()-throughdmg);
-							if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify5") && e.getDamage()!=0) {
+							if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5") && e.getDamage()!=0) {
 								//p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"You were hurt for "+Math.round(throughdmg*10)/10+" damage from "+convertToItemName(e.getCause().name())+".");
 							}
 						} else {
@@ -7813,7 +7861,7 @@ implements Listener
 					} else {
 						if (p.getHealth()-e.getDamage()>0) {
 							p.setHealth(p.getHealth()-e.getDamage());
-							if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify5") && e.getDamage()!=0) {
+							if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5") && e.getDamage()!=0) {
 								//p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"You were hurt for "+Math.round(e.getDamage()*10)/10+" damage from "+convertToItemName(e.getCause().name())+".");
 							}
 						} else {
@@ -7990,26 +8038,26 @@ implements Listener
 					}
 					if (this.plugin.PlayerinJob((Player)e.getDamager(), "Hunter") && this.plugin.getJobLv("Hunter", (Player)e.getDamager())>=5) {
 						//Deal 2 extra damage.
-						e.setDamage(e.getDamage()+2);
+						e.setDamage(e.getDamage()+4);
 					}
-					if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat7")>0) {
-						e.setDamage(e.getDamage()+(this.plugin.getStatBonus(6, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat7"))/2));
+					if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat7")>0) {
+						e.setDamage(e.getDamage()+(this.plugin.getStatBonus(6, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat7"))/2));
 					}
 					//Add Armor penetration from the stat point, if any.
-					if (this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4)>0) {
-						armor_pen+=this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4);
+					if (this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat5")/4)>0) {
+						armor_pen+=this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat5")/4);
 					}
 					if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && armor_pen>0) {
 						double normaldmg=(this.plugin.DMGCALC.getDamage(f.getEquipment().getHelmet(), f.getEquipment().getChestplate(), f.getEquipment().getLeggings(), f.getEquipment().getBoots(), e.getDamage(), DamageCause.ENTITY_ATTACK, false));
 						double throughdmg=(this.plugin.DMGCALC.getDamage(new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), new ItemStack(Material.AIR), e.getDamage(), DamageCause.ENTITY_ATTACK, false));
 						if (throughdmg>normaldmg+armor_pen) {
 							//This means some piercing can be done.
-							//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4));
+							//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat5")/4));
 							if (f.getHealth()-(normaldmg+armor_pen)>0) {
 								f.setHealth(f.getHealth()-(normaldmg+armor_pen));
 								armor_pen_dmg=(normaldmg+armor_pen);
 								if (f!=null) {
-									if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+									if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 										if (f.getCustomName()!=null) {
 											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(normaldmg+armor_pen)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
 										} else {
@@ -8026,7 +8074,7 @@ implements Listener
 								f.setHealth(f.getHealth()-throughdmg);
 								armor_pen_dmg=throughdmg;
 								if (f!=null) {
-									if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+									if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 										if (f.getCustomName()!=null) {
 											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
 										} else {
@@ -8041,7 +8089,7 @@ implements Listener
 						e.setDamage(0);
 					}
 					if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && e.getDamage()!=0) {
-						if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+						if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 							if (f.getCustomName()!=null) {
 								//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round((this.plugin.DMGCALC.getDamage(f.getEquipment().getHelmet(), f.getEquipment().getChestplate(), f.getEquipment().getLeggings(), f.getEquipment().getBoots(), e.getDamage(), DamageCause.ENTITY_ATTACK, false)))*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
 							} else {
@@ -8049,7 +8097,7 @@ implements Listener
 							}
 						}
 					}
-					if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+					if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 						final double armor_dmg = armor_pen_dmg;
 						Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 							@Override
@@ -8120,8 +8168,8 @@ implements Listener
 							e.setDamage(e.getDamage()+dmg);
 						}
 						//Add Armor penetration from the stat point, if any.
-						if (this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4)>0) {
-							armor_pen+=this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4);
+						if (this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat5")/4)>0) {
+							armor_pen+=this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat5")/4);
 						}
 						if (e.getEntity() instanceof LivingEntity) {
 							LivingEntity enemy = (LivingEntity)e.getEntity();
@@ -8164,10 +8212,10 @@ implements Listener
 						}
 						if (this.plugin.PlayerinJob((Player)((Projectile)e.getDamager()).getShooter(), "Hunter") && this.plugin.getJobLv("Hunter", (Player)((Projectile)e.getDamager()).getShooter())>=5) {
 							//Deal 2 extra damage.
-							e.setDamage(e.getDamage()+2);
+							e.setDamage(e.getDamage()+4);
 						}
-						if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat7")>0) {
-							e.setDamage(e.getDamage()+(this.plugin.getStatBonus(6, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat7"))/2));
+						if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat7")>0) {
+							e.setDamage(e.getDamage()+(this.plugin.getStatBonus(6, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat7"))/2));
 						}
 						if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && armor_pen>0) {
 							double normaldmg=(this.plugin.DMGCALC.getDamage(f.getEquipment().getHelmet(), f.getEquipment().getChestplate(), f.getEquipment().getLeggings(), f.getEquipment().getBoots(), e.getDamage(), DamageCause.ENTITY_ATTACK, false));
@@ -8176,11 +8224,11 @@ implements Listener
 
 							if (throughdmg>normaldmg+armor_pen) {
 								//This means some piercing can be done.
-								//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat5")/4));
+								//e.setDamage(normaldmg+this.plugin.getStatBonus(4, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat5")/4));
 								if (f.getHealth()-(normaldmg+armor_pen)>0) {
 									f.setHealth(f.getHealth()-(normaldmg+armor_pen));
 									armor_pen_dmg=(normaldmg+armor_pen);
-									if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+									if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 										if (f.getCustomName()!=null) {
 											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(normaldmg+armor_pen)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
 										} else {
@@ -8195,7 +8243,7 @@ implements Listener
 								if (f.getHealth()-throughdmg>0) {
 									f.setHealth(f.getHealth()-throughdmg);
 									armor_pen_dmg=throughdmg;
-									if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+									if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 										if (f.getCustomName()!=null) {
 											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
 										} else {
@@ -8209,7 +8257,7 @@ implements Listener
 							e.setDamage(0);
 						}
 						if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && e.getDamage()!=0) {
-							if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+							if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 								if (f.getCustomName()!=null) {
 									//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round((this.plugin.DMGCALC.getDamage(f.getEquipment().getHelmet(), f.getEquipment().getChestplate(), f.getEquipment().getLeggings(), f.getEquipment().getBoots(), e.getDamage(), DamageCause.ENTITY_ATTACK, false)))*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");
 								} else {
@@ -8217,7 +8265,7 @@ implements Listener
 								}
 							}
 						}
-						if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify4")) {
+						if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 							final double armor_dmg = armor_pen_dmg;
 							Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 								@Override

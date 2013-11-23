@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import java.text.*;
 
 import me.kaZep.Commands.JobsDataInfo;
+import me.kaZep.Commands.JobsDataInfo.Job;
 import me.kaZep.Commands.commandBankEconomy;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -174,8 +175,8 @@ public class Main extends JavaPlugin
   long GLOBAL_villagetimer=0,GLOBAL_templetimer=0,GLOBAL_cavetimer=0,GLOBAL_undergroundtimer=0,GLOBAL_nethertimer=0;
   
 
-	public String[] ValidJobs = {"Woodcutter","Miner","Builder","Digger","Farmer","Hunter","Fisherman","Weaponsmith","Blacksmith","Cook","Brewer","Enchanter","Breeder","Explorer","Support"};
-	public ChatColor[] JobColors = {ChatColor.GREEN,ChatColor.GRAY,ChatColor.WHITE,ChatColor.GOLD,ChatColor.BLUE,ChatColor.RED,ChatColor.AQUA,ChatColor.DARK_PURPLE,ChatColor.GOLD,
+	public String[] ValidJobs = {"Woodcutter","Miner","Builder","Digger","Hunter","Fisherman","Weaponsmith","Blacksmith","Cook","Brewer","Enchanter","Breeder","Explorer","Support"};
+	public ChatColor[] JobColors = {ChatColor.GREEN,ChatColor.GRAY,ChatColor.WHITE,ChatColor.GOLD,ChatColor.RED,ChatColor.AQUA,ChatColor.DARK_PURPLE,ChatColor.GOLD,
 			ChatColor.YELLOW,ChatColor.LIGHT_PURPLE,ChatColor.DARK_BLUE,ChatColor.DARK_GREEN,ChatColor.WHITE,ChatColor.DARK_RED};
 
   private FileConfiguration accountsConfig = null;
@@ -224,6 +225,8 @@ public class Main extends JavaPlugin
     getCommand("event").setExecutor(new commandBankEconomy(this));
     //getCommand("dungeon").setExecutor(new commandBankEconomy(this));
     getCommand("ticktime").setExecutor(new commandBankEconomy(this));
+    getCommand("line").setExecutor(new commandBankEconomy(this));
+    getCommand("rectangle").setExecutor(new commandBankEconomy(this));
 
     setupEconomy();
 
@@ -242,7 +245,7 @@ public class Main extends JavaPlugin
     SERVER_TICK_TIME = getConfig().getLong("server-tick-time");
 
     getAccountsConfig().options().copyDefaults(true);
-    saveAccountsConfig();
+    //saveAccountsConfig() //Commented out;
     
     getConfig().set("spleefrequestatime", Integer.valueOf(0));
     getConfig().set("spleefrequestbtime", Integer.valueOf(0));
@@ -517,10 +520,12 @@ public class Main extends JavaPlugin
     Woodcutter_job.addData("SAPLINGS", 0.015, 1, 1);
     Woodcutter_job.addData("WOOD", 0.01, 0.25, 1);
     Woodcutter_job.addData("WOODEN PLANK", 0.00, 0.10, 1);
-    Woodcutter_job.setBuffData("Saplings have a higher chance of dropping from tree leaves. (+40%)",
-    		"Axes used gain Efficiency +1 (Speed+30%)",
-    		"Saplings have a higher chance of dropping from tree leaves. (+60%), Axes used gain Efficiency +2 (Speed+60%).",
-    		"Axes that you use never break. Axes used gain Efficiency +3 (Speed+90%) 2-5 wood is dropped from each log. Saplings around you have a higher chance of growing quickly.");
+    Woodcutter_job.setBuffData("Leaves break instantly.",
+    		"Crafting planks gives 6 planks per wood instead of 4.",
+    		"Apples have a x4 higher rate of dropping from leaves. Breaking wood gives a Jump boost buff that lasts for 10 seconds. Axes last 200% longer.",
+    		"Axes you use will never break. Making them viable weapons as well.",
+    		"Crafting planks gives 10 planks per wood instead of 4. Saplings placed down will instantly grow trees.",
+    		"Cuts down a whole tree with one whack. Crafting planks gives 20 planks per wood. Each time you cut down a tree, you get a 4 HP boost (stacks) that lasts for one minute.");
     
     Miner_job.setJobName("Miner");
     Miner_job.setJobDescription("A miner's job is to venture into caves and collect precious minerals from within, eventually coming out with such treasures for use in other production.");
@@ -541,10 +546,12 @@ public class Main extends JavaPlugin
     Miner_job.addData("GOLD ORE", 0.0975, 12, 0);
     Miner_job.addData("DIAMOND ORE", 0.3125, 60, 0);
     Miner_job.addData("EMERALD ORE", 0.7625, 160, 0);
-    Miner_job.setBuffData("Pickaxes used gain Efficiency +1 (Speed+30%)",
-    		"Pickaxes have double the durability.", 
-    		"Pickaxes used gain Efficiency +2 (Speed+60%)", 
-    		"Pickaxes used give 240% more items from ore, have quadruple the durability, Efficiency +3 (Speed+90%). Minecart riding speed increased by 40%.");
+    Miner_job.setBuffData("Automatically mines ores next to each other when one ore is mined.",
+    		"Gain Quadruple the experience from mining ores. Pickaxes gain Efficiency III.", 
+    		"Mining with a diamond pickaxe will mine out 3x3 blocks at a time when using diamond pickaxes. Pickaxes used gain Efficiency VI and Unbreaking IV.",
+    		"When holding a pickaxe, mobs that hit you only deal 25% damage.",
+    		"Mining blocks will stack a haste buff up to Haste V for 10 seconds.",
+    		"Mining ores will grant x2 the normal amount of minerals. Fortune is twice as effective, granting a possible total of x4 the normal minerals from ores.");
 
     Builder_job.setJobName("Builder");
     Builder_job.setJobDescription("A builder's job is to use blocks in order to create and invent new buildings using materials that look nice.");
@@ -582,10 +589,12 @@ public class Main extends JavaPlugin
     Builder_job.addData("BRICK STAIRS", 0.065, 9, 0);
     Builder_job.addData("QUARTZ BLOCK", 0.07, 14, 0);
     Builder_job.addData("BRICK", 0.075, 11, 0);
-    Builder_job.setBuffData("Every 5XP gives you one torch.",
-    		"1% of blocks placed will be replenished to your inventory.", 
-    		"5% of blocks placed will be replenished to your inventory.", 
-    		"Placing blocks gives you experience orbs. 50% of blocks placed will be replenished to your inventory.");
+    Builder_job.setBuffData("Builders gain access to the 'line' tool. Typing /line will make building in straight lines easier.",
+    		"Builders gain access to the 'rectangle' tool. Typing /rectangle will make building in rectangles easier.", 
+    		"When crafting irreversible Builder blocks, 75% of the blocks used for crafting will be restored to your inventory. When cooking Builder blocks, the block results will be doubled.",
+    		"Gain experience orbs (equivalent to the job XP you get) as you build.",
+    		"Building will stack a jump boost buff up to Jump Boost seconds.",
+    		"Builders gain the ability to fly when building. They immediately lose the ability to fly if they stop building for a moment, destroy a block, or enter combat. Every 100 Builder XP gained gives the Builder 5 Glowstone blocks and a stack of torches.");
 
     Digger_job.setJobName("Digger");
     Digger_job.setJobDescription("A digger's job is to collect blocks from the ground that are collectible with a shovel. The digger may also convert some blocks to other types for more XP and money.");
@@ -606,11 +615,14 @@ public class Main extends JavaPlugin
     Digger_job.addData("GLASS", 0.015, 3, 2);
     Digger_job.addData("BRICK", 0.04, 8, 2);
     Digger_job.addData("HARDENED CLAY", 0.04, 8, 2);
-    Digger_job.setBuffData("Shovels used gain Efficiency +1 (Speed+30%)",
-    		"Shovels have double the durability.", 
-    		"Shovels used gain Efficiency +2 (Speed+60%), Shovels have triple the durability.", 
-    		"Shovels have quadruple the durability. Blocks dug up are doubled in quantity. Shovels have Efficiency +4 (Speed+120%).");
-
+    Digger_job.setBuffData("Ability to discover artifacts when digging up blocks.",
+    		"Shovels gain Unbreaking V and Efficiency IV.", 
+    		"Destroying the bottom row of Sand or Gravel with a Wooden Shovel will destroy the whole stack instantly. Artifact discovery rate increased by 25%.",
+    		"Shovels you use will not break.",
+    		"Diggers can craft a Battle Shovel (Use a Lapis block with sticks to build it). Any blocks you destroy with it will shoot 10 arrows rapidly from the destroyed block's position in the direction you are facing.",
+    		"Artifacts will be able to be identified immediately with no identify tomes.");
+    
+    /*
     Farmer_job.setJobName("Farmer");
     Farmer_job.setJobDescription("A farmer's job is to sustain and continue to replenish what nature provides to turn them into sustainable food items and other useful things.");
     Farmer_job.setAction(0, "BREAK");
@@ -635,7 +647,8 @@ public class Main extends JavaPlugin
     		"Killing skeletons yields triple the amount of bones.", 
     		"Nearby crops grow 30% faster.", 
     		"Nearby crops grow 200% faster. Bonemeal grows things instantly. (Just like before the bonemeal nerf) in one use.");
-
+	*/
+    
     Hunter_job.setJobName("Hunter");
     Hunter_job.setJobDescription("A hunter's job is to take care of the threats at night and protect others who may be in danger. Hunters that kill innocent creatures will be punished, thus they must resort to other methods for food.");
     Hunter_job.setAction(0, "HURT");
@@ -646,8 +659,15 @@ public class Main extends JavaPlugin
     Hunter_job.addData("ZOMBIE", 0.01, 2, 0);
     Hunter_job.addData("SPIDER", 0.01, 2, 0);
     Hunter_job.addData("SKELETON", 0.015, 3, 0);
+    Hunter_job.addData("CHARGE ZOMBIE", 0.02, 4, 0);
+    Hunter_job.addData("ZOMBIE NINJA", 0.025, 5, 0);
+    Hunter_job.addData("SNIPER", 0.025, 5, 0);
     Hunter_job.addData("CREEPER", 0.025, 5, 0);
+    Hunter_job.addData("VENOMOUS SPIDER", 0.025, 5, 0);
+    Hunter_job.addData("SNARING SPIDER", 0.025, 5, 0);
     Hunter_job.addData("PIG ZOMBIE", 0.03, 6, 0);
+    Hunter_job.addData("EXPLOSIVE CREEPER", 0.035, 7, 0);
+    Hunter_job.addData("DESTRUCTIVE CREEPER", 0.035, 7, 0);
     Hunter_job.addData("GHAST", 0.04, 8, 0);
     Hunter_job.addData("ENDERMAN", 0.04, 8, 0);
     Hunter_job.addData("BLAZE", 0.05, 10, 0);
@@ -665,16 +685,25 @@ public class Main extends JavaPlugin
     Hunter_job.addData("SPIDER", 0.02, 4, 1);
     Hunter_job.addData("ZOMBIE", 0.025, 5, 1);
     Hunter_job.addData("SKELETON", 0.035, 7, 1);
+    Hunter_job.addData("CHARGE ZOMBIE", 0.05, 10, 1);
+    Hunter_job.addData("ZOMBIE NINJA", 0.05, 10, 1);
+    Hunter_job.addData("SNIPER", 0.05, 10, 1);
+    Hunter_job.addData("VENOMOUS SPIDER", 0.05, 10, 1);
+    Hunter_job.addData("SNARING SPIDER", 0.05, 10, 1);
     Hunter_job.addData("CREEPER", 0.05, 10, 1);
     Hunter_job.addData("PIG ZOMBIE", 0.08, 16, 1);
+    Hunter_job.addData("EXPLOSIVE CREEPER", 0.08, 16, 1);
+    Hunter_job.addData("DESTRUCTIVE CREEPER", 0.08, 16, 1);
     Hunter_job.addData("GHAST", 0.10, 12, 1);
     Hunter_job.addData("ENDERMAN", 0.125, 16, 1);
     Hunter_job.addData("BLAZE", 0.15, 20, 1);
     Hunter_job.addData("ENDER DRAGON", 100.00, 3000, 1);
     Hunter_job.addData("WITHER", 550.00, 7800, 1);
-    Hunter_job.setBuffData("Damage dealt increased by 2.",
-    		"Sneaking gives you invisibility.", 
-    		"Swords gain Fire Aspect II. Movement speed increased by 20%.", 
+    Hunter_job.setBuffData("Damage dealt increased by 4.",
+    		"Sneaking gives you invisibility. Anything targeting you loses aggro.", 
+    		"Swords inflict Poison II on mobs. Movement speed increased by 20%.", 
+    		"Each time you get hit, the next hit has a 10% stacking chance of blocking for 10 seconds.",
+    		"Attacks deal an additional 10 armor penetration damage.",
     		"Damage dealt increased by 4, damage taken decreased by 30%, at night you are invisible. Health increased by 20.");
 
     Fisherman_job.setJobName("Fisherman");
@@ -686,7 +715,9 @@ public class Main extends JavaPlugin
     Fisherman_job.addData("COOKED FISH", 0.125, 2, 1);
     Fisherman_job.setBuffData("Fishing rods have double the durability.",
     		"Fish give double the exp orbs, two fish can be caught at the same time (25% chance)", 
-    		"Up to four fish can be caught at one time. Sometimes fish will be automatically cooked. (Will gain exp and money for the cooked ones as well)", 
+    		"Up to four fish can be caught at one time. Sometimes fish will be automatically cooked. (Will gain exp and money for the cooked ones as well)",
+    		"Fish Catching Rate increased by 30%. You will always catch at least two fish (And gain the amount of money and xp earned for them). Fishing rods last 4x as long.",
+    		"Each successful catch will increase the fishing catch rate multiplicatively by 5%. Missing a fish will reset this rate.",
     		"Fishing rods do 10 damage when hooking an enemy mob. Fishing rods do not run out of durability. Chance of catching fish increased by 50%. Holding a fishing rod gives the ability to fly for 5 seconds at a time.");
     
     Weaponsmith_job.setJobName("Weaponsmith");
@@ -702,7 +733,9 @@ public class Main extends JavaPlugin
     Weaponsmith_job.addData("DIAMOND SWORD", 3.60, 280, 0);
     Weaponsmith_job.setBuffData("Crafting Weaponsmith items have a 10% chance of preserving materials used.",
     		"Weapons crafted gain a free level 5 enchantment.", 
-    		"Crafting Weaponsmith items have a 25% chance of preserving materials used.", 
+    		"Crafting Weaponsmith items have a 25% chance of preserving materials used.",
+    		"All weaponsmith items crafted gain +X Damage bonus enchantments. (Increases by weaponsmithing level)",
+    		"All weaponsmith items have your name engraved on your weapons, and your soul implanted in them...",
     		"Weapons crafted gain free level 25 enchantments. Materials used in crafting have a 50% chance of being preserved. Weapons crafted have a 30% chance of stacking (duplicated), and 30% chance for every extra addition to the weapon stack.");
 
     Blacksmith_job.setJobName("Blacksmith");
@@ -757,16 +790,18 @@ public class Main extends JavaPlugin
     Blacksmith_job.addData("DIAMOND CHESTPLATE", 1.50*10, 750*10, 0);
     Blacksmith_job.setBuffData("All crafted items are buffed with a Lv5 enchantment.",
     		"All crafted items are buffed with a Lv10 enchantment.", 
-    		"Crafting Blacksmith items have a 30% chance of preserving materials used.", 
+    		"Crafting Blacksmith items have a 30% chance of preserving materials used.",
+    		"All blacksmith items crafted gain +4 Health bonus enchantments. (Increases by +4 per blacksmithing level after 30.)",
+    		"Blacksmiths gain the ability to craft armor they find back into ingots / materials, based on the remaining durability. (About 50% lossy)",
     		"All crafted Blacksmith items stack between 2 and 5 of the same item, effectively multiplying the amount you craft. Items are buffed with a Lv20 enchantment and have a 50% chance to be enchanted with a level 30 enchantment.");
 
     Cook_job.setJobName("Cook");
     Cook_job.setJobDescription("A cook's job is to provide food for others and themselves through cooking and crafting together ingredients.");
     Cook_job.setAction(0, "CRAFT");
     Cook_job.setAction(1, "SMELT");
-    Cook_job.setExp(250, 200, 40, 1.04);
+    Cook_job.setExp(400, 250, 40, 1.04);
     Cook_job.addData("BREAD", 0.003125, 1.25, 0);
-    Cook_job.addData("COOKIE", 0.016875, 1.50, 0);
+    Cook_job.addData("COOKIE", 0.016875, 0.45, 0);
     Cook_job.addData("MUSHROOM SOUP", 0.009375, 3.75, 0);
     Cook_job.addData("PUMPKIN PIE", 0.0375, 15, 0);
     Cook_job.addData("GOLDEN CARROT", 0.0875, 35, 0);
@@ -780,6 +815,8 @@ public class Main extends JavaPlugin
     Cook_job.setBuffData("Double the amount of cooking time with one fuel item in the furnace.",
     		"Results of crafting food is double the normal amount.", 
     		"Results of cooking food is double the normal amount.", 
+    		"Increases buff strength of all food items by 1.",
+    		"Increases bonus effect duration of all food items by x4.",
     		"Cooking and crafting food gives 4x the normal amount. Cooking and crafting food gives exp orbs and has a chance of giving Golden Apples and Golden Carrots sometimes. (15% per crafted/cooked item.)");
 
     Brewer_job.setJobName("Brewer");
@@ -801,6 +838,8 @@ public class Main extends JavaPlugin
     Brewer_job.setBuffData("Decrease brewing wait time by half.",
     		"Potions obtained are doubled. (Stacks of two)", 
     		"Potions created by you have double the duration.", 
+    		"Gain the ability to brew Night Vision and Invisibility potions.",
+    		"Potions created by you stack to 8.",
     		"Potions created by you last for 30 minutes. Potions automatically stack up together in your inventory when grabbed. Splash potions provide full power regardless of how far from the splash the affected entities are. Potions obtained are quadrupled. Brewing wait time decreased by 4x the normal time.");
 
     Enchanter_job.setJobName("Enchanter");
@@ -834,7 +873,9 @@ public class Main extends JavaPlugin
     Enchanter_job.addData("SILK TOUCH", 0.50, 40, 0);
     Enchanter_job.setBuffData("Whenever you gain experience, the amount you gain is doubled.",
     		"Enchantments consume 25% less of your exp. (Lv20 enchantment costs 15 levels) Enchantments gain an extra stat enchantment bonus.", 
-    		"Enchantments are more potent. (Gain extra enchantments, bonus enchantments, and higher levels than normal.)", 
+    		"Enchantments are more potent. (Gain extra enchantments, bonus enchantments, and higher levels than normal.)",
+    		"Gain the ability to choose one type of enchantment/bonus enchantment to add to an item when enchanting.",
+    		"Gain the ability to enchant legendary-tier items. (Has an unusually higher level of enchantment than normal)",
     		"Enchanters receive quadruple the amount of experience from orbs. Enchanting consumes 75% less of your exp. (Lv20 enchantment costs 5 levels) Enchantments are at least level 5 or higher. Extra bonus enchantments are very likely, and super enchantments are added as well.");
 
     Breeder_job.setJobName("Breeder");
@@ -858,6 +899,8 @@ public class Main extends JavaPlugin
     Breeder_job.setBuffData("Nearby Sheep and Chickens reproduce wool and eggs at double the rate.",
     		"Breeding animals may yield twins and triplets half the time.", 
     		"Feeding animals will give you the item back half the time.", 
+    		"Animals will become enticed by you whenever you are nearby, requiring no food to breed animals. Animals will be able to breed again at double the normal rate.",
+    		"Wolves and horses you tame gain +150 Health, making these companions much more useful in fighting, and surviving longer. Feeding them one time will heal them completely. For each wolf and horse near you, you gain +2 Health.",
     		"Breeding animals will give between 2-5 of that animal, all of them will be grown up. Sheep will always regrow their wool instantly after shearing them, shears do not break. Chickens will give 64 eggs if you kill one. Cows and Pigs drop a stack of meat when killing them. Feeding pigs will give them a saddle.");
 
     Explorer_job.setJobName("Explorer");
@@ -873,8 +916,10 @@ public class Main extends JavaPlugin
     Explorer_job.addData("Creating maps and uncovering new areas on them (Underground rewards more!): ", 0.01, 8, 0);
     Explorer_job.setBuffData("Movement speed increased by 20%.",
     		"Players lose no exp on death. When taking fatal damage, you will regain all health. This effect can be used once every hour.", 
-    		"Don't lose any money on death. Reviving costs 75% less.", 
-    		"When dying, you only lose 25% of your items. The rest stay in your inventory. Reviving costs 90% less. Teleporting to players costs 75% less. Movement speed increased by 40%. When dying, you will be placed back where you just died. This effect can be used once every hour.");
+    		"Don't lose any money on death. Reviving costs 75% less.",
+    		"When crafting maps, you will also gain 32 paper to zoom the map out completely. (Or use to create more maps.)",
+    		"Increased movement speed to 40%.",
+    		"When holding a pickaxe, it will detect ores around you based on what the pickaxe is made of.");
 
     Support_job.setJobName("Support");
     Support_job.setJobDescription("A support's job is to provide assistance and keep others alive by providing potions to heal, materials to allow others to craft things, and being useful overall.");
@@ -911,14 +956,17 @@ public class Main extends JavaPlugin
     Support_job.addData("-Dousing or using a fire resistance potion on someone burning.", 4.80, 240, 0);
     Support_job.setBuffData("Everyone around you gains +2 Armor.",
     		"Everyone around you gains +10 more Maximum Health.", 
-    		"Everyone around you gains +4 Armor. Everyone's hunger degrades at half the speed. Players with 8 HP or less take half the damage from hits.", 
-    		"Everyone around you gains Regeneration. You gain +10 Armor. Everyone around you gains +20 more Maximum Health. You gain +50 more maximum health. Everyone around you including yourself moves 20% faster.");
+    		"Everyone around you gains +4 Armor. Everyone's hunger degrades at half the speed. Players with 8 HP or less take half the damage from hits.",
+    		"When a nearby player is low in health, if you have health splash potions, one of your potions will be automatically consumed to heal them.",
+    		"Provide a Fire Resistance buff to everyone around you.",
+    		"Everyone around you gains Regeneration. You gain +5 Armor. Everyone around you gains +20 more Health. You gain +10 more health. Everyone around you including yourself moves 20% faster.");
   }
 
   public void onDisable()
   {
 	  getConfig().set("server-tick-time", Long.valueOf(SERVER_TICK_TIME));
 	  saveConfig();
+	  saveAccountsConfig();
     PluginDescriptionFile pdf = getDescription();
     System.out.println("[" + pdf.getName() + "] The plugin has been disabled succesfully.");
   }
@@ -1904,6 +1952,7 @@ public void runTick() {
 				  }
 			  }
 			  if (Main.SERVER_TICK_TIME%600==0) {
+				  saveAccountsConfig();
 				  if (turnedon==false && Bukkit.getWorld("world").getTime()>13000) {
 					  //Bukkit.getPlayer("sigonasr2").sendMessage("It's night now...");
 					  turnedon=true;
@@ -2316,7 +2365,7 @@ public void runTick() {
 							  newloc.setZ(51.65d);
 							  winningplayer.teleport(newloc);
 							  updateTopSPLEEFSigns();
-							  saveAccountsConfig();
+							  //saveAccountsConfig() //Commented out;
 						  } else {
 							  //We're player B.
 							  //Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+getConfig().getString("spleefrequestaplayer")+" is the winner of this spleef game! "+getConfig().getString("spleefrequestbplayer")+" loses.");
@@ -2366,7 +2415,7 @@ public void runTick() {
 							  newloc.setZ(51.65d);
 							  winningplayer.teleport(newloc);
 							  updateTopSPLEEFSigns();
-							  saveAccountsConfig();
+							  //saveAccountsConfig() //Commented out;
 						  }
 						  //Look for the special shovel.
 						  /*
@@ -3246,7 +3295,7 @@ public void payDay(int time)
         	}
             //Main.economy.depositPlayer(allOnlineP.getName(), (Main.this.getConfig().getDouble("payday.amount")*Main.economy.bankBalance(allOnlineP.getName()).balance));
         }
-        saveAccountsConfig();
+        //saveAccountsConfig() //Commented out;
         List<UUID> expired_uuids = new ArrayList<UUID>();
         String moblist = getConfig().getString("fed.mobs");
 		String finalstring = "";
@@ -3400,13 +3449,13 @@ public void payDay(int time)
 
 	public int getPlayerJobCount(Player p) {
 		int count=0;
-		if (getAccountsConfig().getString(p.getName()+".jobs.job1").compareTo("None")!=0) {
+		if (getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1").compareTo("None")!=0) {
 			count++;
 		}
-		if (getAccountsConfig().getString(p.getName()+".jobs.job2").compareTo("None")!=0) {
+		if (getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2").compareTo("None")!=0) {
 			count++;
 		}
-		if (getAccountsConfig().getString(p.getName()+".jobs.job3").compareTo("None")!=0) {
+		if (getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3").compareTo("None")!=0) {
 			count++;
 		}
 		return count;
@@ -3428,9 +3477,19 @@ public void payDay(int time)
     		return;
     	}
     	if (PlayerinJob(p,job)) {
-	    	getAccountsConfig().set(p.getName()+".jobs.ultimate", String.valueOf(ValidJobs[matchedjob]));
-	    	saveAccountsConfig();
-	    	p.sendMessage(ChatColor.YELLOW+"Set Declared Ultimate job to "+job);
+    		if (getJobLv(job,p)>=40) {
+		    	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.ultimate", String.valueOf(ValidJobs[matchedjob]));
+		    	//saveAccountsConfig() //Commented out;
+		    	p.sendMessage(ChatColor.YELLOW+"Set Declared Ultimate job to "+job);
+		    	p.sendMessage("");
+		    	p.sendMessage(ChatColor.GOLD+""+ChatColor.ITALIC+"Unlike other buffs, you do not just receive the buff immediately. You have to earn it.");
+		    	p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Earn enough job exp to be proven worthy, and then search mob drops for a special trinket. The more exp you have built up, the better the chance you'll find one.");
+		    	p.sendMessage("");
+		    	p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"(Note you can still change your declared ultimate at any time during this time.)");
+    		} else {
+        		p.sendMessage(ChatColor.GOLD+"Sorry, you are not a high enough level in that job yet!");
+        		return;
+    		}
     	} else {
     		p.sendMessage(ChatColor.GOLD+"Sorry, you are not in that job!");
     		return;
@@ -3468,6 +3527,13 @@ public void payDay(int time)
     		p.sendMessage(ChatColor.GOLD+"Sorry, there are already "+getConfig().getInt("jobs.MAX_JOBS")+" people in this job!");
     		return false;
     	}
+    	if (getConfig().getInt("jobs."+ValidJobs[matchedjob])==0) {
+    		//Simply set the string.
+    		getConfig().set("jobs."+ValidJobs[matchedjob]+"_members",String.valueOf(p.getName().toLowerCase()));
+    	} else {
+    		//Append to list.
+    		getConfig().set("jobs."+ValidJobs[matchedjob]+"_members",String.valueOf(getConfig().getString("jobs."+ValidJobs[matchedjob]+"_members")+", "+p.getName().toLowerCase()));
+    	}
 		Bukkit.getLogger().info("Well, they are allowed to join this job.");
     	//Add 1 to main config.
     	getConfig().set("jobs."+ValidJobs[matchedjob], Integer.valueOf(getConfig().getInt("jobs."+ValidJobs[matchedjob])+1));
@@ -3477,7 +3543,7 @@ public void payDay(int time)
     	//Check for the slot we have "None" job in first.
     	int openslot=0;
     	for (int i=0;i<3;i++) {
-    		if (getAccountsConfig().getString(p.getName()+".jobs.job"+(i+1)).equalsIgnoreCase("None")) {
+    		if (getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job"+(i+1)).equalsIgnoreCase("None")) {
     			openslot=i;
     			Bukkit.getLogger().info("Found a None job slot.");
     			break;
@@ -3493,10 +3559,10 @@ public void payDay(int time)
     	    hunterplayers.add(p);
     	}
 		Bukkit.getLogger().info("Added extra job pieces when joining.");
-    	getAccountsConfig().set(p.getName()+".jobs.job"+(openslot+1), String.valueOf(ValidJobs[matchedjob]));
-    	getAccountsConfig().set(p.getName()+".jobs.job"+(openslot+1)+"lv", Integer.valueOf(1));
-    	getAccountsConfig().set(p.getName()+".jobs.job"+(openslot+1)+"exp", Double.valueOf(0));
-    	saveAccountsConfig();
+    	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(openslot+1), String.valueOf(ValidJobs[matchedjob]));
+    	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(openslot+1)+"lv", Integer.valueOf(1));
+    	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(openslot+1)+"exp", Double.valueOf(0));
+    	//saveAccountsConfig() //Commented out;
 		Bukkit.getLogger().info("Set job data.");
     	Bukkit.broadcastMessage(p.getName()+" has joined the "+JobColors[matchedjob]+ValidJobs[matchedjob]+ChatColor.WHITE+" job!");
     	p.sendMessage("You can check out your job progress anytime with "+ChatColor.GOLD+"/jobs stats"+ChatColor.WHITE+".");
@@ -3504,12 +3570,11 @@ public void payDay(int time)
     }
 	
 	public String[] getJobs(Player p) {
-		String[] string= {getAccountsConfig().getString(p.getName()+".jobs.job1"),getAccountsConfig().getString(p.getName()+".jobs.job2"),getAccountsConfig().getString(p.getName()+".jobs.job3")};
-		return string;
+		return getJobs(p.getName());
 	}
 	
 	public String[] getJobs(String p) {
-		String[] string= {getAccountsConfig().getString(p+".jobs.job1"),getAccountsConfig().getString(p+".jobs.job2"),getAccountsConfig().getString(p+".jobs.job3")};
+		String[] string= {getAccountsConfig().getString(p.toLowerCase()+".jobs.job1"),getAccountsConfig().getString(p.toLowerCase()+".jobs.job2"),getAccountsConfig().getString(p.toLowerCase()+".jobs.job3")};
 		return string;
 	}
 	
@@ -3524,13 +3589,7 @@ public void payDay(int time)
 	}
 	
 	public boolean PlayerinJob(Player p,String job) {
-		String[] jobs = getJobs(p);
-		for (int i=0;i<jobs.length;i++) {
-			if (job.equalsIgnoreCase(jobs[i])) {
-				return true;
-			}
-		}
-		return false;
+		return PlayerinJob(p.getName(), job);
 	}
 	
 	public void gainMoneyExp(String p,String job,double amount,double exp) {
@@ -3545,7 +3604,7 @@ public void payDay(int time)
 	public void setMoneyExp(Player p,String job,double newamount,double newexp) {
 		String[] jobs = getJobs(p);
 		int slot=-1;
-		JobsDataInfo[] Jobsinfo = {Woodcutter_job,Miner_job,Builder_job,Digger_job,Farmer_job,Hunter_job,Fisherman_job,Weaponsmith_job,Blacksmith_job,Cook_job,Brewer_job,Enchanter_job,Breeder_job,Explorer_job,Support_job};
+		JobsDataInfo[] Jobsinfo = {Woodcutter_job,Miner_job,Builder_job,Digger_job,Hunter_job,Fisherman_job,Weaponsmith_job,Blacksmith_job,Cook_job,Brewer_job,Enchanter_job,Breeder_job,Explorer_job,Support_job};
 		for (int i=0;i<jobs.length;i++) {
 			if (job.equalsIgnoreCase(jobs[i])) {
 				slot=i;
@@ -3556,8 +3615,8 @@ public void payDay(int time)
 		  double val=0;
 		val = economy.getBalance(p.getName());
 		  economy.withdrawPlayer(p.getName(), val);
-		getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"exp", Double.valueOf(newexp));
-		saveAccountsConfig();
+		getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp", Double.valueOf(newexp));
+		//saveAccountsConfig() //Commented out;
 	}
 
 	public void gainMoneyExp(Player p,String job,double amount,double exp) {
@@ -3574,7 +3633,7 @@ public void payDay(int time)
 				break;
 			}
 		}
-		JobsDataInfo[] Jobsinfo = {Woodcutter_job,Miner_job,Builder_job,Digger_job,Farmer_job,Hunter_job,Fisherman_job,Weaponsmith_job,Blacksmith_job,Cook_job,Brewer_job,Enchanter_job,Breeder_job,Explorer_job,Support_job};
+		JobsDataInfo[] Jobsinfo = {Woodcutter_job,Miner_job,Builder_job,Digger_job,Hunter_job,Fisherman_job,Weaponsmith_job,Blacksmith_job,Cook_job,Brewer_job,Enchanter_job,Breeder_job,Explorer_job,Support_job};
 		for (int i=0;i<jobs.length;i++) {
 			if (job.equalsIgnoreCase(jobs[i])) {
 				slot=i;
@@ -3582,18 +3641,18 @@ public void payDay(int time)
 			}
 		}
 		JobsDataInfo info = Jobsinfo[getJobSlot(job)];
-		economy.depositPlayer(p.getName(), amount*(1d+(info.moneymult*getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv"))));
-		getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")+exp));
-		if (getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")<0) {
+		economy.depositPlayer(p.getName(), amount*(1d+(info.moneymult*getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv"))));
+		getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp")+exp));
+		if (getAccountsConfig().getDouble(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp")<0) {
 			//It can't be negative.
-			getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"exp", Double.valueOf(0.0));
+			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp", Double.valueOf(0.0));
 		}
 		//Check for lv up.
-		if (getJobLv(job,p)<40 && getJobExp(job,getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv"))<=getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")) {
+		if (getJobLv(job,p)<40 && getJobExp(job,getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv"))<=getAccountsConfig().getDouble(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp")) {
 			//Level up! Level up! YEAH!
-			getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp")-getJobExp(job,getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv"))));
-			getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv")+1));
-			Bukkit.broadcastMessage(p.getName()+" is now a Level "+getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
+			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp")-getJobExp(job,getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv"))));
+			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv")+1));
+			Bukkit.broadcastMessage(p.getName()+" is now a Level "+getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
 			if (getJobTotalLvs(p)%5==0) {
 				Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+" has reached Level "+getJobTotalLvs(p)+"!");
 				if ((((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))>0) {
@@ -3601,7 +3660,7 @@ public void payDay(int time)
 				}
 			}
 		}
-		saveAccountsConfig();
+		//saveAccountsConfig() //Commented out;
 	}
 	
 	public void levelUpJob(Player p, String job) {
@@ -3628,15 +3687,15 @@ public void payDay(int time)
 			if (slot!=-1) {
 				JobsDataInfo info = Jobsinfo[getJobSlot(job)];
 				if (getJobLv(job,p)<40) {
-				getAccountsConfig().set(p.getName()+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv")+1));
-				Bukkit.broadcastMessage(p.getName()+" is now a Level "+getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
+				getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv")+1));
+				Bukkit.broadcastMessage(p.getName()+" is now a Level "+getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
 				if (getJobTotalLvs(p)%5==0) {
 					Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+" has reached Level "+getJobTotalLvs(p)+"!");
 					if ((((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))>0) {
 						p.sendMessage(ChatColor.GOLD+"You have earned 1 stat point! You now have "+(((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))+" stat point"+((((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))==1?"":"s")+" to spend. "+ChatColor.ITALIC+ChatColor.BLUE+" Type /sp to spend them!");
 					}
 				}
-				saveAccountsConfig();
+				//saveAccountsConfig() //Commented out;
 				p.getInventory().removeItem(j);
 				} else {
 		    		p.sendMessage(ChatColor.GOLD+"You can't level this job. It is already at max level.");
@@ -3670,7 +3729,7 @@ public void payDay(int time)
 			}
 		}
 		JobsDataInfo info = Jobsinfo[getJobSlot(job)];
-		economy.depositPlayer(p.getName(), amount*(1d+(info.moneymult*getAccountsConfig().getInt(p.getName()+".jobs.job"+slot+"lv"))));
+		economy.depositPlayer(p.getName(), amount*(1d+(info.moneymult*getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+slot+"lv"))));
 	}
 	
 	public ChatColor getJobColor(String job) {
@@ -3716,13 +3775,13 @@ public void payDay(int time)
 			int slot=-1;
 			//Check which slot contains our job.
 			for (int i=0;i<3;i++) {
-				if (getAccountsConfig().getString(p.getName()+".jobs.job"+(i+1)).equalsIgnoreCase(job)) {
+				if (getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job"+(i+1)).equalsIgnoreCase(job)) {
 					slot=i;
 					break;
 				}
 			}
 			if (slot!=-1) {
-				return getAccountsConfig().getDouble(p.getName()+".jobs.job"+(slot+1)+"exp");
+				return getAccountsConfig().getDouble(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp");
 			} else {
 				return 0;
 			}
@@ -3962,18 +4021,91 @@ public void payDay(int time)
 			int slot=-1;
 			//Check which slot contains our job.
 			for (int i=0;i<3;i++) {
-				if (getAccountsConfig().getString(p+".jobs.job"+(i+1)).equalsIgnoreCase(job)) {
+				if (getAccountsConfig().getString(p.toLowerCase()+".jobs.job"+(i+1)).equalsIgnoreCase(job)) {
 					slot=i;
 					break;
 				}
 			}
 			if (slot!=-1) {
-				return getAccountsConfig().getInt(p+".jobs.job"+(slot+1)+"lv");
+				return getAccountsConfig().getInt(p.toLowerCase()+".jobs.job"+(slot+1)+"lv");
 			} else {
 				return 0;
 			}
 		}
 		return 0;
+	}
+	
+	public boolean hasJobBuff(String job, Player p, Job j) {
+		return hasJobBuff(job, p.getName(), j);
+	}
+	
+	public boolean hasJobBuff(String job, String p, Job j) {
+		if (PlayerinJob(p,job) || j==Job.JOB40) {
+			//Bukkit.getLogger().info("Inside 1.");
+			int slot=-1;
+			//Check which slot contains our job.
+			for (int i=0;i<3;i++) {
+				if (getAccountsConfig().getString(p.toLowerCase()+".jobs.job"+(i+1)).equalsIgnoreCase(job)) {
+					slot=i;
+					break;
+				}
+			}
+			if (slot!=-1 || j==Job.JOB40) {
+				//Bukkit.getLogger().info("Inside 2. j is "+j.toString()+". ultimate: "+getAccountsConfig().getString(p.toLowerCase()+".jobs.ultimate")+", Sealed ulti:"+ getAccountsConfig().getBoolean(p.toLowerCase()+".jobs.ultimatesealed"));
+				int level = getAccountsConfig().getInt(p.toLowerCase()+".jobs.job"+(slot+1)+"lv");
+				switch (j) {
+					case JOB5: {
+						if (level>=5) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					case JOB10: {
+						if (level>=10) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					case JOB20: {
+						if (level>=20) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					case JOB30A: {
+						if (level>=30 && getAccountsConfig().getInt(p.toLowerCase()+".jobs.job"+(slot+1)+"_30")==1) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					case JOB30B: {
+						if (level>=30 && getAccountsConfig().getInt(p.toLowerCase()+".jobs.job"+(slot+1)+"_30")==2) {
+							return true;
+						} else {
+							return false;
+						}
+					}
+					case JOB40: {
+						if (getAccountsConfig().getString(p.toLowerCase()+".jobs.ultimate").equalsIgnoreCase(job) && getAccountsConfig().getBoolean(p.toLowerCase()+".jobs.ultimatesealed")) {
+							//Bukkit.getLogger().info("Inside 3.");
+							return true;
+						} else {
+							return false;
+						}
+					}
+					default: {
+						return false;
+					}
+				}
+			} else {
+				return false;
+			}
+		}
+		return false;
 	}
 	
 	public int getPlayerDataSlot(Player p) {
@@ -3991,13 +4123,13 @@ public void payDay(int time)
 			int slot=-1;
 			//Check which slot contains our job.
 			for (int i=0;i<3;i++) {
-				if (getAccountsConfig().getString(p.getName()+".jobs.job"+(i+1)).equalsIgnoreCase(job)) {
+				if (getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job"+(i+1)).equalsIgnoreCase(job)) {
 					slot=i;
 					break;
 				}
 			}
 			if (slot!=-1) {
-				return getAccountsConfig().getInt(p.getName()+".jobs.job"+(slot+1)+"lv");
+				return getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv");
 			} else {
 				return 0;
 			}
@@ -4009,7 +4141,7 @@ public void payDay(int time)
 		int totallv=0;
 		//Check which slot contains our job.
 		for (int i=0;i<3;i++) {
-			totallv+=getAccountsConfig().getInt(p.getName()+".jobs.job"+(i+1)+"lv");
+			totallv+=getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(i+1)+"lv");
 		}
 		return totallv;
 	}
@@ -4017,7 +4149,7 @@ public void payDay(int time)
 	public int getStatPointTotal(Player p) {
 		int total=0;
 		for (int i=0;i<10;i++) {
-			total+=getAccountsConfig().getInt(p.getName()+".stats.stat"+(i+1));
+			total+=getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat"+(i+1));
 		}
 		return total;
 	}
@@ -4400,43 +4532,58 @@ public void payDay(int time)
     	//Get their jobs.
     	String[] jobs = getJobs(p);
     	//We can remove them from this job.
-    	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName()+".jobs.job1"))) {
+    	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))) {
+    		//Remove from job members list.
+    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members").replace(", "+p.getName().toLowerCase(), ""));
+    		/*Try again in case it's the only entry.*/
+    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members").replace(p.getName().toLowerCase(), ""));
         	//Remove 1 from main config.
-        	getConfig().set("jobs."+getAccountsConfig().getString(p.getName()+".jobs.job1"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName()+".jobs.job1"))-1));
+        	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))-1));
         	saveConfig();
     		//Remove from job 1.
-        	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName()+".jobs.job1"))+getAccountsConfig().getString(p.getName()+".jobs.job1")+ChatColor.WHITE+" job!");
-        	getAccountsConfig().set(p.getName()+".jobs.job1", String.valueOf("None"));
-        	getAccountsConfig().set(p.getName()+".jobs.job1lv", Integer.valueOf(0));
-        	getAccountsConfig().set(p.getName()+".jobs.job1exp", Double.valueOf(0));
-        	saveAccountsConfig();
+        	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+ChatColor.WHITE+" job!");
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1", String.valueOf("None"));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1lv", Integer.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1_30", Integer.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1exp", Double.valueOf(0));
+        	//saveAccountsConfig() //Commented out;
         	return true;
     	} else
-    	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName()+".jobs.job2"))) {
+    	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))) {
+    		//Remove from job members list.
+    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members").replace(", "+p.getName().toLowerCase(), ""));
+    		/*Try again in case it's the only entry.*/
+    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members").replace(p.getName().toLowerCase(), ""));
         	//Remove 1 from main config.
-        	getConfig().set("jobs."+getAccountsConfig().getString(p.getName()+".jobs.job2"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName()+".jobs.job2"))-1));
+        	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))-1));
         	saveConfig();
     		//Remove from job 2.
-        	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName()+".jobs.job2"))+getAccountsConfig().getString(p.getName()+".jobs.job2")+ChatColor.WHITE+" job!");
-        	getAccountsConfig().set(p.getName()+".jobs.job2", String.valueOf("None"));
-        	getAccountsConfig().set(p.getName()+".jobs.job2lv", Integer.valueOf(0));
-        	getAccountsConfig().set(p.getName()+".jobs.job2exp", Double.valueOf(0));
-        	saveAccountsConfig();
+        	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+ChatColor.WHITE+" job!");
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2", String.valueOf("None"));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2lv", Integer.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2_30", Integer.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2exp", Double.valueOf(0));
+        	//saveAccountsConfig() //Commented out;
         	return true;
     	} else
-    	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName()+".jobs.job3"))) {
+    	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))) {
+    		//Remove from job members list.
+    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members").replace(", "+p.getName().toLowerCase(), ""));
+    		/*Try again in case it's the only entry.*/
+    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members").replace(p.getName().toLowerCase(), ""));
         	//Remove 1 from main config.
-        	getConfig().set("jobs."+getAccountsConfig().getString(p.getName()+".jobs.job3"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName()+".jobs.job3"))-1));
+        	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))-1));
         	saveConfig();
     		//Remove from job 3.
-        	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName()+".jobs.job3"))+getAccountsConfig().getString(p.getName()+".jobs.job3")+ChatColor.WHITE+" job!");
-        	getAccountsConfig().set(p.getName()+".jobs.job3", String.valueOf("None"));
-        	getAccountsConfig().set(p.getName()+".jobs.job3lv", Integer.valueOf(0));
-        	getAccountsConfig().set(p.getName()+".jobs.job3exp", Double.valueOf(0));
-        	saveAccountsConfig();
+        	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+ChatColor.WHITE+" job!");
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3", String.valueOf("None"));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3lv", Integer.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3_30", Integer.valueOf(0));
+        	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3exp", Double.valueOf(0));
+        	//saveAccountsConfig() //Commented out;
         	return true;
     	}
-		Bukkit.broadcastMessage(ChatColor.RED+"[SEVERE]An internal error occurred, triggered by "+p.getName()+".");
+		Bukkit.broadcastMessage(ChatColor.RED+"[SEVERE]An internal error occurred, triggered by "+p.getName().toLowerCase()+".");
     	return false;
     }
     
@@ -4541,5 +4688,112 @@ public void payDay(int time)
   	  } else {
   		  return 0;
   	  }
+    }
+    
+    public void setLv30Choice(Player p, String arg1, String arg2) {
+    	if (getJobLv(arg1, p)>=30) {
+	    	if (arg2.equals("1") || arg2.equals("2")) {
+	    		if (getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(getJobSlot(arg1)+1)+"_30")==0) {
+		    		//We are making a valid choice.
+	    			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(getJobSlot(arg1)+1)+"_30",Integer.valueOf(arg2));
+	    			//saveAccountsConfig() //Commented out;
+	        		p.sendMessage(ChatColor.GREEN+"You have set your Lv30 Buff choice for your "+arg1+" job to the "+((Integer.valueOf(arg2)==1)?"first":"second")+" version.");
+	    		} else {
+	        		p.sendMessage(ChatColor.RED+"Sorry, you already picked your Lv30 Buff Choice for that job! You can't change it.");
+	    		}
+	    	} else {
+	  		  p.sendMessage("Usage: "+ChatColor.GREEN+"/jobs [JobName] 1"+ChatColor.WHITE+" or "+ChatColor.GREEN+"/jobs [JobName] 2"+ChatColor.WHITE+" - Set Lv30 Buff Choice.");
+	    	}
+    	} else {
+    		p.sendMessage(ChatColor.RED+"Sorry, you are not a high enough level in that job to set your buff choice yet!");
+    	}
+    }
+    
+    public void notifyBuffMessages(Player p) {
+    	notifyBuffMessages(p, 20);
+    }
+    
+    public void notifyBuffMessages(final Player p, int tick_delay) {
+    	//Same as notifyBuffMessages(), but waits a number of ticks before displaying it.
+    	//See which messages we have to display.
+    	int total_tick_delay=tick_delay;
+    	if (getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job1lv")>=30 && getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job1_30")==0) {
+    		//Have not selected first job's buff.
+	    	Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+		      @Override
+		      public void run() {
+		    	  String job = getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1");
+		    	  int color_slot = 0;
+		    	  for (int i=0;i<ValidJobs.length;i++) {
+		    		  if (job.equalsIgnoreCase(ValidJobs[i])) {color_slot=i; break;}
+		    	  }
+		    	  p.sendMessage(ChatColor.AQUA+"You have not selected your Lv30 Buff for the "+JobColors[color_slot]+job+" job yet!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Don't know what they are? Type "+ChatColor.RESET+ChatColor.YELLOW+"/jobs buffs "+job+"!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Once you decided one, type "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 1'"+ChatColor.RESET+ChatColor.ITALIC+" or "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 2'"+ChatColor.RESET+ChatColor.ITALIC+" to pick!");
+		      }
+		  	},total_tick_delay+=tick_delay);
+    	}
+    	if (getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job2lv")>=30 && getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job2_30")==0) {
+    		//Have not selected first job's buff.
+	    	Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+		      @Override
+		      public void run() {
+		    	  String job = getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2");
+		    	  int color_slot = 0;
+		    	  for (int i=0;i<ValidJobs.length;i++) {
+		    		  if (job.equalsIgnoreCase(ValidJobs[i])) {color_slot=i; break;}
+		    	  }
+		    	  p.sendMessage(ChatColor.AQUA+"You have not selected your Lv30 Buff for the "+JobColors[color_slot]+job+" job yet!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Don't know what they are? Type "+ChatColor.RESET+ChatColor.YELLOW+"/jobs buffs "+job+"!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Once you decided one, type "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 1'"+ChatColor.RESET+ChatColor.ITALIC+" or "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 2'"+ChatColor.RESET+ChatColor.ITALIC+" to pick!");
+		      }
+		  	},total_tick_delay+=tick_delay);
+    	}
+    	if (getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job3lv")>=30 && getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job3_30")==0) {
+    		//Have not selected first job's buff.
+	    	Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+		      @Override
+		      public void run() {
+		    	  String job = getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3");
+		    	  int color_slot = 0;
+		    	  for (int i=0;i<ValidJobs.length;i++) {
+		    		  if (job.equalsIgnoreCase(ValidJobs[i])) {color_slot=i; break;}
+		    	  }
+		    	  p.sendMessage(ChatColor.AQUA+"You have not selected your Lv30 Buff for the "+JobColors[color_slot]+job+" job yet!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Don't know what they are? Type "+ChatColor.RESET+ChatColor.YELLOW+"/jobs buffs "+job+"!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Once you decided one, type "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 1'"+ChatColor.RESET+ChatColor.ITALIC+" or "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 2'"+ChatColor.RESET+ChatColor.ITALIC+" to pick!");
+		      }
+		  	},total_tick_delay+=tick_delay);
+    	}
+    	if (getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job3lv")>=30 && getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job3_30")==0) {
+    		//Have not selected first job's buff.
+	    	Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+		      @Override
+		      public void run() {
+		    	  String job = getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3");
+		    	  int color_slot = 0;
+		    	  for (int i=0;i<ValidJobs.length;i++) {
+		    		  if (job.equalsIgnoreCase(ValidJobs[i])) {color_slot=i; break;}
+		    	  }
+		    	  p.sendMessage(ChatColor.AQUA+"You have not selected your Lv30 Buff for the "+JobColors[color_slot]+job+" job yet!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Don't know what they are? Type "+ChatColor.RESET+ChatColor.YELLOW+"/jobs buffs "+job+ChatColor.RESET+ChatColor.ITALIC+"!");
+		    	  p.sendMessage(ChatColor.ITALIC+"Once you decided one, type "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 1'"+ChatColor.RESET+ChatColor.ITALIC+" or "+ChatColor.RESET+ChatColor.YELLOW+"'/jobs "+job+" 2'"+ChatColor.RESET+ChatColor.ITALIC+" to pick!");
+		      }
+		  	},total_tick_delay+=tick_delay);
+    	}
+    	if ((getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job1lv")>=40 || getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job2lv")>=40 || getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job3lv")>=40) && !getAccountsConfig().getBoolean(p.getName().toLowerCase()+".jobs.ultimate")) {
+	    	Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			      @Override
+			      public void run() {
+			    	  String job = getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3");
+			    	  int color_slot = 0;
+			    	  for (int i=0;i<ValidJobs.length;i++) {
+			    		  if (job.equalsIgnoreCase(ValidJobs[i])) {color_slot=i; break;}
+			    	  }
+			    	  p.sendMessage(ChatColor.AQUA+"You have not selected your Lv40 Ultimate Buff yet!");
+			    	  p.sendMessage(ChatColor.ITALIC+"Type "+ChatColor.RESET+ChatColor.YELLOW+"/jobs ultimate <job>"+ChatColor.RESET+ChatColor.ITALIC+" replacing it with the ultimate job you want!");
+			      }
+			  	},total_tick_delay+=tick_delay);
+    	}
     }
 }
