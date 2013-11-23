@@ -591,7 +591,7 @@ public class Main extends JavaPlugin
     Builder_job.addData("BRICK", 0.075, 11, 0);
     Builder_job.setBuffData("Builders gain access to the 'line' tool. Typing /line will make building in straight lines easier.",
     		"Builders gain access to the 'rectangle' tool. Typing /rectangle will make building in rectangles easier.", 
-    		"When crafting irreversible Builder blocks, 75% of the blocks used for crafting will be restored to your inventory. When cooking Builder blocks, the block results will be doubled.",
+    		"When crafting irreversible Builder blocks, 75% of the materials used for crafting will be restored to your inventory. When cooking Builder blocks, the block results will be doubled.",
     		"Gain experience orbs (equivalent to the job XP you get) as you build.",
     		"Building will stack a jump boost buff up to Jump Boost seconds.",
     		"Builders gain the ability to fly when building. They immediately lose the ability to fly if they stop building for a moment, destroy a block, or enter combat. Every 100 Builder XP gained gives the Builder 5 Glowstone blocks and a stack of torches.");
@@ -4116,6 +4116,11 @@ public void payDay(int time)
 			  }
 		  }
 		  return 0;
+	}
+
+	public PlayerData getPlayerData(Player p) {
+		  //Find my data.
+		  return playerdata_list.get(getPlayerDataSlot(p));
 	}
 	
 	public int getJobLv(String job, Player p) {

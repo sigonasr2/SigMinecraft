@@ -1,6 +1,7 @@
 package me.kaZep.Base;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -10,6 +11,7 @@ public class PlayerData {
 	long lastinteracttime=0;
 	long lastminetime=0;
 	int minestreak=0;
+	Location clickedblock1=null; //Stores the location of a clicked block.
 	Player data=null;
 	public PlayerData(Player p) {
 		this.data=p;
@@ -62,6 +64,12 @@ public class PlayerData {
 			//This is a block type we are dealing with from beforehand. We will need to add more to buildamt to  make sure we are not cheating the system.
 			buildamt+=2;
 		}
+	}
+	public void SetClickedBlock(Location l) {
+		clickedblock1 = l;
+	}
+	public Location GetClickedBlock() {
+		return clickedblock1;
 	}
 	public Player getPlayer() {
 		return data;

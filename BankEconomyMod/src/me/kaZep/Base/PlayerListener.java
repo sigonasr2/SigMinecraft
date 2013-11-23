@@ -4749,6 +4749,43 @@ implements Listener
 	  }
 		 */
 	}
+	
+	private void restoreItems(CraftingInventory craft, ClickType click, Player p) {
+		ItemStack[] crafteditems = craft.getMatrix();
+		if (click==ClickType.SHIFT_RIGHT || click==ClickType.SHIFT_LEFT) {
+			int lowestamt=9999;
+			for (int i=0;i<crafteditems.length;i++) {
+				if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+					if (crafteditems[i].getAmount()<lowestamt) {
+						lowestamt=crafteditems[i].getAmount();
+					}
+				}
+			}
+			for (int i=0;i<crafteditems.length;i++) {
+				if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+					for (int j=0;j<lowestamt;j++) {
+						if (Math.random()<=0.25) {
+							//p.sendMessage("Restored an item.");
+							ItemStack replenishitem = crafteditems[i].clone();
+							replenishitem.setAmount(1);
+							p.getInventory().addItem(replenishitem);
+						}
+					}
+				}
+			}
+		} else {
+			for (int i=0;i<crafteditems.length;i++) {
+				if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+					if (Math.random()<=0.25) {
+						//p.sendMessage("Restored an item.");
+						ItemStack replenishitem = crafteditems[i].clone();
+						replenishitem.setAmount(1);
+						p.getInventory().addItem(replenishitem);
+					}
+				}
+			}
+		}
+	}
 
 	@EventHandler
 	public void onItemCraft(CraftItemEvent e) {
@@ -4757,6 +4794,13 @@ implements Listener
 		CraftingInventory result = e.getInventory();
 		//Bukkit.getPlayer("sigonasr2").sendMessage("Resulting item is "+result.getResult().getAmount()+" "+result.getResult().getType());
 		Player p = Bukkit.getPlayer(e.getWhoClicked().getName());
+		
+		//***********************************//Job buff stuff
+		if (this.plugin.hasJobBuff("Builder", p, Job.JOB20)) {
+			
+		}
+		//***********************************//End job buff stuff
+		
 		if (this.plugin.PlayerinJob(p,"Weaponsmith")) {
 			boolean crafteditem=false;
 			if (result.getResult().getType()==Material.ARROW) {
@@ -8773,406 +8817,7 @@ implements Listener
 				this.plugin.gainMoneyExp(p,"Woodcutter",0.00,0.10);
 			}
 		}
-		if (this.plugin.PlayerinJob(p, "Builder")) {
-			if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
-				if (this.plugin.getJobLv("Builder", p)>=20) {
-					if (Math.random()<=0.05) {
-						ItemStack replenishitem = e.getItemInHand().clone();
-						replenishitem.setAmount(1);
-						p.getInventory().addItem(replenishitem);
-						p.updateInventory();
-					}
-				} else
-					if (this.plugin.getJobLv("Builder", p)>=10) {
-						if (Math.random()<=0.01) {
-							ItemStack replenishitem = e.getItemInHand().clone();
-							replenishitem.setAmount(1);
-							p.getInventory().addItem(replenishitem);
-							p.updateInventory();
-						}
-					}
-				if (e.getBlockPlaced().getType()==Material.COBBLESTONE) {
-					this.plugin.gainMoneyExp(p,"Builder",0.005,1);
-					if (this.plugin.getJobLv("Builder", p)>=5 && (int)this.plugin.getcurrentJobExp("Builder", p)%5==0) {
-						//Give a torch to the player.
-						p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.WOOD) {
-					this.plugin.gainMoneyExp(p,"Builder",0.005,2);
-					for (int i=0;i<2;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.LOG) {
-					this.plugin.gainMoneyExp(p,"Builder",0.01,3);
-					for (int i=0;i<3;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.WOOD_STEP) {
-					this.plugin.gainMoneyExp(p,"Builder",0.015,3);
-					for (int i=0;i<2;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.COBBLESTONE_STAIRS) {
-					this.plugin.gainMoneyExp(p,"Builder",0.015,3);
-					for (int i=0;i<2;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.STONE) {
-					this.plugin.gainMoneyExp(p,"Builder",0.015,4);
-					for (int i=0;i<4;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.FENCE) {
-					this.plugin.gainMoneyExp(p,"Builder",0.015,3);
-					for (int i=0;i<3;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.STEP) {
-					switch (e.getBlockPlaced().getData()) {
-					case 0:{
-						this.plugin.gainMoneyExp(p,"Builder",0.02,4);
-						for (int i=0;i<4;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					case 1:{
-						this.plugin.gainMoneyExp(p,"Builder",0.025,4);
-						for (int i=0;i<4;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					case 3:{
-						this.plugin.gainMoneyExp(p,"Builder",0.015,3);
-						for (int i=0;i<3;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					case 4:{
-						this.plugin.gainMoneyExp(p,"Builder",0.05,9);
-						for (int i=0;i<9;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					case 5:{
-						this.plugin.gainMoneyExp(p,"Builder",0.03,5);
-						for (int i=0;i<5;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					case 6:{
-						this.plugin.gainMoneyExp(p,"Builder",0.03,5);
-						for (int i=0;i<5;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					case 7:{
-						this.plugin.gainMoneyExp(p,"Builder",0.06,12);
-						for (int i=0;i<12;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					case 8:{
-						this.plugin.gainMoneyExp(p,"Builder",0.02,4);
-						for (int i=0;i<4;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					case 9:{
-						this.plugin.gainMoneyExp(p,"Builder",0.025,4);
-						for (int i=0;i<4;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					case 10:{
-						this.plugin.gainMoneyExp(p,"Builder",0.015,3);
-						for (int i=0;i<3;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					case 11:{
-						this.plugin.gainMoneyExp(p,"Builder",0.015,3);
-						for (int i=0;i<3;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					case 12:{
-						this.plugin.gainMoneyExp(p,"Builder",0.05,9);
-						for (int i=0;i<9;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					case 13:{
-						this.plugin.gainMoneyExp(p,"Builder",0.03,5);
-						for (int i=0;i<5;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					case 14:{
-						this.plugin.gainMoneyExp(p,"Builder",0.03,5);
-						for (int i=0;i<5;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					case 15:{
-						this.plugin.gainMoneyExp(p,"Builder",0.06,12);
-						for (int i=0;i<12;i++) {
-							if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-								//Give a torch to the player.
-								p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-							}
-						}
-					}break;
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.WOOD_STAIRS) {
-					this.plugin.gainMoneyExp(p,"Builder",0.02,4);
-					for (int i=0;i<4;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.LAPIS_BLOCK) {
-					this.plugin.gainMoneyExp(p,"Builder",0.02,3);
-					for (int i=0;i<3;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.COBBLE_WALL) {
-					this.plugin.gainMoneyExp(p,"Builder",0.025,5);
-					for (int i=0;i<5;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.NETHER_BRICK_STAIRS) {
-					this.plugin.gainMoneyExp(p,"Builder",0.025,5);
-					for (int i=0;i<5;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.NETHER_BRICK) {
-					this.plugin.gainMoneyExp(p,"Builder",0.03,5);
-					for (int i=0;i<5;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.NETHER_FENCE) {
-					this.plugin.gainMoneyExp(p,"Builder",0.03,6);
-					for (int i=0;i<6;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.WOOL) {
-					this.plugin.gainMoneyExp(p,"Builder",0.035,7);
-					for (int i=0;i<7;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.getMaterial(109)) {
-					this.plugin.gainMoneyExp(p,"Builder",0.04,8);
-					for (int i=0;i<8;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.getMaterial(98)) {
-					this.plugin.gainMoneyExp(p,"Builder",0.04,8);
-					for (int i=0;i<8;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.GLASS) {
-					this.plugin.gainMoneyExp(p,"Builder",0.04,8);
-					for (int i=0;i<8;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.GLOWSTONE) {
-					this.plugin.gainMoneyExp(p,"Builder",0.05,10);
-					for (int i=0;i<10;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.HARD_CLAY) {
-					this.plugin.gainMoneyExp(p,"Builder",0.05,10);
-					for (int i=0;i<10;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.STAINED_CLAY) {
-					this.plugin.gainMoneyExp(p,"Builder",0.05,10);
-					for (int i=0;i<10;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.SANDSTONE_STAIRS) {
-					this.plugin.gainMoneyExp(p,"Builder",0.05,10);
-					for (int i=0;i<10;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.SANDSTONE) {
-					this.plugin.gainMoneyExp(p,"Builder",0.06,10);
-					for (int i=0;i<10;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.QUARTZ_STAIRS) {
-					this.plugin.gainMoneyExp(p,"Builder",0.06,12);
-					for (int i=0;i<12;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.IRON_FENCE) {
-					this.plugin.gainMoneyExp(p,"Builder",0.06,12);
-					for (int i=0;i<12;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.BRICK_STAIRS) {
-					this.plugin.gainMoneyExp(p,"Builder",0.065,9);
-					for (int i=0;i<9;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.QUARTZ_BLOCK) {
-					this.plugin.gainMoneyExp(p,"Builder",0.07,14);
-					for (int i=0;i<14;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-				if (e.getBlockPlaced().getType()==Material.BRICK) {
-					this.plugin.gainMoneyExp(p,"Builder",0.075,11);
-					for (int i=0;i<11;i++) {
-						if (this.plugin.getJobLv("Builder", p)>=5 && ((((int)this.plugin.getcurrentJobExp("Builder", p))%5)-i)==0) {
-							//Give a torch to the player.
-							p.getInventory().addItem(new ItemStack(Material.TORCH,1)); p.updateInventory();
-						}
-					}
-				}
-			}
-		}
+		
 		if (this.plugin.PlayerinJob(p, "Miner")) {
 			this.plugin.playerdata_list.get(myData).BadInteract(e.getBlockPlaced().getType());
 		}
@@ -12577,6 +12222,144 @@ implements Listener
 		}
 		return new ItemStack(insert_item); //Something went wrong. Just return the item itself so it's back to the player. So we don't get rid of it.
 	}
+	
+	void getBuilderCredit(Block b, Player p) {
+		int myData = this.plugin.getPlayerDataSlot(p);
+		if (this.plugin.PlayerinJob(p, "Builder")) {
+			if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
+				if (b.getType()==Material.COBBLESTONE) {
+					this.plugin.gainMoneyExp(p,"Builder",0.005,1);
+				}
+				if (b.getType()==Material.WOOD) {
+					this.plugin.gainMoneyExp(p,"Builder",0.005,2);
+				}
+				if (b.getType()==Material.LOG) {
+					this.plugin.gainMoneyExp(p,"Builder",0.01,3);
+				}
+				if (b.getType()==Material.WOOD_STEP) {
+					this.plugin.gainMoneyExp(p,"Builder",0.015,3);
+				}
+				if (b.getType()==Material.COBBLESTONE_STAIRS) {
+					this.plugin.gainMoneyExp(p,"Builder",0.015,3);
+				}
+				if (b.getType()==Material.STONE) {
+					this.plugin.gainMoneyExp(p,"Builder",0.015,4);
+				}
+				if (b.getType()==Material.FENCE) {
+					this.plugin.gainMoneyExp(p,"Builder",0.015,3);
+				}
+				if (b.getType()==Material.STEP) {
+					switch (b.getData()) {
+					case 0:{
+						this.plugin.gainMoneyExp(p,"Builder",0.02,4);
+					}break;
+					case 1:{
+						this.plugin.gainMoneyExp(p,"Builder",0.025,4);
+					}break;
+					case 3:{
+						this.plugin.gainMoneyExp(p,"Builder",0.015,3);
+					}break;
+					case 4:{
+						this.plugin.gainMoneyExp(p,"Builder",0.05,9);
+					}break;
+					case 5:{
+						this.plugin.gainMoneyExp(p,"Builder",0.03,5);
+					}break;
+					case 6:{
+						this.plugin.gainMoneyExp(p,"Builder",0.03,5);
+					}break;
+					case 7:{
+						this.plugin.gainMoneyExp(p,"Builder",0.06,12);
+					}break;
+					case 8:{
+						this.plugin.gainMoneyExp(p,"Builder",0.02,4);
+					}break;
+					case 9:{
+						this.plugin.gainMoneyExp(p,"Builder",0.025,4);
+					}break;
+					case 10:{
+						this.plugin.gainMoneyExp(p,"Builder",0.015,3);
+					}break;
+					case 11:{
+						this.plugin.gainMoneyExp(p,"Builder",0.015,3);
+					}break;
+					case 12:{
+						this.plugin.gainMoneyExp(p,"Builder",0.05,9);
+					}break;
+					case 13:{
+						this.plugin.gainMoneyExp(p,"Builder",0.03,5);
+					}break;
+					case 14:{
+						this.plugin.gainMoneyExp(p,"Builder",0.03,5);
+					}break;
+					case 15:{
+						this.plugin.gainMoneyExp(p,"Builder",0.06,12);
+					}break;
+					}
+				}
+				if (b.getType()==Material.WOOD_STAIRS) {
+					this.plugin.gainMoneyExp(p,"Builder",0.02,4);
+				}
+				if (b.getType()==Material.LAPIS_BLOCK) {
+					this.plugin.gainMoneyExp(p,"Builder",0.02,3);
+				}
+				if (b.getType()==Material.COBBLE_WALL) {
+					this.plugin.gainMoneyExp(p,"Builder",0.025,5);
+				}
+				if (b.getType()==Material.NETHER_BRICK_STAIRS) {
+					this.plugin.gainMoneyExp(p,"Builder",0.025,5);
+				}
+				if (b.getType()==Material.NETHER_BRICK) {
+					this.plugin.gainMoneyExp(p,"Builder",0.03,5);
+				}
+				if (b.getType()==Material.NETHER_FENCE) {
+					this.plugin.gainMoneyExp(p,"Builder",0.03,6);
+				}
+				if (b.getType()==Material.WOOL) {
+					this.plugin.gainMoneyExp(p,"Builder",0.035,7);
+				}
+				if (b.getType()==Material.getMaterial(109)) {
+					this.plugin.gainMoneyExp(p,"Builder",0.04,8);
+				}
+				if (b.getType()==Material.getMaterial(98)) {
+					this.plugin.gainMoneyExp(p,"Builder",0.04,8);
+				}
+				if (b.getType()==Material.GLASS) {
+					this.plugin.gainMoneyExp(p,"Builder",0.04,8);
+				}
+				if (b.getType()==Material.GLOWSTONE) {
+					this.plugin.gainMoneyExp(p,"Builder",0.05,10);
+				}
+				if (b.getType()==Material.HARD_CLAY) {
+					this.plugin.gainMoneyExp(p,"Builder",0.05,10);
+				}
+				if (b.getType()==Material.STAINED_CLAY) {
+					this.plugin.gainMoneyExp(p,"Builder",0.05,10);
+				}
+				if (b.getType()==Material.SANDSTONE_STAIRS) {
+					this.plugin.gainMoneyExp(p,"Builder",0.05,10);
+				}
+				if (b.getType()==Material.SANDSTONE) {
+					this.plugin.gainMoneyExp(p,"Builder",0.06,10);
+				}
+				if (b.getType()==Material.QUARTZ_STAIRS) {
+					this.plugin.gainMoneyExp(p,"Builder",0.06,12);
+				}
+				if (b.getType()==Material.IRON_FENCE) {
+					this.plugin.gainMoneyExp(p,"Builder",0.06,12);
+				}
+				if (b.getType()==Material.BRICK_STAIRS) {
+					this.plugin.gainMoneyExp(p,"Builder",0.065,9);
+				}
+				if (b.getType()==Material.QUARTZ_BLOCK) {
+					this.plugin.gainMoneyExp(p,"Builder",0.07,14);
+				}
+				if (b.getType()==Material.BRICK) {
+					this.plugin.gainMoneyExp(p,"Builder",0.075,11);
+				}
+			}
+		}
+	}
 
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e)
@@ -12588,6 +12371,260 @@ implements Listener
 		boolean stats = this.plugin.getAccountsConfig().getBoolean(p.getName() + ".status");
 		double actMon = this.plugin.getAccountsConfig().getDouble(p.getName() + ".money");
 		int actHand = (int)Main.economy.getBalance(p.getName());
+		
+		//******************************//All Job Buff related items go in here.
+		if (e.getAction()==Action.LEFT_CLICK_BLOCK || e.getAction()==Action.RIGHT_CLICK_AIR) {
+			if (this.plugin.hasJobBuff("Builder", p, Job.JOB10)) {
+				//See if they are holding a line tool.
+				if (p.getItemInHand().getType()==Material.getMaterial(142)) {
+					//Check to see if this is the first block they clicked.
+					Block checkblock = null;
+					if (e.getAction()==Action.RIGHT_CLICK_AIR) {
+						checkblock = p.getTargetBlock(null, 10);
+					} else {
+						checkblock=e.getClickedBlock();
+					}
+					PlayerData pd = this.plugin.getPlayerData(p);
+					if (pd.GetClickedBlock()==null) {
+						p.sendMessage("Set first block. Left-click another block of the same type to build an outlined rectangle of that block between them.");
+						p.sendMessage("Right-click another block of the same type to build a filled rectangle of that block between them. "+ChatColor.GRAY+ChatColor.ITALIC+"If you wish to cancel, swap items.");
+						pd.SetClickedBlock(checkblock.getLocation());
+					} else {
+						if (pd.GetClickedBlock().distance(checkblock.getLocation())<=500) {//Make sure the range is small enough.
+							//Compare the blocks and see if they are the same.
+							boolean successful=true;
+							if (pd.GetClickedBlock().getBlock().getType().getId()==checkblock.getType().getId() &&
+									pd.GetClickedBlock().getBlock().getData()==checkblock.getData()) {
+								boolean ranOutOfBlocks=false;
+								Location pt1 = pd.GetClickedBlock();
+								Location pt2 = checkblock.getLocation();
+								if (e.getAction()==Action.LEFT_CLICK_BLOCK) {
+									//This is an outlined rectangle.
+									int xdiff=pt2.getBlockX()-pt1.getBlockX();
+									int ydiff=pt2.getBlockY()-pt1.getBlockY();
+									int zdiff=pt2.getBlockZ()-pt1.getBlockZ();
+									Bukkit.getLogger().info("xdiff:"+xdiff+", ydiff:"+ydiff+", zdiff:"+zdiff);
+									for (int x=0;x<Math.abs(xdiff)+1;x++) {
+										for (int y=0;y<Math.abs(ydiff)+1;y++) {
+											for (int z=0;z<Math.abs(zdiff)+1;z++) {
+												//Iterate through all blocks, making sure we are on an outline.
+												Bukkit.getLogger().info("Check Loc: "+pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff)).toString());
+												if (((x==0 || x==Math.abs(xdiff)) &&
+														(y==0 || y==Math.abs(ydiff))) ||
+													((x==0 || x==Math.abs(xdiff)) &&
+															(z==0 || z==Math.abs(zdiff))) ||
+													((y==0 || y==Math.abs(ydiff)) &&
+															(z==0 || z==Math.abs(zdiff)))) {
+													if (e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).getType()==Material.AIR) {
+														if (e.getPlayer().getInventory().containsAtLeast(new ItemStack(pd.GetClickedBlock().getBlock().getType(),1,(short)pd.GetClickedBlock().getBlock().getData()), 1)) {
+															Bukkit.getLogger().info("    Was AIR. Block has been changed.");
+															//Get the amount holding. Then remove it and add one back for the player.
+															ItemStack[] items = e.getPlayer().getInventory().getContents();
+															//Loop through items until we find the right type.
+															for (int i=0;i<items.length;i++) {
+																if (items[i]!=null) {
+																	if (items[i].getType().getId()==pd.GetClickedBlock().getBlock().getType().getId() &&
+																			items[i].getData().getData()==pd.GetClickedBlock().getBlock().getData()) {
+																		items[i].setAmount(items[i].getAmount()-1);
+																		break;
+																	}
+																}
+															}
+															e.getPlayer().getInventory().setContents(items);
+															e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).setType(pd.GetClickedBlock().getBlock().getType());
+															e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).setData(pd.GetClickedBlock().getBlock().getData());
+															getBuilderCredit(pd.GetClickedBlock().getBlock(),p);
+														} else {
+															//Bukkit.getLogger().info("====Cannot continue. Ran out of blocks. Exiting.");
+															ranOutOfBlocks=true;
+															successful=false;
+														}
+													} else {
+														Bukkit.getLogger().info("    Was "+e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).getType().name()+". Skipping...");
+													}
+												}
+											}
+										}
+									}
+								} else {
+									//This is a filled rectangle.
+									int xdiff=pt2.getBlockX()-pt1.getBlockX();
+									int ydiff=pt2.getBlockY()-pt1.getBlockY();
+									int zdiff=pt2.getBlockZ()-pt1.getBlockZ();
+									for (int x=0;x<Math.abs(xdiff)+1;x++) {
+										for (int y=0;y<Math.abs(ydiff)+1;y++) {
+											for (int z=0;z<Math.abs(zdiff)+1;z++) {
+												//Iterate through all blocks.
+												Bukkit.getLogger().info("Check Loc: "+pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff)).toString());
+												if (e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).getType()==Material.AIR) {
+													if (e.getPlayer().getInventory().containsAtLeast(new ItemStack(pd.GetClickedBlock().getBlock().getType(),1,(short)pd.GetClickedBlock().getBlock().getData()), 1)) {
+														Bukkit.getLogger().info("    Was AIR. Block has been changed.");
+														//Get the amount holding. Then remove it and add one back for the player.
+														ItemStack[] items = e.getPlayer().getInventory().getContents();
+														//Loop through items until we find the right type.
+														for (int i=0;i<items.length;i++) {
+															if (items[i]!=null) {
+																if (items[i].getType().getId()==pd.GetClickedBlock().getBlock().getType().getId() &&
+																		items[i].getData().getData()==pd.GetClickedBlock().getBlock().getData()) {
+																	items[i].setAmount(items[i].getAmount()-1);
+																	break;
+																}
+															}
+														}
+														e.getPlayer().getInventory().setContents(items);
+														e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).setType(pd.GetClickedBlock().getBlock().getType());
+														e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).setData(pd.GetClickedBlock().getBlock().getData());
+														getBuilderCredit(pd.GetClickedBlock().getBlock(),p);
+													} else {
+														//Bukkit.getLogger().info("====Cannot continue. Ran out of blocks. Exiting.");
+														ranOutOfBlocks=true;
+														successful=false;
+													}
+												} else {
+													Bukkit.getLogger().info("    Was "+e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).getType().name()+". Skipping...");
+												}
+											}
+										}
+									}
+								}
+								pd.SetClickedBlock(null);
+								if (successful) {
+									p.sendMessage(ChatColor.YELLOW+"Rectangle Build completed successfully!");
+									p.updateInventory();
+								} else {
+									if (ranOutOfBlocks) {
+										p.sendMessage(ChatColor.GOLD+"You ran out of blocks! Stopped mid-way through building.");
+										p.updateInventory();
+									}
+								}
+							} else {
+								//If they are not, set it as the new target block.
+								p.sendMessage("Set first block. Left-click another block of the same type to build an outlined rectangle of that block between them.");
+								p.sendMessage("Right-click another block of the same type to build a filled rectangle of that block between them. "+ChatColor.GRAY+ChatColor.ITALIC+"If you wish to cancel, swap items.");
+								pd.SetClickedBlock(checkblock.getLocation());
+							}
+						} else {
+							p.sendMessage(ChatColor.RED+"The distance of building is larger than 500 blocks! You cannot build that far.");
+						}
+					}
+					e.setCancelled(true);
+					return;
+				}
+			}
+			if (e.getAction()==Action.LEFT_CLICK_BLOCK && this.plugin.hasJobBuff("Builder", p, Job.JOB5)) {
+				//See if they are holding a line tool.
+				if (p.getItemInHand().getType()==Material.getMaterial(141)) {
+					//Check to see if this is the first block they clicked.
+					PlayerData pd = this.plugin.getPlayerData(p);
+					if (pd.GetClickedBlock()==null) {
+						p.sendMessage("Set first block. Left-click another block of the same type to build a line of that block between them. "+ChatColor.GRAY+ChatColor.ITALIC+"If you wish to cancel, right-click or swap items.");
+						pd.SetClickedBlock(e.getClickedBlock().getLocation());
+					} else {
+						if (pd.GetClickedBlock().distance(e.getClickedBlock().getLocation())<=500) {//Make sure the range is small enough.
+							//Compare the blocks and see if they are the same.
+							boolean successful=true;
+							if (pd.GetClickedBlock().getBlock().getType().getId()==e.getClickedBlock().getType().getId() &&
+									pd.GetClickedBlock().getBlock().getData()==e.getClickedBlock().getData()) {
+								int xdiff=0;int ydiff=0;int zdiff=0; //Difference between these two locations.
+								double xstep=1;double ystep=1;double zstep=1; //The amount of travel we can make for each direction, as we fully step in one direction.
+								double xcur=0.5;double ycur=0.5;double zcur=0.5; //The current amount of travel we've made before shifting over on another axis.
+								Location pt1 = pd.GetClickedBlock();
+								Location pt2 = e.getClickedBlock().getLocation();
+								xdiff=pt2.getBlockX()-pt1.getBlockX(); ydiff=pt2.getBlockY()-pt1.getBlockY(); zdiff=pt2.getBlockZ()-pt1.getBlockZ();
+								
+								//Find the maximum one that we have to move. The other axes are divided among that.
+								int mode = 0; //0 = X, 1 = Y, 2 = Z
+								int maxdiff = 0;
+								if (Math.abs(xdiff)>maxdiff) {maxdiff=Math.abs(xdiff); mode=0;}
+								if (Math.abs(ydiff)>maxdiff) {maxdiff=Math.abs(ydiff); mode=1;}
+								if (Math.abs(zdiff)>maxdiff) {maxdiff=Math.abs(zdiff); mode=2;}
+								
+								if (mode==0) {
+									ystep = (double)ydiff/xdiff;
+									zstep = (double)zdiff/xdiff;
+								}
+								if (mode==1) {
+									xstep = (double)xdiff/ydiff;
+									zstep = (double)zdiff/ydiff;
+								}
+								if (mode==2) {
+									xstep = (double)xdiff/zdiff;
+									ystep = (double)ydiff/zdiff;
+								}
+								if ((int)Math.signum(xstep)!=(int)Math.signum(xdiff)) {xstep*=-1;}
+								if ((int)Math.signum(ystep)!=(int)Math.signum(ydiff)) {ystep*=-1;}
+								if ((int)Math.signum(zstep)!=(int)Math.signum(zdiff)) {zstep*=-1;}
+		
+								Bukkit.getLogger().info("Line Drawer: Initialized mode "+mode+". xstep="+xstep+", ystep="+ystep+", zstep="+zstep+" | xdiff="+xdiff+", ydiff="+ydiff+", zdiff="+zdiff+".");
+								Bukkit.getLogger().info("Going from: "+pt1+" to "+pt2);
+								
+								boolean ranOutOfBlocks = false; //Turns true if the player runs out of building blocks.
+								
+								//Now that we know which direction we always step in, start moving coords.
+								while ((pt1.clone().add(xcur,ycur,zcur).getBlockX()!=pt2.getBlockX() ||
+										pt1.clone().add(xcur,ycur,zcur).getBlockY()!=pt2.getBlockY() ||
+										pt1.clone().add(xcur,ycur,zcur).getBlockZ()!=pt2.getBlockZ()) && !ranOutOfBlocks) {
+									Bukkit.getLogger().info("  Location: ("+pt1.clone().add(xcur,ycur,zcur).toString()+")");
+									//Get the block at this location. Make sure it's AIR, and then see if the block is in the player's inventory.
+									//If it is, we can place one down and subtract one from the inventory.
+									if (e.getPlayer().getWorld().getBlockAt(pt1.clone().add(xcur,ycur,zcur)).getType()==Material.AIR) {
+										if (e.getPlayer().getInventory().containsAtLeast(new ItemStack(pd.GetClickedBlock().getBlock().getType(),1,(short)pd.GetClickedBlock().getBlock().getData()), 1)) {
+											Bukkit.getLogger().info("    Was AIR. Block has been changed.");
+											//Get the amount holding. Then remove it and add one back for the player.
+											ItemStack[] items = e.getPlayer().getInventory().getContents();
+											//Loop through items until we find the right type.
+											for (int i=0;i<items.length;i++) {
+												if (items[i]!=null) {
+													if (items[i].getType().getId()==pd.GetClickedBlock().getBlock().getType().getId() &&
+															items[i].getData().getData()==pd.GetClickedBlock().getBlock().getData()) {
+														items[i].setAmount(items[i].getAmount()-1);
+														break;
+													}
+												}
+											}
+											e.getPlayer().getInventory().setContents(items);
+											e.getPlayer().getWorld().getBlockAt(pt1.clone().add(xcur,ycur,zcur)).setType(pd.GetClickedBlock().getBlock().getType());
+											e.getPlayer().getWorld().getBlockAt(pt1.clone().add(xcur,ycur,zcur)).setData(pd.GetClickedBlock().getBlock().getData());
+											getBuilderCredit(pd.GetClickedBlock().getBlock(),p);
+										} else {
+											Bukkit.getLogger().info("====Cannot continue. Ran out of blocks. Exiting.");
+											ranOutOfBlocks=true;
+											successful=false;
+										}
+									} else {
+										Bukkit.getLogger().info("    Was "+e.getPlayer().getWorld().getBlockAt(pt1.clone().add(xcur,ycur,zcur)).getType().name()+". Skipping...");
+									}
+									xcur+=xstep;
+									ycur+=ystep;
+									zcur+=zstep;
+								}
+								Bukkit.getLogger().info("====Operation completed. Resetting clicked block.");
+								pd.SetClickedBlock(null);
+								if (successful) {
+									p.sendMessage(ChatColor.YELLOW+"Line Build completed successfully!");
+									p.updateInventory();
+								} else {
+									if (ranOutOfBlocks) {
+										p.sendMessage(ChatColor.GOLD+"You ran out of blocks! Stopped mid-way through building.");
+										p.updateInventory();
+									}
+								}
+							} else {
+								//If they are not, set it as the new target block.
+								p.sendMessage("Set first block. Left-click another block of the same type to build a line of that block between them. "+ChatColor.GRAY+ChatColor.ITALIC+"If you wish to cancel, right-click or swap items.");
+								pd.SetClickedBlock(e.getClickedBlock().getLocation());
+							}
+						} else {
+							p.sendMessage(ChatColor.RED+"The distance of building is larger than 500 blocks! You cannot build that far.");
+						}
+					}
+					e.setCancelled(true);
+					return;
+				}
+			}
+		}
+		//******************************//End Job related buffs.
+		
 		if (this.plugin.PlayerinJob(p, "Explorer")) {
 			for (int i=0;i<this.plugin.explorerlist.size();i++) {
 				if (this.plugin.explorerlist.get(i).player.compareTo(p.getName())==0) {
@@ -12595,24 +12632,6 @@ implements Listener
 				}
 			}
 		}
-		/*Was for rotating halloween pumpkins.
-    if (e.getAction()==Action.LEFT_CLICK_BLOCK) {
-    	if (e.getClickedBlock().getType()==Material.PUMPKIN) {
-    		e.getClickedBlock().setData((byte) ((e.getClickedBlock().getData()+2 % 4)));
-    	}
-    }*/
-		/*Was for testing lightning in item frames.
-    if (e.getAction()==Action.LEFT_CLICK_AIR) {
-    	if (p.getName().equalsIgnoreCase("sigonasr2")) {
-    		Bukkit.getWorld("world").strikeLightning(p.getLocation());
-    	}
-    }*/
-		/*
-    if (e.getAction()==Action.LEFT_CLICK_BLOCK) {
-    	if (p.getName().equalsIgnoreCase("sigonasr2")) {
-    		p.sendMessage("This block at "+e.getClickedBlock().getLocation());
-    	}
-    }*/
 		if (e.getAction()==Action.RIGHT_CLICK_AIR || e.getAction()==Action.RIGHT_CLICK_BLOCK) {
 			if (p.getItemInHand()!=null && (p.getItemInHand().getType()==Material.FLINT_AND_STEEL || p.getItemInHand().getType()==Material.LAVA_BUCKET)) {
 				if (this.plugin.PlayerinJob(p, "Support")) {
