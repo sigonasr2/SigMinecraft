@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import me.kaZep.Base.Main;
+import me.kaZep.Commands.JobsDataInfo.Job;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
@@ -439,6 +440,47 @@ public String convertToItemName(String val) {
     			  p.getItemInHand().setItemMeta(meta);
     		  }
     		  p.sendMessage("Enchantments and bonuses removed on this item.");
+          }
+          else
+          if (cmd.getName().equalsIgnoreCase("line")) {
+        	  if (this.plugin.hasJobBuff("Builder", p, Job.JOB5)) {
+        		  p.sendMessage("You have received a line builder tool.");
+        		  ItemStack i = new ItemStack(Material.getMaterial(141));
+        		  ItemMeta meta = i.getItemMeta();
+        		  meta.setDisplayName(ChatColor.GRAY+"Line Builder Tool");
+        		  List<String> newlore = new ArrayList<String>();
+        		  newlore.add(ChatColor.YELLOW+"Can only be used by Lv5+ Builders.");
+        		  newlore.add(ChatColor.YELLOW+"");
+        		  newlore.add("Left-click one block and another");
+        		  newlore.add("of the same type to create a line");
+        		  newlore.add("of blocks. "+ChatColor.BLUE+"(Max Range: 500 blocks)");
+        		  meta.setLore(newlore);
+        		  i.setItemMeta(meta);
+        		  p.getInventory().addItem(i);
+        	  } else {
+        		  p.sendMessage(ChatColor.RED+"You do not have the Lv5 Builder Buff!");
+        	  }
+          }
+          else
+          if (cmd.getName().equalsIgnoreCase("rectangle")) {
+        	  if (this.plugin.hasJobBuff("Builder", p, Job.JOB10)) {
+        		  p.sendMessage("You have received a rectangle builder tool.");
+        		  ItemStack i = new ItemStack(Material.getMaterial(142));
+        		  ItemMeta meta = i.getItemMeta();
+        		  meta.setDisplayName(ChatColor.GRAY+"Rectangle Builder Tool");
+        		  List<String> newlore = new ArrayList<String>();
+        		  newlore.add(ChatColor.YELLOW+"Can only be used by Lv10+ Builders.");
+        		  newlore.add(ChatColor.YELLOW+"");
+        		  newlore.add("Left-click one block and another");
+        		  newlore.add("of the same type to fill a");
+        		  newlore.add("rectangle of blocks.");
+        		  newlore.add(ChatColor.BLUE+" (Max Range: 500 blocks)");
+        		  meta.setLore(newlore);
+        		  i.setItemMeta(meta);
+        		  p.getInventory().addItem(i);
+        	  } else {
+        		  p.sendMessage(ChatColor.RED+"You do not have the Lv10 Builder Buff!");
+        	  }
           }
           else
           if (cmd.getName().equalsIgnoreCase("ticktime")) {

@@ -19,9 +19,6 @@ import net.milkbowl.vault.economy.EconomyResponse;
 //import net.minecraft.server.v1_4_R1.EntityWolf;
 
 
-
-
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -3183,10 +3180,10 @@ implements Listener
 	
 	private void breakOreBlock(Player p, Block b, boolean silk_touch, double xp_mult) {
 		if (this.plugin.PlayerinJob(p, "Miner")) {
-			Bukkit.getLogger().info("This player is a miner.");
+			//Bukkit.getLogger().info("This player is a miner.");
 			int myData=this.plugin.getPlayerDataSlot(p);
 			if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
-				Bukkit.getLogger().info("Good interact.");
+				//Bukkit.getLogger().info("Good interact.");
 				if (b.getType()==Material.STONE) {
 					this.plugin.gainMoneyExp(p,"Miner",0.0025,1);
 				} else
@@ -3195,7 +3192,7 @@ implements Listener
 				} else
 				if (b.getType()==Material.COAL_ORE && !silk_touch) {
 					this.plugin.gainMoneyExp(p,"Miner",0.0125,3);
-					Bukkit.getLogger().info("Coal Ore.");
+					//Bukkit.getLogger().info("Coal Ore.");
 				} else
 				if (b.getType()==Material.GLOWSTONE && !silk_touch) {
 					this.plugin.gainMoneyExp(p,"Miner",0.015,3);

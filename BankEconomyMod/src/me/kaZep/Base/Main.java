@@ -224,6 +224,8 @@ public class Main extends JavaPlugin
     getCommand("event").setExecutor(new commandBankEconomy(this));
     //getCommand("dungeon").setExecutor(new commandBankEconomy(this));
     getCommand("ticktime").setExecutor(new commandBankEconomy(this));
+    getCommand("line").setExecutor(new commandBankEconomy(this));
+    getCommand("rectangle").setExecutor(new commandBankEconomy(this));
 
     setupEconomy();
 

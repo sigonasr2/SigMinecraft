@@ -25,3 +25,7 @@ commands:
     description: Toggles or untoggles events.
   ticktime:
     description: Displays the server tick time.
+  line:
+    description: Gives the player a line builder tool.
+  rectangle:
+    description: Gives the player a rectangle builder tool.
