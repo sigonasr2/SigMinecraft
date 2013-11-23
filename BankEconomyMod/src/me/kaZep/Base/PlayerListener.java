@@ -3640,6 +3640,24 @@ implements Listener
 				breakOreBlock(p, e.getBlock(), has_silktouch);
 			}
 		}
+		if (this.plugin.hasJobBuff("Digger", p, Job.JOB5)) {
+			//Applies to dirt, sand, and gravel blocks. A small chance that a nearby block drops an artifact piece (clay with enchantment to glow)
+			if (e.getBlock().getType()==Material.DIRT ||
+					e.getBlock().getType()==Material.SAND ||
+					e.getBlock().getType()==Material.GRAVEL && Math.random()<=0.0025 /*0.25% chance*/) {
+				ItemStack artifact = new ItemStack(Material.CLAY_BALL);
+				ItemMeta meta = artifact.getItemMeta();
+				List<String> lore = new ArrayList<String>();
+				lore.add("This clump of material seems to");
+				lore.add("be part of something ancient.");
+				lore.add("");
+				lore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"Combine this piece with Eyes of Ender");
+				lore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"to perhaps restore its true potential.");
+				meta.setLore(lore);
+				artifact.setItemMeta(meta);
+				e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), artifact);
+			}
+		}
 		//*******************************//Job Buffs end here!
 
 		int myData=this.plugin.getPlayerDataSlot(p);
@@ -4383,6 +4401,23 @@ implements Listener
 	@EventHandler
 	public void onItemPrepareCraft(PrepareItemCraftEvent e) {
 		CraftingInventory result = e.getInventory();
+		
+		//****************************// Job Boofs poof here.
+		if (result.getResult().getType()==Material.CLAY_BALL) {
+			//Check to see if there is an artifact in the crafting grid.
+			boolean artifact=false;
+			for (int i=0;i<result.getMatrix().length;i++) {
+				if (result.getMatrix()[i].getType()==Material.CLAY_BALL) {
+					//See if it's an artifact.
+					if (result.getMatrix()[i].hasItemMeta() && result.getMatrix()[i].getItemMeta().hasLore()) {
+						if (result.getMatrix()[i].getItemMeta().getLore().contains("This clump of material seems to")) {
+							
+						}
+					}
+				}
+			}
+		}
+		//****************************//Job Non-Boofs go below.
 
 		// Disable melon crafting recipe
 		if (result.getResult().getType()==Material.MELON_BLOCK) {
@@ -12569,7 +12604,8 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 													((y==0 || y==Math.abs(ydiff)) &&
 															(z==0 || z==Math.abs(zdiff)))) {
 													if (e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).getType()==Material.AIR) {
-														if (e.getPlayer().getInventory().containsAtLeast(new ItemStack(pd.GetClickedBlock().getBlock().getType(),1,(short)pd.GetClickedBlock().getBlock().getData()), 1)) {
+														if (e.getPlayer().getInventory().containsAtLeast(new ItemStack(pd.GetClickedBlock().getBlock().getType(),1,(short)pd.GetClickedBlock().getBlock().getData()), 1) || (
+																pd.GetClickedBlock().getBlock().getType()==Material.DOUBLE_STEP && e.getPlayer().getInventory().containsAtLeast(new ItemStack(Material.STEP,1,(short)pd.GetClickedBlock().getBlock().getData()), 2))) {
 															//Bukkit.getLogger().info("    Was AIR. Block has been changed.");
 															//Get the amount holding. Then remove it and add one back for the player.
 															ItemStack[] items = e.getPlayer().getInventory().getContents();
@@ -12577,7 +12613,8 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 															for (int i=0;i<items.length;i++) {
 																if (items[i]!=null) {
 																	if (items[i].getType().getId()==pd.GetClickedBlock().getBlock().getType().getId() &&
-																			items[i].getData().getData()==pd.GetClickedBlock().getBlock().getData()) {
+																			items[i].getData().getData()==pd.GetClickedBlock().getBlock().getData() || (
+																					pd.GetClickedBlock().getBlock().getType()==Material.DOUBLE_STEP && items[i].getType()==Material.STEP && items[i].getData().getData()==pd.GetClickedBlock().getBlock().getData())) {
 																		items[i].setAmount(items[i].getAmount()-1);
 																		break;
 																	}
@@ -12610,7 +12647,8 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 												//Iterate through all blocks.
 												//Bukkit.getLogger().info("Check Loc: "+pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff)).toString());
 												if (e.getPlayer().getWorld().getBlockAt(pt1.clone().add(x*Math.signum(xdiff),y*Math.signum(ydiff),z*Math.signum(zdiff))).getType()==Material.AIR) {
-													if (e.getPlayer().getInventory().containsAtLeast(new ItemStack(pd.GetClickedBlock().getBlock().getType(),1,(short)pd.GetClickedBlock().getBlock().getData()), 1)) {
+													if (e.getPlayer().getInventory().containsAtLeast(new ItemStack(pd.GetClickedBlock().getBlock().getType(),1,(short)pd.GetClickedBlock().getBlock().getData()), 1) || (
+															pd.GetClickedBlock().getBlock().getType()==Material.DOUBLE_STEP && e.getPlayer().getInventory().containsAtLeast(new ItemStack(Material.STEP,1,(short)pd.GetClickedBlock().getBlock().getData()), 2))) {
 														//Bukkit.getLogger().info("    Was AIR. Block has been changed.");
 														//Get the amount holding. Then remove it and add one back for the player.
 														ItemStack[] items = e.getPlayer().getInventory().getContents();
@@ -12618,7 +12656,8 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 														for (int i=0;i<items.length;i++) {
 															if (items[i]!=null) {
 																if (items[i].getType().getId()==pd.GetClickedBlock().getBlock().getType().getId() &&
-																		items[i].getData().getData()==pd.GetClickedBlock().getBlock().getData()) {
+																		items[i].getData().getData()==pd.GetClickedBlock().getBlock().getData() || (
+																				pd.GetClickedBlock().getBlock().getType()==Material.DOUBLE_STEP && items[i].getType()==Material.STEP && items[i].getData().getData()==pd.GetClickedBlock().getBlock().getData())) {
 																	items[i].setAmount(items[i].getAmount()-1);
 																	break;
 																}
@@ -12741,7 +12780,8 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 									//Get the block at this location. Make sure it's AIR, and then see if the block is in the player's inventory.
 									//If it is, we can place one down and subtract one from the inventory.
 									if (e.getPlayer().getWorld().getBlockAt(pt1.clone().add(xcur,ycur,zcur)).getType()==Material.AIR) {
-										if (e.getPlayer().getInventory().containsAtLeast(new ItemStack(pd.GetClickedBlock().getBlock().getType(),1,(short)pd.GetClickedBlock().getBlock().getData()), 1)) {
+										if (e.getPlayer().getInventory().containsAtLeast(new ItemStack(pd.GetClickedBlock().getBlock().getType(),1,(short)pd.GetClickedBlock().getBlock().getData()), 1) || (
+												pd.GetClickedBlock().getBlock().getType()==Material.DOUBLE_STEP && e.getPlayer().getInventory().containsAtLeast(new ItemStack(Material.STEP,1,(short)pd.GetClickedBlock().getBlock().getData()), 2))) {
 											//Bukkit.getLogger().info("    Was AIR. Block has been changed.");
 											//Get the amount holding. Then remove it and add one back for the player.
 											ItemStack[] items = e.getPlayer().getInventory().getContents();
@@ -12749,7 +12789,8 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 											for (int i=0;i<items.length;i++) {
 												if (items[i]!=null) {
 													if (items[i].getType().getId()==pd.GetClickedBlock().getBlock().getType().getId() &&
-															items[i].getData().getData()==pd.GetClickedBlock().getBlock().getData()) {
+															items[i].getData().getData()==pd.GetClickedBlock().getBlock().getData() || (
+																	pd.GetClickedBlock().getBlock().getType()==Material.DOUBLE_STEP && items[i].getType()==Material.STEP && items[i].getData().getData()==pd.GetClickedBlock().getBlock().getData())) {
 														items[i].setAmount(items[i].getAmount()-1);
 														break;
 													}
