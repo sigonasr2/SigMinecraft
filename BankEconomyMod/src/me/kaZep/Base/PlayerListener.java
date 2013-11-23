@@ -196,6 +196,7 @@ import me.kaZep.Base.PersistentExplorerList;
 import me.kaZep.Base.PlayerData;
 import me.kaZep.Base.SupportEntity;
 import me.kaZep.Base.SupportPlayer;
+import me.kaZep.Commands.JobsDataInfo.Job;
 
 public class PlayerListener
 implements Listener
@@ -3188,6 +3189,270 @@ implements Listener
 			}
 		}
 	}
+
+	private void breakOreBlock(Player p, Block b) {
+		breakOreBlock(p, b, false);
+	}
+
+	private void breakOreBlock(Player p, Block b, boolean silk_touch) {
+		breakOreBlock(p, b, false, 1);
+	}
+	
+	private void breakOreBlock(Player p, Block b, boolean silk_touch, double xp_mult) {
+		if (this.plugin.PlayerinJob(p, "Miner")) {
+			//Bukkit.getLogger().info("This player is a miner.");
+			int myData=this.plugin.getPlayerDataSlot(p);
+			if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
+				//Bukkit.getLogger().info("Good interact.");
+				if (b.getType()==Material.STONE) {
+					this.plugin.gainMoneyExp(p,"Miner",0.0025,1);
+				} else
+				if (b.getType()==Material.NETHERRACK) {
+					this.plugin.gainMoneyExp(p,"Miner",0.005,1);
+				} else
+				if (b.getType()==Material.COAL_ORE && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.0125,3);
+					//Bukkit.getLogger().info("Coal Ore.");
+				} else
+				if (b.getType()==Material.GLOWSTONE && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.015,3);
+				} else
+				if (b.getType()==Material.SANDSTONE) {
+					this.plugin.gainMoneyExp(p,"Miner",0.015,4);
+				} else
+				if (b.getType()==Material.NETHER_BRICK) {
+					this.plugin.gainMoneyExp(p,"Miner",0.02,3);
+				} else
+				if (b.getType()==Material.QUARTZ_ORE && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.025,4);
+				} else
+				if (b.getType()==Material.LAPIS_ORE && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.03,5);
+				} else
+				if (b.getType()==Material.MOSSY_COBBLESTONE) {
+					this.plugin.gainMoneyExp(p,"Miner",0.0375,8);
+				} else
+				if (b.getType()==Material.IRON_ORE && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.0375,6);
+				} else
+				if ((b.getType()==Material.REDSTONE_ORE || b.getType()==Material.GLOWING_REDSTONE_ORE) && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.05,9);
+				} else
+				if (b.getType()==Material.OBSIDIAN) {
+					this.plugin.gainMoneyExp(p,"Miner",0.0625,10);
+				} else
+				if (b.getType()==Material.GOLD_ORE && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.0975,12);
+				} else
+				if (b.getType()==Material.DIAMOND_ORE && !silk_touch) {
+						this.plugin.gainMoneyExp(p,"Miner",0.3125,60);
+				} else
+				if (b.getType()==Material.EMERALD_ORE && !silk_touch) {
+					this.plugin.gainMoneyExp(p,"Miner",0.7625,160);
+				}
+			}
+		}
+		Material[] fortune_materials = {Material.EMERALD_ORE,Material.COAL_ORE,Material.DIAMOND_ORE,Material.REDSTONE_ORE,Material.GLOWING_REDSTONE_ORE,Material.LAPIS_ORE,Material.QUARTZ_ORE}; //An array of all blocks that multiply via fortune.
+		Material[] result_materials = {Material.EMERALD,Material.COAL,Material.DIAMOND,Material.REDSTONE,Material.REDSTONE,Material.INK_SACK,Material.QUARTZ}; //The resulting materials corresponding to the fortune blocks being broken.
+		boolean fortune_material=false;
+		int fortune_material_slot=0;
+		int mult = 1;
+		short WOOD_PICKAXE = 0, STONE_PICKAXE = 1, GOLD_PICKAXE = 2, IRON_PICKAXE = 3, DIAMOND_PICKAXE = 4; //Constants that define the pickaxe strength.
+		
+		short[] material_pickaxe_requirements = {IRON_PICKAXE,WOOD_PICKAXE,IRON_PICKAXE,IRON_PICKAXE,IRON_PICKAXE,STONE_PICKAXE,WOOD_PICKAXE};
+		
+		short my_pickaxe_strength=-1; //-1 is some other random item / your hand.
+		switch (p.getItemInHand().getType()) {
+			case WOOD_PICKAXE:{my_pickaxe_strength = WOOD_PICKAXE;}break;
+			case STONE_PICKAXE:{my_pickaxe_strength = STONE_PICKAXE;}break;
+			case GOLD_PICKAXE:{my_pickaxe_strength = GOLD_PICKAXE;}break;
+			case IRON_PICKAXE:{my_pickaxe_strength = IRON_PICKAXE;}break;
+			case DIAMOND_PICKAXE:{my_pickaxe_strength = DIAMOND_PICKAXE;}break;
+		}
+		for (int i=0;i<fortune_materials.length;i++) {
+			if (fortune_materials[i].equals(b.getType())) {
+				fortune_material=true;
+				fortune_material_slot=i;
+				break;
+			}
+		}
+		if (!silk_touch) {
+			if (b.getType()==Material.COAL_ORE && my_pickaxe_strength>=WOOD_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(1*xp_mult));
+			}
+			if (b.getType()==Material.IRON_ORE && my_pickaxe_strength>=STONE_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(1*xp_mult));
+			}
+			if (b.getType()==Material.GOLD_ORE && my_pickaxe_strength>=IRON_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(1*xp_mult));
+			}
+			if ((b.getType()==Material.REDSTONE_ORE || b.getType()==Material.GLOWING_REDSTONE_ORE) && my_pickaxe_strength>=IRON_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(3*xp_mult));
+			}
+			if (b.getType()==Material.LAPIS_ORE && my_pickaxe_strength>=STONE_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(3*xp_mult));
+			}
+			if (b.getType()==Material.DIAMOND_ORE && my_pickaxe_strength>=IRON_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(12*xp_mult));
+			}
+			if (b.getType()==Material.EMERALD_ORE && my_pickaxe_strength>=IRON_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(28*xp_mult));
+			}
+			if (b.getType()==Material.QUARTZ_ORE && my_pickaxe_strength>=WOOD_PICKAXE) {
+				ExperienceOrb exp = (ExperienceOrb)p.getWorld().spawnEntity(b.getLocation(), EntityType.EXPERIENCE_ORB);
+				exp.setExperience((int)(4*xp_mult));
+			}
+		}
+		if (this.plugin.hasJobBuff("Miner", p, Job.JOB40)) {
+			mult=2;
+		}
+		if (p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)>0) { //Check if the player has fortune.
+			if (fortune_material && my_pickaxe_strength>=material_pickaxe_requirements[fortune_material_slot]) { //If this is a fortune material, we have to account for the new fortune enchantment algorithm. Make sure we have a good enough pickaxe too.
+				//e.setCancelled(true);
+				p.getWorld().getBlockAt(b.getLocation()).setType(Material.AIR);
+				int fortune_level = p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
+				int drop_chance=50;
+				for (int i=1;i<fortune_level;i++) {
+					drop_chance += (100-drop_chance)/2;
+				}
+				boolean drop_extra=false;
+				if (Math.random()*100d<=drop_chance) {
+					drop_extra=true;
+				}
+				if (result_materials[fortune_material_slot]!=Material.REDSTONE &&
+						result_materials[fortune_material_slot]!=Material.INK_SACK) {
+					//This is an item that actually just drops one of per ore. Drop normally.
+					p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(result_materials[fortune_material_slot],((drop_extra)?2:1)*mult));
+				} else {
+					if (result_materials[fortune_material_slot]==Material.REDSTONE) { //Drop redstone
+						p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(result_materials[fortune_material_slot],((drop_extra)?(((int)(Math.random()*2))+4)*2:((int)(Math.random()*2))+4)*mult));
+					} else {//Drop Lapis.
+						Item lapis = p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(result_materials[fortune_material_slot],((drop_extra)?(((int)(Math.random()*5))+4)*2:((int)(Math.random()*5))+4)*mult,(byte)4));
+					}
+				}
+			}
+		} else {
+			if (fortune_material && my_pickaxe_strength>=material_pickaxe_requirements[fortune_material_slot]) {
+				//Bukkit.getLogger().info("No fortune, drop "+result_materials[fortune_material_slot].name()+" manually.");
+				p.getWorld().getBlockAt(b.getLocation()).setType(Material.AIR);
+				boolean drop_extra=false;
+				if (result_materials[fortune_material_slot]!=Material.REDSTONE &&
+						result_materials[fortune_material_slot]!=Material.INK_SACK) {
+					//This is an item that actually just drops one of per ore. Drop normally.
+					p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(result_materials[fortune_material_slot],((drop_extra)?2:1)*mult));
+				} else {
+					if (result_materials[fortune_material_slot]==Material.REDSTONE) { //Drop redstone
+						p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(result_materials[fortune_material_slot],((drop_extra)?(((int)(Math.random()*2))+4)*2:((int)(Math.random()*2))+4)*mult));
+					} else {//Drop Lapis.
+						Item lapis = p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(result_materials[fortune_material_slot],((drop_extra)?(((int)(Math.random()*5))+4)*2:((int)(Math.random()*5))+4)*mult,(byte)4));
+					}
+				}
+			}
+		}
+		if (b.getType()==Material.IRON_ORE && !silk_touch) {
+			//e.setCancelled(true);
+			p.getWorld().getBlockAt(b.getLocation()).setType(Material.AIR);
+			if (my_pickaxe_strength>=STONE_PICKAXE) {
+				p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(Material.IRON_INGOT));
+			}
+		}
+		if (b.getType()==Material.GOLD_ORE && !silk_touch) {
+			//e.setCancelled(true);
+			p.getWorld().getBlockAt(b.getLocation()).setType(Material.AIR);
+			if (my_pickaxe_strength>=IRON_PICKAXE) {
+				p.getWorld().dropItemNaturally(b.getLocation(), new ItemStack(Material.GOLD_INGOT));
+			}
+		}
+	}
+	
+	private void destroyNearbyOres(World w, Player p, Location currentloc) {
+		destroyNearbyOres(w, p, currentloc, false, 1);
+	}
+	
+	private void destroyNearbyOres(World w, Player p, Location currentloc, boolean silk_touch, double xp_mult) {
+		//Check surrounding ores.
+		if (w.getBlockAt(currentloc).getType().name().toLowerCase().contains("ore")) {
+			breakOreBlock(p, w.getBlockAt(currentloc), silk_touch, xp_mult);
+		}
+		Location newloc = null;
+		for (int x=-1;x<2;x++) {
+			for (int y=-1;y<2;y++) {
+				for (int z=-1;z<2;z++) {
+					if (x!=0 || y!=0 || z!=0) {
+						//Bukkit.getLogger().info("Destroy block.");
+						newloc = currentloc.clone().add(x,y,z);
+						if (w.getBlockAt(newloc).getType().name().toLowerCase().contains("ore")) {
+							//Bukkit.getLogger().info("New ore, set block break.");
+							breakOreBlock(p, w.getBlockAt(newloc), silk_touch, xp_mult);
+							destroyNearbyOres(w, p, newloc, silk_touch, xp_mult);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	private void destroyNearbyTree(World w, Location treeNode, Location checkloc, byte type, boolean silk_touch) {
+		//treeNode is where the original tree is located. checkloc is the current checking location.
+		//Code for destroying a tree. This iterates on itself. Using a base point to determine how far out it can go.
+		if (treeNode.distance(checkloc)<3) {
+			//Loop around and find all leaves/logs.
+			Location newloc = null;
+			for (int i=-1;i<2;i++) {
+				for (int j=-1;j<2;j++) {
+					for (int k=-1;k<2;k++) {
+						newloc = checkloc.clone().add(i,j,k);
+						if (w.getBlockAt(newloc).getType()==Material.LOG && w.getBlockAt(newloc).getData()%4==type) {
+							//logs.add(newloc.getBlock());
+							w.dropItemNaturally(newloc, new ItemStack(w.getBlockAt(newloc).getType(),1,(short)(w.getBlockAt(newloc).getData()%4)));
+							newloc.getBlock().setType(Material.AIR);
+							destroyNearbyTree(w, newloc, newloc, type, silk_touch);
+						} else
+						if (w.getBlockAt(newloc).getType()==Material.LEAVES && w.getBlockAt(newloc).getData()%4==type) {
+							//leaves.add(newloc.getBlock());
+							//Emulate apples / saplings dropping.
+							if (w.getBlockAt(newloc).getData()==3) {
+								//Jungle sapling.
+								if (silk_touch) {
+									w.dropItemNaturally(newloc, new ItemStack(Material.LEAVES,1,(short)(w.getBlockAt(newloc).getData()%4)));
+								} else 
+								if (Math.random()<=0.025) {
+									ItemStack item = new ItemStack(Material.SAPLING,1);
+									item.setDurability((short)(w.getBlockAt(newloc).getData()%4));
+									w.dropItemNaturally(newloc, item);
+								}
+							} else {
+								if (w.getBlockAt(newloc).getData()%4==0) {
+									//Chance to drop an apple.
+									if (Math.random()<=0.02) {
+										w.dropItemNaturally(newloc, new ItemStack(Material.APPLE,1));
+									}
+								}
+								if (silk_touch) {
+									w.dropItemNaturally(newloc, new ItemStack(Material.LEAVES,1,(short)(w.getBlockAt(newloc).getData()%4)));
+								} else 
+								if (Math.random()<=0.05) {
+									ItemStack item = new ItemStack(Material.SAPLING,1);
+									item.setDurability((short)(w.getBlockAt(newloc).getData()%4));
+									w.dropItemNaturally(newloc, item);
+								}
+							}
+							newloc.getBlock().setType(Material.AIR);
+							destroyNearbyTree(w, treeNode, newloc, type, silk_touch);
+						}
+					}
+				}
+			}
+		}
+	}
+
 
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent e) {
