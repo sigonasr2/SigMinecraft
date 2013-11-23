@@ -9584,6 +9584,48 @@ implements Listener
 		if (p.hasPermission("group.administrators")) {
 			p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.DARK_PURPLE+"");
 		}
+		if (event.getInventory().getType()==InventoryType.MERCHANT) {
+			double villager_mult = 2.00d; //The rate at which merchant amounts will be increased (For quantity items).
+			if (event.getInventory().getContents()[2]!=null) {
+				//Bukkit.getLogger().info("Result trade item is "+event.getInventory().getContents()[2]);
+				if (event.getInventory().getContents()[2].getMaxStackSize()>1) {
+					//This is a stackable item.
+					//event.getInventory().getContents()[2].setAmount((int)(event.getInventory().getContents()[2].getAmount()*villager_mult));
+				} else {
+					int amount=28;
+					if (event.getInventory().getContents()[0]!=null) {
+						amount+=event.getInventory().getContents()[0].getAmount()*8;
+					}
+					if (event.getInventory().getContents()[1]!=null) {
+						amount+=event.getInventory().getContents()[1].getAmount()*20;
+					}
+					boolean slot1_equip=false;
+					boolean slot2_equip=false;
+				    ItemMeta meta = event.getInventory().getContents()[2].getItemMeta();
+					if (event.getInventory().getContents()[0].getMaxStackSize()<=1) {
+						slot1_equip=true;
+					}
+					if (event.getInventory().getContents()[1].getMaxStackSize()<=1) {
+						slot2_equip=true;
+					}
+					if (event.getInventory().getContents()[0].hasItemMeta() && event.getInventory().getContents()[0].getItemMeta().hasLore()) {
+						meta.setLore(event.getInventory().getContents()[0].getItemMeta().getLore());
+					} else {
+						if (event.getInventory().getContents()[1].hasItemMeta() && event.getInventory().getContents()[1].getItemMeta().hasLore()) {
+							meta.setLore(event.getInventory().getContents()[1].getItemMeta().getLore());
+						}
+					}
+				    meta.setDisplayName(ChatColor.GRAY+"Trader's "+convertToItemName(event.getInventory().getContents()[2].getType().name()));
+				    event.getInventory().getContents()[2].setItemMeta(meta);
+					Random r = new Random(amount);
+					Map<Enchantment,Integer> map = event.getInventory().getContents()[2].getEnchantments();
+				    for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
+				    	//Bukkit.getLogger().info("Raising "+entry.getKey().toString()+"'s value from "+entry.getValue());
+					    event.getInventory().getContents()[2].addUnsafeEnchantment(entry.getKey(), entry.getValue()+(r.nextInt(11)));
+				    }
+				}
+			}
+		}
 		if (event.getCursor()!=null || event.getCurrentItem()!=null) {
 			if (event.getCursor().getType()==Material.SULPHUR) {
 				//This is a broken Halloween item...Maybe. Let's find out.
