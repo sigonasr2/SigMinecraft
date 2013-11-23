@@ -1780,6 +1780,7 @@ public void runTick() {
 												  }
 											  }
 										  } else {
+											  if (l.getCustomName().compareTo(ChatColor.GOLD+"Charge Zombie II")==0 && !l.isDead() && l.getKiller()!=null) {
 											  /*
 											  for (int k=-1;k<2;k++) {
 												  for (int j=-1;j<2;j++) {
@@ -1800,26 +1801,48 @@ public void runTick() {
 													  }
 												  }
 											  }*/ //Charge Zombie II's now only break blocks when YOU get hit by them.
-											  /*//OLD CHARGE ZOMBIE II BEHAVIOR.
-											  for (int k=-2;k<3;k++) {
-												  for (int j=-2;j<3;j++) {
-													  Location checkloc = l.getLocation().add(k,1,j);
-													  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,2,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,0,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL) {
-														  bl.breakNaturally();
+											  //OLD CHARGE ZOMBIE II BEHAVIOR.
+												  for (int k=-2;k<3;k++) {
+													  for (int j=-2;j<3;j++) {
+														  Location checkloc = l.getLocation().add(k,1,j);
+														  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND) {
+															  bl.breakNaturally();
+														  }
+														  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+														  checkloc = l.getLocation().add(k,2,j);
+														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND) {
+															  bl.breakNaturally();
+														  }
+														  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+														  checkloc = l.getLocation().add(k,0,j);
+														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND) {
+															  bl.breakNaturally();
+														  }
 													  }
 												  }
-											  }*/
+											  } else 
+											if (l.getCustomName().compareTo(ChatColor.YELLOW+"Charge Zombie")==0 && !l.isDead() && l.getKiller()!=null) {
+												  for (int k=-1;k<2;k++) {
+													  for (int j=-1;j<2;j++) {
+														  Location checkloc = l.getLocation().add(k,1,j);
+														  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+															  bl.breakNaturally();
+														  }
+														  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+														  checkloc = l.getLocation().add(k,2,j);
+														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+															  bl.breakNaturally();
+														  }
+														  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+														  checkloc = l.getLocation().add(k,0,j);
+														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+															  bl.breakNaturally();
+														  }
+													  }
+												  }
+											  }
 										  }
 									  }
 								  }
@@ -2610,7 +2633,21 @@ public void checkJukeboxes() {
     					//Bukkit.getLogger().info("Disparity is "+(unmatched/6727.0d*100)+"%");
     				}
     			}
-    			if (!spawneddungeon) {
+    			int airmeasure=0;
+    			//Get the underground chunk density of this chunk.
+    			//Max chunk density is 12800.
+    			Chunk c = list[i].getWorld().getChunkAt(list[i].getLocation());
+    			for (int x=0;x<16;x++) {
+        			for (int y=0;y<50;y++) {
+            			for (int z=0;z<16;z++) {
+            				if (c.getBlock(x, y, z).getType()==Material.AIR) {
+            					airmeasure++;
+            				}
+            			}
+        			}
+    			}
+    			//Bukkit.getLogger().info("For player "+list[i].getName()+", Chunk air density is "+((double)airmeasure/12800)*100.0d+"%");
+    			if (!spawneddungeon && ((double)airmeasure/12800)*100.0d<=10) { //Make sure the air density is small enough that we are allowed to carve things.
 	    			//See if the player is very far underground and there is nothing around him/her. This would be odd behavior (Hint at strip mining) and we will force Charge Zombie II's to spawn and create areas.
 	    			List<Entity> nearby = list[i].getNearbyEntities(20, 5, 20);
 	    			for (int j=0;j<nearby.size();j++) {
@@ -2729,275 +2766,7 @@ public void checkJukeboxes() {
 		    				e4 = Bukkit.getWorld("world").spawnEntity(list[i].getLocation().add(spread,0,-20), EntityType.ZOMBIE);
 	    				}
     				}
-    				/*
-    				torch1=false;
-    				torch2=false;
-    				torch3=false;
-    				torch4=false;
-    				spread = (int)(Math.random()*20)+20;
-    				int randomheight=(int)(Math.random()*5)-(int)(Math.random()*5);
-    				for (int j=10;j>-11;j--) {
-        				for (int k=4;k>-2;k--) {
-            				for (int l=10;l>-11;l--) {
-            					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(30+j,k+randomheight,spread+l));
-            					if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE) {
-            						torch1=true;
-            					}
-            				}
-        				}
-    				}
-    				if (!torch1) {
-    					int lb1=(int)(Math.random()*5)+10,lb2=(int)(Math.random()*5)+10,ub1=-(int)(Math.random()*6)+10,ub2=-(int)(Math.random()*6)+10;
-	    				for (int j=lb1;j>ub1;j--) {
-	        				for (int k=(int)(Math.random()*4)+1;k>-1;k--) {
-	            				for (int l=lb2;l>-ub2;l--) {
-	            					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(20+j,k+randomheight,spread+l));
-	            					if (Math.random()<=0.75-k*0.10 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME) {
-	            						b.setType(Material.AIR);
-	            					}
-	            				}
-	        				}
-	    				}
-    				}
-    				torch2=false;
-    				spread = (int)(Math.random()*20)+20;
-    				randomheight=(int)(Math.random()*5)-(int)(Math.random()*5);
-    				for (int j=10;j>-11;j--) {
-        				for (int k=4;k>-2;k--) {
-            				for (int l=10;l>-11;l--) {
-            					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(-20+j,k+randomheight,spread+l));
-            					if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE) {
-            						torch2=true;
-            					}
-            				}
-        				}
-    				}
-    				if (!torch2) {
-    					int lb1=(int)(Math.random()*5)+10,lb2=(int)(Math.random()*5)+10,ub1=-(int)(Math.random()*6)+10,ub2=-(int)(Math.random()*6)+10;
-	    				for (int j=lb1;j>ub1;j--) {
-	        				for (int k=(int)(Math.random()*4)+1;k>-1;k--) {
-	            				for (int l=lb2;l>-ub2;l--) {
-	            					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(20+j,k+randomheight,spread+l));
-	            					if (Math.random()<=0.75-k*0.10 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME) {
-	            						b.setType(Material.AIR);
-	            					}
-	            				}
-	        				}
-	    				}
-    				}
-    				spread = (int)(Math.random()*20)+20;
-    				for (int j=10;j>-11;j--) {
-        				for (int k=4;k>-2;k--) {
-            				for (int l=10;l>-11;l--) {
-            					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(spread+j,k+randomheight,20+l));
-            					if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE) {
-            						torch3=true;
-            					}
-            				}
-        				}
-    				}
-    				if (!torch3) {
-    					int lb1=(int)(Math.random()*5)+10,lb2=(int)(Math.random()*5)+10,ub1=-(int)(Math.random()*6)+10,ub2=-(int)(Math.random()*6)+10;
-	    				for (int j=lb1;j>ub1;j--) {
-	        				for (int k=(int)(Math.random()*4)+1;k>-1;k--) {
-	            				for (int l=lb2;l>-ub2;l--) {
-	            					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(20+j,k+randomheight,spread+l));
-	            					if (Math.random()<=0.75-k*0.10 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME) {
-	            						b.setType(Material.AIR);
-	            					}
-	            				}
-	        				}
-	    				}
-    				}
-    				spread = (int)(Math.random()*20)+20;
-    				for (int j=10;j>-11;j--) {
-        				for (int k=4;k>-2;k--) {
-            				for (int l=10;l>-11;l--) {
-            					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(spread+j,k+randomheight,-20+l));
-            					if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE) {
-            						torch4=true;
-            					}
-            				}
-        				}
-    				}
-    				if (!torch4) {
-    					int lb1=(int)(Math.random()*5)+10,lb2=(int)(Math.random()*5)+10,ub1=-(int)(Math.random()*6)+10,ub2=-(int)(Math.random()*6)+10;
-	    				for (int j=lb1;j>ub1;j--) {
-	        				for (int k=(int)(Math.random()*4)+1;k>-1;k--) {
-	            				for (int l=lb2;l>-ub2;l--) {
-	            					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(20+j,k+randomheight,spread+l));
-	            					if (Math.random()<=0.75-k*0.10 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME) {
-	            						b.setType(Material.AIR);
-	            					}
-	            				}
-	        				}
-	    				}
-    				}
-    				if (!torch1) {
-        				Zombie z1 = (Zombie)e1;
-	    				z1.setCustomName(ChatColor.GOLD+"Charge Zombie II");
-	    				z1.setCustomNameVisible(false);
-	    				z1.setTarget(list[i]);
-    				}
-    				if (!torch2) {
-        				Zombie z2 = (Zombie)e2;
-	    				z2.setCustomName(ChatColor.GOLD+"Charge Zombie II");
-	    				z2.setCustomNameVisible(false);
-	    				z2.setTarget(list[i]);
-    				}
-    				if (!torch3) {
-        				Zombie z3 = (Zombie)e3;
-	    				z3.setCustomName(ChatColor.GOLD+"Charge Zombie II");
-	    				z3.setCustomNameVisible(false);
-	    				z3.setTarget(list[i]);
-    				}
-    				if (!torch4) {
-        				Zombie z4 = (Zombie)e4;
-	    				z4.setCustomName(ChatColor.GOLD+"Charge Zombie II");
-	    				z4.setCustomNameVisible(false);
-	    				z4.setTarget(list[i]);
-    				}*/
     			}
-    			/* Kind of an out-of-date way to spawn things. Don't need anymore.
-                //Find out how much a player is worth.
-    			if (list[i].getWorld().getName().compareTo("world")==0 && list[i].getLocation().getY()<=50) {
-	    			double value=0;
-	    			ItemStack[] items = list[i].getInventory().getContents();
-	                for (int j=0;j<items.length;j++) {
-	                	if (items[j]!=null) {
-	                		if (items[j].getType()==Material.CHEST) {
-	                			if (items[j].hasItemMeta() && items[j].getItemMeta().getLore()!=null) {
-	                				List<String> loredata = items[j].getItemMeta().getLore();
-	                				for (int m=0;m<loredata.size();m++) {
-	                					if (loredata.get(m).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.")) {
-	                						value+=1*items[j].getAmount();
-	                					}
-	                				}
-	                			}
-	                		}
-	                		if (items[j].getType()==Material.TRAPPED_CHEST) {
-	                			if (items[j].hasItemMeta() && items[j].getItemMeta().getLore()!=null) {
-	                				List<String> loredata = items[j].getItemMeta().getLore();
-	                				for (int m=0;m<loredata.size();m++) {
-	                					if (loredata.get(m).equalsIgnoreCase(ChatColor.AQUA+"Contains 54 item slots.")) {
-	                						value+=10*items[j].getAmount();
-	                					}
-	                				}
-	                			}
-	                		}
-	                		if (items[j].getType()==Material.ENDER_CHEST) {
-	                			if (items[j].hasItemMeta() && items[j].getItemMeta().getLore()!=null) {
-	                				List<String> loredata = items[j].getItemMeta().getLore();
-	                				for (int m=0;m<loredata.size();m++) {
-	                					if (loredata.get(m).equalsIgnoreCase(ChatColor.AQUA+"Contains 27 item slots.")) {
-	                						value+=10*items[j].getAmount();
-	                					}
-	                				}
-	                			}
-	                		}
-	                		if (items[j].getType()==Material.COAL) {
-	                			value+=0.001d*items[j].getAmount();
-	                		} else 
-	                		if (items[j].getType()==Material.IRON_INGOT) {
-	                			value+=0.01d*items[j].getAmount();
-	                		} else 
-	                		if (items[j].getType()==Material.GOLD_INGOT) {
-	                			value+=0.05d*items[j].getAmount();
-	                		} else 
-	                		if (items[j].getType()==Material.DIAMOND) {
-	                			value+=0.25d*items[j].getAmount();
-	                		} else 
-	                		if (items[j].getType()==Material.LAPIS_ORE) {
-	                			value+=0.01d*items[j].getAmount();
-	                		} else 
-	                		if (items[j].getType()==Material.EMERALD) {
-	                			value+=0.3d*items[j].getAmount();
-	                		} else 
-	                		if (items[j].getType()==Material.COAL_BLOCK) {
-	                			value+=0.001d*9*items[j].getAmount();
-	                		} else 
-	                		if (items[j].getType()==Material.IRON_BLOCK) {
-	                			value+=0.01d*9*items[j].getAmount();
-	                		} else 
-	                		if (items[j].getType()==Material.GOLD_BLOCK) {
-	                			value+=0.05d*9*items[j].getAmount();
-	                		} else 
-	                		if (items[j].getType()==Material.DIAMOND_BLOCK) {
-	                			value+=0.25d*9*items[j].getAmount();
-	                		} else 
-	                		if (items[j].getType()==Material.LAPIS_BLOCK) {
-	                			value+=0.01d*9*items[j].getAmount();
-	                		} else 
-	                		if (items[j].getType()==Material.IRON_AXE ||
-	                				items[j].getType()==Material.IRON_PICKAXE ||
-	                				items[j].getType()==Material.IRON_SPADE ||
-	                				items[j].getType()==Material.IRON_SWORD ||
-	                				items[j].getType()==Material.IRON_HOE) {
-	                			value+=0.05d*items[j].getAmount();
-	                		} else 
-		                		if (items[j].getType()==Material.GOLD_AXE ||
-                				items[j].getType()==Material.GOLD_PICKAXE ||
-                				items[j].getType()==Material.GOLD_SPADE ||
-                				items[j].getType()==Material.GOLD_SWORD ||
-                				items[j].getType()==Material.GOLD_HOE) {
-                			value+=0.25d*items[j].getAmount();
-	                		} else 
-		                		if (items[j].getType()==Material.DIAMOND_AXE ||
-                				items[j].getType()==Material.DIAMOND_PICKAXE ||
-                				items[j].getType()==Material.DIAMOND_SPADE ||
-                				items[j].getType()==Material.DIAMOND_SWORD ||
-                				items[j].getType()==Material.DIAMOND_HOE) {
-                				value+=1.25d*items[j].getAmount();
-	                		}
-	                	}
-	                }
-	    			items = list[i].getEquipment().getArmorContents();
-	                for (int j=0;j<items.length;j++) {
-	                	if (items[j]!=null) {
-	                		if (items[j].getType()==Material.IRON_CHESTPLATE ||
-	                				items[j].getType()==Material.IRON_HELMET ||
-	                				items[j].getType()==Material.IRON_LEGGINGS ||
-	                				items[j].getType()==Material.IRON_BOOTS) {
-	                			value+=0.05d*items[j].getAmount();
-	                		} else 
-	                		if (items[j].getType()==Material.GOLD_CHESTPLATE ||
-                				items[j].getType()==Material.GOLD_HELMET ||
-                				items[j].getType()==Material.GOLD_LEGGINGS ||
-                				items[j].getType()==Material.GOLD_BOOTS) {
-	                			value+=0.25d*items[j].getAmount();
-	                		} else 
-	                		if (items[j].getType()==Material.DIAMOND_CHESTPLATE ||
-                				items[j].getType()==Material.DIAMOND_HELMET ||
-                				items[j].getType()==Material.DIAMOND_LEGGINGS ||
-                				items[j].getType()==Material.DIAMOND_BOOTS) {
-	                			value+=1.25d*items[j].getAmount();
-	                		}
-	                	}
-	                }
-	                //Bukkit.getPlayer("sigonasr2").sendMessage("Player "+list[i].getName()+" has a value of "+value);
-	                if (Math.random()<=value/2.0d) {
-		                //Bukkit.getPlayer("sigonasr2").sendMessage("Generating..."+(((int)value*2)+1));
-	                	switch ((int)(Math.random()*5)) {
-		                	case 0: {
-		                		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "mm pspawn skeleton "+(((int)(value/8))+1)+" "+list[i].getName());
-		                	}break;
-		                	case 1: {
-		                		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "mm pspawn zombie "+(((int)(value/8))+1)+" "+list[i].getName());
-		                	}break;
-		                	case 2: {
-		                		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "mm pspawn creeper "+(((int)(value/8))+1)+" "+list[i].getName());
-		                	}break;
-		                	case 3: {
-		                		Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "mm pspawn spider "+(((int)(value/8))+1)+" "+list[i].getName());
-		                	}break;
-		                	case 4: {
-		                		if (Math.random()*3<=1) {
-		                			Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "mm pspawn enderman "+(((int)(value/8))+1)+" "+list[i].getName());
-		                		}
-		                	}break;
-	                	}
-	                }
-    			}*/
     			list[i].getScoreboard().getTeam(list[i].getName()).setSuffix(healthbar(list[i].getHealth(),list[i].getMaxHealth(),list[i].getFoodLevel()));
     		}
           LOGGING_UPDATE_COUNTS++; //3
@@ -3391,8 +3160,7 @@ public void checkJukeboxes() {
               
               LOGGING_UPDATE_COUNTS++; //12
     	}
-    }
-    , 200, 200);
+    }, 200, 200);
 }
 
 @SuppressWarnings("deprecation")

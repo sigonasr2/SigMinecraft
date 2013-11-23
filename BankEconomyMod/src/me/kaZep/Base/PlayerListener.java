@@ -18,8 +18,6 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 //import net.minecraft.server.v1_4_R1.EntityWolf;
 
-
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -2374,7 +2372,7 @@ implements Listener
 								if (Math.random()<=1.00-((m+4)*0.05d)) {
 									Location checkloc = e.getEntity().getLocation().add(k,m,j);
 									Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-									if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER || bl.getType()!=Material.COMMAND || bl.getType()!=Material.MOSSY_COBBLESTONE) {
+									if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER || bl.getType()!=Material.COMMAND || bl.getType()!=Material.MOSSY_COBBLESTONE && naturalBlock(bl.getType())) {
 										bl.setType(Material.AIR);
 									}
 								}
@@ -3281,7 +3279,7 @@ implements Listener
 							for (int k=2;k>-1;k--) {
 								for (int l=lb2;l>-ub2;l--) {
 									Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(spread+j,k,10+l));
-									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME) {
+									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
 										b.setType(Material.AIR);
 									}
 								}
@@ -3306,7 +3304,7 @@ implements Listener
 							for (int k=2;k>-1;k--) {
 								for (int l=lb2;l>-ub2;l--) {
 									Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(spread+j,k,-10+l));
-									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME) {
+									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
 										b.setType(Material.AIR);
 									}
 								}
