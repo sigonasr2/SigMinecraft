@@ -6892,7 +6892,7 @@ implements Listener
 		  if (e.getEntity().getType()==EntityType.ZOMBIE) {
 			  Zombie z = (Zombie)e.getEntity();
 			  if ((z.getCustomName()==null || (
-					  z.getCustomName()!=null && (z.getCustomName().contains("II") ||
+					  z.getCustomName()!=null && !z.getCustomName().contains(ChatColor.DARK_PURPLE+"") && ((!z.getCustomName().contains(ChatColor.DARK_PURPLE+"") && z.getCustomName().contains("II")) ||
 							  z.getCustomName().contains("Ninja")))) && z.getHealth()>65) {
 				  //If it's a normal zombie with too much HP, something's wrong. Lower it.
 				  z.setHealth(z.getHealth()/2);
