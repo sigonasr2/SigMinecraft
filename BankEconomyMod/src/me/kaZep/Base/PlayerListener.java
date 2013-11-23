@@ -13230,13 +13230,13 @@ implements Listener
 				color = "Light Blue";
 			}break;
 			case 13:{
-				color = "Green";
+				color = "Magenta";
 			}break;
 			case 14:{
-				color = "Red";
+				color = "Orange";
 			}break;
 			case 15:{
-				color = "Black";
+				color = "White";
 			}break;
 			}
 		} else {
