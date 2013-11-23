@@ -74,6 +74,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.util.Vector;
 import org.bukkit.enchantments.Enchantment;
 
 import com.sk89q.worldedit.CuboidClipboard;
@@ -991,6 +992,7 @@ public class Main extends JavaPlugin
   }
 
 public void runTick() {
+	final Main plugin = this;
   this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new  Runnable(){
 		  public void run(){
 			SERVER_TICK_TIME++;
@@ -1724,7 +1726,11 @@ public void runTick() {
 							  } else {
 								  if (l.getCustomName()!=null && (l.getCustomName().compareTo(ChatColor.YELLOW+"Charge Zombie")==0 || l.getCustomName().compareTo(ChatColor.GOLD+"Charge Zombie II")==0 || l.getCustomName().compareTo(ChatColor.DARK_PURPLE+"Charge Zombie III")==0)) {
 									  //Destroy blocks around it.
-									  
+									  /*Block b = l.getLocation().getBlock();
+									  if (b.getType()==Material.WATER || b.getType()==Material.STATIONARY_WATER ||
+											  b.getType()==Material.LAVA || b.getType()==Material.STATIONARY_LAVA) {
+										Vector knockback = l.getVelocity().multiply(8f);
+										l.setVelocity(knockback);*/
 									  boolean doit=true;
 									  if (l.getKiller()!=null && l.getKiller().getLocation().getY()>l.getLocation().getY()) {
 										  doit=false;
@@ -1755,8 +1761,8 @@ public void runTick() {
 													  }
 												  }
 											  }*/
-											  for (int k=-1;k<2;k++) {
-												  for (int j=-1;j<2;j++) {
+											  for (int k=-2;k<3;k++) {
+												  for (int j=-2;j<3;j++) {
 													  Location checkloc = l.getLocation().add(k,1,j);
 													  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
 													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {

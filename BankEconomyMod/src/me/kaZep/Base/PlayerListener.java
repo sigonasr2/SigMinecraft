@@ -7098,7 +7098,18 @@ implements Listener
 					},1);
 				}
 			}
-			if (p.isBlocking()) {e.setDamage(e.getDamage()/2.0d);}
+			if (p.isBlocking()) {
+				final Player p2 = p;
+				Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+					@Override
+					public void run() {
+						//Multiplying by a number lower than 1 will reduce knockback
+						//Multiplying by a number greater than 1 will increase knockback
+						Vector knockback = p2.getVelocity().multiply(0.4f);
+						p2.setVelocity(knockback);
+					}
+				}, 1L);
+				e.setDamage(e.getDamage()/2.0d);}
 			p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 			int slot=0;
 			for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
