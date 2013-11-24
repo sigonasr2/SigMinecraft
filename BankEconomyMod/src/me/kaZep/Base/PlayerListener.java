@@ -13355,7 +13355,7 @@ class updateInventoryTask implements Runnable {
 					if (itemEnchantments.get(e) == null || bookEnchantments.get(e) > itemEnchantments.get(e)) {
 						// Book enchantment is larger in magnitude. Assign it as a possible outcome.
 						probableEnchantments.put(e, bookEnchantments.get(e));
-					} else if (bookEnchantments.get(e) == itemEnchantments.get(e) && bookEnchantments.get(e) <= 10) {
+					} else if (bookEnchantments.get(e) == itemEnchantments.get(e) && bookEnchantments.get(e) < 10) {
 						// Book enchantment is same in magnitude. Upgrade by one level.
 						probableEnchantments.put(e, bookEnchantments.get(e) + 1);
 					}
@@ -13766,7 +13766,7 @@ class updateInventoryTask implements Runnable {
 	public double getEnchantmentNumb(String s) {
 		//Parse the string for spaces.
 		String[] enchant = s.split(" ");
-		if (enchant[0].contains(ChatColor.YELLOW+"")) {
+		if (enchant[0].contains(ChatColor.YELLOW+"") && (enchant.length > 1)) {
 			String newstring = ((enchant[0].replace(ChatColor.YELLOW.getChar(), ' ')).replace('%', ' ')).replace(Character.toString((char)0x00A7), Character.toString((char)0x0020));
 			// Bukkit.getLogger().info("Enchant number is "+Double.valueOf(newstring));
 			return Double.valueOf(newstring);
