@@ -23,6 +23,7 @@ import java.text.*;
 import me.kaZep.Commands.JobsDataInfo;
 import me.kaZep.Commands.commandBankEconomy;
 import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -64,6 +65,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -430,6 +432,18 @@ public class Main extends JavaPlugin
     fireproof_wood_slab.setIngredient('a', Material.SLIME_BALL);
     fireproof_wood_slab.setIngredient('b', Material.WOOD_STEP);
     Bukkit.addRecipe(fireproof_wood_slab);
+    
+    // Add high efficiency recipes for wool
+    // White
+    ShapedRecipe woolRecipe;
+    
+    for (int i = 0; i < 16; i++) {
+	    woolRecipe = new ShapedRecipe(new ItemStack(Material.WOOL, 8, (short) i));
+	    woolRecipe.shape("aaa","aba", "aaa");
+	    woolRecipe.setIngredient('a', Material.WOOL);
+	    woolRecipe.setIngredient('b', new MaterialData(Material.INK_SACK, (byte) (15 - i)));
+	    Bukkit.addRecipe(woolRecipe);
+    }
     
     // Add Recipes for Item cube crafting.
     ItemStack temp = new ItemStack(Material.CHEST);

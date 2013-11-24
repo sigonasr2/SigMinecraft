@@ -4066,6 +4066,12 @@ implements Listener
 		// Disable melon crafting recipe
 		if (result.getResult().getType()==Material.MELON_BLOCK) {
 			result.setResult(new ItemStack(Material.AIR));
+			return;
+		}
+
+		if (result.getResult().getType()==Material.WOOL && result.getResult().getAmount() == 1) {
+			result.setResult(new ItemStack(Material.AIR));
+			return;
 		}
 
 		// Increase stairs recipe efficiency
@@ -12898,13 +12904,13 @@ implements Listener
 				color = "Light Blue";
 			}break;
 			case 13:{
-				color = "Green";
+				color = "Magenta";
 			}break;
 			case 14:{
-				color = "Red";
+				color = "Orange";
 			}break;
 			case 15:{
-				color = "Black";
+				color = "White";
 			}break;
 			}
 		} else {
