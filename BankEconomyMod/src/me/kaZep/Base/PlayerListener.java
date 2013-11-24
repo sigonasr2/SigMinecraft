@@ -9881,16 +9881,16 @@ implements Listener
 					final int LEVELS = 22;
 					boolean anvilClicked = false;
 
-					Bukkit.getLogger().info("Anvil interface CLICK at slot #" + event.getRawSlot());
+					// Bukkit.getLogger().info("Anvil interface CLICK at slot #" + event.getRawSlot());
 
 					if (event.getRawSlot() == -999) {
 						anvilClicked = false;
-						Bukkit.getLogger().info("Window exterior clicked.");
+						// Bukkit.getLogger().info("Window exterior clicked.");
 					} else if (event.getRawSlot() < 27) {
 						anvilClicked = true;
-						Bukkit.getLogger().info("Anvil clicked.");
+						// Bukkit.getLogger().info("Anvil clicked.");
 					} else {
-						Bukkit.getLogger().info("Inventory clicked.");
+						// Bukkit.getLogger().info("Inventory clicked.");
 					}
 					if (!anvilClicked) {
 						// Clicked the inventory. Leave the operation alone UNLESS it's a shift-click operation.
@@ -9908,7 +9908,7 @@ implements Listener
 							 */
 
 							if (event.getSlot() == OUTPUT && event.getCursor() != null && event.getCursor().getType() != Material.AIR && !matches(event.getCursor(), event.getCurrentItem())){
-								Bukkit.getLogger().info("Anvil OUTPUT click.");
+								// Bukkit.getLogger().info("Anvil OUTPUT click.");
 								event.setCancelled(true); // Cancel the event if trying to put items into the output slot
 							}
 
@@ -9916,18 +9916,18 @@ implements Listener
 							if (event.getInventory().getContents()[OUTPUT] != null
 									&& event.getSlot() == OUTPUT) {
 
-								Bukkit.getLogger().info("Anvil OUTPUT click with output populated.");
+								// Bukkit.getLogger().info("Anvil OUTPUT click with output populated.");
 
 								if (event.getInventory().getContents()[LEVELS].getAmount() > Bukkit.getPlayer(event.getWhoClicked().getName()).getLevel()) {
 									// Player doesn't have enough XP, abort
-									Bukkit.getLogger().info("Player has insufficient XP.");
+									// Bukkit.getLogger().info("Player has insufficient XP.");
 									p.sendMessage(ChatColor.RED+"You don't have enough experience to do that!");
 									event.setCancelled(true);
 								} else {
-									Bukkit.getLogger().info("Player has sufficient XP.");
+									// Bukkit.getLogger().info("Player has sufficient XP.");
 									if (event.getCursor() != null && event.getCursor().getType() != Material.AIR) {
 
-										Bukkit.getLogger().info("Anvil OUTPUT click with non-null mouse. Mouse has: " + event.getCursor());
+										// Bukkit.getLogger().info("Anvil OUTPUT click with non-null mouse. Mouse has: " + event.getCursor());
 
 										event.setCancelled(true); // Cancel event if cursor is not empty
 
@@ -9935,7 +9935,7 @@ implements Listener
 											// Attempts to store the item in the player's inventory.
 											// If it succeeds, remove the item from the anvil
 											// interface.
-											Bukkit.getLogger().info("Shift-click");
+											// Bukkit.getLogger().info("Shift-click");
 											if (event
 													.getWhoClicked()
 													.getInventory()
@@ -9943,16 +9943,48 @@ implements Listener
 															event.getInventory().getContents()[OUTPUT])
 															.isEmpty()) {
 
-												Bukkit.getLogger().info("Can place into inventory.");
+												// Bukkit.getLogger().info("Can place into inventory.");
 
-												event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
+												if (event.getCurrentItem().getType() == Material.ENCHANTED_BOOK && event.getInventory().getItem(MAGIC).getType() == Material.BOOK) {
+													// Halve its durability
+													event.getInventory().getItem(INPUT).setDurability((short)(event.getInventory().getItem(INPUT).getDurability() + (event.getInventory().getItem(INPUT).getType().getMaxDurability() - event.getInventory().getItem(INPUT).getDurability()) / 2));
+													
+													// DISENCHANT BEGIN
+										        	  Map<Enchantment,Integer> map  = event.getInventory().getItem(INPUT).getEnchantments();
+										    		  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
+										    			  event.getInventory().getItem(INPUT).removeEnchantment(entry.getKey());
+										    		  }
+										    		  if (event.getInventory().getItem(INPUT).hasItemMeta() && event.getInventory().getItem(INPUT).getItemMeta().hasLore()) {
+										        		  List<String> newlore = new ArrayList<String>();
+										    			  for (int i=0;i<event.getInventory().getItem(INPUT).getItemMeta().getLore().size();i++) {
+										    				  //Remove all lore when unenchanting.
+										    				  //Do not remove -400% durability.
+															  if (this.plugin.is_PermanentProperty(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i))) {
+																  newlore.add(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i));
+															  }
+										    			  }
+										    			  ItemMeta meta = event.getInventory().getItem(INPUT).getItemMeta();
+										    			  meta.setLore(newlore);
+										    			  event.getInventory().getItem(INPUT).setItemMeta(meta);
+										    		  }
+													// DISENCHANT END
+
+													// Destroy the item if random() exceeds %remaining durability
+													if (Math.random() < (double)(event.getInventory().getItem(INPUT).getType().getMaxDurability() - event.getInventory().getItem(INPUT).getDurability()) / (double)event.getInventory().getItem(INPUT).getType().getMaxDurability()) {
+														event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
+													}
+													
+												} else {
+													event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
+												}
+												
 												event.getInventory().setItem(MATERIALS, new ItemStack(Material.AIR));
 												event.getInventory().setItem(MAGIC, new ItemStack(Material.AIR));
 
 												// Set XP
 												Bukkit.getPlayer(event.getWhoClicked().getName()).setLevel(Bukkit.getPlayer(event.getWhoClicked().getName()).getLevel() - event.getInventory().getContents()[LEVELS].getAmount());
 
-												Bukkit.getLogger().info("Item is: " + event.getInventory().getItem(OUTPUT));												
+												// Bukkit.getLogger().info("Item is: " + event.getInventory().getItem(OUTPUT));												
 
 												// Play anvil sound
 												if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("IRON") || 
@@ -9969,6 +10001,8 @@ implements Listener
 												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("BOW") || 
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("FISHING")) {
 													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.ARROW_HIT, 10, 1);
+												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("ENCHANTED")) {
+													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.LEVEL_UP, 10, 1);
 												}
 
 												event.getInventory().setItem(OUTPUT, new ItemStack(Material.AIR));
@@ -9978,7 +10012,7 @@ implements Listener
 										}
 									} else {
 
-										Bukkit.getLogger().info("Anvil OUTPUT click with null mouse.");
+										// Bukkit.getLogger().info("Anvil OUTPUT click with null mouse.");
 
 
 										if (event.isShiftClick()) {
@@ -9987,7 +10021,7 @@ implements Listener
 											// Attempts to store the item in the player's inventory.
 											// If it succeeds, remove the item from the anvil
 											// interface.
-											Bukkit.getLogger().info("Shift-click");
+											// Bukkit.getLogger().info("Shift-click");
 											if (event
 													.getWhoClicked()
 													.getInventory()
@@ -9995,9 +10029,41 @@ implements Listener
 															event.getInventory().getContents()[OUTPUT])
 															.isEmpty()) {
 
-												Bukkit.getLogger().info("Can place into inventory.");
+												// Bukkit.getLogger().info("Can place into inventory.");
 
-												event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
+												if (event.getCurrentItem().getType() == Material.ENCHANTED_BOOK && event.getInventory().getItem(MAGIC).getType() == Material.BOOK) {
+													// Halve its durability and remove enchantments
+													event.getInventory().getItem(INPUT).setDurability((short)(event.getInventory().getItem(INPUT).getDurability() + (event.getInventory().getItem(INPUT).getType().getMaxDurability() - event.getInventory().getItem(INPUT).getDurability()) / 2));
+
+													// DISENCHANT BEGIN
+										        	  Map<Enchantment,Integer> map  = event.getInventory().getItem(INPUT).getEnchantments();
+										    		  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
+										    			  event.getInventory().getItem(INPUT).removeEnchantment(entry.getKey());
+										    		  }
+										    		  if (event.getInventory().getItem(INPUT).hasItemMeta() && event.getInventory().getItem(INPUT).getItemMeta().hasLore()) {
+										        		  List<String> newlore = new ArrayList<String>();
+										    			  for (int i=0;i<event.getInventory().getItem(INPUT).getItemMeta().getLore().size();i++) {
+										    				  //Remove all lore when unenchanting.
+										    				  //Do not remove -400% durability.
+															  if (this.plugin.is_PermanentProperty(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i))) {
+																  newlore.add(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i));
+															  }
+										    			  }
+										    			  ItemMeta meta = event.getInventory().getItem(INPUT).getItemMeta();
+										    			  meta.setLore(newlore);
+										    			  event.getInventory().getItem(INPUT).setItemMeta(meta);
+										    		  }
+													// DISENCHANT END
+
+													
+													// Destroy the item if random() exceeds %remaining durability
+													if (Math.random() < (double)(event.getInventory().getItem(INPUT).getType().getMaxDurability() - event.getInventory().getItem(INPUT).getDurability()) / (double)event.getInventory().getItem(INPUT).getType().getMaxDurability()) {
+														event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
+													}
+													
+												} else {
+													event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
+												}
 												event.getInventory().setItem(MATERIALS, new ItemStack(Material.AIR));
 												event.getInventory().setItem(MAGIC, new ItemStack(Material.AIR));
 
@@ -10019,16 +10085,50 @@ implements Listener
 												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("BOW") || 
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("FISHING")) {
 													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.ARROW_HIT, 10, 1);
+												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("ENCHANTED")) {
+													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.LEVEL_UP, 10, 1);
 												}
+												
 
 												event.getInventory().setItem(OUTPUT, new ItemStack(Material.AIR));
 												Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
 											}
 										} else {
-											Bukkit.getLogger().info("Normal click");
+											// Bukkit.getLogger().info("Normal click");
 
 											// Cursor is empty, item picked up. Subtract XP levels and remove ingredients.
-											event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
+											if (event.getCurrentItem().getType() == Material.ENCHANTED_BOOK && event.getInventory().getItem(MAGIC).getType() == Material.BOOK) {
+												// Halve its durability
+												event.getInventory().getItem(INPUT).setDurability((short)(event.getInventory().getItem(INPUT).getDurability() + (event.getInventory().getItem(INPUT).getType().getMaxDurability() - event.getInventory().getItem(INPUT).getDurability()) / 2));
+												
+												// DISENCHANT BEGIN
+									        	  Map<Enchantment,Integer> map  = event.getInventory().getItem(INPUT).getEnchantments();
+									    		  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
+									    			  event.getInventory().getItem(INPUT).removeEnchantment(entry.getKey());
+									    		  }
+									    		  if (event.getInventory().getItem(INPUT).hasItemMeta() && event.getInventory().getItem(INPUT).getItemMeta().hasLore()) {
+									        		  List<String> newlore = new ArrayList<String>();
+									    			  for (int i=0;i<event.getInventory().getItem(INPUT).getItemMeta().getLore().size();i++) {
+									    				  //Remove all lore when unenchanting.
+									    				  //Do not remove -400% durability.
+														  if (this.plugin.is_PermanentProperty(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i))) {
+															  newlore.add(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i));
+														  }
+									    			  }
+									    			  ItemMeta meta = event.getInventory().getItem(INPUT).getItemMeta();
+									    			  meta.setLore(newlore);
+									    			  event.getInventory().getItem(INPUT).setItemMeta(meta);
+									    		  }
+												// DISENCHANT END
+
+									    		  // Destroy the item if random() exceeds %remaining durability
+												if (Math.random() < (double)(event.getInventory().getItem(INPUT).getType().getMaxDurability() - event.getInventory().getItem(INPUT).getDurability()) / (double)event.getInventory().getItem(INPUT).getType().getMaxDurability()) {
+													event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
+												}
+												
+											} else {
+												event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
+											}
 											event.getInventory().setItem(MATERIALS, new ItemStack(Material.AIR));
 											event.getInventory().setItem(MAGIC, new ItemStack(Material.AIR));
 											// event.getInventory().setItem(OUTPUT, new ItemStack(Material.AIR));
@@ -10051,6 +10151,8 @@ implements Listener
 											} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("BOW") || 
 													event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("FISHING")) {
 												Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.ARROW_HIT, 10, 1);
+											} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("ENCHANTED")) {
+												Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.LEVEL_UP, 10, 1);
 											}
 
 											Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
@@ -10076,7 +10178,7 @@ implements Listener
 								 * All tools and armor types, as well as fishing rods and bows.
 								 */
 
-								Bukkit.getLogger().info("Anvil INPUT click with this item on mouse: " + event.getCursor().getType().toString());
+								// Bukkit.getLogger().info("Anvil INPUT click with this item on mouse: " + event.getCursor().getType().toString());
 
 								/*
 								if (event.getCursor().getType().toString().toUpperCase().contains("HELMET") || event.getCursor().getType().toString().toUpperCase().contains("CHESTPLATE") || 
@@ -10101,7 +10203,7 @@ implements Listener
 								 * Leather, string, wood, cobble, iron, gold, and diamond allowed.
 								 */
 
-								Bukkit.getLogger().info("Anvil MATERIALS click with this item on mouse: " + event.getCursor().getType().toString());
+								// Bukkit.getLogger().info("Anvil MATERIALS click with this item on mouse: " + event.getCursor().getType().toString());
 
 								/*
 								if (event.getCursor().getType() == Material.LEATHER || event.getCursor().getType() == Material.IRON_INGOT || 
@@ -10121,7 +10223,7 @@ implements Listener
 								 * Not implemented yet, so nothing is allowed at the moment. 
 								 */
 
-								Bukkit.getLogger().info("Anvil MAGIC click with this item on mouse: " + event.getCursor().getType().toString());
+								// Bukkit.getLogger().info("Anvil MAGIC click with this item on mouse: " + event.getCursor().getType().toString());
 
 								/*
 					if (event.getCursor().getType() == Material.FLINT || event.getCursor().getType() == Material.QUARTZ || 
