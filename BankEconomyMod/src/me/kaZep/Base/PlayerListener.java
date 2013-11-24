@@ -9621,8 +9621,19 @@ implements Listener
 							meta.setLore(event.getInventory().getContents()[1].getItemMeta().getLore());
 						}
 					}
+
 					meta.setDisplayName(ChatColor.GRAY+"Trader's "+convertToItemName(event.getInventory().getContents()[2].getType().name()));
 					event.getInventory().getContents()[2].setItemMeta(meta);
+					
+					if (event.getInventory().getContents()[2].getType() == Material.ENCHANTED_BOOK) {
+						ItemMeta tempMeta = new ItemStack(Material.ENCHANTED_BOOK).getItemMeta();
+						Map<Enchantment, Integer> tempEnchant = ((EnchantmentStorageMeta)(event.getInventory().getContents()[2].getItemMeta())).getStoredEnchants();
+						for (Enchantment e : tempEnchant.keySet()) {
+							tempMeta.addEnchant(e, tempEnchant.get(e), true);
+						}
+						event.getInventory().getContents()[2].setItemMeta(tempMeta);
+					}
+					
 					Random r = new Random(amount);
 					Map<Enchantment,Integer> map = event.getInventory().getContents()[2].getEnchantments();
 					for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
