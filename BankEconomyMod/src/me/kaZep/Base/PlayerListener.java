@@ -13679,6 +13679,8 @@ class updateInventoryTask implements Runnable {
 				for (Enchantment e : enchantments.keySet()) {
 					cost += (1 + enchantments.get(e));
 				}
+				
+				cost = Math.min(60, cost);
 
 				ItemStack orbs = new ItemStack(Material.SLIME_BALL);
 
