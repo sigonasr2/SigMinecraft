@@ -13539,34 +13539,34 @@ class updateInventoryTask implements Runnable {
 
 							// Bukkit.getLogger().info("Bonus enchantment string: " + appliedEnchant);
 							if (appliedEnchant.equalsIgnoreCase("Critical Chance")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Critical Chance");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Critical Chance");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Armor Penetration")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Armor Penetration");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Armor Penetration");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Life Steal")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Life Steal");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Life Steal");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Attack Speed")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Attack Speed");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Attack Speed");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Damage")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Damage");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Damage");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Health")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Health");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Health");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Damage Reduction")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Damage Reduction");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Damage Reduction");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Durability")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Durability");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Durability");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Block Chance")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Block Chance");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Block Chance");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Speed Boost Chance")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Speed Boost Chance");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Speed Boost Chance");
 							}
 
 							bonusesMeta.setLore(bonusesLore);
@@ -13575,7 +13575,7 @@ class updateInventoryTask implements Runnable {
 						} else {
 							// This enchantment exists. Calculate incremental cost.
 
-							cost += (int)(12 * itemBonuses.get(appliedEnchant) / probableBonuses.get(appliedEnchant)); // Make sure it's at least one level
+							cost += (int)(12d * itemBonuses.get(appliedEnchant) / probableBonuses.get(appliedEnchant)); // Make sure it's at least one level
 							cost = Math.min(60, cost);
 							cost = Math.max(1, cost);
 
