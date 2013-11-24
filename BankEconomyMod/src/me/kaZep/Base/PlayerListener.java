@@ -208,7 +208,7 @@ implements Listener
 	}
 
 	enum Cube { SMALL, LARGE, ENDER }
-	
+
 	public boolean naturalBlock(Material mat) {
 		List<Material> natural_mats = new ArrayList<Material>();
 		natural_mats.add(Material.DIRT);
@@ -231,7 +231,7 @@ implements Listener
 			return false;
 		}
 	}
-	
+
 	public void updateTopSPLEEFSigns() {
 		String name[] = {"","",""};
 		int rating[] = {-9999,-9999,-9999}, wins[] = {0,0,0}, losses[] = {0,0,0};
@@ -1282,15 +1282,15 @@ implements Listener
 	}
 
 
-  @EventHandler
-  public void onPlayerWakeup(PlayerBedLeaveEvent e) {
-	Player p = e.getPlayer();
-	//p.sendMessage("Wakeup at "+Bukkit.getWorld("world").getTime());
-	if (Bukkit.getWorld("world").getTime()==0) {
-		this.plugin.last_world_time=0;
+	@EventHandler
+	public void onPlayerWakeup(PlayerBedLeaveEvent e) {
+		Player p = e.getPlayer();
+		//p.sendMessage("Wakeup at "+Bukkit.getWorld("world").getTime());
+		if (Bukkit.getWorld("world").getTime()==0) {
+			this.plugin.last_world_time=0;
+		}
+		return;
 	}
-	return;
-  }
 
 	@EventHandler
 	public void onPlayerSneak(PlayerToggleSneakEvent e) {
@@ -2089,13 +2089,13 @@ implements Listener
 					l.setHealth(l.getMaxHealth());
 				}
 			}
-		  if (Math.random()<=0.003 && l.getLocation().getY()>=60) {
-			  Skeleton s = (Skeleton)l;
-			  s.setSkeletonType(SkeletonType.WITHER);
-			  s.setMaxHealth(150);
-			  s.setHealth(s.getMaxHealth());
-			  s.getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD));
-		  }
+			if (Math.random()<=0.003 && l.getLocation().getY()>=60) {
+				Skeleton s = (Skeleton)l;
+				s.setSkeletonType(SkeletonType.WITHER);
+				s.setMaxHealth(150);
+				s.setHealth(s.getMaxHealth());
+				s.getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD));
+			}
 		}break;
 		case SLIME: {
 		}break;
@@ -5242,7 +5242,7 @@ implements Listener
 	public ItemStack getGoodie() {
 		return getGoodie(0);
 	}
-	
+
 	public ItemStack getGoodie(int rar /*1=Mythical 0=Normal*/) {
 		ItemStack item = null;
 		if (Math.random()<0.33) {
@@ -6941,37 +6941,37 @@ implements Listener
 							l.removePotionEffect(PotionEffectType.NIGHT_VISION);
 							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,999999,2));
 							LivingEntity zombie = (LivingEntity)Bukkit.getWorld("world").spawnEntity(e.getEntity().getLocation(),EntityType.ZOMBIE);
-							  LivingEntity enderdragon = (LivingEntity)Bukkit.getWorld("world").spawnEntity(e.getEntity().getLocation(),EntityType.ENDER_DRAGON);
-							  //Bukkit.getWorld("world").spawn(e.getEntity().getLocation(), enderdragon.getClass());
-							  zombie.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
-							  zombie.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
-							  zombie.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
-							  zombie.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
-							  zombie.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,999999,3));
-							  ItemStack sword = new ItemStack(Material.IRON_SWORD);
-							  sword.addEnchantment(Enchantment.DAMAGE_ALL, 3);
-							  zombie.getEquipment().setItemInHand(sword);
-							  ItemStack skull = new ItemStack(397);
-							  skull.setDurability((short)3);
-							  SkullMeta meta = (SkullMeta)skull.getItemMeta();
-							  meta.setOwner("MHF_Enderman");
-							  skull.setItemMeta(meta);
-							  zombie.getEquipment().setHelmet(skull);
-							  
-							  enderdragon.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
-							  enderdragon.setMaxHealth(200);
-							  enderdragon.setHealth(200);
-							  enderdragon.remove();
-							  //enderdragon.teleport(new Location(p.getWorld(),p.getLocation().getBlockX()+i,-250,p.getLocation().getBlockZ()+j));
-							  //p.sendMessage(ChatColor.DARK_PURPLE+"You feel a dark presence nearby.");
-							  //Bukkit.getPlayer("sigonasr2").sendMessage("Trigger this.");
-							  zombie.setRemoveWhenFarAway(false);
-							  zombie.setMaxHealth(300);
-							  zombie.setHealth(300);
-							  zombie.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,999999,0));
-							  zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,0));
-							  zombie.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,999999,0));
-							  zombie.setTicksLived(1);
+							LivingEntity enderdragon = (LivingEntity)Bukkit.getWorld("world").spawnEntity(e.getEntity().getLocation(),EntityType.ENDER_DRAGON);
+							//Bukkit.getWorld("world").spawn(e.getEntity().getLocation(), enderdragon.getClass());
+							zombie.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
+							zombie.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
+							zombie.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+							zombie.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+							zombie.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,999999,3));
+							ItemStack sword = new ItemStack(Material.IRON_SWORD);
+							sword.addEnchantment(Enchantment.DAMAGE_ALL, 3);
+							zombie.getEquipment().setItemInHand(sword);
+							ItemStack skull = new ItemStack(397);
+							skull.setDurability((short)3);
+							SkullMeta meta = (SkullMeta)skull.getItemMeta();
+							meta.setOwner("MHF_Enderman");
+							skull.setItemMeta(meta);
+							zombie.getEquipment().setHelmet(skull);
+
+							enderdragon.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
+							enderdragon.setMaxHealth(200);
+							enderdragon.setHealth(200);
+							enderdragon.remove();
+							//enderdragon.teleport(new Location(p.getWorld(),p.getLocation().getBlockX()+i,-250,p.getLocation().getBlockZ()+j));
+							//p.sendMessage(ChatColor.DARK_PURPLE+"You feel a dark presence nearby.");
+							//Bukkit.getPlayer("sigonasr2").sendMessage("Trigger this.");
+							zombie.setRemoveWhenFarAway(false);
+							zombie.setMaxHealth(300);
+							zombie.setHealth(300);
+							zombie.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,999999,0));
+							zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,0));
+							zombie.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,999999,0));
+							zombie.setTicksLived(1);
 						}
 						/*if (nexteffect.getType().getName().compareTo(PotionEffectType.JUMP.getName())==0) {
 							p.removePotionEffect(PotionEffectType.JUMP);
@@ -6983,15 +6983,15 @@ implements Listener
 					Bukkit.getLogger().warning("Potion Effect Collection not accessible while trying to hurt entity.");
 				}
 			}
-		  if (e.getEntity().getType()==EntityType.ZOMBIE) {
-			  Zombie z = (Zombie)e.getEntity();
-			  if ((z.getCustomName()==null || (
-					  z.getCustomName()!=null && !z.getCustomName().contains(ChatColor.DARK_PURPLE+"") && ((!z.getCustomName().contains(ChatColor.DARK_PURPLE+"") && z.getCustomName().contains("II")) ||
-							  z.getCustomName().contains("Ninja")))) && z.getHealth()>65) {
-				  //If it's a normal zombie with too much HP, something's wrong. Lower it.
-				  z.setHealth(z.getHealth()/2);
-			  }
-		  }
+			if (e.getEntity().getType()==EntityType.ZOMBIE) {
+				Zombie z = (Zombie)e.getEntity();
+				if ((z.getCustomName()==null || (
+						z.getCustomName()!=null && !z.getCustomName().contains(ChatColor.DARK_PURPLE+"") && ((!z.getCustomName().contains(ChatColor.DARK_PURPLE+"") && z.getCustomName().contains("II")) ||
+								z.getCustomName().contains("Ninja")))) && z.getHealth()>65) {
+					//If it's a normal zombie with too much HP, something's wrong. Lower it.
+					z.setHealth(z.getHealth()/2);
+				}
+			}
 			if (e.getDamager() instanceof Projectile) {
 				Projectile pp = (Projectile)(e.getDamager());			  
 				if (pp.getShooter() instanceof Player && l instanceof Wither) {
@@ -9601,7 +9601,7 @@ implements Listener
 					}
 					boolean slot1_equip=false;
 					boolean slot2_equip=false;
-				    ItemMeta meta = event.getInventory().getContents()[2].getItemMeta();
+					ItemMeta meta = event.getInventory().getContents()[2].getItemMeta();
 					if (event.getInventory().getContents()[0].getMaxStackSize()<=1) {
 						slot1_equip=true;
 					}
@@ -9615,14 +9615,14 @@ implements Listener
 							meta.setLore(event.getInventory().getContents()[1].getItemMeta().getLore());
 						}
 					}
-				    meta.setDisplayName(ChatColor.GRAY+"Trader's "+convertToItemName(event.getInventory().getContents()[2].getType().name()));
-				    event.getInventory().getContents()[2].setItemMeta(meta);
+					meta.setDisplayName(ChatColor.GRAY+"Trader's "+convertToItemName(event.getInventory().getContents()[2].getType().name()));
+					event.getInventory().getContents()[2].setItemMeta(meta);
 					Random r = new Random(amount);
 					Map<Enchantment,Integer> map = event.getInventory().getContents()[2].getEnchantments();
-				    for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
-				    	//Bukkit.getLogger().info("Raising "+entry.getKey().toString()+"'s value from "+entry.getValue());
-					    event.getInventory().getContents()[2].addUnsafeEnchantment(entry.getKey(), entry.getValue()+(r.nextInt(11)));
-				    }
+					for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
+						//Bukkit.getLogger().info("Raising "+entry.getKey().toString()+"'s value from "+entry.getValue());
+						event.getInventory().getContents()[2].addUnsafeEnchantment(entry.getKey(), entry.getValue()+(r.nextInt(11)));
+					}
 				}
 			}
 		}
@@ -10869,10 +10869,10 @@ implements Listener
 
 	@EventHandler
 	public void onMinecartExit(VehicleExitEvent e) {
-	  if (e.getVehicle().getType()==EntityType.MINECART && e.getVehicle().getPassenger().getType()==EntityType.PLAYER) {
-		  Bukkit.getWorld("world").dropItemNaturally(e.getVehicle().getLocation(),new ItemStack(Material.MINECART));
-		  e.getVehicle().remove();
-	  }
+		if (e.getVehicle().getType()==EntityType.MINECART && e.getVehicle().getPassenger().getType()==EntityType.PLAYER) {
+			Bukkit.getWorld("world").dropItemNaturally(e.getVehicle().getLocation(),new ItemStack(Material.MINECART));
+			e.getVehicle().remove();
+		}
 	}
 
 	@EventHandler
@@ -11388,12 +11388,12 @@ implements Listener
 	@EventHandler
 	public void onPlayerLeave(PlayerQuitEvent e) {
 		Player p = e.getPlayer();
-	    if (p.isInsideVehicle()) {
-   		 	p.leaveVehicle();
-  		  }
-	    if (p.getOpenInventory()!=null) {
-	    	p.closeInventory();
-	    }
+		if (p.isInsideVehicle()) {
+			p.leaveVehicle();
+		}
+		if (p.getOpenInventory()!=null) {
+			p.closeInventory();
+		}
 		for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
 			if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
 				p.removePotionEffect(PotionEffectType.SPEED);
@@ -11974,7 +11974,7 @@ implements Listener
 	public boolean isItemCube(ItemStack item_cube) {
 		return this.plugin.is_ItemCube(item_cube);
 	}
-	
+
 	public void viewItemCube(Player p, ItemStack item_cube) {
 		//This function will figure out what type of Item Cube this item is and then display the correct inventory on-screen, also setting up the identifier.
 		Cube cube_type = null;
@@ -13088,9 +13088,11 @@ class updateInventoryTask implements Runnable {
 			boolean isHalloweenItem = false;
 
 			List<String> lore = anvilInv.getItem(INPUT).getItemMeta().getLore();
-			for (int i=0;i<lore.size();i++) {
-				if (lore.get(i).contains(ChatColor.YELLOW+"[Halloween]")) {
-					isHalloweenItem = true;
+			if (lore != null) {
+				for (int i=0;i<lore.size();i++) {
+					if (lore.get(i).contains(ChatColor.YELLOW+"[Halloween]")) {
+						isHalloweenItem = true;
+					}
 				}
 			}
 
