@@ -12990,6 +12990,7 @@ implements Listener
 
 class updateInventoryTask implements Runnable {
 	String playerName;
+	double repairMultiplier, experienceMultiplier;
 
 	public updateInventoryTask(String pl){
 		playerName = pl;
@@ -12997,7 +12998,7 @@ class updateInventoryTask implements Runnable {
 
 	@Override
 	public void run() {
-		Bukkit.getLogger().info("Runnable task run() called; player name: " + playerName);
+		// Bukkit.getLogger().info("Runnable task run() called; player name: " + playerName);
 
 		Player player = Bukkit.getPlayer(playerName);
 		Inventory anvilInv = player.getOpenInventory().getTopInventory();
@@ -13008,62 +13009,69 @@ class updateInventoryTask implements Runnable {
 		final int OUTPUT = 16;
 		final int LEVELS = 22;
 
+		// Apply cost reductions for specialists
+		repairMultiplier = 0.2; // Set to 0.25 if Blacksmith/Weaponsmith
+		experienceMultiplier = 1; // Halve for enchanters (maybe? balance issue), reduce substantially for tinkerers
+
 
 		// Redundant validation code for verification
 
 		if (anvilInv.getItem(INPUT) != null) {
-			if (!(anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("HELMET") || anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("CHESTPLATE") || 
+			if (!(anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("HELMET") || anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("CHESTPLATE") ||
 					anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("LEGGINGS") || anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("BOOTS") ||
-					anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("PICKAXE") || anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("SPADE") || 
+					anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("PICKAXE") || anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("SPADE") ||
 					anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("HOE") || anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("AXE") ||
-					anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("SWORD") || anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("FISHING") || 
-					anvilInv.getItem(INPUT).getType().toString().toUpperCase().contentEquals("BOW"))) {
+					anvilInv.getItem(INPUT).getType().toString().toUpperCase().contains("SWORD") || anvilInv.getItem(INPUT).getType().toString().toUpperCase().contentEquals("FISHING") ||
+					anvilInv.getItem(INPUT).getType().toString().toUpperCase().contentEquals("BOW") || anvilInv.getItem(INPUT).getType().toString().toUpperCase().contentEquals("ENCHANTED_BOOK"))) {
 
 				sendToInventory(INPUT, anvilInv.getItem(INPUT).getAmount(), player);
-				Bukkit.getLogger().info("Invalid input!");
+				// Bukkit.getLogger().info("Invalid input!");
 			} else {
-				Bukkit.getLogger().info("Valid input, " + anvilInv.getItem(INPUT).toString().toUpperCase() + " with durability " + anvilInv.getItem(INPUT).getDurability());
+				// Bukkit.getLogger().info("Valid input, " + anvilInv.getItem(INPUT).toString().toUpperCase() + " with durability " + anvilInv.getItem(INPUT).getDurability());
 			}
 		}
 
 		if (anvilInv.getItem(MATERIALS) != null) {
-			if (!(anvilInv.getItem(MATERIALS).getType() == Material.LEATHER || anvilInv.getItem(MATERIALS).getType() == Material.IRON_INGOT || 
-					anvilInv.getItem(MATERIALS).getType() == Material.GOLD_INGOT || anvilInv.getItem(MATERIALS).getType() == Material.IRON_BLOCK || 
+			if (!(anvilInv.getItem(MATERIALS).getType() == Material.LEATHER || anvilInv.getItem(MATERIALS).getType() == Material.IRON_INGOT ||
+					anvilInv.getItem(MATERIALS).getType() == Material.GOLD_INGOT || anvilInv.getItem(MATERIALS).getType() == Material.IRON_BLOCK ||
 					anvilInv.getItem(MATERIALS).getType() == Material.DIAMOND_BLOCK || anvilInv.getItem(MATERIALS).getType() == Material.DIAMOND ||
 					anvilInv.getItem(MATERIALS).getType() == Material.WOOD || anvilInv.getItem(MATERIALS).getType() == Material.COBBLESTONE ||
 					anvilInv.getItem(MATERIALS).getType() == Material.LOG || anvilInv.getItem(MATERIALS).getType() == Material.STONE ||
-					anvilInv.getItem(MATERIALS).getType() == Material.STRING)) {
+					anvilInv.getItem(MATERIALS).getType() == Material.STRING || anvilInv.getItem(MATERIALS).getType() == Material.EMERALD ||
+					anvilInv.getItem(MATERIALS).getType() == Material.EMERALD_BLOCK || anvilInv.getItem(MATERIALS).getType() == Material.ENCHANTED_BOOK)) {
 
 				sendToInventory(MATERIALS, anvilInv.getItem(MATERIALS).getAmount(), player);
 
-				Bukkit.getLogger().info("Invalid materials!");
-			} else {
-				Bukkit.getLogger().info("Valid materials, " + anvilInv.getItem(MATERIALS).toString().toUpperCase() + " with durability " + anvilInv.getItem(MATERIALS).getDurability());
+				// Bukkit.getLogger().info("Invalid materials!");
+			} else if ((anvilInv.getItem(MATERIALS).getType() == Material.ENCHANTED_BOOK || anvilInv.getItem(MATERIALS).getType() == Material.BOOK) && anvilInv.getItem(MAGIC) == null) {
+				anvilInv.setItem(MAGIC, anvilInv.getItem(MATERIALS).clone());
+				anvilInv.setItem(MATERIALS, new ItemStack(Material.AIR));
+				// Bukkit.getLogger().info("Valid materials, " + anvilInv.getItem(MATERIALS).toString().toUpperCase() + " with durability " + anvilInv.getItem(MATERIALS).getDurability());
 			}
 		}
 
 		if (anvilInv.getItem(MAGIC) != null) {
-			if (!(anvilInv.getItem(MAGIC).getType() == Material.ENCHANTED_BOOK)) {
+			if (!(anvilInv.getItem(MAGIC).getType() == Material.ENCHANTED_BOOK || anvilInv.getItem(MAGIC).getType() == Material.BOOK)) {
 
 				sendToInventory(MAGIC, anvilInv.getItem(MAGIC).getAmount(), player);
 
-				Bukkit.getLogger().info("Invalid magic!");
+				// Bukkit.getLogger().info("Invalid magic!");
 			} else {
-				Bukkit.getLogger().info("Valid magic, " + anvilInv.getItem(MAGIC).toString().toUpperCase());
+				// Bukkit.getLogger().info("Valid magic, " + anvilInv.getItem(MAGIC).toString().toUpperCase());
 			}
 		}
 
 		if ((anvilInv.getItem(INPUT) == null) || // No input, or material/magic both empty, or all three filled, or input and materials filled but item full
 				(anvilInv.getItem(MAGIC) == null && anvilInv.getItem(MATERIALS) == null) ||
-				(anvilInv.getItem(MAGIC) != null && anvilInv.getItem(MATERIALS) != null && anvilInv.getItem(INPUT) != null) || 
+				(anvilInv.getItem(MAGIC) != null && anvilInv.getItem(MATERIALS) != null && anvilInv.getItem(INPUT) != null) ||
 				(anvilInv.getItem(INPUT) != null && anvilInv.getItem(MATERIALS) != null && anvilInv.getItem(INPUT).getDurability() == 0)) {
-			// No valid combo, set XP orb to stack size 1 and remove output. 
+			// No valid combo, set XP orb to stack size 1 and remove output.
 			anvilInv.setItem(OUTPUT, new ItemStack(Material.AIR));
 			ItemStack orbs = new ItemStack(Material.SLIME_BALL);
 			ItemMeta temp_meta = orbs.getItemMeta();
 			temp_meta.setDisplayName(ChatColor.YELLOW + "Experience Cost");
 			List<String> temp_meta_lore = new ArrayList<String>();
-			temp_meta_lore.add(ChatColor.ITALIC	+ "Experience Cost of Enchanting.");			
+			temp_meta_lore.add(ChatColor.ITALIC + "Experience Cost of Enchanting.");
 			temp_meta.setLore(temp_meta_lore);
 			orbs.setItemMeta(temp_meta);
 			anvilInv.setItem(LEVELS, orbs);
@@ -13073,13 +13081,21 @@ class updateInventoryTask implements Runnable {
 			anvilInv.setContents(anvilInv.getContents());
 			player.updateInventory();
 		} else if (anvilInv.getItem(INPUT) != null && anvilInv.getItem(MATERIALS) != null && anvilInv.getItem(INPUT).getDurability() != 0) {
-			// Both repair slots are populated, and the item is damaged. 
+			// Both repair slots are populated, and the item is damaged.
 			// Verify the right material is combined with the source item.
 			boolean validCombo = false;
 			double multiplier = 0;
+			boolean isHalloweenItem = false;
+
+			List<String> lore = anvilInv.getItem(INPUT).getItemMeta().getLore();
+			for (int i=0;i<lore.size();i++) {
+				if (lore.get(i).contains(ChatColor.YELLOW+"[Halloween]")) {
+					isHalloweenItem = true;
+				}
+			}
 
 			if (anvilInv.getItem(MATERIALS).getType() == Material.WOOD && (anvilInv.getItem(INPUT).getType() == Material.WOOD_AXE ||
-					anvilInv.getItem(INPUT).getType() == Material.WOOD_SWORD || anvilInv.getItem(INPUT).getType() == Material.WOOD_HOE || 
+					anvilInv.getItem(INPUT).getType() == Material.WOOD_SWORD || anvilInv.getItem(INPUT).getType() == Material.WOOD_HOE ||
 					anvilInv.getItem(INPUT).getType() == Material.WOOD_PICKAXE || anvilInv.getItem(INPUT).getType() == Material.WOOD_SPADE)) {
 
 				validCombo = true;
@@ -13087,7 +13103,7 @@ class updateInventoryTask implements Runnable {
 			}
 
 			if (anvilInv.getItem(MATERIALS).getType() == Material.LOG && (anvilInv.getItem(INPUT).getType() == Material.WOOD_AXE ||
-					anvilInv.getItem(INPUT).getType() == Material.WOOD_SWORD || anvilInv.getItem(INPUT).getType() == Material.WOOD_HOE || 
+					anvilInv.getItem(INPUT).getType() == Material.WOOD_SWORD || anvilInv.getItem(INPUT).getType() == Material.WOOD_HOE ||
 					anvilInv.getItem(INPUT).getType() == Material.WOOD_PICKAXE || anvilInv.getItem(INPUT).getType() == Material.WOOD_SPADE)) {
 
 				validCombo = true;
@@ -13102,7 +13118,7 @@ class updateInventoryTask implements Runnable {
 			}
 
 			if (anvilInv.getItem(MATERIALS).getType() == Material.COBBLESTONE && (anvilInv.getItem(INPUT).getType() == Material.STONE_AXE ||
-					anvilInv.getItem(INPUT).getType() == Material.STONE_SWORD || anvilInv.getItem(INPUT).getType() == Material.STONE_HOE || 
+					anvilInv.getItem(INPUT).getType() == Material.STONE_SWORD || anvilInv.getItem(INPUT).getType() == Material.STONE_HOE ||
 					anvilInv.getItem(INPUT).getType() == Material.STONE_PICKAXE || anvilInv.getItem(INPUT).getType() == Material.STONE_SPADE)) {
 
 				validCombo = true;
@@ -13110,7 +13126,7 @@ class updateInventoryTask implements Runnable {
 			}
 
 			if (anvilInv.getItem(MATERIALS).getType() == Material.STONE && (anvilInv.getItem(INPUT).getType() == Material.STONE_AXE ||
-					anvilInv.getItem(INPUT).getType() == Material.STONE_SWORD || anvilInv.getItem(INPUT).getType() == Material.STONE_HOE || 
+					anvilInv.getItem(INPUT).getType() == Material.STONE_SWORD || anvilInv.getItem(INPUT).getType() == Material.STONE_HOE ||
 					anvilInv.getItem(INPUT).getType() == Material.STONE_PICKAXE || anvilInv.getItem(INPUT).getType() == Material.STONE_SPADE)) {
 
 				validCombo = true;
@@ -13118,7 +13134,7 @@ class updateInventoryTask implements Runnable {
 			}
 
 			if (anvilInv.getItem(MATERIALS).getType() == Material.LEATHER && (anvilInv.getItem(INPUT).getType() == Material.LEATHER_BOOTS ||
-					anvilInv.getItem(INPUT).getType() == Material.LEATHER_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.LEATHER_HELMET || 
+					anvilInv.getItem(INPUT).getType() == Material.LEATHER_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.LEATHER_HELMET ||
 					anvilInv.getItem(INPUT).getType() == Material.LEATHER_LEGGINGS)) {
 
 				validCombo = true;
@@ -13126,9 +13142,9 @@ class updateInventoryTask implements Runnable {
 			}
 
 			if (anvilInv.getItem(MATERIALS).getType() == Material.IRON_INGOT && (anvilInv.getItem(INPUT).getType() == Material.IRON_BOOTS ||
-					anvilInv.getItem(INPUT).getType() == Material.IRON_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.IRON_HELMET || 
+					anvilInv.getItem(INPUT).getType() == Material.IRON_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.IRON_HELMET ||
 					anvilInv.getItem(INPUT).getType() == Material.IRON_LEGGINGS || anvilInv.getItem(INPUT).getType() == Material.IRON_AXE ||
-					anvilInv.getItem(INPUT).getType() == Material.IRON_SWORD || anvilInv.getItem(INPUT).getType() == Material.IRON_HOE || 
+					anvilInv.getItem(INPUT).getType() == Material.IRON_SWORD || anvilInv.getItem(INPUT).getType() == Material.IRON_HOE ||
 					anvilInv.getItem(INPUT).getType() == Material.IRON_PICKAXE || anvilInv.getItem(INPUT).getType() == Material.IRON_SPADE)) {
 
 				validCombo = true;
@@ -13136,9 +13152,9 @@ class updateInventoryTask implements Runnable {
 			}
 
 			if (anvilInv.getItem(MATERIALS).getType() == Material.IRON_BLOCK && (anvilInv.getItem(INPUT).getType() == Material.IRON_BOOTS ||
-					anvilInv.getItem(INPUT).getType() == Material.IRON_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.IRON_HELMET || 
+					anvilInv.getItem(INPUT).getType() == Material.IRON_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.IRON_HELMET ||
 					anvilInv.getItem(INPUT).getType() == Material.IRON_LEGGINGS || anvilInv.getItem(INPUT).getType() == Material.IRON_AXE ||
-					anvilInv.getItem(INPUT).getType() == Material.IRON_SWORD || anvilInv.getItem(INPUT).getType() == Material.IRON_HOE || 
+					anvilInv.getItem(INPUT).getType() == Material.IRON_SWORD || anvilInv.getItem(INPUT).getType() == Material.IRON_HOE ||
 					anvilInv.getItem(INPUT).getType() == Material.IRON_PICKAXE || anvilInv.getItem(INPUT).getType() == Material.IRON_SPADE)) {
 
 				validCombo = true;
@@ -13146,7 +13162,7 @@ class updateInventoryTask implements Runnable {
 			}
 
 			if (anvilInv.getItem(MATERIALS).getType() == Material.IRON_INGOT && (anvilInv.getItem(INPUT).getType() == Material.CHAINMAIL_BOOTS ||
-					anvilInv.getItem(INPUT).getType() == Material.CHAINMAIL_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.CHAINMAIL_HELMET || 
+					anvilInv.getItem(INPUT).getType() == Material.CHAINMAIL_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.CHAINMAIL_HELMET ||
 					anvilInv.getItem(INPUT).getType() == Material.CHAINMAIL_LEGGINGS)) {
 
 				validCombo = true;
@@ -13154,43 +13170,59 @@ class updateInventoryTask implements Runnable {
 			}
 
 			if (anvilInv.getItem(MATERIALS).getType() == Material.GOLD_INGOT && (anvilInv.getItem(INPUT).getType() == Material.GOLD_BOOTS ||
-					anvilInv.getItem(INPUT).getType() == Material.GOLD_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.GOLD_HELMET || 
+					anvilInv.getItem(INPUT).getType() == Material.GOLD_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.GOLD_HELMET ||
 					anvilInv.getItem(INPUT).getType() == Material.GOLD_LEGGINGS || anvilInv.getItem(INPUT).getType() == Material.GOLD_AXE ||
-					anvilInv.getItem(INPUT).getType() == Material.GOLD_SWORD || anvilInv.getItem(INPUT).getType() == Material.GOLD_HOE || 
+					anvilInv.getItem(INPUT).getType() == Material.GOLD_SWORD || anvilInv.getItem(INPUT).getType() == Material.GOLD_HOE ||
 					anvilInv.getItem(INPUT).getType() == Material.GOLD_PICKAXE || anvilInv.getItem(INPUT).getType() == Material.GOLD_SPADE)) {
 
 				validCombo = true;
 				multiplier = 0.3;
 			}
 
-			if (anvilInv.getItem(MATERIALS).getType() == Material.DIAMOND && (anvilInv.getItem(INPUT).getType() == Material.DIAMOND_BOOTS ||
-					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_HELMET || 
+			if ((anvilInv.getItem(MATERIALS).getType() == Material.DIAMOND && (anvilInv.getItem(INPUT).getType() == Material.DIAMOND_BOOTS ||
+					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_HELMET ||
 					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_LEGGINGS || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_AXE ||
-					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_SWORD || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_HOE || 
-					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_PICKAXE || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_SPADE)) {
+					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_SWORD || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_HOE ||
+					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_PICKAXE || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_SPADE) &&
+					!isHalloweenItem)) {
 
 				validCombo = true;
 				multiplier = 1.2;
 			}
 
 			if (anvilInv.getItem(MATERIALS).getType() == Material.DIAMOND_BLOCK && (anvilInv.getItem(INPUT).getType() == Material.DIAMOND_BOOTS ||
-					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_HELMET || 
+					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_CHESTPLATE || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_HELMET ||
 					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_LEGGINGS || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_AXE ||
-					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_SWORD || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_HOE || 
+					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_SWORD || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_HOE ||
 					anvilInv.getItem(INPUT).getType() == Material.DIAMOND_PICKAXE || anvilInv.getItem(INPUT).getType() == Material.DIAMOND_SPADE)) {
 
 				validCombo = true;
 				multiplier = 0.12;
+
+				if (isHalloweenItem) {
+					multiplier = 1.2;
+				}
+			}
+
+			if (anvilInv.getItem(MATERIALS).getType() == Material.EMERALD) {
+				validCombo = true;
+				multiplier = 0.5;
+			}
+
+			if (anvilInv.getItem(MATERIALS).getType() == Material.EMERALD_BLOCK) {
+				validCombo = true;
+				multiplier = 0.05;
 			}
 
 			if (validCombo) {
 				// If materials stacked past number needed to full repair, reduce stack size and drop the rest
 				// in the player's inventory, or if that fails, drop it on the ground.
-				// Limit to 5 just in case math doesn't work. 
-				int maxItemsNeeded = Math.min(5, 1 + (5 * anvilInv.getItem(INPUT).getDurability() / anvilInv.getItem(INPUT).getType().getMaxDurability()));
+				// Limit to 5 just in case math doesn't work.
+				int maxPossible = (int)Math.round(1 / repairMultiplier);
+				int maxItemsNeeded = Math.min(maxPossible, 1 + (maxPossible * anvilInv.getItem(INPUT).getDurability() / anvilInv.getItem(INPUT).getType().getMaxDurability()));
 
 				if (anvilInv.getItem(MATERIALS).getAmount() > maxItemsNeeded) {
-					// Bukkit.getLogger().info("Materials exceed " + maxItemsNeeded + " stack. Dropping " + (anvilInv.getItem(MATERIALS).getAmount() - maxItemsNeeded) + " of " + anvilInv.getItem(MATERIALS).getType());
+					// // Bukkit.getLogger().info("Materials exceed " + maxItemsNeeded + " stack. Dropping " + (anvilInv.getItem(MATERIALS).getAmount() - maxItemsNeeded) + " of " + anvilInv.getItem(MATERIALS).getType());
 
 					sendToInventory(MATERIALS, anvilInv.getItem(MATERIALS).getAmount() - maxItemsNeeded, player);
 
@@ -13201,32 +13233,32 @@ class updateInventoryTask implements Runnable {
 				int bonus_cost = 0;
 				ItemStack item = anvilInv.getContents()[INPUT];
 
-				Bukkit.getLogger().warning("Repair cost calculation valid");
+				// Bukkit.getLogger().warning("Repair cost calculation valid");
 				Map<Enchantment, Integer> enchantments = item.getEnchantments();
 
-				Bukkit.getLogger().warning(enchantments.keySet().toString());
+				// Bukkit.getLogger().warning(enchantments.keySet().toString());
 				for (Enchantment e : enchantments.keySet()) {
-					Bukkit.getLogger().warning("BC: " + bonus_cost + " | INCR: " + 2 + enchantments.get(e));
+					// Bukkit.getLogger().warning("BC: " + bonus_cost + " | INCR: " + 2 + enchantments.get(e));
 					bonus_cost += (2 + enchantments.get(e));
 				}
 
 				cost += bonus_cost;
 
-				Bukkit.getLogger().info("Raw cost: " + cost);
+				// Bukkit.getLogger().info("Raw cost: " + cost);
 
 				cost = (short) Math.floor(cost * multiplier);
 				cost = Math.min(cost, 60); // Cap cost at 60 in case some egregiously enchanted item exists
 				cost = Math.max(cost, 1); // Make sure it's at least one level
 
-				Bukkit.getLogger().info("Cost: " + cost);
+				// Bukkit.getLogger().info("Cost: " + cost);
 
 				ItemStack orbs = new ItemStack(Material.SLIME_BALL);
 
 				ItemMeta temp_meta = orbs.getItemMeta();
 				temp_meta.setDisplayName(ChatColor.YELLOW + "Experience Cost");
 				List<String> temp_meta_lore = new ArrayList<String>();
-				temp_meta_lore.add(ChatColor.ITALIC	+ "This operation costs " + cost + " levels.");
-				temp_meta_lore.add(ChatColor.ITALIC	+ "You currently have " + player.getLevel() + " levels.");
+				temp_meta_lore.add(ChatColor.ITALIC + "This operation costs " + cost + " levels.");
+				temp_meta_lore.add(ChatColor.ITALIC + "You currently have " + player.getLevel() + " levels.");
 
 				if (cost > player.getLevel()) {
 					orbs.setType(Material.MAGMA_CREAM);
@@ -13248,7 +13280,7 @@ class updateInventoryTask implements Runnable {
 				// anvilInv.getContents()[OUTPUT].setData(item.getData());
 
 				anvilInv.setItem(OUTPUT, item.clone());
-				anvilInv.getContents()[OUTPUT].setDurability((short) (item.getDurability() - item.getType().getMaxDurability() * 0.2 * anvilInv.getContents()[MATERIALS].getAmount()));
+				anvilInv.getContents()[OUTPUT].setDurability((short) (item.getDurability() - item.getType().getMaxDurability() * repairMultiplier * anvilInv.getContents()[MATERIALS].getAmount()));
 			}
 
 
@@ -13257,356 +13289,426 @@ class updateInventoryTask implements Runnable {
 			anvilInv.setContents(anvilInv.getContents());
 			player.updateInventory();
 		} else if (anvilInv.getItem(INPUT) != null && anvilInv.getItem(MAGIC) != null) {
-			// Both Magic slots are populated. 
-			// Get the list of enchantments from both items. 
-			Map<Enchantment, Integer> itemEnchantments = anvilInv.getItem(INPUT).getEnchantments();
-			Map<Enchantment, Integer> bookEnchantments = new java.util.HashMap<Enchantment, Integer>();
+			if (anvilInv.getItem(MAGIC).getType() == Material.ENCHANTED_BOOK) {
+				// Both Magic slots are populated, enchanted book is detected.
+				// Get the list of enchantments from both items.
+				Map<Enchantment, Integer> itemEnchantments = anvilInv.getItem(INPUT).getEnchantments();
+				Map<Enchantment, Integer> bookEnchantments = new java.util.HashMap<Enchantment, Integer>();
 
-			// Get enchanted book "enchantment" and enchantments. 
-			bookEnchantments.putAll(anvilInv.getItem(MAGIC).getEnchantments());
-			bookEnchantments.putAll(((EnchantmentStorageMeta)(anvilInv.getItem(MAGIC).getItemMeta())).getStoredEnchants());
+				// Get enchanted book "enchantment" and enchantments.
+				bookEnchantments.putAll(anvilInv.getItem(MAGIC).getEnchantments());
+				bookEnchantments.putAll(((EnchantmentStorageMeta)(anvilInv.getItem(MAGIC).getItemMeta())).getStoredEnchants());
 
-			// Get the list of bonuses from both items. 
-			Map<String, Double> itemBonuses = new java.util.HashMap<String, Double>();
-			Map<String, Double> bookBonuses = new java.util.HashMap<String, Double>();
+				// Get the list of bonuses from both items.
+				Map<String, Double> itemBonuses = new java.util.HashMap<String, Double>();
+				Map<String, Double> bookBonuses = new java.util.HashMap<String, Double>();
 
-			if (anvilInv.getItem(INPUT).getItemMeta().hasLore()) {
-				for (int i = 0; i < anvilInv.getItem(INPUT).getItemMeta().getLore().size(); i++) {
-					// Put enchantments together for the input. Also stacks identical enchantments. 
-					Bukkit.getLogger().info("Iterating bonus: " + anvilInv.getItem(INPUT).getItemMeta().getLore().get(i));
-					
-					if (getEnchantmentName(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i)) != null) {
-						if (itemBonuses.get(getEnchantmentName(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i))) == null) {
-	
-							Bukkit.getLogger().info("New bonus: " + getEnchantmentName(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i)));
-							itemBonuses.put(getEnchantmentName(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i)), getEnchantmentNumb(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i)));
-						} else {
-	
-							Bukkit.getLogger().info("Stacking bonus: " + itemBonuses.get(getEnchantmentName(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i))) + " + " + getEnchantmentNumb(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i)));
-							itemBonuses.put(getEnchantmentName(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i)), itemBonuses.get(getEnchantmentName(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i))) + getEnchantmentNumb(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i)));
+				if (anvilInv.getItem(INPUT).getItemMeta().hasLore()) {
+					for (int i = 0; i < anvilInv.getItem(INPUT).getItemMeta().getLore().size(); i++) {
+						// Put enchantments together for the input. Also stacks identical enchantments.
+						// Bukkit.getLogger().info("Iterating bonus: " + anvilInv.getItem(INPUT).getItemMeta().getLore().get(i));
+
+						if (getEnchantmentName(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i)) != null) {
+							if (itemBonuses.get(getEnchantmentName(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i))) == null) {
+
+								// Bukkit.getLogger().info("New bonus: " + getEnchantmentName(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i)));
+								itemBonuses.put(getEnchantmentName(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i)), getEnchantmentNumb(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i)));
+							} else {
+
+								// Bukkit.getLogger().info("Stacking bonus: " + itemBonuses.get(getEnchantmentName(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i))) + " + " + getEnchantmentNumb(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i)));
+								itemBonuses.put(getEnchantmentName(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i)), itemBonuses.get(getEnchantmentName(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i))) + getEnchantmentNumb(anvilInv.getItem(INPUT).getItemMeta().getLore().get(i)));
+							}
 						}
 					}
 				}
-			}
 
-			if (anvilInv.getItem(MAGIC).getItemMeta().hasLore()) {
-				for (int i = 0; i < anvilInv.getItem(MAGIC).getItemMeta().getLore().size(); i++) {
-					// Put enchantments together for the MAGIC. Also stacks identical enchantments. 
-					Bukkit.getLogger().info("Iterating bonus: " + anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i));
-					if (bookBonuses.get(getEnchantmentName(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i))) == null) {
+				if (anvilInv.getItem(MAGIC).getItemMeta().hasLore()) {
+					for (int i = 0; i < anvilInv.getItem(MAGIC).getItemMeta().getLore().size(); i++) {
+						// Put enchantments together for the MAGIC. Also stacks identical enchantments.
+						// Bukkit.getLogger().info("Iterating bonus: " + anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i));
+						if (bookBonuses.get(getEnchantmentName(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i))) == null) {
 
-						Bukkit.getLogger().info("New bonus: " + getEnchantmentName(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i)));
-						bookBonuses.put(getEnchantmentName(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i)), getEnchantmentNumb(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i)));
-					} else {
+							// Bukkit.getLogger().info("New bonus: " + getEnchantmentName(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i)));
+							bookBonuses.put(getEnchantmentName(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i)), getEnchantmentNumb(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i)));
+						} else {
 
-						Bukkit.getLogger().info("Stacking bonus: " + bookBonuses.get(getEnchantmentName(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i))) + " + " + getEnchantmentNumb(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i)));
-						bookBonuses.put(getEnchantmentName(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i)), bookBonuses.get(getEnchantmentName(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i))) + getEnchantmentNumb(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i)));
+							// Bukkit.getLogger().info("Stacking bonus: " + bookBonuses.get(getEnchantmentName(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i))) + " + " + getEnchantmentNumb(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i)));
+							bookBonuses.put(getEnchantmentName(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i)), bookBonuses.get(getEnchantmentName(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i))) + getEnchantmentNumb(anvilInv.getItem(MAGIC).getItemMeta().getLore().get(i)));
+						}
 					}
 				}
-			}
 
-			// Generate appropriate possible enchantments
-			Map<Enchantment, Integer> probableEnchantments = new java.util.HashMap<Enchantment, Integer>();
+				// Generate appropriate possible enchantments
+				Map<Enchantment, Integer> probableEnchantments = new java.util.HashMap<Enchantment, Integer>();
 
-			for (Enchantment e : bookEnchantments.keySet()) {
-				Bukkit.getLogger().info("Iterating enchantment: " + e);
+				for (Enchantment e : bookEnchantments.keySet()) {
+					// Bukkit.getLogger().info("Iterating enchantment: " + e);
 
-				if (itemEnchantments.get(e) == null || bookEnchantments.get(e) > itemEnchantments.get(e)) {
-					// Book enchantment is larger in magnitude. Assign it as a possible outcome.
-					probableEnchantments.put(e, bookEnchantments.get(e));
-				} else if (bookEnchantments.get(e) == itemEnchantments.get(e)) {
-					// Book enchantment is same in magnitude. Upgrade by one level.
-					probableEnchantments.put(e, bookEnchantments.get(e) + 1);
-				}
-			}
-
-			// Generate appropriate possible bonuses
-			Map<String, Double> probableBonuses = new java.util.HashMap<String, Double>();
-
-			for (String e : bookBonuses.keySet()) {
-				Bukkit.getLogger().info("Iterating bonus: " + e);
-
-				if (itemBonuses.get(e) == null || bookBonuses.get(e) > itemBonuses.get(e)) {
-					// Book enchantment is larger in magnitude. Assign it as a possible outcome.
-					probableBonuses.put(e, bookBonuses.get(e));
-				} else if (bookBonuses.get(e) == itemBonuses.get(e)) {
-					// Book enchantment is same in magnitude. Upgrade by half.
-					probableBonuses.put(e, Math.floor(bookBonuses.get(e) * 1.5));
-				}
-			}
-
-			if (probableEnchantments.size() == 0 && probableBonuses.size() == 0) {
-				// No possible valid enchantments. Output nothing
-			} else {
-				if (probableEnchantments.size() != 0) {
-					// Randomly select an enchantment to add.
-					int random = (int)(Math.random() * probableEnchantments.size());
-					Bukkit.getLogger().info("Randomized to # " + (random + 1) + " out of " + probableEnchantments.size());
-
-					int i = 0;
-
-					Enchantment appliedEnchant = null;
-					int magnitude = 0;
-					for (Enchantment e : probableEnchantments.keySet()) {
-
-						if (i == random) {
-							// Rolled this one
-							appliedEnchant = e;
-							magnitude = probableEnchantments.get(e);
-						}
-						i++;
+					if (itemEnchantments.get(e) == null || bookEnchantments.get(e) > itemEnchantments.get(e)) {
+						// Book enchantment is larger in magnitude. Assign it as a possible outcome.
+						probableEnchantments.put(e, bookEnchantments.get(e));
+					} else if (bookEnchantments.get(e) == itemEnchantments.get(e) && bookEnchantments.get(e) <= 10) {
+						// Book enchantment is same in magnitude. Upgrade by one level.
+						probableEnchantments.put(e, bookEnchantments.get(e) + 1);
 					}
+				}
 
-					int cost = 0;
+				// Generate appropriate possible bonuses
+				Map<String, Integer> probableBonuses = new java.util.HashMap<String, Integer>();
 
-					if (itemEnchantments.get(appliedEnchant) == null) {
-						// This enchantment doesn't exist. Calculate full cost. 
+				for (String e : bookBonuses.keySet()) {
+					// Bukkit.getLogger().info("Iterating bonus: " + e);
 
-						cost = Math.min(60, magnitude * magnitude);
-						cost = Math.max(cost, 1); // Make sure it's at least one level
+					if (itemBonuses.get(e) == null) {
+						// Book enchantment is new. Assign it as a possible outcome.
+						probableBonuses.put(e, (int)Math.round(bookBonuses.get(e) * 0.2));
+						// The int cast appears to be needed to make it display integers and not stuff like "+5.0 Health"
+						// Don't remove unless workaround can be found.
+					} else if (bookBonuses.get(e) >= itemBonuses.get(e) * 0.2) {
+						// Book enchantment is large enough in magnitude to stack. Assign it as a possible outcome.
+						probableBonuses.put(e, (int)Math.round(itemBonuses.get(e) + bookBonuses.get(e) * 0.2));
+					}
+				}
 
-						ItemStack orbs = new ItemStack(Material.SLIME_BALL);
-
-						ItemMeta temp_meta = orbs.getItemMeta();
-						temp_meta.setDisplayName(ChatColor.YELLOW + "Experience Cost");
-						List<String> temp_meta_lore = new ArrayList<String>();
-						temp_meta_lore.add(ChatColor.ITALIC	+ "This operation costs " + cost + " levels.");
-						temp_meta_lore.add(ChatColor.ITALIC	+ "You currently have " + player.getLevel() + " levels.");
-
-						if (cost > player.getLevel()) {
-							orbs.setType(Material.MAGMA_CREAM);
-							temp_meta_lore.add("");
-							temp_meta_lore.add(ChatColor.RED + "You can't afford this!");
-						} else {
-							temp_meta_lore.add("");
-							temp_meta_lore.add(ChatColor.GREEN + "Completing the operation will");
-							temp_meta_lore.add(ChatColor.GREEN + "bring you to " + (player.getLevel() - cost) + " levels.");
-						}
-
-						temp_meta.setLore(temp_meta_lore);
-						orbs.setItemMeta(temp_meta);
-
-						orbs.setAmount(cost);
-						anvilInv.setItem(LEVELS, orbs);
-						anvilInv.setItem(OUTPUT, anvilInv.getItem(INPUT).clone());
-						anvilInv.getItem(OUTPUT).addUnsafeEnchantment(appliedEnchant, magnitude);
-
-					} else {
-						// This enchantment exists. Calculate incremental cost. 
-
-						cost = Math.min(60, magnitude * magnitude - itemEnchantments.get(appliedEnchant) * itemEnchantments.get(appliedEnchant));
-						cost = Math.max(cost, 1); // Make sure it's at least one level
-
-						ItemStack orbs = new ItemStack(Material.SLIME_BALL);
-
-						ItemMeta temp_meta = orbs.getItemMeta();
-						temp_meta.setDisplayName(ChatColor.YELLOW + "Experience Cost");
-						List<String> temp_meta_lore = new ArrayList<String>();
-						temp_meta_lore.add(ChatColor.ITALIC	+ "This operation costs " + cost + " levels.");
-						temp_meta_lore.add(ChatColor.ITALIC	+ "You currently have " + player.getLevel() + " levels.");
-
-						if (cost > player.getLevel()) {
-							orbs.setType(Material.MAGMA_CREAM);
-							temp_meta_lore.add("");
-							temp_meta_lore.add(ChatColor.RED + "You can't afford this!");
-						} else {
-							temp_meta_lore.add("");
-							temp_meta_lore.add(ChatColor.GREEN + "Completing the operation will");
-							temp_meta_lore.add(ChatColor.GREEN + "bring you to " + (player.getLevel() - cost) + " levels.");
-						}
-
-						temp_meta.setLore(temp_meta_lore);
-						orbs.setItemMeta(temp_meta);
-
-						orbs.setAmount(cost);
-						anvilInv.setItem(LEVELS, orbs);
-
-						anvilInv.setItem(OUTPUT, anvilInv.getItem(INPUT).clone());
-						anvilInv.getItem(OUTPUT).removeEnchantment(appliedEnchant);
-						anvilInv.getItem(OUTPUT).addUnsafeEnchantment(appliedEnchant, magnitude);
-					} 
+				if (probableEnchantments.size() == 0 && probableBonuses.size() == 0) {
+					// No possible valid enchantments. Output nothing
 				} else {
-					// Can't add enchant, but can add bonus. Prepare output for bonus.
-					anvilInv.setItem(OUTPUT, anvilInv.getItem(INPUT).clone());
-				}
+					if (probableEnchantments.size() != 0) {
+						// Randomly select an enchantment to add.
+						int random = (int)(Math.random() * probableEnchantments.size());
+						// Bukkit.getLogger().info("Randomized to # " + (random + 1) + " out of " + probableEnchantments.size());
 
-				if (probableBonuses.size() != 0) {
-					// Randomly select a bonus to add.
-					int random = (int)(Math.random() * probableBonuses.size());
-					Bukkit.getLogger().info("Randomized to # " + (random + 1) + " out of " + probableBonuses.size());
+						int i = 0;
 
-					int i = 0;
+						Enchantment appliedEnchant = null;
+						int magnitude = 0;
+						for (Enchantment e : probableEnchantments.keySet()) {
 
-					String appliedEnchant = null;
-					double magnitude = 0;
-					for (String e : probableBonuses.keySet()) {
-
-						if (i == random) {
-							// Rolled this one
-							appliedEnchant = e;
-							magnitude = probableBonuses.get(e);
+							if (i == random) {
+								// Rolled this one
+								appliedEnchant = e;
+								magnitude = probableEnchantments.get(e);
+							}
+							i++;
 						}
-						i++;
+
+						int cost = 0;
+
+						if (itemEnchantments.get(appliedEnchant) == null) {
+							// This enchantment doesn't exist. Calculate full cost.
+
+							cost = Math.min(60, magnitude * magnitude);
+							cost = Math.max(cost, 1); // Make sure it's at least one level
+
+							ItemStack orbs = new ItemStack(Material.SLIME_BALL);
+
+							ItemMeta temp_meta = orbs.getItemMeta();
+							temp_meta.setDisplayName(ChatColor.YELLOW + "Experience Cost");
+							List<String> temp_meta_lore = new ArrayList<String>();
+							temp_meta_lore.add(ChatColor.ITALIC + "This operation costs " + cost + " levels.");
+							temp_meta_lore.add(ChatColor.ITALIC + "You currently have " + player.getLevel() + " levels.");
+
+							if (cost > player.getLevel()) {
+								orbs.setType(Material.MAGMA_CREAM);
+								temp_meta_lore.add("");
+								temp_meta_lore.add(ChatColor.RED + "You can't afford this!");
+							} else {
+								temp_meta_lore.add("");
+								temp_meta_lore.add(ChatColor.GREEN + "Completing the operation will");
+								temp_meta_lore.add(ChatColor.GREEN + "bring you to " + (player.getLevel() - cost) + " levels.");
+							}
+
+							temp_meta.setLore(temp_meta_lore);
+							orbs.setItemMeta(temp_meta);
+
+							orbs.setAmount(cost);
+							anvilInv.setItem(LEVELS, orbs);
+							anvilInv.setItem(OUTPUT, anvilInv.getItem(INPUT).clone());
+							anvilInv.getItem(OUTPUT).addUnsafeEnchantment(appliedEnchant, magnitude);
+
+						} else {
+							// This enchantment exists. Calculate incremental cost.
+
+							cost = Math.min(60, magnitude * magnitude - itemEnchantments.get(appliedEnchant) * itemEnchantments.get(appliedEnchant));
+							cost = Math.max(cost, 1); // Make sure it's at least one level
+
+							ItemStack orbs = new ItemStack(Material.SLIME_BALL);
+
+							ItemMeta temp_meta = orbs.getItemMeta();
+							temp_meta.setDisplayName(ChatColor.YELLOW + "Experience Cost");
+							List<String> temp_meta_lore = new ArrayList<String>();
+							temp_meta_lore.add(ChatColor.ITALIC + "This operation costs " + cost + " levels.");
+							temp_meta_lore.add(ChatColor.ITALIC + "You currently have " + player.getLevel() + " levels.");
+
+							if (cost > player.getLevel()) {
+								orbs.setType(Material.MAGMA_CREAM);
+								temp_meta_lore.add("");
+								temp_meta_lore.add(ChatColor.RED + "You can't afford this!");
+							} else {
+								temp_meta_lore.add("");
+								temp_meta_lore.add(ChatColor.GREEN + "Completing the operation will");
+								temp_meta_lore.add(ChatColor.GREEN + "bring you to " + (player.getLevel() - cost) + " levels.");
+							}
+
+							temp_meta.setLore(temp_meta_lore);
+							orbs.setItemMeta(temp_meta);
+
+							orbs.setAmount(cost);
+							anvilInv.setItem(LEVELS, orbs);
+
+							anvilInv.setItem(OUTPUT, anvilInv.getItem(INPUT).clone());
+							anvilInv.getItem(OUTPUT).removeEnchantment(appliedEnchant);
+							anvilInv.getItem(OUTPUT).addUnsafeEnchantment(appliedEnchant, magnitude);
+						}
+					} else {
+						// Can't add enchant, but can add bonus. Prepare output for bonus.
+						anvilInv.setItem(OUTPUT, anvilInv.getItem(INPUT).clone());
 					}
 
-					int cost = 0;
+					boolean isTinkerer = true; // Change this to a playerInJob() call later.
 
-					if (itemBonuses.get(appliedEnchant) == null) {
-						// This bonus doesn't exist. Calculate full cost. 
+					if (probableBonuses.size() != 0 && isTinkerer) {
+						// Randomly select a bonus to add.
+						int random = (int)(Math.random() * probableBonuses.size());
+						Bukkit.getLogger().info("Randomized to # " + (random + 1) + " out of " + probableBonuses.size());
 
-						cost = 30;
+						int i = 0;
 
-						ItemStack orbs = new ItemStack(Material.SLIME_BALL);
+						String appliedEnchant = null;
+						int magnitude = 0;
+						for (String e : probableBonuses.keySet()) {
 
-						ItemMeta temp_meta = orbs.getItemMeta();
-						temp_meta.setDisplayName(ChatColor.YELLOW + "Experience Cost");
-						List<String> temp_meta_lore = new ArrayList<String>();
-						temp_meta_lore.add(ChatColor.ITALIC	+ "This operation costs " + cost + " levels.");
-						temp_meta_lore.add(ChatColor.ITALIC	+ "You currently have " + player.getLevel() + " levels.");
-
-						if (cost > player.getLevel()) {
-							orbs.setType(Material.MAGMA_CREAM);
-							temp_meta_lore.add("");
-							temp_meta_lore.add(ChatColor.RED + "You can't afford this!");
-						} else {
-							temp_meta_lore.add("");
-							temp_meta_lore.add(ChatColor.GREEN + "Completing the operation will");
-							temp_meta_lore.add(ChatColor.GREEN + "bring you to " + (player.getLevel() - cost) + " levels.");
+							if (i == random) {
+								// Rolled this one
+								appliedEnchant = e;
+								magnitude = probableBonuses.get(e);
+							}
+							i++;
 						}
 
-						temp_meta.setLore(temp_meta_lore);
-						orbs.setItemMeta(temp_meta);
+						int cost = 0;
 
-						orbs.setAmount(cost);
-						anvilInv.setItem(LEVELS, orbs);
-						
-						// Change entry matching modified lore
-						List<String> bonusesLore = anvilInv.getItem(OUTPUT).getItemMeta().getLore();
+						if (itemBonuses.get(appliedEnchant) == null) {
+							// This bonus doesn't exist. Calculate full cost.
+							Bukkit.getLogger().info("Bonus doesn't exist.");
+							Bukkit.getLogger().info("Bonus is: " + appliedEnchant + " at magnitude " + magnitude);
 
-						for (int i1 = 0; i1 < bonusesLore.size(); i1++) {
-							String e = bonusesLore.get(i1);
-							
-							if (containsEnchantment(e, appliedEnchant)) {
-								if (appliedEnchant.equalsIgnoreCase("Critical Chance")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Critical Chance");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Armor Penetration")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Armor Penetration");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Life Steal")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Life Steal");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Attack Speed")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Attack Speed");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Damage")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Damage");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Health")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Health");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Damage Reduction")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Damage Reduction");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Durability")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Durability");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Block Chance")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Block Chance");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Speed Boost Chance")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Speed Boost Chance");
+							cost += 12;
+							cost = Math.min(60, cost);
+							cost = Math.max(1, cost);
+
+							ItemStack orbs = new ItemStack(Material.SLIME_BALL);
+
+							ItemMeta temp_meta = orbs.getItemMeta();
+							temp_meta.setDisplayName(ChatColor.YELLOW + "Experience Cost");
+							List<String> temp_meta_lore = new ArrayList<String>();
+							temp_meta_lore.add(ChatColor.ITALIC + "This operation costs " + cost + " levels.");
+							temp_meta_lore.add(ChatColor.ITALIC + "You currently have " + player.getLevel() + " levels.");
+
+							if (cost > player.getLevel()) {
+								orbs.setType(Material.MAGMA_CREAM);
+								temp_meta_lore.add("");
+								temp_meta_lore.add(ChatColor.RED + "You can't afford this!");
+							} else {
+								temp_meta_lore.add("");
+								temp_meta_lore.add(ChatColor.GREEN + "Completing the operation will");
+								temp_meta_lore.add(ChatColor.GREEN + "bring you to " + (player.getLevel() - cost) + " levels.");
+							}
+
+							temp_meta.setLore(temp_meta_lore);
+							orbs.setItemMeta(temp_meta);
+
+							orbs.setAmount(cost);
+							anvilInv.setItem(LEVELS, orbs);
+
+							// Change entry matching modified lore
+							ItemMeta bonusesMeta = anvilInv.getItem(OUTPUT).getItemMeta();
+							List<String> bonusesLore = bonusesMeta.getLore();
+							if (bonusesLore == null)
+							{
+								bonusesLore = new ArrayList<String>();
+							}
+
+							// Bukkit.getLogger().info("Bonus enchantment string: " + appliedEnchant);
+							if (appliedEnchant.equalsIgnoreCase("Critical Chance")) {
+								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Critical Chance");
+							}
+							if (appliedEnchant.equalsIgnoreCase("Armor Penetration")) {
+								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Armor Penetration");
+							}
+							if (appliedEnchant.equalsIgnoreCase("Life Steal")) {
+								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Life Steal");
+							}
+							if (appliedEnchant.equalsIgnoreCase("Attack Speed")) {
+								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Attack Speed");
+							}
+							if (appliedEnchant.equalsIgnoreCase("Damage")) {
+								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Damage");
+							}
+							if (appliedEnchant.equalsIgnoreCase("Health")) {
+								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Health");
+							}
+							if (appliedEnchant.equalsIgnoreCase("Damage Reduction")) {
+								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Damage Reduction");
+							}
+							if (appliedEnchant.equalsIgnoreCase("Durability")) {
+								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Durability");
+							}
+							if (appliedEnchant.equalsIgnoreCase("Block Chance")) {
+								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Block Chance");
+							}
+							if (appliedEnchant.equalsIgnoreCase("Speed Boost Chance")) {
+								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Speed Boost Chance");
+							}
+
+							bonusesMeta.setLore(bonusesLore);
+							anvilInv.getItem(OUTPUT).setItemMeta(bonusesMeta);
+
+						} else {
+							// This enchantment exists. Calculate incremental cost.
+
+							cost += (int)(12 * itemBonuses.get(appliedEnchant) / probableBonuses.get(appliedEnchant)); // Make sure it's at least one level
+							cost = Math.min(60, cost);
+							cost = Math.max(1, cost);
+
+							ItemStack orbs = new ItemStack(Material.SLIME_BALL);
+
+							ItemMeta temp_meta = orbs.getItemMeta();
+							temp_meta.setDisplayName(ChatColor.YELLOW + "Experience Cost");
+							List<String> temp_meta_lore = new ArrayList<String>();
+							temp_meta_lore.add(ChatColor.ITALIC + "This operation costs " + cost + " levels.");
+							temp_meta_lore.add(ChatColor.ITALIC + "You currently have " + player.getLevel() + " levels.");
+
+							if (cost > player.getLevel()) {
+								orbs.setType(Material.MAGMA_CREAM);
+								temp_meta_lore.add("");
+								temp_meta_lore.add(ChatColor.RED + "You can't afford this!");
+							} else {
+								temp_meta_lore.add("");
+								temp_meta_lore.add(ChatColor.GREEN + "Completing the operation will");
+								temp_meta_lore.add(ChatColor.GREEN + "bring you to " + (player.getLevel() - cost) + " levels.");
+							}
+
+							temp_meta.setLore(temp_meta_lore);
+							orbs.setItemMeta(temp_meta);
+
+							orbs.setAmount(cost);
+							anvilInv.setItem(LEVELS, orbs);
+
+							// Change entry matching modified lore
+							ItemMeta bonusesMeta = anvilInv.getItem(OUTPUT).getItemMeta();
+							List<String> bonusesLore = bonusesMeta.getLore();
+
+							for (int i1 = 0; i1 < bonusesLore.size(); i1++) {
+								String e = bonusesLore.get(i1);
+
+								if (containsEnchantment(e, appliedEnchant)) {
+									// Bukkit.getLogger().info("Success! Found enchantment: " + e);
+									// Bukkit.getLogger().info("Bonus enchantment: " + appliedEnchant);
+
+									if (appliedEnchant.equalsIgnoreCase("Critical Chance")) {
+										bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Critical Chance");
+									}
+									if (appliedEnchant.equalsIgnoreCase("Armor Penetration")) {
+										bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Armor Penetration");
+									}
+									if (appliedEnchant.equalsIgnoreCase("Life Steal")) {
+										bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Life Steal");
+									}
+									if (appliedEnchant.equalsIgnoreCase("Attack Speed")) {
+										bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Attack Speed");
+									}
+									if (appliedEnchant.equalsIgnoreCase("Damage")) {
+										bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Damage");
+									}
+									if (appliedEnchant.equalsIgnoreCase("Health")) {
+										bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Health");
+									}
+									if (appliedEnchant.equalsIgnoreCase("Damage Reduction")) {
+										bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Damage Reduction");
+									}
+									if (appliedEnchant.equalsIgnoreCase("Durability")) {
+										bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Durability");
+									}
+									if (appliedEnchant.equalsIgnoreCase("Block Chance")) {
+										bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Block Chance");
+									}
+									if (appliedEnchant.equalsIgnoreCase("Speed Boost Chance")) {
+										bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Speed Boost Chance");
+									}
 								}
 							}
+
+							bonusesMeta.setLore(bonusesLore);
+							anvilInv.getItem(OUTPUT).setItemMeta(bonusesMeta);
 						}
-						
-						anvilInv.getItem(OUTPUT).getItemMeta().setLore(bonusesLore);
-						
-					} else {
-						// This enchantment exists. Calculate incremental cost. 
+					}
 
-						cost = (int)(30 * itemBonuses.get(appliedEnchant) / probableBonuses.get(appliedEnchant)); // Make sure it's at least one level
+				}
+				// TRY EVERYTHING
+				player.getInventory().setContents(player.getInventory().getContents());
+				anvilInv.setContents(anvilInv.getContents());
+				player.updateInventory();
+			} else if (anvilInv.getItem(MAGIC).getType() == Material.BOOK && anvilInv.getItem(INPUT).getType() != Material.ENCHANTED_BOOK) {
+				// Magic slot is a book. Unenchanting logic goes here.
+				anvilInv.setItem(OUTPUT, new ItemStack(Material.ENCHANTED_BOOK));
+				anvilInv.getItem(OUTPUT).setType(Material.ENCHANTED_BOOK);
 
-						ItemStack orbs = new ItemStack(Material.SLIME_BALL);
+				ItemMeta bookMeta = anvilInv.getItem(INPUT).getItemMeta();
+				bookMeta.setDisplayName(null);
+				anvilInv.getItem(OUTPUT).setItemMeta(bookMeta);
 
-						ItemMeta temp_meta = orbs.getItemMeta();
-						temp_meta.setDisplayName(ChatColor.YELLOW + "Experience Cost");
-						List<String> temp_meta_lore = new ArrayList<String>();
-						temp_meta_lore.add(ChatColor.ITALIC	+ "This operation costs " + cost + " levels.");
-						temp_meta_lore.add(ChatColor.ITALIC	+ "You currently have " + player.getLevel() + " levels.");
+				// If books stacked past 1, return all but 1 book to player inventory.
 
-						if (cost > player.getLevel()) {
-							orbs.setType(Material.MAGMA_CREAM);
-							temp_meta_lore.add("");
-							temp_meta_lore.add(ChatColor.RED + "You can't afford this!");
-						} else {
-							temp_meta_lore.add("");
-							temp_meta_lore.add(ChatColor.GREEN + "Completing the operation will");
-							temp_meta_lore.add(ChatColor.GREEN + "bring you to " + (player.getLevel() - cost) + " levels.");
-						}
-
-						temp_meta.setLore(temp_meta_lore);
-						orbs.setItemMeta(temp_meta);
-
-						orbs.setAmount(cost);
-						anvilInv.setItem(LEVELS, orbs);
-
-						// Change entry matching modified lore
-						List<String> bonusesLore = anvilInv.getItem(OUTPUT).getItemMeta().getLore();
-
-						for (int i1 = 0; i1 < bonusesLore.size(); i1++) {
-							String e = bonusesLore.get(i1);
-							
-							if (containsEnchantment(e, appliedEnchant)) {
-								if (appliedEnchant.equalsIgnoreCase("Critical Chance")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Critical Chance");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Armor Penetration")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Armor Penetration");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Life Steal")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Life Steal");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Attack Speed")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Attack Speed");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Damage")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Damage");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Health")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Health");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Damage Reduction")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Damage Reduction");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Durability")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Durability");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Block Chance")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Block Chance");
-								}
-								if (appliedEnchant.equalsIgnoreCase("Speed Boost Chance")) {
-									bonusesLore.set(i1, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Speed Boost Chance");
-								}
-							}
-						}
-						
-						anvilInv.getItem(OUTPUT).getItemMeta().setLore(bonusesLore);
-					} 
+				if (anvilInv.getItem(MAGIC).getAmount() > 1) {
+					sendToInventory(MAGIC, anvilInv.getItem(MAGIC).getAmount() - 1, player);
 				}
 
+				int cost = 12;
+
+				Map<Enchantment, Integer> enchantments = anvilInv.getItem(INPUT).getEnchantments();
+
+				for (Enchantment e : enchantments.keySet()) {
+					cost += (1 + enchantments.get(e));
+				}
+
+				ItemStack orbs = new ItemStack(Material.SLIME_BALL);
+
+				ItemMeta temp_meta = orbs.getItemMeta();
+				temp_meta.setDisplayName(ChatColor.YELLOW + "Experience Cost");
+				List<String> temp_meta_lore = new ArrayList<String>();
+				temp_meta_lore.add(ChatColor.ITALIC + "This operation costs " + cost + " levels.");
+				temp_meta_lore.add(ChatColor.ITALIC + "You currently have " + player.getLevel() + " levels.");
+
+				if (cost > player.getLevel()) {
+					orbs.setType(Material.MAGMA_CREAM);
+					temp_meta_lore.add("");
+					temp_meta_lore.add(ChatColor.RED + "You can't afford this!");
+				} else {
+					temp_meta_lore.add("");
+					temp_meta_lore.add(ChatColor.GREEN + "Completing the operation will");
+					temp_meta_lore.add(ChatColor.GREEN + "bring you to " + (player.getLevel() - cost) + " levels.");
+				}
+
+				temp_meta.setLore(temp_meta_lore);
+				orbs.setItemMeta(temp_meta);
+
+				orbs.setAmount(cost);
+				anvilInv.setItem(LEVELS, orbs);
+
+				// TRY EVERYTHING
+				player.getInventory().setContents(player.getInventory().getContents());
+				anvilInv.setContents(anvilInv.getContents());
+				player.updateInventory();
+
 			}
-			// TRY EVERYTHING
-			player.getInventory().setContents(player.getInventory().getContents());
-			anvilInv.setContents(anvilInv.getContents());
-			player.updateInventory();
 		}
 	}
 
 	public void sendToInventory(int slot, int itemCount, Player player) {
-		Bukkit.getLogger().info("Slot: " + slot);
-		Bukkit.getLogger().info("Item Count: " + itemCount);
-		Bukkit.getLogger().info("Player: " + player.getDisplayName());
+		// Bukkit.getLogger().info("Slot: " + slot);
+		// Bukkit.getLogger().info("Item Count: " + itemCount);
+		// Bukkit.getLogger().info("Player: " + player.getDisplayName());
 
 		// Get inventories
 		Inventory anvilInventory = player.getOpenInventory().getTopInventory();
@@ -13620,20 +13722,20 @@ class updateInventoryTask implements Runnable {
 		ItemStack leftovers = playerInventory.addItem(temp).get(0);
 
 		if (leftovers != null) {
-			player.getWorld().dropItemNaturally(player.getLocation(), leftovers); 
+			player.getWorld().dropItemNaturally(player.getLocation(), leftovers);
 		}
 
 
-		Bukkit.getLogger().info("Slot stack size is " + anvilInventory.getItem(slot).getAmount());
+		// Bukkit.getLogger().info("Slot stack size is " + anvilInventory.getItem(slot).getAmount());
 
 
 		if (anvilInventory.getItem(slot).getAmount() - itemCount == 0) {
-			// Should reduce stack count to zero, meaning item needs to be removed. 
-			Bukkit.getLogger().info("Item stack size reduced to 0, " + anvilInventory.getItem(slot).getType().toString() + " removed.");
-			anvilInventory.setItem(slot, new ItemStack(Material.AIR));			
+			// Should reduce stack count to zero, meaning item needs to be removed.
+			// Bukkit.getLogger().info("Item stack size reduced to 0, " + anvilInventory.getItem(slot).getType().toString() + " removed.");
+			anvilInventory.setItem(slot, new ItemStack(Material.AIR));
 		} else {
-			// Should set stack size. 
-			Bukkit.getLogger().info("Reduced stack size from " + anvilInventory.getItem(slot).getAmount() + " by " + itemCount);
+			// Should set stack size.
+			// Bukkit.getLogger().info("Reduced stack size from " + anvilInventory.getItem(slot).getAmount() + " by " + itemCount);
 			anvilInventory.getItem(slot).setAmount(anvilInventory.getItem(slot).getAmount() - itemCount);
 		}
 		// player.getWorld().dropItemNaturally(player.getLocation(), new ItemStack(anvilInv.getItem(MATERIALS).getType(), anvilInv.getItem(MATERIALS).getAmount() - maxItemsNeeded));
@@ -13645,7 +13747,7 @@ class updateInventoryTask implements Runnable {
 		String[] enchant = s.split(" ");
 		if (enchant[0].contains(ChatColor.YELLOW+"")) {
 			String newstring = ((enchant[0].replace(ChatColor.YELLOW.getChar(), ' ')).replace('%', ' ')).replace(Character.toString((char)0x00A7), Character.toString((char)0x0020));
-			//Bukkit.getLogger().info("Enchant number is "+Double.valueOf(newstring));
+			// Bukkit.getLogger().info("Enchant number is "+Double.valueOf(newstring));
 			return Double.valueOf(newstring);
 		} else {
 			return 0;
@@ -13663,12 +13765,11 @@ class updateInventoryTask implements Runnable {
 	}
 
 
-    public boolean containsEnchantment(String s, String enchant) {
-    	  if (s.contains(enchant)) {
-    		  return true;
-    	  }
-    	  return false;
-      }
-    
-}
+	public boolean containsEnchantment(String s, String enchant) {
+		if (s.contains(enchant)) {
+			return true;
+		}
+		return false;
+	}
 
+} 
