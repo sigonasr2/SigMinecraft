@@ -13660,9 +13660,20 @@ class updateInventoryTask implements Runnable {
 			} else if (anvilInv.getItem(MAGIC).getType() == Material.BOOK && anvilInv.getItem(INPUT).getType() != Material.ENCHANTED_BOOK) {
 				// Magic slot is a book. Unenchanting logic goes here.
 				anvilInv.setItem(OUTPUT, new ItemStack(Material.ENCHANTED_BOOK));
-				anvilInv.getItem(OUTPUT).setType(Material.ENCHANTED_BOOK);
+				// anvilInv.getItem(OUTPUT).setType(Material.ENCHANTED_BOOK);
 
-				ItemMeta bookMeta = anvilInv.getItem(INPUT).getItemMeta();
+				ItemMeta bookMeta = anvilInv.getItem(OUTPUT).getItemMeta();
+				
+				// Grab enchantments and lore. This is necessary due to leather armor meta being a different class.
+				Map<Enchantment, Integer> itemEnchantments = anvilInv.getItem(INPUT).getItemMeta().getEnchants(); 
+				
+				for (Enchantment e : itemEnchantments.keySet()) {
+					bookMeta.addEnchant(e, itemEnchantments.get(e), true); // force-add all enchants
+				}
+				
+				List<String> bookLore = anvilInv.getItem(INPUT).getItemMeta().getLore(); // add more filtering code after this later
+				bookMeta.setLore(bookLore);
+				
 				bookMeta.setDisplayName(null);
 				anvilInv.getItem(OUTPUT).setItemMeta(bookMeta);
 
