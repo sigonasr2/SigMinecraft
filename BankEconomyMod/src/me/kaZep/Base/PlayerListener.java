@@ -3474,7 +3474,7 @@ implements Listener
 		//p.sendMessage("Block broke.");
 		//p.sendMessage("Has name: "+p.getItemInHand().getItemMeta().hasDisplayName());
 		//p.sendMessage("Name is: "+p.getItemInHand().getItemMeta().getDisplayName());
-
+		int myData=this.plugin.getPlayerDataSlot(p);
 		boolean has_silktouch=false;
 		if (!p.getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH)) {
 			has_silktouch=false;
@@ -3611,7 +3611,7 @@ implements Listener
 										destroyNearbyOres(e.getBlock().getWorld(), p, e.getBlock().getLocation(), has_silktouch, 4);
 									} else {
 										if (this.plugin.PlayerinJob(p, "Miner")) {
-											int myData=this.plugin.getPlayerDataSlot(p);
+											myData=this.plugin.getPlayerDataSlot(p);
 											if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
 												if (e.getBlock().getType()==Material.STONE) {
 													this.plugin.gainMoneyExp(p,"Miner",0.0025,1);
@@ -3660,7 +3660,7 @@ implements Listener
 		}
 		//*******************************//Job Buffs end here!
 
-		int myData=this.plugin.getPlayerDataSlot(p);
+		myData=this.plugin.getPlayerDataSlot(p);
 		if (p!=null) {
 			if (e.getBlock().getType()==Material.COMMAND) {
 				e.setCancelled(true);

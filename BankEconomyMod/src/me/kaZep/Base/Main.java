@@ -24,6 +24,7 @@ import me.kaZep.Commands.JobsDataInfo;
 import me.kaZep.Commands.JobsDataInfo.Job;
 import me.kaZep.Commands.commandBankEconomy;
 import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -65,6 +66,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -433,6 +435,18 @@ public class Main extends JavaPlugin
     fireproof_wood_slab.setIngredient('a', Material.SLIME_BALL);
     fireproof_wood_slab.setIngredient('b', Material.WOOD_STEP);
     Bukkit.addRecipe(fireproof_wood_slab);
+    
+    // Add high efficiency recipes for wool
+    // White
+    ShapedRecipe woolRecipe;
+    
+    for (int i = 0; i < 16; i++) {
+	    woolRecipe = new ShapedRecipe(new ItemStack(Material.WOOL, 8, (short) i));
+	    woolRecipe.shape("aaa","aba", "aaa");
+	    woolRecipe.setIngredient('a', Material.WOOL);
+	    woolRecipe.setIngredient('b', new MaterialData(Material.INK_SACK, (byte) (15 - i)));
+	    Bukkit.addRecipe(woolRecipe);
+    }
     
     // Add Recipes for Item cube crafting.
     ItemStack temp = new ItemStack(Material.CHEST);
@@ -1169,6 +1183,32 @@ public void runTick() {
 			  if (Main.SERVER_TICK_TIME%100==0) {
 				  //This is for events that occur once every 5 seconds. 
 				  List<Entity> world_entities = Bukkit.getWorld("world").getEntities();
+				  for (int i=0;i<world_entities.size();i++) {
+					  if (world_entities.get(i).getType()==EntityType.WITHER) {
+						  Wither l = (Wither)world_entities.get(i);
+						  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE+"Mythical Wither")) {
+							  if (l.getMaxHealth()>l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth()))) {
+							      DecimalFormat df = new DecimalFormat("#0.0");
+							      //Bukkit.broadcastMessage("Healing for "+(+5+(0.2*(l.getMaxHealth()/l.getHealth())))+" health. "+df.format(l.getHealth())+"/"+l.getMaxHealth()+" HP");
+								  l.setHealth(l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth())));
+							  }
+						  }
+					  }
+				  }
+				  world_entities = Bukkit.getWorld("world_nether").getEntities();
+				  for (int i=0;i<world_entities.size();i++) {
+					  if (world_entities.get(i).getType()==EntityType.WITHER) {
+						  Wither l = (Wither)world_entities.get(i);
+						  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE+"Mythical Wither")) {
+							  if (l.getMaxHealth()>l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth()))) {
+							      DecimalFormat df = new DecimalFormat("#0.0");
+							      //Bukkit.broadcastMessage("Healing for "+(+5+(0.2*(l.getMaxHealth()/l.getHealth())))+" health. "+df.format(l.getHealth())+"/"+l.getMaxHealth()+" HP");
+								  l.setHealth(l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth())));
+							  }
+						  }
+					  }
+				  }
+				  world_entities = Bukkit.getWorld("world_the_end").getEntities();
 				  for (int i=0;i<world_entities.size();i++) {
 					  if (world_entities.get(i).getType()==EntityType.WITHER) {
 						  Wither l = (Wither)world_entities.get(i);
