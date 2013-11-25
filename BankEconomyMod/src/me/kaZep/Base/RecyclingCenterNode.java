@@ -15,8 +15,8 @@ import org.bukkit.plugin.Plugin;
 //deposit, choosing the closest one.
 public class RecyclingCenterNode {
 	
-	public static double chanceincrease = 3.0; //The amount of chance that each item will increase the chest as it gets placed. Increase this for less items.
-	public static double chestdecrease = 0.05; //The amount of chance that each item will decrease the chest. Increase this for more items.
+	public static double chanceincrease = 1.5; //The amount of chance that each item will increase the chest as it gets placed. Increase this for less items.
+	public static double chestdecrease = 0.25; //The amount of chance that each item will decrease the chest. Increase this for more items.
 	//Store our items we can give out array along with our rare items we might potentially track.
 	public static int[] items = {1,3,4,5,6,12,13,14,15,17,18,20,22,23,24,25,27,28,39,31,32,33,35,37,38,39,40,41,42,44,45,46,47,48,49,50,53,54,57,58,61,65,66,67,69,70,72,76,77,78,80,81,82,84,85,86,87,88,89,91,96,98,101,102,103,106,107,108,109,111,112,113,114,116,121,122,123,126,128,130,131,133,134,135,136,138,139,143,145,146,147,148,151,152,154,155,156,157,158,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,2256,2257,2258,2259,2260,2261,2262,2263,2264,2265,2266,2267};
 	//Rare items can only be given out in quantities of 1. To prevent massive amounts of OP. 
@@ -102,7 +102,7 @@ public class RecyclingCenterNode {
 						  tempchance*=2.0d;
 					  }
 				  }
-				  if (Math.random()*tempchance<1.0d) {
+				  if (Math.random()*tempchance<1.0d || (Main.SERVER_TICK_TIME-this.plugin.last_player_death_time<=12000 && Math.random()*tempchance<3.0d)) {
 					  boolean contains=false;
 					  for (int k=0;k<unalloweditems.length;k++) {
 						  if (itemslot==unalloweditems[k]) {

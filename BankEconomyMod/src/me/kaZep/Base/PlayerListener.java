@@ -6701,6 +6701,60 @@ implements Listener
 		ev.event=0;
 		this.plugin.explorers.add(ev);
 	}
+	
+
+	final public void doFireAspectDamage(final LivingEntity l, final Main plug) {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+			@Override
+			public void run() {
+				if (l.getHealth()!=0 && l.getFireTicks()>60 && !l.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
+					double firedmg=1;
+					double oldfireticks=l.getFireTicks();
+					DecimalFormat df = new DecimalFormat("#0.0");
+					DecimalFormat df2 = new DecimalFormat("#0");
+					//Bukkit.getLogger().info(l.getType().name()+" health: "+l.getHealth()+", Fire ticks:"+l.getFireTicks());
+					//Get all fire protection values.
+					if (l.getEquipment().getBoots()!=null) {
+						for (int i=0;i<l.getEquipment().getBoots().getEnchantmentLevel(Enchantment.PROTECTION_FIRE);i++) {
+							firedmg*=0.92;
+							oldfireticks*=0.92;
+						}
+					}
+					if (l.getEquipment().getLeggings()!=null) {
+						for (int i=0;i<l.getEquipment().getLeggings().getEnchantmentLevel(Enchantment.PROTECTION_FIRE);i++) {
+							firedmg*=0.92;
+							oldfireticks*=0.92;
+						}
+					}
+					if (l.getEquipment().getChestplate()!=null) {
+						for (int i=0;i<l.getEquipment().getChestplate().getEnchantmentLevel(Enchantment.PROTECTION_FIRE);i++) {
+							firedmg*=0.92;
+							oldfireticks*=0.92;
+						}
+					}
+					if (l.getEquipment().getHelmet()!=null) {
+						for (int i=0;i<l.getEquipment().getHelmet().getEnchantmentLevel(Enchantment.PROTECTION_FIRE);i++) {
+							firedmg*=0.92;
+							oldfireticks*=0.92;
+						}
+					}
+					l.setFireTicks((int)oldfireticks);
+					l.getWorld().playSound(l.getLocation(), Sound.FIZZ, 0.2f, 1);
+					if (l.getHealth()-firedmg>0) {
+						l.setHealth(l.getHealth()-firedmg);
+					} else {
+						l.setHealth(0);
+					}
+					if (l instanceof Player) {
+						if (plug.getAccountsConfig().getBoolean(((Player)l).getName()+".settings.notify5")) {
+							((Player)l).sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(firedmg)+" damage from "+ChatColor.WHITE+"FIRE_TICK"+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((firedmg)/l.getMaxHealth())*100)+"%)");
+						}
+					}
+					doFireAspectDamage(l, plug);
+				}
+			}
+		},(int)(20/((double)l.getFireTicks()/60))+1);
+	}
 
 	@EventHandler
 	public void onHurt(EntityDamageEvent e) {
@@ -6794,14 +6848,11 @@ implements Listener
 			}
 		}
 		EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
-		boolean contains=e.getEntity() instanceof Monster;
+		boolean contains=e.getEntity() instanceof LivingEntity;
 		if (contains) {
 			LivingEntity l = (LivingEntity)e.getEntity();
-			if ((l.getCustomName()==null || (!l.getCustomName().contains(ChatColor.DARK_PURPLE+"") && !l.getCustomName().contains(ChatColor.DARK_AQUA+""))) && l.getType()!=EntityType.ENDER_DRAGON) {
-				if ((l.getTicksLived()<120 && e.getCause()==DamageCause.SUFFOCATION)) {
-					l.remove();
-					e.setCancelled(true);
-				}
+			if (l.getFireTicks()>60 && e.getCause()==DamageCause.LAVA && !l.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
+				l.setFireTicks(l.getFireTicks()+20);
 			}
 		}
 	}
@@ -6865,6 +6916,9 @@ implements Listener
 
 	@EventHandler
 	public void onPlayerOnFire(EntityCombustEvent e) {
+		if (e.getEntity() instanceof LivingEntity) {
+			doFireAspectDamage(((LivingEntity)e.getEntity()), this.plugin);
+		}
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			Player p = (Player)e.getEntity();
 			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat6")>0) {
@@ -10880,7 +10934,7 @@ implements Listener
 			}
 
 			//There is a small chance we can swap items between two centers.
-			if (Math.random()<=0.01) {
+			if (Math.random()<=0.15) {
 				//Get the first center. It's randomly picked.
 				if (this.plugin.recycling_center_list.size()<=2) {
 					//If there are only two centers in the list, it has to be those two...
@@ -11738,6 +11792,7 @@ implements Listener
 		//If we have Fatal Survivor, use the force! Otherwise, uh, you're dead.
 
 		final Player p = e.getEntity();
+		this.plugin.last_player_death_time = Main.SERVER_TICK_TIME;
 		e.setDeathMessage(e.getDeathMessage().replace(p.getScoreboard().getTeam(p.getName()).getPrefix()+p.getName()+p.getScoreboard().getTeam(p.getName()).getSuffix(),p.getName()));
 		p.getScoreboard().getTeam(p.getName()).setSuffix("");
 		boolean survivor=false;
