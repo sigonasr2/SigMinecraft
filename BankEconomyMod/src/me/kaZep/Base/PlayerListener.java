@@ -3646,6 +3646,7 @@ implements Listener
 					e.getBlock().getType()==Material.SAND ||
 					e.getBlock().getType()==Material.GRAVEL && Math.random()<=0.0025 /*0.25% chance*/) {
 				ItemStack artifact = new ItemStack(Material.CLAY_BALL);
+			    artifact.addEnchantment(Enchantment.LOOT_BONUS_MOBS, 0);
 				ItemMeta meta = artifact.getItemMeta();
 				List<String> lore = new ArrayList<String>();
 				lore.add("This clump of material seems to");
@@ -7107,6 +7108,59 @@ implements Listener
 		ev.event=0;
 		this.plugin.explorers.add(ev);
 	}
+	
+	final public void doFireAspectDamage(final LivingEntity l, final Main plug) {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+			@Override
+			public void run() {
+				if (l.getHealth()!=0 && l.getFireTicks()>60 && !l.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
+					double firedmg=1;
+					double oldfireticks=l.getFireTicks();
+					DecimalFormat df = new DecimalFormat("#0.0");
+					DecimalFormat df2 = new DecimalFormat("#0");
+					//Bukkit.getLogger().info(l.getType().name()+" health: "+l.getHealth()+", Fire ticks:"+l.getFireTicks());
+					//Get all fire protection values.
+					if (l.getEquipment().getBoots()!=null) {
+						for (int i=0;i<l.getEquipment().getBoots().getEnchantmentLevel(Enchantment.PROTECTION_FIRE);i++) {
+							firedmg*=0.92;
+							oldfireticks*=0.92;
+						}
+					}
+					if (l.getEquipment().getLeggings()!=null) {
+						for (int i=0;i<l.getEquipment().getLeggings().getEnchantmentLevel(Enchantment.PROTECTION_FIRE);i++) {
+							firedmg*=0.92;
+							oldfireticks*=0.92;
+						}
+					}
+					if (l.getEquipment().getChestplate()!=null) {
+						for (int i=0;i<l.getEquipment().getChestplate().getEnchantmentLevel(Enchantment.PROTECTION_FIRE);i++) {
+							firedmg*=0.92;
+							oldfireticks*=0.92;
+						}
+					}
+					if (l.getEquipment().getHelmet()!=null) {
+						for (int i=0;i<l.getEquipment().getHelmet().getEnchantmentLevel(Enchantment.PROTECTION_FIRE);i++) {
+							firedmg*=0.92;
+							oldfireticks*=0.92;
+						}
+					}
+					l.setFireTicks((int)oldfireticks);
+					l.getWorld().playSound(l.getLocation(), Sound.FIZZ, 0.2f, 1);
+					if (l.getHealth()-firedmg>0) {
+						l.setHealth(l.getHealth()-firedmg);
+					} else {
+						l.setHealth(0);
+					}
+					if (l instanceof Player) {
+						if (plug.getAccountsConfig().getBoolean(((Player)l).getName()+".settings.notify5")) {
+							((Player)l).sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(firedmg)+" damage from "+ChatColor.WHITE+"FIRE_TICK"+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((firedmg)/l.getMaxHealth())*100)+"%)");
+						}
+					}
+					doFireAspectDamage(l, plug);
+				}
+			}
+		},(int)(20/((double)l.getFireTicks()/60))+1);
+	}
 
 	@EventHandler
 	public void onHurt(EntityDamageEvent e) {
@@ -7123,7 +7177,7 @@ implements Listener
 				}
 			},5);
 			//p.sendMessage("Your Health: "+p.getHealth()+", Damage: "+e.getDamage()+", Actual: "+this.plugin.DMGCALC.getDamage(p, e.getDamage(), DamageCause.ENTITY_ATTACK));
-			double actualdmg = this.plugin.DMGCALC.getDamage(p, e.getDamage(), e.getCause());
+			//double actualdmg = this.plugin.DMGCALC.getDamage(p, e.getDamage(), e.getCause());
 			List<Entity> nearby = p.getNearbyEntities(10, 10, 10);
 			for (int i=0;i<nearby.size();i++) {
 				if (nearby.get(i).getType()==EntityType.PLAYER && this.plugin.PlayerinJob((Player)nearby.get(i), "Support") && this.plugin.getJobLv("Support", (Player)nearby.get(i))>=20) {
@@ -7200,14 +7254,11 @@ implements Listener
 			}
 		}
 		EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
-		boolean contains=e.getEntity() instanceof Monster;
+		boolean contains=e.getEntity() instanceof LivingEntity;
 		if (contains) {
 			LivingEntity l = (LivingEntity)e.getEntity();
-			if ((l.getCustomName()==null || (!l.getCustomName().contains(ChatColor.DARK_PURPLE+"") && !l.getCustomName().contains(ChatColor.DARK_AQUA+""))) && l.getType()!=EntityType.ENDER_DRAGON) {
-				if ((l.getTicksLived()<120 && e.getCause()==DamageCause.SUFFOCATION)) {
-					l.remove();
-					e.setCancelled(true);
-				}
+			if (l.getFireTicks()>60 && e.getCause()==DamageCause.LAVA && !l.hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
+				l.setFireTicks(l.getFireTicks()+20);
 			}
 		}
 	}
@@ -7271,6 +7322,9 @@ implements Listener
 
 	@EventHandler
 	public void onPlayerOnFire(EntityCombustEvent e) {
+		if (e.getEntity() instanceof LivingEntity) {
+			doFireAspectDamage(((LivingEntity)e.getEntity()), this.plugin);
+		}
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			Player p = (Player)e.getEntity();
 			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat6")>0) {
@@ -7345,6 +7399,16 @@ implements Listener
 
 		if (e.getEntity() instanceof LivingEntity) {
 			final LivingEntity l = (LivingEntity)e.getEntity();
+			if (e.getDamager() instanceof LivingEntity) {
+				//They are both living entities. Check if damager has fire aspect.
+				LivingEntity l2 = (LivingEntity)e.getDamager();
+				if (l2.getEquipment().getItemInHand().getEnchantmentLevel(Enchantment.FIRE_ASPECT)>0) {
+					l.setFireTicks(l.getFireTicks()+l2.getEquipment().getItemInHand().getEnchantmentLevel(Enchantment.FIRE_ASPECT)*60);
+				}
+				if (l2.getEquipment().getItemInHand().getEnchantmentLevel(Enchantment.ARROW_FIRE)>0) {
+					l.setFireTicks(l.getFireTicks()+l2.getEquipment().getItemInHand().getEnchantmentLevel(Enchantment.ARROW_FIRE)*60);
+				}
+			}
 			if (l instanceof Player) {
 				e.setDamage(e.getDamage()*1.45d);
 				if (e.getDamager() instanceof Wither) {
@@ -10891,7 +10955,7 @@ implements Listener
 			}
 
 			//There is a small chance we can swap items between two centers.
-			if (Math.random()<=0.01) {
+			if (Math.random()<=0.1) {
 				//Get the first center. It's randomly picked.
 				if (this.plugin.recycling_center_list.size()<=2) {
 					//If there are only two centers in the list, it has to be those two...
@@ -11751,6 +11815,7 @@ implements Listener
 		final Player p = e.getEntity();
 		e.setDeathMessage(e.getDeathMessage().replace(p.getScoreboard().getTeam(p.getName()).getPrefix()+p.getName()+p.getScoreboard().getTeam(p.getName()).getSuffix(),p.getName()));
 		p.getScoreboard().getTeam(p.getName()).setSuffix("");
+		this.plugin.last_player_death_time = Main.SERVER_TICK_TIME;
 		boolean survivor=false;
 		if (this.plugin.PlayerinJob(p, "Explorer")) {
 			if (this.plugin.getJobLv("Explorer", p)>=10) {
@@ -12556,10 +12621,6 @@ implements Listener
 		//******************************//All Job Buff related items go in here.
 		if (e.getAction()==Action.LEFT_CLICK_BLOCK || e.getAction()==Action.RIGHT_CLICK_AIR) {
 			if (this.plugin.hasJobBuff("Builder", p, Job.JOB10)) {
-				if (this.plugin.hasJobBuff("Builder", p, Job.JOB30B)) {
-					p.removePotionEffect(PotionEffectType.JUMP);
-					p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,200,9));
-				}
 				if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && !p.getAllowFlight()) {
 					p.setAllowFlight(true);
 					p.sendMessage(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"Flight enabled...");
@@ -12585,6 +12646,10 @@ implements Listener
 						pd.SetClickedBlock(checkblock.getLocation());
 					} else {
 						if (pd.GetClickedBlock().distance(checkblock.getLocation())<=500) {//Make sure the range is small enough.
+							if (this.plugin.hasJobBuff("Builder", p, Job.JOB30B)) {
+								p.removePotionEffect(PotionEffectType.JUMP);
+								p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,200,9));
+							}
 							//Compare the blocks and see if they are the same.
 							boolean successful=true;
 							int expbefore = (int)this.plugin.getPlayerCurrentJobExp(p, "Builder");
@@ -12717,10 +12782,6 @@ implements Listener
 				}
 			}
 			if (e.getAction()==Action.LEFT_CLICK_BLOCK && this.plugin.hasJobBuff("Builder", p, Job.JOB5)) {
-				if (this.plugin.hasJobBuff("Builder", p, Job.JOB30B)) {
-					p.removePotionEffect(PotionEffectType.JUMP);
-					p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,200,9));
-				}
 				if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && !p.getAllowFlight()) {
 					p.setAllowFlight(true);
 					p.sendMessage(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"Flight enabled...");
@@ -12739,6 +12800,10 @@ implements Listener
 						pd.SetClickedBlock(e.getClickedBlock().getLocation());
 					} else {
 						if (pd.GetClickedBlock().distance(e.getClickedBlock().getLocation())<=500) {//Make sure the range is small enough.
+							if (this.plugin.hasJobBuff("Builder", p, Job.JOB30B)) {
+								p.removePotionEffect(PotionEffectType.JUMP);
+								p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,200,9));
+							}
 							int expbefore = (int)this.plugin.getPlayerCurrentJobExp(p, "Builder");
 							//Compare the blocks and see if they are the same.
 							boolean successful=true;

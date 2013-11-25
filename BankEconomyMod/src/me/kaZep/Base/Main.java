@@ -62,6 +62,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapRenderer;
@@ -108,6 +109,7 @@ public class Main extends JavaPlugin
   public long last_bank_deposit_use_time=0;
   public String last_bank_deposit_user="";
   public long last_bank_withdraw_use_time=0;
+  public long last_player_death_time=0;
   public String last_bank_withdraw_user="";
   public long last_boss_dungeon_time=0;
   public long check_nether_time=0;
@@ -499,6 +501,19 @@ public class Main extends JavaPlugin
     item_cube.setIngredient('b', Material.HOPPER);
     item_cube.setIngredient('c', Material.EMERALD_BLOCK);
     Bukkit.addRecipe(item_cube);
+    
+	ItemStack artifact = new ItemStack(Material.CLAY_BALL);
+    artifact.addEnchantment(Enchantment.LOOT_BONUS_MOBS, 0);
+	ItemMeta meta = artifact.getItemMeta();
+	List<String> lore = new ArrayList<String>();
+	lore.add("This clump of material seems to");
+	lore.add("be part of something ancient.");
+	lore.add("");
+	lore.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+"There is a small chance the piece will");
+	lore.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+"be restored.");
+	meta.setLore(lore);
+	artifact.setItemMeta(meta);
+    ShapelessRecipe artifact_recipe = new ShapelessRecipe(artifact);
     
     DMGCALC = new DamageAPI();
     //System.out.println("Running BankEconomy in "+this.getDataFolder().getAbsolutePath());
@@ -1053,390 +1068,417 @@ public class Main extends JavaPlugin
 	  sign.update();
   }
 
-public void runTick() {
-	final Main plugin = this;
-  this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new  Runnable(){
-		  public void run(){
-			SERVER_TICK_TIME++;
-			for (int i=0;i<ARROW_SHOOTERS.size();i++) {
-				ArrowShooter shooter = ARROW_SHOOTERS.get(i);
-				shooter.timer--;
-				if ( ( shooter.timer % shooter.frequency )==0) {
-					Arrow arrow = Bukkit.getWorld("world").spawnArrow(shooter.loc, shooter.spd, 0.6f, 12f);
-					//arrow.setShooter(shooter.shooter);
-					List<Entity> arrows = Bukkit.getWorld("world").getEntities();
-					for (int j=0;j<arrows.size();j++) {
-						if (arrows.get(j).getType()==EntityType.ARROW && arrows.get(j).getTicksLived()>60) {
-							//Remove old arrows that have existed long enough. (2 seconds)
-							arrows.get(j).remove();
-						}
-					}
-				}
-				if (shooter.timer<=0) {
-					ARROW_SHOOTERS.remove(i);
-					i--;
+final public void runTick() {
+	Bukkit.getLogger().info("Run tick "+SERVER_TICK_TIME);
+	Main.SERVER_TICK_TIME++;
+	for (int i=0;i<ARROW_SHOOTERS.size();i++) {
+		ArrowShooter shooter = ARROW_SHOOTERS.get(i);
+		shooter.timer--;
+		if ( ( shooter.timer % shooter.frequency )==0) {
+			Arrow arrow = Bukkit.getWorld("world").spawnArrow(shooter.loc, shooter.spd, 0.6f, 12f);
+			//arrow.setShooter(shooter.shooter);
+			List<Entity> arrows = Bukkit.getWorld("world").getEntities();
+			for (int j=0;j<arrows.size();j++) {
+				if (arrows.get(j).getType()==EntityType.ARROW && arrows.get(j).getTicksLived()>60) {
+					//Remove old arrows that have existed long enough. (2 seconds)
+					arrows.get(j).remove();
 				}
 			}
-			for (int i=0;i<TEMP_WEBS.size();i++) {
-				TempWeb web = TEMP_WEBS.get(i);
-				web.timer--;
-				if (web.timer<=0) {
-					//Attempt to destroy the block in the world.
-					if (Bukkit.getWorld("world").getBlockAt(web.loc).getType()==Material.WEB) {
-						Bukkit.getWorld("world").getBlockAt(web.loc).setType(Material.AIR);
+		}
+		if (shooter.timer<=0) {
+			ARROW_SHOOTERS.remove(i);
+			i--;
+		}
+	}
+	for (int i=0;i<TEMP_WEBS.size();i++) {
+		TempWeb web = TEMP_WEBS.get(i);
+		web.timer--;
+		if (web.timer<=0) {
+			//Attempt to destroy the block in the world.
+			if (Bukkit.getWorld("world").getBlockAt(web.loc).getType()==Material.WEB) {
+				Bukkit.getWorld("world").getBlockAt(web.loc).setType(Material.AIR);
+			}
+			TEMP_WEBS.remove(i);
+			i--;
+		}
+	}
+	for (int i=0;i<ninjavisible_list.size();i++) {
+		if (Main.SERVER_TICK_TIME>ninjavisible_list.get(i).resettime) {
+			//Recloak this ninja if it's still alive.
+			List<Entity> entities = Bukkit.getWorld("world").getEntities();
+			for (int j=0;j<entities.size();j++) {
+				if (entities.get(j).getType()==EntityType.ZOMBIE) {
+					if (entities.get(j).getUniqueId()==ninjavisible_list.get(i).val) {
+						LivingEntity e = (LivingEntity)entities.get(j);
+						e.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0, true));
+						break;
 					}
-					TEMP_WEBS.remove(i);
-					i--;
 				}
 			}
-			for (int i=0;i<ninjavisible_list.size();i++) {
-				if (Main.SERVER_TICK_TIME>ninjavisible_list.get(i).resettime) {
-					//Recloak this ninja if it's still alive.
-					List<Entity> entities = Bukkit.getWorld("world").getEntities();
-					for (int j=0;j<entities.size();j++) {
-						if (entities.get(j).getType()==EntityType.ZOMBIE) {
-							if (entities.get(j).getUniqueId()==ninjavisible_list.get(i).val) {
-								LivingEntity e = (LivingEntity)entities.get(j);
-								e.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0, true));
-								break;
-							}
-						}
-					}
-					ninjavisible_list.remove(i);
-					i--;
-				}
-			}
-		    //Put your code here...
-			//Bukkit.getPlayer("sigonasr2").sendMessage("Server Tick "+Main.SERVER_TICK_TIME);
-			  if (POLYMORPH>0) {
-				  Bukkit.getWorld("world").playEffect(new Location(POLYMORPH_LOC.getWorld(),POLYMORPH_LOC.getX()+(Math.random()-Math.random())*2,POLYMORPH_LOC.getY()+(Math.random())*2+2,POLYMORPH_LOC.getZ()+(Math.random()-Math.random())*2), Effect.STEP_SOUND, Material.EMERALD_BLOCK);
-				  Bukkit.getWorld("world").playEffect(new Location(POLYMORPH_LOC.getWorld(),POLYMORPH_LOC.getX()+(Math.random()-Math.random())*2,POLYMORPH_LOC.getY()+(Math.random())*2+2,POLYMORPH_LOC.getZ()+(Math.random()-Math.random())*2), Effect.STEP_SOUND, Material.WATER);
-				  if (POLYMORPH==1) {
-					  Bukkit.getWorld("world").playEffect(new Location(POLYMORPH_LOC.getWorld(),POLYMORPH_LOC.getX()+(Math.random()-Math.random())*2,POLYMORPH_LOC.getY()+(Math.random())*2+2,POLYMORPH_LOC.getZ()+(Math.random()-Math.random())*2), Effect.POTION_BREAK, 0);
+			ninjavisible_list.remove(i);
+			i--;
+		}
+	}
+    //Put your code here...
+	//Bukkit.getPlayer("sigonasr2").sendMessage("Server Tick "+Main.SERVER_TICK_TIME);
+	  if (POLYMORPH>0) {
+		  Bukkit.getWorld("world").playEffect(new Location(POLYMORPH_LOC.getWorld(),POLYMORPH_LOC.getX()+(Math.random()-Math.random())*2,POLYMORPH_LOC.getY()+(Math.random())*2+2,POLYMORPH_LOC.getZ()+(Math.random()-Math.random())*2), Effect.STEP_SOUND, Material.EMERALD_BLOCK);
+		  Bukkit.getWorld("world").playEffect(new Location(POLYMORPH_LOC.getWorld(),POLYMORPH_LOC.getX()+(Math.random()-Math.random())*2,POLYMORPH_LOC.getY()+(Math.random())*2+2,POLYMORPH_LOC.getZ()+(Math.random()-Math.random())*2), Effect.STEP_SOUND, Material.WATER);
+		  if (POLYMORPH==1) {
+			  Bukkit.getWorld("world").playEffect(new Location(POLYMORPH_LOC.getWorld(),POLYMORPH_LOC.getX()+(Math.random()-Math.random())*2,POLYMORPH_LOC.getY()+(Math.random())*2+2,POLYMORPH_LOC.getZ()+(Math.random()-Math.random())*2), Effect.POTION_BREAK, 0);
+		  }
+		  POLYMORPH--;
+	  }
+	  if (BOSS_DEFEAT>0) {
+		  if (BOSS_DEFEAT%4==0) {
+			  Bukkit.getWorld("world").playEffect(BOSS_DEFEAT_LOC.add(Math.random()*5-Math.random()*5, BOSS_DEFEAT/20, Math.random()*5-Math.random()*5), Effect.SMOKE, 0);
+		  }
+		  if (BOSS_DEFEAT==1) {
+			  Bukkit.getWorld("world").playEffect(BOSS_DEFEAT_LOC, Effect.ZOMBIE_DESTROY_DOOR, 0);
+		  }
+		  BOSS_DEFEAT--;
+	  }
+	  if (REVIVE_EFFECT>0) {
+		  switch (REVIVE_EFFECT) { //starts at 90.
+		  	case 90:
+		  	case 88:
+		  	case 86:
+		  	case 84:
+		  	case 82:
+		  	case 80: {
+		  		Bukkit.getWorld("world").playEffect(new Location(REVIVE_EFFECT_LOC.getWorld(),REVIVE_EFFECT_LOC.getX(),REVIVE_EFFECT_LOC.getY()+(90-REVIVE_EFFECT)/2,REVIVE_EFFECT_LOC.getZ()), Effect.MOBSPAWNER_FLAMES, 0);
+		  	}break;
+		  	case 89:
+		  	case 85:
+		  	case 79:
+		  	case 75:
+		  	case 70:
+		  	case 65:
+		  	case 60:
+		  	case 55:
+		  	case 50:
+		  	case 45:
+		  	case 40:
+		  	case 35:
+		  	case 30:
+		  	case 25:
+		  	case 20:
+		  	case 15:
+		  	case 10:
+		  	case 5:{
+		  		Bukkit.getWorld("world").playEffect(new Location(REVIVE_EFFECT_LOC.getWorld(),REVIVE_EFFECT_LOC.getX()+(Math.random()-Math.random())*2,REVIVE_EFFECT_LOC.getY(),REVIVE_EFFECT_LOC.getZ()+(Math.random()-Math.random())*2), Effect.EXTINGUISH, 0);
+		  	}break;
+		  	case 87:
+		  	case 83:
+		  	case 77:
+		  	case 72:
+		  	case 67:
+		  	case 62:
+		  	case 57:
+		  	case 52:
+		  	case 47:
+		  	case 42:
+		  	case 37:
+		  	case 32:
+		  	case 27:
+		  	case 22:
+		  	case 17:
+		  	case 12:
+		  	case 7: {
+		  		Bukkit.getWorld("world").playEffect(new Location(REVIVE_EFFECT_LOC.getWorld(),REVIVE_EFFECT_LOC.getX()+(Math.random()-Math.random())*2,REVIVE_EFFECT_LOC.getY()+(Math.random())*2,REVIVE_EFFECT_LOC.getZ()+(Math.random()-Math.random())*2), Effect.SMOKE, (int)(Math.random()*9));
+		  	}break;
+		  }
+	  	  Bukkit.getWorld("world").playEffect(new Location(REVIVE_EFFECT_LOC.getWorld(),REVIVE_EFFECT_LOC.getX()+(Math.random()-Math.random())*2,REVIVE_EFFECT_LOC.getY()+(Math.random())*2,REVIVE_EFFECT_LOC.getZ()+(Math.random()-Math.random())*2), Effect.STEP_SOUND, Material.BEACON);
+		  REVIVE_EFFECT--;
+		  //Bukkit.getPlayer("sigonasr2").sendMessage(REVIVE_EFFECT+"");
+	  }
+	  List<UUID> lineofsight_check = new ArrayList<UUID>();
+	  if (Main.SERVER_TICK_TIME%100==0) {
+		  //This is for events that occur once every 5 seconds. 
+		  List<Entity> world_entities = Bukkit.getWorld("world").getEntities();
+		  for (int i=0;i<world_entities.size();i++) {
+			  if (world_entities.get(i).getType()==EntityType.WITHER) {
+				  Wither l = (Wither)world_entities.get(i);
+				  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE+"Mythical Wither")) {
+					  if (l.getMaxHealth()>l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth()))) {
+					      DecimalFormat df = new DecimalFormat("#0.0");
+					      //Bukkit.broadcastMessage("Healing for "+(+5+(0.2*(l.getMaxHealth()/l.getHealth())))+" health. "+df.format(l.getHealth())+"/"+l.getMaxHealth()+" HP");
+						  l.setHealth(l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth())));
+					  }
 				  }
-				  POLYMORPH--;
 			  }
-			  if (BOSS_DEFEAT>0) {
-				  if (BOSS_DEFEAT%4==0) {
-					  Bukkit.getWorld("world").playEffect(BOSS_DEFEAT_LOC.add(Math.random()*5-Math.random()*5, BOSS_DEFEAT/20, Math.random()*5-Math.random()*5), Effect.SMOKE, 0);
+		  }
+		  world_entities = Bukkit.getWorld("world_nether").getEntities();
+		  for (int i=0;i<world_entities.size();i++) {
+			  if (world_entities.get(i).getType()==EntityType.WITHER) {
+				  Wither l = (Wither)world_entities.get(i);
+				  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE+"Mythical Wither")) {
+					  if (l.getMaxHealth()>l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth()))) {
+					      DecimalFormat df = new DecimalFormat("#0.0");
+					      //Bukkit.broadcastMessage("Healing for "+(+5+(0.2*(l.getMaxHealth()/l.getHealth())))+" health. "+df.format(l.getHealth())+"/"+l.getMaxHealth()+" HP");
+						  l.setHealth(l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth())));
+					  }
 				  }
-				  if (BOSS_DEFEAT==1) {
-					  Bukkit.getWorld("world").playEffect(BOSS_DEFEAT_LOC, Effect.ZOMBIE_DESTROY_DOOR, 0);
-				  }
-				  BOSS_DEFEAT--;
 			  }
-			  if (REVIVE_EFFECT>0) {
-				  switch (REVIVE_EFFECT) { //starts at 90.
-				  	case 90:
-				  	case 88:
-				  	case 86:
-				  	case 84:
-				  	case 82:
-				  	case 80: {
-				  		Bukkit.getWorld("world").playEffect(new Location(REVIVE_EFFECT_LOC.getWorld(),REVIVE_EFFECT_LOC.getX(),REVIVE_EFFECT_LOC.getY()+(90-REVIVE_EFFECT)/2,REVIVE_EFFECT_LOC.getZ()), Effect.MOBSPAWNER_FLAMES, 0);
-				  	}break;
-				  	case 89:
-				  	case 85:
-				  	case 79:
-				  	case 75:
-				  	case 70:
-				  	case 65:
-				  	case 60:
-				  	case 55:
-				  	case 50:
-				  	case 45:
-				  	case 40:
-				  	case 35:
-				  	case 30:
-				  	case 25:
-				  	case 20:
-				  	case 15:
-				  	case 10:
-				  	case 5:{
-				  		Bukkit.getWorld("world").playEffect(new Location(REVIVE_EFFECT_LOC.getWorld(),REVIVE_EFFECT_LOC.getX()+(Math.random()-Math.random())*2,REVIVE_EFFECT_LOC.getY(),REVIVE_EFFECT_LOC.getZ()+(Math.random()-Math.random())*2), Effect.EXTINGUISH, 0);
-				  	}break;
-				  	case 87:
-				  	case 83:
-				  	case 77:
-				  	case 72:
-				  	case 67:
-				  	case 62:
-				  	case 57:
-				  	case 52:
-				  	case 47:
-				  	case 42:
-				  	case 37:
-				  	case 32:
-				  	case 27:
-				  	case 22:
-				  	case 17:
-				  	case 12:
-				  	case 7: {
-				  		Bukkit.getWorld("world").playEffect(new Location(REVIVE_EFFECT_LOC.getWorld(),REVIVE_EFFECT_LOC.getX()+(Math.random()-Math.random())*2,REVIVE_EFFECT_LOC.getY()+(Math.random())*2,REVIVE_EFFECT_LOC.getZ()+(Math.random()-Math.random())*2), Effect.SMOKE, (int)(Math.random()*9));
-				  	}break;
+		  }
+		  world_entities = Bukkit.getWorld("world_the_end").getEntities();
+		  for (int i=0;i<world_entities.size();i++) {
+			  if (world_entities.get(i).getType()==EntityType.WITHER) {
+				  Wither l = (Wither)world_entities.get(i);
+				  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE+"Mythical Wither")) {
+					  if (l.getMaxHealth()>l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth()))) {
+					      DecimalFormat df = new DecimalFormat("#0.0");
+					      //Bukkit.broadcastMessage("Healing for "+(+5+(0.2*(l.getMaxHealth()/l.getHealth())))+" health. "+df.format(l.getHealth())+"/"+l.getMaxHealth()+" HP");
+						  l.setHealth(l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth())));
+					  }
 				  }
-			  	  Bukkit.getWorld("world").playEffect(new Location(REVIVE_EFFECT_LOC.getWorld(),REVIVE_EFFECT_LOC.getX()+(Math.random()-Math.random())*2,REVIVE_EFFECT_LOC.getY()+(Math.random())*2,REVIVE_EFFECT_LOC.getZ()+(Math.random()-Math.random())*2), Effect.STEP_SOUND, Material.BEACON);
-				  REVIVE_EFFECT--;
-				  //Bukkit.getPlayer("sigonasr2").sendMessage(REVIVE_EFFECT+"");
 			  }
-			  List<UUID> lineofsight_check = new ArrayList<UUID>();
-			  if (Main.SERVER_TICK_TIME%100==0) {
-				  //This is for events that occur once every 5 seconds. 
-				  List<Entity> world_entities = Bukkit.getWorld("world").getEntities();
-				  for (int i=0;i<world_entities.size();i++) {
-					  if (world_entities.get(i).getType()==EntityType.WITHER) {
-						  Wither l = (Wither)world_entities.get(i);
-						  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE+"Mythical Wither")) {
-							  if (l.getMaxHealth()>l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth()))) {
-							      DecimalFormat df = new DecimalFormat("#0.0");
-							      //Bukkit.broadcastMessage("Healing for "+(+5+(0.2*(l.getMaxHealth()/l.getHealth())))+" health. "+df.format(l.getHealth())+"/"+l.getMaxHealth()+" HP");
-								  l.setHealth(l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth())));
+		  }
+	  }
+	  for (int zx=0;zx<Bukkit.getOnlinePlayers().length;zx++) {
+	  Player p = Bukkit.getOnlinePlayers()[zx];
+	  //p.sendMessage("That's item slot #"+p.getInventory().getHeldItemSlot());
+	  /*
+	  if (p.getName().compareTo("sigonasr2")==0) {
+		  //Packet61WorldEvent packet = new Packet61WorldEvent(2004, p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ(), 0, false);
+		  
+		  //((CraftPlayer)t).getHandle().netServerHandler.sendPacket(packet);
+		  Bukkit.getWorld("world").playEffect(p.getLocation(), Effect.STEP_SOUND, Material.IRON_BLOCK.getId());
+	  }*/
+	  //p.removePotionEffect(PotionEffectType.SPEED);
+	  //p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 20, true));
+	  /*if (last_world_time==0) {
+		  last_world_time = Bukkit.getWorld("world").getTime();
+	  } else {
+		  if (Bukkit.getWorld("world").getTime()-last_world_time>2) {
+			  Bukkit.getPlayer("sigonasr2").sendMessage("Previous Time: "+Bukkit.getWorld("world").getTime());
+			  Bukkit.getWorld("world").setTime((long) (Bukkit.getWorld("world").getTime()-((Bukkit.getWorld("world").getTime()-last_world_time)/2.0d)));
+			  last_world_time = Bukkit.getWorld("world").getTime();
+			  Bukkit.getPlayer("sigonasr2").sendMessage("New Time: "+Bukkit.getWorld("world").getTime());
+		  }
+	  }*/
+	  //last_world_time = Main.SERVER_TICK_TIME;
+	  if (p.getWorld().getName().compareTo("world")==0) {
+		  //Bukkit.getWorld("world").spawnEntity(p.getLocation(), EntityType.EXPERIENCE_ORB);
+		  //Bukkit.getWorld("world").dropItemNaturally(p.getLocation(), new ItemStack(Material.DIRT));
+		  if (getConfig().getBoolean("halloween-enabled") && Main.SERVER_TICK_TIME%10==0) {
+			  //1551,69,275
+			  Location testloc = new Location(p.getWorld(),1551,69,-275);
+			  if (p.getLocation().distanceSquared(testloc)<900) {
+				  //p.sendMessage("In range.");
+				  //We are close enough to the sheep pen. Check out the sheep.
+				  List<Entity> ents = p.getNearbyEntities(15, 15, 15);
+				  for (int i=0;i<ents.size();i++) {
+					  if (ents.get(i).getType()!=EntityType.SHEEP) {
+						  ents.remove(i);
+						  i--;
+					  }
+				  }
+				  boolean colorone=false;
+				  for (int i=0;i<ents.size();i++) {
+					  //Check all the sheep to see if they are blue. If so, un-toggle it.
+					  if (ents.get(i) instanceof Sheep) {
+						  Sheep s = (Sheep)ents.get(i);
+						  if (s.getColor()==DyeColor.BLUE) {
+							  if (Math.random()<=0.80) {
+								  int col=(int)(Math.random()*4);
+								  switch (col) {
+								  	case 0: {s.setColor(DyeColor.WHITE);}break;
+								  	case 1: {s.setColor(DyeColor.GRAY);}break;
+								  	case 2: {s.setColor(DyeColor.BLACK);}break;
+								  	case 3: {s.setColor(DyeColor.ORANGE);}break;
+								  }
+							  }
+						  } else {
+							  if (!colorone && Math.random()<=0.005) {
+								  s.setColor(DyeColor.BLUE);
+								  colorone=true;
 							  }
 						  }
 					  }
 				  }
-				  world_entities = Bukkit.getWorld("world_nether").getEntities();
-				  for (int i=0;i<world_entities.size();i++) {
-					  if (world_entities.get(i).getType()==EntityType.WITHER) {
-						  Wither l = (Wither)world_entities.get(i);
-						  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE+"Mythical Wither")) {
-							  if (l.getMaxHealth()>l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth()))) {
-							      DecimalFormat df = new DecimalFormat("#0.0");
-							      //Bukkit.broadcastMessage("Healing for "+(+5+(0.2*(l.getMaxHealth()/l.getHealth())))+" health. "+df.format(l.getHealth())+"/"+l.getMaxHealth()+" HP");
-								  l.setHealth(l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth())));
-							  }
-						  }
-					  }
-				  }
-				  world_entities = Bukkit.getWorld("world_the_end").getEntities();
-				  for (int i=0;i<world_entities.size();i++) {
-					  if (world_entities.get(i).getType()==EntityType.WITHER) {
-						  Wither l = (Wither)world_entities.get(i);
-						  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE+"Mythical Wither")) {
-							  if (l.getMaxHealth()>l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth()))) {
-							      DecimalFormat df = new DecimalFormat("#0.0");
-							      //Bukkit.broadcastMessage("Healing for "+(+5+(0.2*(l.getMaxHealth()/l.getHealth())))+" health. "+df.format(l.getHealth())+"/"+l.getMaxHealth()+" HP");
-								  l.setHealth(l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth())));
-							  }
-						  }
-					  }
-				  }
 			  }
-			  for (int zx=0;zx<Bukkit.getOnlinePlayers().length;zx++) {
-			  Player p = Bukkit.getOnlinePlayers()[zx];
-			  //p.sendMessage("That's item slot #"+p.getInventory().getHeldItemSlot());
-			  /*
-			  if (p.getName().compareTo("sigonasr2")==0) {
-				  //Packet61WorldEvent packet = new Packet61WorldEvent(2004, p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ(), 0, false);
-				  
-				  //((CraftPlayer)t).getHandle().netServerHandler.sendPacket(packet);
-				  Bukkit.getWorld("world").playEffect(p.getLocation(), Effect.STEP_SOUND, Material.IRON_BLOCK.getId());
-			  }*/
-			  //p.removePotionEffect(PotionEffectType.SPEED);
-			  //p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 20, true));
-			  /*if (last_world_time==0) {
-				  last_world_time = Bukkit.getWorld("world").getTime();
-			  } else {
-				  if (Bukkit.getWorld("world").getTime()-last_world_time>2) {
-					  Bukkit.getPlayer("sigonasr2").sendMessage("Previous Time: "+Bukkit.getWorld("world").getTime());
-					  Bukkit.getWorld("world").setTime((long) (Bukkit.getWorld("world").getTime()-((Bukkit.getWorld("world").getTime()-last_world_time)/2.0d)));
-					  last_world_time = Bukkit.getWorld("world").getTime();
-					  Bukkit.getPlayer("sigonasr2").sendMessage("New Time: "+Bukkit.getWorld("world").getTime());
-				  }
-			  }*/
-			  //last_world_time = Main.SERVER_TICK_TIME;
-			  if (p.getWorld().getName().compareTo("world")==0) {
-				  //Bukkit.getWorld("world").spawnEntity(p.getLocation(), EntityType.EXPERIENCE_ORB);
-				  //Bukkit.getWorld("world").dropItemNaturally(p.getLocation(), new ItemStack(Material.DIRT));
-				  if (getConfig().getBoolean("halloween-enabled") && Main.SERVER_TICK_TIME%10==0) {
-					  //1551,69,275
-					  Location testloc = new Location(p.getWorld(),1551,69,-275);
-					  if (p.getLocation().distanceSquared(testloc)<900) {
-						  //p.sendMessage("In range.");
-						  //We are close enough to the sheep pen. Check out the sheep.
-						  List<Entity> ents = p.getNearbyEntities(15, 15, 15);
-						  for (int i=0;i<ents.size();i++) {
-							  if (ents.get(i).getType()!=EntityType.SHEEP) {
-								  ents.remove(i);
-								  i--;
+		  }
+		  if (getConfig().getBoolean("halloween-enabled") && Bukkit.getWorld("world").hasStorm() && Main.SERVER_TICK_TIME%20==0) {
+			  Item i = null;
+			  int item = (int)(Math.random()*4);
+			  switch (item) {
+			  	case 0: {i=Bukkit.getWorld("world").dropItemNaturally(p.getLocation().add((int)(Math.random()*20)-(int)(Math.random()*20), 256, (int)(Math.random()*20)-(int)(Math.random()*20)),new ItemStack(Material.PUMPKIN));}break;
+			  	case 1: {i=Bukkit.getWorld("world").dropItemNaturally(p.getLocation().add((int)(Math.random()*20)-(int)(Math.random()*20), 256, (int)(Math.random()*20)-(int)(Math.random()*20)),new ItemStack(Material.EGG));}break;
+			  	case 2: {i=Bukkit.getWorld("world").dropItemNaturally(p.getLocation().add((int)(Math.random()*20)-(int)(Math.random()*20), 256, (int)(Math.random()*20)-(int)(Math.random()*20)),new ItemStack(Material.SUGAR));}break;
+			  	case 3: {i=Bukkit.getWorld("world").dropItemNaturally(p.getLocation().add((int)(Math.random()*20)-(int)(Math.random()*20), 256, (int)(Math.random()*20)-(int)(Math.random()*20)),new ItemStack(Material.PUMPKIN_PIE));}break;
+			  }
+			  i.setTicksLived(3600);
+		  }
+		  if (Main.SERVER_TICK_TIME%90==0) {
+			  for (int i=-15;i<=15;i++) {
+				  for (int j=-15;j<=15;j++) {
+					  for (int k=-15;k<=15;k++) {
+						  if (Bukkit.getWorld("world").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getType()==Material.MOB_SPAWNER) {
+							  int g=0,maxiter=1000;
+							  CreatureSpawner spawner = (CreatureSpawner)Bukkit.getWorld("world").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getState();
+							  List<Entity> nearbylist = p.getNearbyEntities(15, 15, 5);
+							  List<Entity> nearbylist2 = p.getNearbyEntities(3, 3, 5);
+							  for (int l=0;l<nearbylist.size();l++) {
+								  if (spawner.getCreatureTypeName().compareToIgnoreCase(nearbylist.get(l).getType().getName())!=0) {
+									  nearbylist.remove(l);
+									  l--;
+								  }
 							  }
-						  }
-						  boolean colorone=false;
-						  for (int i=0;i<ents.size();i++) {
-							  //Check all the sheep to see if they are blue. If so, un-toggle it.
-							  if (ents.get(i) instanceof Sheep) {
-								  Sheep s = (Sheep)ents.get(i);
-								  if (s.getColor()==DyeColor.BLUE) {
-									  if (Math.random()<=0.80) {
-										  int col=(int)(Math.random()*4);
-										  switch (col) {
-										  	case 0: {s.setColor(DyeColor.WHITE);}break;
-										  	case 1: {s.setColor(DyeColor.GRAY);}break;
-										  	case 2: {s.setColor(DyeColor.BLACK);}break;
-										  	case 3: {s.setColor(DyeColor.ORANGE);}break;
-										  }
+							  for (int l=0;l<nearbylist2.size();l++) {
+								  if (spawner.getCreatureTypeName().compareToIgnoreCase(nearbylist2.get(l).getType().getName())!=0) {
+									  nearbylist2.remove(l);
+									  l--;
+								  }
+							  }
+							  if (nearbylist.size()>10) {
+								  for (int l=0;l<nearbylist.size();l++) {
+									  if (Math.random()<=0.5) {
+										  nearbylist.get(l).remove();
+										  nearbylist.remove(l);
+										  l--;
 									  }
-								  } else {
-									  if (!colorone && Math.random()<=0.005) {
-										  s.setColor(DyeColor.BLUE);
-										  colorone=true;
+								  }
+							  } 
+							  if (nearbylist2.size()<5) {
+								  if (Math.random()<=0.2d) {
+									  int l=0;
+									  while (l<5) {
+										  //CreatureSpawner spawner = (CreatureSpawner)Bukkit.getWorld("world").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getState();
+										  Location testloc = new Location(Bukkit.getWorld("world"),spawner.getLocation().getX()+Math.random()*2-Math.random()*2,spawner.getLocation().getY()+Math.random()*5,spawner.getLocation().getZ()+Math.random()*2-Math.random()*2);
+										  if (p.getNearbyEntities(15, 15, 5).size()<50 && Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR || Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.WEB) {
+											  Bukkit.getWorld("world").spawnCreature(testloc,spawner.getCreatureType());
+										  }
+										  l++;
 									  }
 								  }
 							  }
 						  }
-					  }
-				  }
-				  if (getConfig().getBoolean("halloween-enabled") && Bukkit.getWorld("world").hasStorm() && Main.SERVER_TICK_TIME%20==0) {
-					  Item i = null;
-					  int item = (int)(Math.random()*4);
-					  switch (item) {
-					  	case 0: {i=Bukkit.getWorld("world").dropItemNaturally(p.getLocation().add((int)(Math.random()*20)-(int)(Math.random()*20), 256, (int)(Math.random()*20)-(int)(Math.random()*20)),new ItemStack(Material.PUMPKIN));}break;
-					  	case 1: {i=Bukkit.getWorld("world").dropItemNaturally(p.getLocation().add((int)(Math.random()*20)-(int)(Math.random()*20), 256, (int)(Math.random()*20)-(int)(Math.random()*20)),new ItemStack(Material.EGG));}break;
-					  	case 2: {i=Bukkit.getWorld("world").dropItemNaturally(p.getLocation().add((int)(Math.random()*20)-(int)(Math.random()*20), 256, (int)(Math.random()*20)-(int)(Math.random()*20)),new ItemStack(Material.SUGAR));}break;
-					  	case 3: {i=Bukkit.getWorld("world").dropItemNaturally(p.getLocation().add((int)(Math.random()*20)-(int)(Math.random()*20), 256, (int)(Math.random()*20)-(int)(Math.random()*20)),new ItemStack(Material.PUMPKIN_PIE));}break;
-					  }
-					  i.setTicksLived(3600);
-				  }
-				  if (Main.SERVER_TICK_TIME%90==0) {
-					  for (int i=-15;i<=15;i++) {
-						  for (int j=-15;j<=15;j++) {
-							  for (int k=-15;k<=15;k++) {
-								  if (Bukkit.getWorld("world").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getType()==Material.MOB_SPAWNER) {
-									  int g=0,maxiter=1000;
-									  CreatureSpawner spawner = (CreatureSpawner)Bukkit.getWorld("world").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getState();
-									  List<Entity> nearbylist = p.getNearbyEntities(15, 15, 5);
-									  List<Entity> nearbylist2 = p.getNearbyEntities(3, 3, 5);
-									  for (int l=0;l<nearbylist.size();l++) {
-										  if (spawner.getCreatureTypeName().compareToIgnoreCase(nearbylist.get(l).getType().getName())!=0) {
-											  nearbylist.remove(l);
-											  l--;
+						  if (Math.abs(i)<4 && Math.abs(j)<4 && Math.abs(k)<4 &&Bukkit.getWorld("world").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getType()==Material.COMMAND) {
+							  //Bukkit.getWorld("world").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).setType(Material.COBBLESTONE);
+							  Bukkit.getLogger().info("Near command block. Attempt to spawn a boss.");
+							  List<Entity> nearby = p.getNearbyEntities(30, 30, 30);
+							  boolean exists=false;
+							  for (int m=0;m<nearby.size();m++) {
+								  if (nearby.get(m) instanceof LivingEntity) {
+									  LivingEntity ev = (LivingEntity)nearby.get(m);
+									  if (nearby.get(m).getType()==EntityType.ZOMBIE) {
+										  if (ev.getCustomName()!=null && ev.getCustomName().equalsIgnoreCase(ChatColor.DARK_PURPLE+"Charge Zombie III")) {
+											  //ev.setTicksLived(0);
+											  exists=true;
 										  }
 									  }
-									  for (int l=0;l<nearbylist2.size();l++) {
-										  if (spawner.getCreatureTypeName().compareToIgnoreCase(nearbylist2.get(l).getType().getName())!=0) {
-											  nearbylist2.remove(l);
-											  l--;
-										  }
+								  }
+							  }
+							  if (!exists) {
+								  Bukkit.getLogger().info("Does not exist, spawn it.");
+								  //Create an EnderDragon npc for the healthbar.
+								  //Create the Charge Zombie III.
+								  //Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "npc create Boss --type EnderDragon --at "+(p.getLocation().getBlockX()+i)+":-50:"+(p.getLocation().getBlockZ()+j));
+								  LivingEntity zombie = (LivingEntity)Bukkit.getWorld("world").spawnEntity(new Location(p.getWorld(),p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k+2,p.getLocation().getBlockZ()+j),EntityType.ZOMBIE);
+								  LivingEntity enderdragon = (LivingEntity)Bukkit.getWorld("world").spawnEntity(new Location(p.getWorld(),p.getLocation().getBlockX()+i,-250,p.getLocation().getBlockZ()+j),EntityType.ENDER_DRAGON);
+								  //Bukkit.getWorld("world").spawn(p.getLocation(), enderdragon.getClass());
+								  zombie.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
+								  zombie.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
+								  zombie.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+								  zombie.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+								  zombie.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,999999,3));
+								  ItemStack sword = new ItemStack(Material.IRON_SWORD);
+								  sword.addEnchantment(Enchantment.DAMAGE_ALL, 3);
+								  zombie.getEquipment().setItemInHand(sword);
+								  ItemStack skull = new ItemStack(397);
+								  skull.setDurability((short)3);
+								  SkullMeta meta = (SkullMeta)skull.getItemMeta();
+								  meta.setOwner("MHF_Enderman");
+								  skull.setItemMeta(meta);
+								  zombie.getEquipment().setHelmet(skull);
+								  
+								  enderdragon.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
+								  enderdragon.setMaxHealth(200);
+								  enderdragon.setHealth(200);
+								  enderdragon.remove();
+								  //enderdragon.teleport(new Location(p.getWorld(),p.getLocation().getBlockX()+i,-250,p.getLocation().getBlockZ()+j));
+								  //p.sendMessage(ChatColor.DARK_PURPLE+"You feel a dark presence nearby.");
+								  //Bukkit.getPlayer("sigonasr2").sendMessage("Trigger this.");
+								  zombie.setRemoveWhenFarAway(false);
+								  zombie.setMaxHealth(300);
+								  zombie.setHealth(300);
+								  zombie.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,999999,6));
+								  zombie.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,999999,0));
+								  zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,0));
+								  zombie.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,999999,0));
+								  zombie.setTicksLived(1);
+								  /*Iterator<EnderDragon> e_list = Bukkit.getWorld("world").getEntitiesByClass(EnderDragon.class).iterator();
+								  boolean first=false;
+								  while (e_list.hasNext()) {
+									  //p.sendMessage("Moving Enderdragon to "+new Location(p.getWorld(),p.getLocation().getBlockX()+i,-50,p.getLocation().getBlockZ()+j));
+									  EnderDragon next = e_list.next();
+									  if (!first) {
+										  first=true;
+									  } else {
+										  next.remove();
 									  }
-									  if (nearbylist.size()>10) {
-										  for (int l=0;l<nearbylist.size();l++) {
-											  if (Math.random()<=0.5) {
-												  nearbylist.get(l).remove();
-												  nearbylist.remove(l);
-												  l--;
+								  }*/
+							  }
+						  }
+					  }
+				  }
+			  }
+		  }
+		  if (Main.SERVER_TICK_TIME%20==0) {
+	    	for (int d=0;d<chunk_queue_list.size();d++) {
+	    		if (chunk_queue_list.get(d)==null || !chunk_queue_list.get(d).isLoaded()) {
+	    			chunk_queue_list.remove(0);
+	    		} else {
+	    			break;
+	    		}
+	    	}
+	    	if (chunk_queue_list.size()>0 && chunk_queue_list.get(0).isLoaded() && chunk_queue_list.get(0).getWorld().getName().equalsIgnoreCase("world")) {
+	    		//Load up this chunk if it's loaded and check things.
+	    		//Attempt to load up the custom chunk.
+				List<String> debugmessages = new ArrayList<String>();
+				FileConfiguration customchunk = reloadChunksConfig(chunk_queue_list.get(0).getX(), chunk_queue_list.get(0).getZ());
+				if (!customchunk.contains("animal-reset2")) {
+					customchunk.set("animal-reset2", Long.valueOf(Main.SERVER_TICK_TIME+17280000));
+					Chunk c = chunk_queue_list.get(0);
+					Random r = new Random();
+					  for (int x=0;x<16;x++) {
+						  for (int z=0;z<16;z++) {
+							  if (r.nextDouble()<=0.000244140625) {
+								  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,Bukkit.getWorld("world").getHighestBlockYAt(x+c.getX()*16, z+c.getZ()*16),z+c.getZ()*16);
+								  if (b.getType()!=Material.WATER && b.getType()!=Material.ICE && b.getType()!=Material.LAVA && !b.getBiome().name().equalsIgnoreCase("ocean") && !b.getBiome().name().equalsIgnoreCase("river")) {
+									  if (b.getType()==Material.SNOW || b.getType()==Material.DIRT || b.getType()==Material.SAND || b.getType()==Material.LEAVES || b.getType()==Material.GRASS || b.getType()==Material.GRAVEL || b.getType()==Material.STONE || b.getType()==Material.COBBLESTONE || b.getType()==Material.MYCEL || b.getType()==Material.BROWN_MUSHROOM || b.getType()==Material.RED_MUSHROOM) {
+										  if (b.getBiome().name().equalsIgnoreCase("plains")) {
+											  //Best place for things to spawn. Any mob type can spawn here.
+											  //Choose a mob type randomly.
+											  EntityType[] mobs = {EntityType.COW,EntityType.HORSE,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
+											  int i=(int)(Math.random()*4)+2;
+											  EntityType selected = mobs[(int)(mobs.length*Math.random())];
+											  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
+											  debugmessages.add("  Spawned: "+i+" "+selected.getName());
+											  while (i>0) {
+												  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
+												  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
+												  i--;
 											  }
-										  }
-									  } 
-									  if (nearbylist2.size()<5) {
-										  if (Math.random()<=0.2d) {
-											  int l=0;
-											  while (l<5) {
-												  //CreatureSpawner spawner = (CreatureSpawner)Bukkit.getWorld("world").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getState();
-												  Location testloc = new Location(Bukkit.getWorld("world"),spawner.getLocation().getX()+Math.random()*2-Math.random()*2,spawner.getLocation().getY()+Math.random()*5,spawner.getLocation().getZ()+Math.random()*2-Math.random()*2);
-												  if (p.getNearbyEntities(15, 15, 5).size()<50 && Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR || Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.WEB) {
-													  Bukkit.getWorld("world").spawnCreature(testloc,spawner.getCreatureType());
+										  } else {
+											  if (b.getBiome().name().equalsIgnoreCase("forest")) {
+												  //Wolves can still spawn here. Horses cannot.
+												  //Choose a mob type randomly.
+												  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
+												  int i=(int)(Math.random()*4)+2;
+												  EntityType selected = mobs[(int)(mobs.length*Math.random())];
+												  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
+												  debugmessages.add("  Spawned: "+i+" "+selected.getName());
+												  while (i>0) {
+													  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
+													  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
+													  i--;
 												  }
-												  l++;
-											  }
-										  }
-									  }
-								  }
-								  if (Math.abs(i)<4 && Math.abs(j)<4 && Math.abs(k)<4 &&Bukkit.getWorld("world").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getType()==Material.COMMAND) {
-									  //Bukkit.getWorld("world").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).setType(Material.COBBLESTONE);
-									  List<Entity> nearby = p.getNearbyEntities(30, 30, 30);
-									  boolean exists=false;
-									  for (int m=0;m<nearby.size();m++) {
-										  if (nearby.get(m) instanceof LivingEntity) {
-											  LivingEntity ev = (LivingEntity)nearby.get(m);
-											  if (nearby.get(m).getType()==EntityType.ZOMBIE) {
-												  if (ev.getCustomName()!=null && ev.getCustomName().equalsIgnoreCase(ChatColor.DARK_PURPLE+"Charge Zombie III")) {
-													  //ev.setTicksLived(0);
-													  exists=true;
-												  }
-											  }
-										  }
-									  }
-									  if (!exists) {
-										  //Create an EnderDragon npc for the healthbar.
-										  //Create the Charge Zombie III.
-										  //Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "npc create Boss --type EnderDragon --at "+(p.getLocation().getBlockX()+i)+":-50:"+(p.getLocation().getBlockZ()+j));
-										  LivingEntity zombie = (LivingEntity)Bukkit.getWorld("world").spawnEntity(new Location(p.getWorld(),p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k+2,p.getLocation().getBlockZ()+j),EntityType.ZOMBIE);
-										  LivingEntity enderdragon = (LivingEntity)Bukkit.getWorld("world").spawnEntity(new Location(p.getWorld(),p.getLocation().getBlockX()+i,-250,p.getLocation().getBlockZ()+j),EntityType.ENDER_DRAGON);
-										  //Bukkit.getWorld("world").spawn(p.getLocation(), enderdragon.getClass());
-										  zombie.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
-										  zombie.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
-										  zombie.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
-										  zombie.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
-										  zombie.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,999999,3));
-										  ItemStack sword = new ItemStack(Material.IRON_SWORD);
-										  sword.addEnchantment(Enchantment.DAMAGE_ALL, 3);
-										  zombie.getEquipment().setItemInHand(sword);
-										  ItemStack skull = new ItemStack(397);
-										  skull.setDurability((short)3);
-										  SkullMeta meta = (SkullMeta)skull.getItemMeta();
-										  meta.setOwner("MHF_Enderman");
-										  skull.setItemMeta(meta);
-										  zombie.getEquipment().setHelmet(skull);
-										  
-										  enderdragon.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
-										  enderdragon.setMaxHealth(200);
-										  enderdragon.setHealth(200);
-										  enderdragon.remove();
-										  //enderdragon.teleport(new Location(p.getWorld(),p.getLocation().getBlockX()+i,-250,p.getLocation().getBlockZ()+j));
-										  //p.sendMessage(ChatColor.DARK_PURPLE+"You feel a dark presence nearby.");
-										  //Bukkit.getPlayer("sigonasr2").sendMessage("Trigger this.");
-										  zombie.setRemoveWhenFarAway(false);
-										  zombie.setMaxHealth(300);
-										  zombie.setHealth(300);
-										  zombie.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,999999,6));
-										  zombie.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,999999,0));
-										  zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,999999,0));
-										  zombie.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,999999,0));
-										  zombie.setTicksLived(1);
-										  /*Iterator<EnderDragon> e_list = Bukkit.getWorld("world").getEntitiesByClass(EnderDragon.class).iterator();
-										  boolean first=false;
-										  while (e_list.hasNext()) {
-											  //p.sendMessage("Moving Enderdragon to "+new Location(p.getWorld(),p.getLocation().getBlockX()+i,-50,p.getLocation().getBlockZ()+j));
-											  EnderDragon next = e_list.next();
-											  if (!first) {
-												  first=true;
-											  } else {
-												  next.remove();
-											  }
-										  }*/
-									  }
-								  }
-							  }
-						  }
-					  }
-				  }
-				  if (Main.SERVER_TICK_TIME%20==0) {
-			    	for (int d=0;d<chunk_queue_list.size();d++) {
-			    		if (chunk_queue_list.get(d)==null || !chunk_queue_list.get(d).isLoaded()) {
-			    			chunk_queue_list.remove(0);
-			    		} else {
-			    			break;
-			    		}
-			    	}
-			    	if (chunk_queue_list.size()>0 && chunk_queue_list.get(0).isLoaded() && chunk_queue_list.get(0).getWorld().getName().equalsIgnoreCase("world")) {
-			    		//Load up this chunk if it's loaded and check things.
-			    		//Attempt to load up the custom chunk.
-						List<String> debugmessages = new ArrayList<String>();
-						FileConfiguration customchunk = reloadChunksConfig(chunk_queue_list.get(0).getX(), chunk_queue_list.get(0).getZ());
-						if (!customchunk.contains("animal-reset2")) {
-							customchunk.set("animal-reset2", Long.valueOf(Main.SERVER_TICK_TIME+17280000));
-							Chunk c = chunk_queue_list.get(0);
-							Random r = new Random();
-							  for (int x=0;x<16;x++) {
-								  for (int z=0;z<16;z++) {
-									  if (r.nextDouble()<=0.000244140625) {
-										  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,Bukkit.getWorld("world").getHighestBlockYAt(x+c.getX()*16, z+c.getZ()*16),z+c.getZ()*16);
-										  if (b.getType()!=Material.WATER && b.getType()!=Material.ICE && b.getType()!=Material.LAVA && !b.getBiome().name().equalsIgnoreCase("ocean") && !b.getBiome().name().equalsIgnoreCase("river")) {
-											  if (b.getType()==Material.SNOW || b.getType()==Material.DIRT || b.getType()==Material.SAND || b.getType()==Material.LEAVES || b.getType()==Material.GRASS || b.getType()==Material.GRAVEL || b.getType()==Material.STONE || b.getType()==Material.COBBLESTONE || b.getType()==Material.MYCEL || b.getType()==Material.BROWN_MUSHROOM || b.getType()==Material.RED_MUSHROOM) {
-												  if (b.getBiome().name().equalsIgnoreCase("plains")) {
-													  //Best place for things to spawn. Any mob type can spawn here.
-													  //Choose a mob type randomly.
-													  EntityType[] mobs = {EntityType.COW,EntityType.HORSE,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
+											  }else {
+												  if (b.getBiome().name().equalsIgnoreCase("jungle")) {
+													  //Chance to spawn ocelots here.
+													  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.OCELOT};
 													  int i=(int)(Math.random()*4)+2;
 													  EntityType selected = mobs[(int)(mobs.length*Math.random())];
 													  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
@@ -1446,11 +1488,70 @@ public void runTick() {
 														  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
 														  i--;
 													  }
-												  } else {
-													  if (b.getBiome().name().equalsIgnoreCase("forest")) {
-														  //Wolves can still spawn here. Horses cannot.
-														  //Choose a mob type randomly.
-														  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
+												  }else {
+													  //Choose a mob type randomly.
+													  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN};
+													  int i=(int)(Math.random()*4)+2;
+													  EntityType selected = mobs[(int)(mobs.length*Math.random())];
+													  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
+													  debugmessages.add("  Spawned: "+i+" "+selected.getName());
+													  while (i>0) {
+														  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
+														  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
+														  i--;
+													  }
+												  }
+											  }
+										  }
+									  }
+								  }
+							  }
+							  ////Bukkit.getLogger().info("Biome here is "+b.getBiome().name());
+						  }
+					  }
+				} else {
+					//Check the value and regenerate if necessary.
+					if (Main.SERVER_TICK_TIME>customchunk.getLong("animal-reset2")) {
+						customchunk.set("animal-reset2", Long.valueOf(Main.SERVER_TICK_TIME+17280000));
+						Chunk c = chunk_queue_list.get(0);
+						Random r = new Random();
+						  for (int x=0;x<16;x++) {
+							  for (int z=0;z<16;z++) {
+								  if (r.nextDouble()<=0.000244140625) {
+									  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,Bukkit.getWorld("world").getHighestBlockYAt(x+c.getX()*16, z+c.getZ()*16),z+c.getZ()*16);
+									  if (b.getType()!=Material.WATER && b.getType()!=Material.ICE && b.getType()!=Material.LAVA && !b.getBiome().name().equalsIgnoreCase("ocean") && !b.getBiome().name().equalsIgnoreCase("river")) {
+										  if (b.getType()==Material.SNOW || b.getType()==Material.DIRT || b.getType()==Material.SAND || b.getType()==Material.LEAVES || b.getType()==Material.GRASS || b.getType()==Material.GRAVEL || b.getType()==Material.STONE || b.getType()==Material.COBBLESTONE || b.getType()==Material.MYCEL || b.getType()==Material.BROWN_MUSHROOM || b.getType()==Material.RED_MUSHROOM) {
+											  if (b.getBiome().name().equalsIgnoreCase("plains")) {
+												  //Best place for things to spawn. Any mob type can spawn here.
+												  //Choose a mob type randomly.
+												  EntityType[] mobs = {EntityType.COW,EntityType.HORSE,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
+												  int i=(int)(Math.random()*4)+2;
+												  EntityType selected = mobs[(int)(mobs.length*Math.random())];
+												  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
+												  debugmessages.add("  Spawned: "+i+" "+selected.getName());
+												  while (i>0) {
+													  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
+													  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
+													  i--;
+												  }
+											  } else {
+												  if (b.getBiome().name().equalsIgnoreCase("forest")) {
+													  //Wolves can still spawn here. Horses cannot.
+													  //Choose a mob type randomly.
+													  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
+													  int i=(int)(Math.random()*4)+2;
+													  EntityType selected = mobs[(int)(mobs.length*Math.random())];
+													  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
+													  debugmessages.add("  Spawned: "+i+" "+selected.getName());
+													  while (i>0) {
+														  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
+														  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
+														  i--;
+													  }
+												  }else {
+													  if (b.getBiome().name().equalsIgnoreCase("jungle")) {
+														  //Chance to spawn ocelots here.
+														  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.OCELOT};
 														  int i=(int)(Math.random()*4)+2;
 														  EntityType selected = mobs[(int)(mobs.length*Math.random())];
 														  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
@@ -1461,55 +1562,8 @@ public void runTick() {
 															  i--;
 														  }
 													  }else {
-														  if (b.getBiome().name().equalsIgnoreCase("jungle")) {
-															  //Chance to spawn ocelots here.
-															  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.OCELOT};
-															  int i=(int)(Math.random()*4)+2;
-															  EntityType selected = mobs[(int)(mobs.length*Math.random())];
-															  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
-															  debugmessages.add("  Spawned: "+i+" "+selected.getName());
-															  while (i>0) {
-																  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
-																  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
-																  i--;
-															  }
-														  }else {
-															  //Choose a mob type randomly.
-															  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN};
-															  int i=(int)(Math.random()*4)+2;
-															  EntityType selected = mobs[(int)(mobs.length*Math.random())];
-															  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
-															  debugmessages.add("  Spawned: "+i+" "+selected.getName());
-															  while (i>0) {
-																  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
-																  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
-																  i--;
-															  }
-														  }
-													  }
-												  }
-											  }
-										  }
-									  }
-									  ////Bukkit.getLogger().info("Biome here is "+b.getBiome().name());
-								  }
-							  }
-						} else {
-							//Check the value and regenerate if necessary.
-							if (Main.SERVER_TICK_TIME>customchunk.getLong("animal-reset2")) {
-								customchunk.set("animal-reset2", Long.valueOf(Main.SERVER_TICK_TIME+17280000));
-								Chunk c = chunk_queue_list.get(0);
-								Random r = new Random();
-								  for (int x=0;x<16;x++) {
-									  for (int z=0;z<16;z++) {
-										  if (r.nextDouble()<=0.000244140625) {
-											  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,Bukkit.getWorld("world").getHighestBlockYAt(x+c.getX()*16, z+c.getZ()*16),z+c.getZ()*16);
-											  if (b.getType()!=Material.WATER && b.getType()!=Material.ICE && b.getType()!=Material.LAVA && !b.getBiome().name().equalsIgnoreCase("ocean") && !b.getBiome().name().equalsIgnoreCase("river")) {
-												  if (b.getType()==Material.SNOW || b.getType()==Material.DIRT || b.getType()==Material.SAND || b.getType()==Material.LEAVES || b.getType()==Material.GRASS || b.getType()==Material.GRAVEL || b.getType()==Material.STONE || b.getType()==Material.COBBLESTONE || b.getType()==Material.MYCEL || b.getType()==Material.BROWN_MUSHROOM || b.getType()==Material.RED_MUSHROOM) {
-													  if (b.getBiome().name().equalsIgnoreCase("plains")) {
-														  //Best place for things to spawn. Any mob type can spawn here.
 														  //Choose a mob type randomly.
-														  EntityType[] mobs = {EntityType.COW,EntityType.HORSE,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
+														  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN};
 														  int i=(int)(Math.random()*4)+2;
 														  EntityType selected = mobs[(int)(mobs.length*Math.random())];
 														  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
@@ -1519,424 +1573,383 @@ public void runTick() {
 															  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
 															  i--;
 														  }
-													  } else {
-														  if (b.getBiome().name().equalsIgnoreCase("forest")) {
-															  //Wolves can still spawn here. Horses cannot.
-															  //Choose a mob type randomly.
-															  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.WOLF};
-															  int i=(int)(Math.random()*4)+2;
-															  EntityType selected = mobs[(int)(mobs.length*Math.random())];
-															  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
-															  debugmessages.add("  Spawned: "+i+" "+selected.getName());
-															  while (i>0) {
-																  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
-																  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
-																  i--;
-															  }
-														  }else {
-															  if (b.getBiome().name().equalsIgnoreCase("jungle")) {
-																  //Chance to spawn ocelots here.
-																  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN,EntityType.OCELOT};
-																  int i=(int)(Math.random()*4)+2;
-																  EntityType selected = mobs[(int)(mobs.length*Math.random())];
-																  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
-																  debugmessages.add("  Spawned: "+i+" "+selected.getName());
-																  while (i>0) {
-																	  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
-																	  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
-																	  i--;
-																  }
-															  }else {
-																  //Choose a mob type randomly.
-																  EntityType[] mobs = {EntityType.COW,EntityType.PIG,EntityType.SHEEP,EntityType.CHICKEN};
-																  int i=(int)(Math.random()*4)+2;
-																  EntityType selected = mobs[(int)(mobs.length*Math.random())];
-																  ////Bukkit.getLogger().info("Spawned "+i+" "+selected.getName()+" in Biome "+b.getBiome().name()+" for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+".");
-																  debugmessages.add("  Spawned: "+i+" "+selected.getName());
-																  while (i>0) {
-																	  LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(b.getLocation().add(Math.random()*10-Math.random()*10,1,Math.random()*10-Math.random()*10), selected);
-																	  f.setRemoveWhenFarAway(false); //This should be a permanent mob.
-																	  i--;
-																  }
-															  }
-														  }
 													  }
 												  }
 											  }
 										  }
-										  ////Bukkit.getLogger().info("Biome here is "+b.getBiome().name());
 									  }
 								  }
-							}
-						}
-						if (!customchunk.contains("diamond-generate")) {
-							customchunk.set("diamond-generate", Boolean.valueOf(true));
-							Chunk c = chunk_queue_list.get(0);
-							  int adddiamond=0;
-							  for (int x=0;x<16;x++) {
-								  for (int y=5;y<25;y++) {
-									  for (int z=0;z<16;z++) {
-										  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,y,z+c.getZ()*16);
-										  if (b!=null && b.getType()==Material.STONE) {
-											  if (Math.random()<=0.000625) {
-												  int i=(int)(Math.random()*8.0d)+1;
-												  while (i>0) {
-													  Block d = c.getBlock(x+(int)(Math.random()*i)-(int)(Math.random()*i), y+(int)(Math.random()*i)-(int)(Math.random()*i), z+(int)(Math.random()*i)-(int)(Math.random()*i));
-													  adddiamond++;
-													  b.setType(Material.DIAMOND_ORE);
-													  i--;
-												  }
-												  //Make a patch between 1 and 8.
-											  }
-										  }
-									  }
-								  }
+								  ////Bukkit.getLogger().info("Biome here is "+b.getBiome().name());
 							  }
-							////Bukkit.getLogger().info("Generated "+adddiamond+" new diamonds for chunk "+e.getChunk().getX()+","+e.getChunk().getZ());
-							if (adddiamond>0) {
-							  debugmessages.add("  Added "+adddiamond+" diamond"+((adddiamond!=1)?"s":"")+".");
-							}
-						}
-						if (!customchunk.contains("limit-ore-generation")) {
-							customchunk.set("limit-ore-generation", Boolean.valueOf(true));
-							Chunk c = chunk_queue_list.get(0);
-							  int removeore=0,totalore=0,newore=0;
-							  for (int x=0;x<16;x++) {
-								  for (int y=5;y<96;y++) {
-									  for (int z=0;z<16;z++) {
-										  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,y,z+c.getZ()*16);
-										  if (b!=null && (b.getType()==Material.COAL_ORE ||
-												  b.getType()==Material.IRON_ORE ||
-												  b.getType()==Material.GOLD_ORE ||
-												  b.getType()==Material.REDSTONE_ORE ||
-												  b.getType()==Material.LAPIS_ORE ||
-												  b.getType()==Material.DIAMOND_ORE)) {
-											  if (Math.random()<=0.60) {
-												  removeore++;
-												  b.setType(Material.STONE);
-												  //Make a patch between 1 and 8.
-											  }
-											  totalore++;
-										  }
-									  }
-								  }
-							  }
-							  for (int x=0;x<16;x++) {
-								  for (int y=5;y<96;y++) {
-									  for (int z=0;z<16;z++) {
-										  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,y,z+c.getZ()*16);
-										  if (b!=null && (b.getType()==Material.COAL_ORE ||
-												  b.getType()==Material.IRON_ORE ||
-												  b.getType()==Material.GOLD_ORE ||
-												  b.getType()==Material.REDSTONE_ORE ||
-												  b.getType()==Material.LAPIS_ORE ||
-												  b.getType()==Material.DIAMOND_ORE)) {
-											  newore++;
-										  }
-									  }
-								  }
-							  }
-								////Bukkit.getLogger().info("Removed "+removeore+"/"+totalore+" ore for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+". There are now "+newore+" ores left.");
-							  debugmessages.add("  Removed: "+removeore+"/"+totalore+" ores.");
-						}
-						saveChunksConfig(customchunk, chunk_queue_list.get(0).getX(), chunk_queue_list.get(0).getZ());
-						  if (debugmessages.size()>0) {
-							  for (int i=0;i<debugmessages.size();i++) {
-								  //Bukkit.getLogger().info(debugmessages.get(i));
-							  }
-							  //Bukkit.getLogger().info(new String(new char[("Chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+" ("+e.getChunk().getX()*16+","+e.getChunk().getZ()*16+")").length()]).replace("\0", "="));
-							  //Bukkit.getLogger().info("Chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+" ("+e.getChunk().getX()*16+","+e.getChunk().getZ()*16+")");
 						  }
-			    	}
-			    	
-			    	
-					  List<Entity> nearby = p.getNearbyEntities(20, 12, 20);
-					  //List<Entity> nearby2 = p.getNearbyEntities(10, 6, 10);
-					  for (int i=0;i<nearby.size();i++) {
-						  //EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
-						  boolean contains=nearby.get(i) instanceof Monster;
-						  if (contains) {
-							  LivingEntity l = (LivingEntity)nearby.get(i);
-							  if (l.getCustomName()!=null && l.hasLineOfSight(p)) {
-									 if (!lineofsight_check.contains(l.getUniqueId())) {
-										 l.setCustomNameVisible(true);
-										 lineofsight_check.add(l.getUniqueId());
-									 }
+					}
+				}
+				if (!customchunk.contains("diamond-generate")) {
+					customchunk.set("diamond-generate", Boolean.valueOf(true));
+					Chunk c = chunk_queue_list.get(0);
+					  int adddiamond=0;
+					  for (int x=0;x<16;x++) {
+						  for (int y=5;y<25;y++) {
+							  for (int z=0;z<16;z++) {
+								  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,y,z+c.getZ()*16);
+								  if (b!=null && b.getType()==Material.STONE) {
+									  if (Math.random()<=0.000625) {
+										  int i=(int)(Math.random()*8.0d)+1;
+										  while (i>0) {
+											  Block d = c.getBlock(x+(int)(Math.random()*i)-(int)(Math.random()*i), y+(int)(Math.random()*i)-(int)(Math.random()*i), z+(int)(Math.random()*i)-(int)(Math.random()*i));
+											  adddiamond++;
+											  b.setType(Material.DIAMOND_ORE);
+											  i--;
+										  }
+										  //Make a patch between 1 and 8.
+									  }
+								  }
+							  }
+						  }
+					  }
+					////Bukkit.getLogger().info("Generated "+adddiamond+" new diamonds for chunk "+e.getChunk().getX()+","+e.getChunk().getZ());
+					if (adddiamond>0) {
+					  debugmessages.add("  Added "+adddiamond+" diamond"+((adddiamond!=1)?"s":"")+".");
+					}
+				}
+				if (!customchunk.contains("limit-ore-generation")) {
+					customchunk.set("limit-ore-generation", Boolean.valueOf(true));
+					Chunk c = chunk_queue_list.get(0);
+					  int removeore=0,totalore=0,newore=0;
+					  for (int x=0;x<16;x++) {
+						  for (int y=5;y<96;y++) {
+							  for (int z=0;z<16;z++) {
+								  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,y,z+c.getZ()*16);
+								  if (b!=null && (b.getType()==Material.COAL_ORE ||
+										  b.getType()==Material.IRON_ORE ||
+										  b.getType()==Material.GOLD_ORE ||
+										  b.getType()==Material.REDSTONE_ORE ||
+										  b.getType()==Material.LAPIS_ORE ||
+										  b.getType()==Material.DIAMOND_ORE)) {
+									  if (Math.random()<=0.60) {
+										  removeore++;
+										  b.setType(Material.STONE);
+										  //Make a patch between 1 and 8.
+									  }
+									  totalore++;
+								  }
+							  }
+						  }
+					  }
+					  for (int x=0;x<16;x++) {
+						  for (int y=5;y<96;y++) {
+							  for (int z=0;z<16;z++) {
+								  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,y,z+c.getZ()*16);
+								  if (b!=null && (b.getType()==Material.COAL_ORE ||
+										  b.getType()==Material.IRON_ORE ||
+										  b.getType()==Material.GOLD_ORE ||
+										  b.getType()==Material.REDSTONE_ORE ||
+										  b.getType()==Material.LAPIS_ORE ||
+										  b.getType()==Material.DIAMOND_ORE)) {
+									  newore++;
+								  }
+							  }
+						  }
+					  }
+						////Bukkit.getLogger().info("Removed "+removeore+"/"+totalore+" ore for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+". There are now "+newore+" ores left.");
+					  debugmessages.add("  Removed: "+removeore+"/"+totalore+" ores.");
+				}
+				saveChunksConfig(customchunk, chunk_queue_list.get(0).getX(), chunk_queue_list.get(0).getZ());
+				  if (debugmessages.size()>0) {
+					  for (int i=0;i<debugmessages.size();i++) {
+						  //Bukkit.getLogger().info(debugmessages.get(i));
+					  }
+					  //Bukkit.getLogger().info(new String(new char[("Chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+" ("+e.getChunk().getX()*16+","+e.getChunk().getZ()*16+")").length()]).replace("\0", "="));
+					  //Bukkit.getLogger().info("Chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+" ("+e.getChunk().getX()*16+","+e.getChunk().getZ()*16+")");
+				  }
+	    	}
+	    	
+	    	
+			  List<Entity> nearby = p.getNearbyEntities(20, 12, 20);
+			  //List<Entity> nearby2 = p.getNearbyEntities(10, 6, 10);
+			  for (int i=0;i<nearby.size();i++) {
+				  //EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
+				  boolean contains=nearby.get(i) instanceof Monster;
+				  if (contains) {
+					  LivingEntity l = (LivingEntity)nearby.get(i);
+					  if (l.getCustomName()!=null && l.hasLineOfSight(p)) {
+							 if (!lineofsight_check.contains(l.getUniqueId())) {
+								 l.setCustomNameVisible(true);
+								 lineofsight_check.add(l.getUniqueId());
+							 }
+					  } else {
+						 if (!lineofsight_check.contains(l.getUniqueId())) {
+							 l.setCustomNameVisible(false);
+						 }
+					  }
+				  }
+				  int heightmodifier=0;
+				  if (Bukkit.getWorld("world").getHighestBlockYAt(nearby.get(i).getLocation())>=96) {
+					  heightmodifier=126;
+				  } else {
+					  heightmodifier=63;
+				  }
+				  if (nearby.get(i).getType()==EntityType.CREEPER) {
+					  LivingEntity l = (LivingEntity)nearby.get(i);
+					  if (l.getCustomName()==null && l.getTicksLived()<6400 && !l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+						  if (l.getLocation().getY()<=40 && Math.random()<=0.08+((heightmodifier-l.getLocation().getY())*0.01d)) {
+							  if (Math.random()<=0.35) {
+								  l.setCustomName(ChatColor.YELLOW+"Explosive Creeper");
+								  l.setCustomNameVisible(false);
+								  //l.setCustomNameVisible(true);
+								  l.setMaxHealth(Warning(l.getMaxHealth()*1.25d,1));
+							  } else
+							  if (Math.random()<=0.15) {
+								  l.setCustomName(ChatColor.GOLD+"Explosive Creeper II");
+								  l.setCustomNameVisible(false);
+								  //l.setCustomNameVisible(true);
+								  l.setMaxHealth(Warning(l.getMaxHealth()*1.75d,2));
+							  } else
+							  if (Math.random()<=0.35) {
+								  l.setCustomName(ChatColor.YELLOW+"Destructive Creeper");
+								  l.setCustomNameVisible(false);
+								  //l.setCustomNameVisible(true);
+								  l.setMaxHealth(Warning(l.getMaxHealth()*1.25d,3));
 							  } else {
-								 if (!lineofsight_check.contains(l.getUniqueId())) {
-									 l.setCustomNameVisible(false);
-								 }
+								  l.setCustomName(ChatColor.GOLD+"Destructive Creeper II");
+								  l.setCustomNameVisible(false);
+								  //l.setCustomNameVisible(true);
+								  l.setMaxHealth(Warning(l.getMaxHealth()*1.75d,4));
+							  }
+							  if (l!=null && l.isValid()) {
+								  l.setHealth(Warning(l.getMaxHealth(),20));
 							  }
 						  }
-						  int heightmodifier=0;
-						  if (Bukkit.getWorld("world").getHighestBlockYAt(nearby.get(i).getLocation())>=96) {
-							  heightmodifier=126;
+						  l.setTicksLived(6400);
+					  }
+				  } else
+				  if (nearby.get(i).getType()==EntityType.SPIDER) {
+					  LivingEntity l = (LivingEntity)nearby.get(i);
+					  if (l.getCustomName()==null && l.getTicksLived()<6400 && !l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+						  if (Math.random()<=0.08+((heightmodifier-l.getLocation().getY())*0.01d)) {
+							  if (Math.random()<=0.35) {
+								  l.setCustomName(ChatColor.YELLOW+"Venomous Spider");
+								  l.setCustomNameVisible(false);
+								  //l.setCustomNameVisible(true);
+								  l.setMaxHealth(Warning(l.getMaxHealth(),5));
+							  } else
+							  if (Math.random()<=0.15) {
+								  l.setCustomName(ChatColor.GOLD+"Venomous Spider II");
+								  l.setCustomNameVisible(false);
+								  //l.setCustomNameVisible(true);
+								  l.setMaxHealth(Warning(l.getMaxHealth()*1.5,6));
+							  } else
+							  if (Math.random()<=0.35) {
+								  l.setCustomName(ChatColor.YELLOW+"Snaring Spider");
+								  l.setCustomNameVisible(false);
+								  //l.setCustomNameVisible(true);
+								  l.setMaxHealth(Warning(l.getMaxHealth()*1.5,7));
+							  } else {
+								  l.setCustomName(ChatColor.GOLD+"Snaring Spider II");
+								  l.setCustomNameVisible(false);
+								  //l.setCustomNameVisible(true);
+								  l.setMaxHealth(Warning(l.getMaxHealth()*2,8));
+							  }
+							  if (l!=null && l.isValid()) {
+								  l.setHealth(Warning(l.getMaxHealth(),21));
+							  }
+						  }
+						  l.setTicksLived(6400);
+					  }
+				  } else
+				  if (nearby.get(i).getType()==EntityType.SKELETON) {
+					  LivingEntity l = (LivingEntity)nearby.get(i);
+					  if (l.getCustomName()==null && l.getTicksLived()<6400 && !l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+						  if (Math.random()<=0.10+((heightmodifier-l.getLocation().getY())*0.01d)) {
+							  if (Math.random()<=0.85) {
+								  l.setCustomName(ChatColor.YELLOW+"Sniper");
+								  l.setCustomNameVisible(false);
+								  //l.setCustomNameVisible(true);
+								  l.setMaxHealth(Warning(l.getMaxHealth()/2,9));
+							  } else {
+								  l.setCustomName(ChatColor.GOLD+"Sniper II");
+								  l.setCustomNameVisible(false);
+								  //l.setCustomNameVisible(true);
+								  l.setMaxHealth(Warning(l.getMaxHealth()/4,10));
+							  }
+							  if (l!=null && l.isValid()) {
+								  l.setHealth(Warning(l.getMaxHealth(),11));
+							  }
+						  }
+						  l.setTicksLived(6400);
+					  }
+				  } else
+				  if (nearby.get(i).getType()==EntityType.ZOMBIE) {
+					  LivingEntity l = (LivingEntity)nearby.get(i);
+					  if (l.getCustomName()==null && l.getTicksLived()<6400 && !l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+						  if (l.getLocation().getY()<=35 && Math.random()<=0.15) {
+							  if (Math.random()<=0.85) {
+								  l.setCustomName(ChatColor.YELLOW+"Charge Zombie");
+								  l.setCustomNameVisible(false);
+								  //l.setCustomNameVisible(true);
+								  l.setMaxHealth(Warning(l.getMaxHealth()+5,12));
+							  } else {
+								  l.setCustomName(ChatColor.GOLD+"Charge Zombie II");
+								  l.setCustomNameVisible(false);
+								  //l.setCustomNameVisible(true);
+								  Warning(l,13);
+								  if (l!=null && l.isValid()) {
+									  l.setMaxHealth(l.getMaxHealth()+20);
+								  }
+							  }
+							  Warning(l,23);
+							  if (l!=null && l.isValid()) {
+								  l.setMaxHealth(l.getMaxHealth());
+							  }
 						  } else {
-							  heightmodifier=63;
-						  }
-						  if (nearby.get(i).getType()==EntityType.CREEPER) {
-							  LivingEntity l = (LivingEntity)nearby.get(i);
-							  if (l.getCustomName()==null && l.getTicksLived()<6400 && !l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-								  if (l.getLocation().getY()<=40 && Math.random()<=0.08+((heightmodifier-l.getLocation().getY())*0.01d)) {
-									  if (Math.random()<=0.35) {
-										  l.setCustomName(ChatColor.YELLOW+"Explosive Creeper");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()*1.25d,1));
-									  } else
-									  if (Math.random()<=0.15) {
-										  l.setCustomName(ChatColor.GOLD+"Explosive Creeper II");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()*1.75d,2));
-									  } else
-									  if (Math.random()<=0.35) {
-										  l.setCustomName(ChatColor.YELLOW+"Destructive Creeper");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()*1.25d,3));
-									  } else {
-										  l.setCustomName(ChatColor.GOLD+"Destructive Creeper II");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()*1.75d,4));
-									  }
+							  if (Math.random()<=0.10+((heightmodifier-l.getLocation().getY())*0.01d)) {
+								  if (Math.random()<=0.25) {
+									  l.setCustomName(ChatColor.GRAY+"Zombie Ninja");
+									  l.setCustomNameVisible(false);
+									  l.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0, true));
+									  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 2, true));
+									  //l.setCustomNameVisible(true);
+									  //A Zombie Ninja will not wear armor to stay hidden. But may carry a sword.
+									  l.getEquipment().setChestplate(new ItemStack(Material.AIR));
+									  l.getEquipment().setBoots(new ItemStack(Material.AIR));
+									  l.getEquipment().setLeggings(new ItemStack(Material.AIR));
+									  l.getEquipment().setHelmet(new ItemStack(Material.AIR));
+									  Zombie g = (Zombie)l;
+									  g.setBaby(true);
+									  Warning(l,14);
 									  if (l!=null && l.isValid()) {
-										  l.setHealth(Warning(l.getMaxHealth(),20));
-									  }
-								  }
-								  l.setTicksLived(6400);
-							  }
-						  } else
-						  if (nearby.get(i).getType()==EntityType.SPIDER) {
-							  LivingEntity l = (LivingEntity)nearby.get(i);
-							  if (l.getCustomName()==null && l.getTicksLived()<6400 && !l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-								  if (Math.random()<=0.08+((heightmodifier-l.getLocation().getY())*0.01d)) {
-									  if (Math.random()<=0.35) {
-										  l.setCustomName(ChatColor.YELLOW+"Venomous Spider");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth(),5));
-									  } else
-									  if (Math.random()<=0.15) {
-										  l.setCustomName(ChatColor.GOLD+"Venomous Spider II");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()*1.5,6));
-									  } else
-									  if (Math.random()<=0.35) {
-										  l.setCustomName(ChatColor.YELLOW+"Snaring Spider");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()*1.5,7));
-									  } else {
-										  l.setCustomName(ChatColor.GOLD+"Snaring Spider II");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()*2,8));
-									  }
-									  if (l!=null && l.isValid()) {
-										  l.setHealth(Warning(l.getMaxHealth(),21));
-									  }
-								  }
-								  l.setTicksLived(6400);
-							  }
-						  } else
-						  if (nearby.get(i).getType()==EntityType.SKELETON) {
-							  LivingEntity l = (LivingEntity)nearby.get(i);
-							  if (l.getCustomName()==null && l.getTicksLived()<6400 && !l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-								  if (Math.random()<=0.10+((heightmodifier-l.getLocation().getY())*0.01d)) {
-									  if (Math.random()<=0.85) {
-										  l.setCustomName(ChatColor.YELLOW+"Sniper");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()/2,9));
-									  } else {
-										  l.setCustomName(ChatColor.GOLD+"Sniper II");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()/4,10));
-									  }
-									  if (l!=null && l.isValid()) {
-										  l.setHealth(Warning(l.getMaxHealth(),11));
-									  }
-								  }
-								  l.setTicksLived(6400);
-							  }
-						  } else
-						  if (nearby.get(i).getType()==EntityType.ZOMBIE) {
-							  LivingEntity l = (LivingEntity)nearby.get(i);
-							  if (l.getCustomName()==null && l.getTicksLived()<6400 && !l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-								  if (l.getLocation().getY()<=35 && Math.random()<=0.15) {
-									  if (Math.random()<=0.85) {
-										  l.setCustomName(ChatColor.YELLOW+"Charge Zombie");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()+5,12));
-									  } else {
-										  l.setCustomName(ChatColor.GOLD+"Charge Zombie II");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  Warning(l,13);
+										  l.setMaxHealth(l.getMaxHealth()*0.65d);
+										  Warning(l,15);
 										  if (l!=null && l.isValid()) {
-											  l.setMaxHealth(l.getMaxHealth()+20);
+											  l.setHealth(l.getMaxHealth());
 										  }
 									  }
-									  Warning(l,23);
-									  if (l!=null && l.isValid()) {
-										  l.setMaxHealth(l.getMaxHealth());
+								  }
+							  }
+						  }
+						  l.setTicksLived(6400);
+					  } else {
+						  if (l.getCustomName()!=null && (l.getCustomName().compareTo(ChatColor.YELLOW+"Charge Zombie")==0 || l.getCustomName().compareTo(ChatColor.GOLD+"Charge Zombie II")==0 || l.getCustomName().compareTo(ChatColor.DARK_PURPLE+"Charge Zombie III")==0)) {
+							  //Destroy blocks around it.
+							  /*Block b = l.getLocation().getBlock();
+							  if (b.getType()==Material.WATER || b.getType()==Material.STATIONARY_WATER ||
+									  b.getType()==Material.LAVA || b.getType()==Material.STATIONARY_LAVA) {
+								Vector knockback = l.getVelocity().multiply(8f);
+								l.setVelocity(knockback);*/
+							  boolean doit=true;
+							  if (l.getKiller()!=null && l.getKiller().getLocation().getY()>l.getLocation().getY()) {
+								  doit=false;
+							  }
+							  if (l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+								  l.removePotionEffect(PotionEffectType.INVISIBILITY);
+							  }
+							  if (doit) {
+								  //Bukkit.getPlayer("sigonasr2").sendMessage("Charge Zombie!");
+								  if (l.getCustomName().compareTo(ChatColor.DARK_PURPLE+"Charge Zombie III")==0 && !l.isDead()) {
+									  /*//OLD CHARGE ZOMBIE BEHAVIOR. Charge Zombie II now does this weak block destruction.
+									  for (int k=-1;k<2;k++) {
+										  for (int j=-1;j<2;j++) {
+											  Location checkloc = l.getLocation().add(k,1,j);
+											  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+											  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+												  bl.breakNaturally();
+											  }
+											  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+											  checkloc = l.getLocation().add(k,2,j);
+											  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+												  bl.breakNaturally();
+											  }
+											  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+											  checkloc = l.getLocation().add(k,0,j);
+											  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+												  bl.breakNaturally();
+											  }
+										  }
+									  }*/
+									  for (int k=-2;k<3;k++) {
+										  for (int j=-2;j<3;j++) {
+											  Location checkloc = l.getLocation().add(k,1,j);
+											  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+											  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+												  bl.breakNaturally();
+											  }
+											  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+											  checkloc = l.getLocation().add(k,2,j);
+											  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+												  bl.breakNaturally();
+											  }
+											  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+											  checkloc = l.getLocation().add(k,0,j);
+											  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+												  bl.breakNaturally();
+											  }
+											  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+											  checkloc = l.getLocation().add(k,-1,j);
+											  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+												  bl.breakNaturally();
+											  }
+										  }
 									  }
 								  } else {
-									  if (Math.random()<=0.10+((heightmodifier-l.getLocation().getY())*0.01d)) {
-										  if (Math.random()<=0.25) {
-											  l.setCustomName(ChatColor.GRAY+"Zombie Ninja");
-											  l.setCustomNameVisible(false);
-											  l.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0, true));
-											  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 2, true));
-											  //l.setCustomNameVisible(true);
-											  //A Zombie Ninja will not wear armor to stay hidden. But may carry a sword.
-											  l.getEquipment().setChestplate(new ItemStack(Material.AIR));
-											  l.getEquipment().setBoots(new ItemStack(Material.AIR));
-											  l.getEquipment().setLeggings(new ItemStack(Material.AIR));
-											  l.getEquipment().setHelmet(new ItemStack(Material.AIR));
-											  Zombie g = (Zombie)l;
-											  g.setBaby(true);
-											  Warning(l,14);
-											  if (l!=null && l.isValid()) {
-												  l.setMaxHealth(l.getMaxHealth()*0.65d);
-												  Warning(l,15);
-												  if (l!=null && l.isValid()) {
-													  l.setHealth(l.getMaxHealth());
+									  if (l.getCustomName().compareTo(ChatColor.GOLD+"Charge Zombie II")==0 && !l.isDead() && l.getKiller()!=null) {
+									  /*
+									  for (int k=-1;k<2;k++) {
+										  for (int j=-1;j<2;j++) {
+											  Location checkloc = l.getLocation().add(k,1,j);
+											  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+											  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+												  bl.breakNaturally();
+											  }
+											  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+											  checkloc = l.getLocation().add(k,2,j);
+											  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+												  bl.breakNaturally();
+											  }
+											  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+											  checkloc = l.getLocation().add(k,0,j);
+											  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+												  bl.breakNaturally();
+											  }
+										  }
+									  }*/ //Charge Zombie II's now only break blocks when YOU get hit by them.
+									  //OLD CHARGE ZOMBIE II BEHAVIOR.
+										  for (int k=-2;k<3;k++) {
+											  for (int j=-2;j<3;j++) {
+												  Location checkloc = l.getLocation().add(k,1,j);
+												  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+												  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND) {
+													  bl.breakNaturally();
+												  }
+												  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+												  checkloc = l.getLocation().add(k,2,j);
+												  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND) {
+													  bl.breakNaturally();
+												  }
+												  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+												  checkloc = l.getLocation().add(k,0,j);
+												  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND) {
+													  bl.breakNaturally();
 												  }
 											  }
 										  }
-									  }
-								  }
-								  l.setTicksLived(6400);
-							  } else {
-								  if (l.getCustomName()!=null && (l.getCustomName().compareTo(ChatColor.YELLOW+"Charge Zombie")==0 || l.getCustomName().compareTo(ChatColor.GOLD+"Charge Zombie II")==0 || l.getCustomName().compareTo(ChatColor.DARK_PURPLE+"Charge Zombie III")==0)) {
-									  //Destroy blocks around it.
-									  /*Block b = l.getLocation().getBlock();
-									  if (b.getType()==Material.WATER || b.getType()==Material.STATIONARY_WATER ||
-											  b.getType()==Material.LAVA || b.getType()==Material.STATIONARY_LAVA) {
-										Vector knockback = l.getVelocity().multiply(8f);
-										l.setVelocity(knockback);*/
-									  boolean doit=true;
-									  if (l.getKiller()!=null && l.getKiller().getLocation().getY()>l.getLocation().getY()) {
-										  doit=false;
-									  }
-									  if (l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-										  l.removePotionEffect(PotionEffectType.INVISIBILITY);
-									  }
-									  if (doit) {
-										  //Bukkit.getPlayer("sigonasr2").sendMessage("Charge Zombie!");
-										  if (l.getCustomName().compareTo(ChatColor.DARK_PURPLE+"Charge Zombie III")==0 && !l.isDead()) {
-											  /*//OLD CHARGE ZOMBIE BEHAVIOR. Charge Zombie II now does this weak block destruction.
-											  for (int k=-1;k<2;k++) {
-												  for (int j=-1;j<2;j++) {
-													  Location checkloc = l.getLocation().add(k,1,j);
-													  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,2,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,0,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
+									  } else 
+									if (l.getCustomName().compareTo(ChatColor.YELLOW+"Charge Zombie")==0 && !l.isDead() && l.getKiller()!=null) {
+										  for (int k=-1;k<2;k++) {
+											  for (int j=-1;j<2;j++) {
+												  Location checkloc = l.getLocation().add(k,1,j);
+												  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+												  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+													  bl.breakNaturally();
 												  }
-											  }*/
-											  for (int k=-2;k<3;k++) {
-												  for (int j=-2;j<3;j++) {
-													  Location checkloc = l.getLocation().add(k,1,j);
-													  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,2,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,0,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,-1,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
+												  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+												  checkloc = l.getLocation().add(k,2,j);
+												  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+													  bl.breakNaturally();
 												  }
-											  }
-										  } else {
-											  if (l.getCustomName().compareTo(ChatColor.GOLD+"Charge Zombie II")==0 && !l.isDead() && l.getKiller()!=null) {
-											  /*
-											  for (int k=-1;k<2;k++) {
-												  for (int j=-1;j<2;j++) {
-													  Location checkloc = l.getLocation().add(k,1,j);
-													  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,2,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,0,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-												  }
-											  }*/ //Charge Zombie II's now only break blocks when YOU get hit by them.
-											  //OLD CHARGE ZOMBIE II BEHAVIOR.
-												  for (int k=-2;k<3;k++) {
-													  for (int j=-2;j<3;j++) {
-														  Location checkloc = l.getLocation().add(k,1,j);
-														  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND) {
-															  bl.breakNaturally();
-														  }
-														  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-														  checkloc = l.getLocation().add(k,2,j);
-														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND) {
-															  bl.breakNaturally();
-														  }
-														  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-														  checkloc = l.getLocation().add(k,0,j);
-														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND) {
-															  bl.breakNaturally();
-														  }
-													  }
-												  }
-											  } else 
-											if (l.getCustomName().compareTo(ChatColor.YELLOW+"Charge Zombie")==0 && !l.isDead() && l.getKiller()!=null) {
-												  for (int k=-1;k<2;k++) {
-													  for (int j=-1;j<2;j++) {
-														  Location checkloc = l.getLocation().add(k,1,j);
-														  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-															  bl.breakNaturally();
-														  }
-														  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-														  checkloc = l.getLocation().add(k,2,j);
-														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-															  bl.breakNaturally();
-														  }
-														  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-														  checkloc = l.getLocation().add(k,0,j);
-														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-															  bl.breakNaturally();
-														  }
-													  }
+												  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+												  checkloc = l.getLocation().add(k,0,j);
+												  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
+													  bl.breakNaturally();
 												  }
 											  }
 										  }
@@ -1947,522 +1960,150 @@ public void runTick() {
 					  }
 				  }
 			  }
-			  if (p.getWorld().getName().compareTo("world_nether")==0) {
-				  if (Main.SERVER_TICK_TIME%60==0) {
-					  for (int i=-15;i<=15;i++) {
-						  for (int j=-15;j<=15;j++) {
-							  for (int k=-5;k<=5;k++) {
-								  if (Bukkit.getWorld("world_nether").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getType()==Material.MOB_SPAWNER) {
-									  if (Math.random()<=0.5) {
-										  CreatureSpawner spawner = (CreatureSpawner)Bukkit.getWorld("world_nether").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getState();
-										  Location testloc = new Location(Bukkit.getWorld("world_nether"),spawner.getLocation().getX()+Math.random()*5,spawner.getLocation().getY()+Math.random()*3,spawner.getLocation().getZ()+Math.random()*5);
-										  if (Bukkit.getWorld("world_nether").getBlockAt(testloc).getType()==Material.AIR && Bukkit.getWorld("world_nether").getBlockAt(testloc.add(0,1,0)).getType()==Material.AIR) {
-											  Bukkit.getWorld("world_nether").spawnCreature(testloc,spawner.getCreatureType());
-										  }
-										  Bukkit.getWorld("world_nether").spawnCreature(spawner.getLocation(),spawner.getCreatureType());
-									  }
-									  
+		  }
+	  }
+	  if (p.getWorld().getName().compareTo("world_nether")==0) {
+		  if (Main.SERVER_TICK_TIME%60==0) {
+			  for (int i=-15;i<=15;i++) {
+				  for (int j=-15;j<=15;j++) {
+					  for (int k=-5;k<=5;k++) {
+						  if (Bukkit.getWorld("world_nether").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getType()==Material.MOB_SPAWNER) {
+							  if (Math.random()<=0.5) {
+								  CreatureSpawner spawner = (CreatureSpawner)Bukkit.getWorld("world_nether").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getState();
+								  Location testloc = new Location(Bukkit.getWorld("world_nether"),spawner.getLocation().getX()+Math.random()*5,spawner.getLocation().getY()+Math.random()*3,spawner.getLocation().getZ()+Math.random()*5);
+								  if (Bukkit.getWorld("world_nether").getBlockAt(testloc).getType()==Material.AIR && Bukkit.getWorld("world_nether").getBlockAt(testloc.add(0,1,0)).getType()==Material.AIR) {
+									  Bukkit.getWorld("world_nether").spawnCreature(testloc,spawner.getCreatureType());
 								  }
+								  Bukkit.getWorld("world_nether").spawnCreature(spawner.getLocation(),spawner.getCreatureType());
 							  }
-						  }
-					  }
-					  List<Entity> nearby = p.getNearbyEntities(30, 30, 30);
-					  try {
-						  for (int i=0;i<nearby.size();i++) {
-							  if (nearby.get(i).getType()==EntityType.PIG_ZOMBIE) {
-								  if (Math.random()<=0.25) {
-									  PigZombie pigman = (PigZombie)nearby.get(i);
-									  pigman.setAngry(true);
-									  //Bukkit.getPlayer("sigonasr2").sendMessage("Pig Zombie angry.");
-								  }
-							  }
-							  if (nearby.get(i).getType()==EntityType.MAGMA_CUBE) {
-								  if (Math.random()<=0.05 && last_lava_dump_time<Bukkit.getWorld("world_nether").getFullTime()) {
-									  if (Bukkit.getWorld("world_nether").getBlockAt(nearby.get(i).getLocation()).getType()==Material.AIR) {
-										  Bukkit.getWorld("world_nether").getBlockAt(nearby.get(i).getLocation()).setType(Material.LAVA);
-										  last_lava_dump_time=Bukkit.getWorld("world_nether").getFullTime()+100;
-										  //Bukkit.getPlayer("sigonasr2").sendMessage("Magma Cube lava.");
-									  }
-								  }
-							  }
-						  }
-					  } catch (ConcurrentModificationException ex_e) {
-						  Bukkit.getLogger().warning("Could not check nearby entities in the nether.");
-					  }
-				  }
-			  }
-			  if (Main.SERVER_TICK_TIME%600==0) {
-				  saveAccountsConfig();
-				  if (turnedon==false && Bukkit.getWorld("world").getTime()>13000) {
-					  //Bukkit.getPlayer("sigonasr2").sendMessage("It's night now...");
-					  turnedon=true;
-					  for (int x=1562;x<1645;x++) {
-						  for (int y=64;y<80;y++) {
-							  for (int z=-357;z<-211;z++) {
-								  Block theblock=Bukkit.getWorld("world").getBlockAt(x,y,z);
-								  if (theblock.getType()==Material.REDSTONE_LAMP_OFF) {
-									  theblock.setType(Material.REDSTONE_LAMP_ON);
-								  }
-							  }
-						  }
-					  }
-				  }
-				  if (turnedon==true && Bukkit.getWorld("world").getTime()<13000) {
-					  turnedon=false;
-					  //Bukkit.getPlayer("sigonasr2").sendMessage("It's day now...");
-					  for (int x=1562;x<1645;x++) {
-						  for (int y=64;y<80;y++) {
-							  for (int z=-357;z<-211;z++) {
-								  Block theblock=Bukkit.getWorld("world").getBlockAt(x,y,z);
-								  if (theblock.getType()==Material.REDSTONE_LAMP_ON) {
-									  theblock.setType(Material.REDSTONE_LAMP_OFF);
-								  }
-							  }
-						  }
-					  }
-				  }
-			  }
-			  if (Main.SERVER_TICK_TIME%10==0) {
-				  if (getConfig().getBoolean("spleef4insession")) {
-					  //Check to see if we fall off.
-					  if ((p.getLocation().getX()<1585 || p.getLocation().getX()>1600 || p.getLocation().getZ()<24 || p.getLocation().getZ()>39 || p.getLocation().getY()<86.5d) && (
-							  (p.getName().compareTo(getConfig().getString("spleefrequesta4player"))==0 || p.getName().compareTo(getConfig().getString("spleefrequestb4player"))==0
-							  || p.getName().compareTo(getConfig().getString("spleefrequestc4player"))==0 || p.getName().compareTo(getConfig().getString("spleefrequestd4player"))==0))) {
-						  //You lose.
-						  //See if we're the winner.
-						  int countdead=0; //We're looking for 3.
-						  
-						  
-						  Player winningplayer = p,losingplayer = p;
-						  if (getConfig().getString("spleefrequesta4player").compareTo("none")==0) {
-							  countdead++;
-						  } else {
-							  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0) {
-								  losingplayer=Bukkit.getPlayer(getConfig().getString("spleefrequesta4player"));
-							  } else {
-								  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequesta4player"));
-							  }
-						  }
-						  if (getConfig().getString("spleefrequestb4player").compareTo("none")==0) {
-							  countdead++;
-						  } else {
-							  if (getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0) {
-								  losingplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestb4player"));
-							  } else {
-								  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestb4player"));
-							  }
-						  }
-						  if (getConfig().getString("spleefrequestc4player").compareTo("none")==0) {
-							  countdead++;
-						  } else {
-							  if (getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0) {
-								  losingplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestc4player"));
-							  } else {
-								  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestc4player"));
-							  }
-						  }
-						  if (getConfig().getString("spleefrequestd4player").compareTo("none")==0) {
-							  countdead++;
-						  } else {
-							  if (getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
-								  losingplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestd4player"));
-							  } else {
-								  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestd4player"));
-							  }
-						  }
-						  if (countdead==2) {
-				        		getConfig().set("spleef4insession", Boolean.valueOf(false));
-				        		
-				        		
-				        		
-				        		
-	
-				        		//Stand someplace else when you win.
-				        		
-				        		
-				        		//Losing player has losing player stuff happen.
-				        		//This was a player that lost.
-								  //Move them out, give them back their stuff.
-								  Location newloc = p.getLocation();
-								  //Look for the special shovel for the sake of storing it.
-								  /*
-								  ItemStack[] shovelstack = p.getInventory().getContents();
-								  boolean shovelfound=false;
-								  ItemStack shovel = shovelstack[0];
-								  for (int i=0;i<shovelstack.length;i++) {
-									  if (shovelstack[i]!=null && shovelstack[i].getItemMeta().hasDisplayName()==true && shovelstack[i].getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
-										  //We found the shovel!
-										  //Bukkit.getPlayer("sigonasr2").sendMessage("Found shovel in inventory.");
-										  shovelfound=true;
-										  shovel=shovelstack[i];
-										  break;
-									  }
-								  }
-								  store_shovel = shovel;
-								  */
-								  p.getInventory().clear();
-								  p.getInventory().clear(p.getInventory().getHeldItemSlot());
-								  //Give inventories back.
-								  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0) {
-									  for (int i=0;i<spleef4_inventory_a.length;i++) {
-										  if (spleef4_inventory_a[i]!=null) {
-										  p.getInventory().addItem(spleef4_inventory_a[i]);
-										  }
-									  }
-									  getConfig().set("spleefrequesta4player",String.valueOf("none"));
-								  } else
-								  if (getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0) {
-									  for (int i=0;i<spleef4_inventory_b.length;i++) {
-										  if (spleef4_inventory_b[i]!=null) {
-										  p.getInventory().addItem(spleef4_inventory_b[i]);
-										  }
-									  }
-									  getConfig().set("spleefrequestb4player",String.valueOf("none"));
-								  } else
-								  if (getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0) {
-									  for (int i=0;i<spleef4_inventory_c.length;i++) {
-										  if (spleef4_inventory_c[i]!=null) {
-										  p.getInventory().addItem(spleef4_inventory_c[i]);
-										  }
-									  }
-									  getConfig().set("spleefrequestc4player",String.valueOf("none"));
-								  } else
-								  if (getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
-									  for (int i=0;i<spleef4_inventory_d.length;i++) {
-										  if (spleef4_inventory_d[i]!=null) {
-										  p.getInventory().addItem(spleef4_inventory_d[i]);
-										  }
-									  }
-									  getConfig().set("spleefrequestd4player",String.valueOf("none"));
-								  }
-								  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+p.getName()+" fell out of the arena and is out of the match!");
-								  
-	
-								  newloc = winningplayer.getLocation();
-								  newloc.setX(1583);
-								  newloc.setY(91);
-								  newloc.setZ(31.5);
-								  winningplayer.teleport(newloc);
-								  //Look for the special shovel for the sake of storing it.
-								  /*
-								  shovelstack = winningplayer.getInventory().getContents();
-								  shovelfound=false;
-								  shovel = shovelstack[0];
-								  for (int i=0;i<shovelstack.length;i++) {
-									  if (shovelstack[i]!=null && shovelstack[i].getItemMeta().hasDisplayName()==true && shovelstack[i].getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
-										  //We found the shovel!
-										  //Bukkit.getPlayer("sigonasr2").sendMessage("Found shovel in inventory.");
-										  shovelfound=true;
-										  shovel=shovelstack[i];
-										  break;
-									  }
-								  }
-								  store_shovel = shovel;*/
-								  winningplayer.getInventory().clear();
-								  winningplayer.getInventory().clear(winningplayer.getInventory().getHeldItemSlot());
-								  //Give inventories back.
-								  if (getConfig().getString("spleefrequesta4player").compareTo(winningplayer.getName())==0) {
-									  for (int i=0;i<spleef4_inventory_a.length;i++) {
-										  if (spleef4_inventory_a[i]!=null) {
-											  winningplayer.getInventory().addItem(spleef4_inventory_a[i]);
-										  }
-									  }
-									  getConfig().set("spleefrequesta4player",String.valueOf("none"));
-								  } else
-								  if (getConfig().getString("spleefrequestb4player").compareTo(winningplayer.getName())==0) {
-									  for (int i=0;i<spleef4_inventory_b.length;i++) {
-										  if (spleef4_inventory_b[i]!=null) {
-											  winningplayer.getInventory().addItem(spleef4_inventory_b[i]);
-										  }
-									  }
-									  getConfig().set("spleefrequestb4player",String.valueOf("none"));
-								  } else
-								  if (getConfig().getString("spleefrequestc4player").compareTo(winningplayer.getName())==0) {
-									  for (int i=0;i<spleef4_inventory_c.length;i++) {
-										  if (spleef4_inventory_c[i]!=null) {
-											  winningplayer.getInventory().addItem(spleef4_inventory_c[i]);
-										  }
-									  }
-									  getConfig().set("spleefrequestc4player",String.valueOf("none"));
-								  } else
-								  if (getConfig().getString("spleefrequestd4player").compareTo(winningplayer.getName())==0) {
-									  for (int i=0;i<spleef4_inventory_d.length;i++) {
-										  if (spleef4_inventory_d[i]!=null) {
-											  winningplayer.getInventory().addItem(spleef4_inventory_d[i]);
-										  }
-									  }
-									  getConfig().set("spleefrequestd4player",String.valueOf("none"));
-								  }
-								  /*
-								  Location l1 = new Location(Bukkit.getWorld("world"), 1593, 85, 29);
-								  Chest c=(Chest)Bukkit.getWorld("world").getBlockAt(l1).getState();
-								  shovelstack = c.getBlockInventory().getContents();
-								  shovelfound=false;
-								  shovel = shovelstack[0];
-								  for (int i=0;i<shovelstack.length;i++) {
-									  if (shovelstack[i]!=null && shovelstack[i].getItemMeta().hasDisplayName()==true && shovelstack[i].getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
-										  //We found the shovel!
-										  //Bukkit.getPlayer("sigonasr2").sendMessage("Found shovel in inventory.");
-										  shovelfound=true;
-										  shovel=shovelstack[i];
-										  store_shovel = shovel;
-										  break;
-									  }
-								  }
-								  l1 = new Location(Bukkit.getWorld("world"), 1593, 85, 34);
-								  c=(Chest)Bukkit.getWorld("world").getBlockAt(l1).getState();
-								  shovelstack = c.getBlockInventory().getContents();
-								  shovelfound=false;
-								  shovel = shovelstack[0];
-								  for (int i=0;i<shovelstack.length;i++) {
-									  if (shovelstack[i]!=null && shovelstack[i].getItemMeta().hasDisplayName()==true && shovelstack[i].getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
-										  //We found the shovel!
-										  //Bukkit.getPlayer("sigonasr2").sendMessage("Found shovel in inventory.");
-										  shovelfound=true;
-										  shovel=shovelstack[i];
-										  store_shovel = shovel;
-										  break;
-									  }
-								  }
-								  l1 = new Location(Bukkit.getWorld("world"), 1593, 85, 29);
-								  c=(Chest)Bukkit.getWorld("world").getBlockAt(l1).getState();
-								  if (!c.getBlockInventory().contains(store_shovel)) {
-									  c.getBlockInventory().setItem((int)(Math.random()*27.0d), store_shovel);
-								  }
-								  l1 = new Location(Bukkit.getWorld("world"), 1593, 85, 34);
-								  c=(Chest)Bukkit.getWorld("world").getBlockAt(l1).getState();
-								  if (!c.getBlockInventory().contains(store_shovel)) {
-									  c.getBlockInventory().setItem((int)(Math.random()*27.0d), store_shovel);
-								  }
-								  */
-								  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+winningplayer.getName()+"["+(int)getAccountsConfig().getDouble(winningplayer.getName()+".spleefrating")/10+"] is the winner of this 4-player spleef game!");
-								  getConfig().set("spleeflastrequesttime",Double.valueOf(0.0d));
-				        		getConfig().set("spleefrequesta4player", String.valueOf("none"));
-				        		getConfig().set("spleefrequestb4player", String.valueOf("none"));
-				        		getConfig().set("spleefrequestc4player", String.valueOf("none"));
-				        		getConfig().set("spleefrequestd4player", String.valueOf("none"));
-						  } else
-						  {
-							  //This was a player that lost.
-							  //Move them out, give them back their stuff.
-							  Location newloc = p.getLocation();
-							  newloc.setX(1583);
-							  newloc.setY(91);
-							  newloc.setZ(31.5);
-							  p.teleport(newloc);
-							  /*
-							  //Look for the special shovel for the sake of storing it.
-							  ItemStack[] shovelstack = p.getInventory().getContents();
-							  boolean shovelfound=false;
-							  ItemStack shovel = shovelstack[0];
-							  for (int i=0;i<shovelstack.length;i++) {
-								  if (shovelstack[i]!=null && shovelstack[i].getItemMeta().hasDisplayName()==true && shovelstack[i].getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
-									  //We found the shovel!
-									  //Bukkit.getPlayer("sigonasr2").sendMessage("Found shovel in inventory.");
-									  shovelfound=true;
-									  shovel=shovelstack[i];
-									  break;
-								  }
-							  }
-							  store_shovel = shovel;*/
-							  p.getInventory().clear();
-							  p.getInventory().clear(p.getInventory().getHeldItemSlot());
-							  //Give inventories back.
-							  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0) {
-								  for (int i=0;i<spleef4_inventory_a.length;i++) {
-									  if (spleef4_inventory_a[i]!=null) {
-									  p.getInventory().addItem(spleef4_inventory_a[i]);
-									  }
-								  }
-								  getConfig().set("spleefrequesta4player",String.valueOf("none"));
-							  } else
-							  if (getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0) {
-								  for (int i=0;i<spleef4_inventory_b.length;i++) {
-									  if (spleef4_inventory_b[i]!=null) {
-									  p.getInventory().addItem(spleef4_inventory_b[i]);
-									  }
-								  }
-								  getConfig().set("spleefrequestb4player",String.valueOf("none"));
-							  } else
-							  if (getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0) {
-								  for (int i=0;i<spleef4_inventory_c.length;i++) {
-									  if (spleef4_inventory_c[i]!=null) {
-									  p.getInventory().addItem(spleef4_inventory_c[i]);
-									  }
-								  }
-								  getConfig().set("spleefrequestc4player",String.valueOf("none"));
-							  } else
-							  if (getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
-								  for (int i=0;i<spleef4_inventory_d.length;i++) {
-									  if (spleef4_inventory_d[i]!=null) {
-									  p.getInventory().addItem(spleef4_inventory_d[i]);
-									  }
-								  }
-								  getConfig().set("spleefrequestd4player",String.valueOf("none"));
-							  }
-							  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+p.getName()+" fell out of the arena and is out of the match!");
 							  
 						  }
 					  }
-					  //Check to see if we are a player in spleef.
-					  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0 ||
-							  getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0 ||
-							  getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0 ||
-							  getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
-						  //If they are holding something, remove it.
-						  if (p.getItemInHand()!=null) {
-							  p.getInventory().remove(p.getInventory().getHeldItemSlot());
+				  }
+			  }
+			  List<Entity> nearby = p.getNearbyEntities(30, 30, 30);
+			  try {
+				  for (int i=0;i<nearby.size();i++) {
+					  if (nearby.get(i).getType()==EntityType.PIG_ZOMBIE) {
+						  if (Math.random()<=0.25) {
+							  PigZombie pigman = (PigZombie)nearby.get(i);
+							  pigman.setAngry(true);
+							  //Bukkit.getPlayer("sigonasr2").sendMessage("Pig Zombie angry.");
+						  }
+					  }
+					  if (nearby.get(i).getType()==EntityType.MAGMA_CUBE) {
+						  if (Math.random()<=0.05 && last_lava_dump_time<Bukkit.getWorld("world_nether").getFullTime()) {
+							  if (Bukkit.getWorld("world_nether").getBlockAt(nearby.get(i).getLocation()).getType()==Material.AIR) {
+								  Bukkit.getWorld("world_nether").getBlockAt(nearby.get(i).getLocation()).setType(Material.LAVA);
+								  last_lava_dump_time=Bukkit.getWorld("world_nether").getFullTime()+100;
+								  //Bukkit.getPlayer("sigonasr2").sendMessage("Magma Cube lava.");
+							  }
 						  }
 					  }
 				  }
-				  
-				  if (getConfig().getBoolean("spleefinsession") && (p.getName().compareTo(getConfig().getString("spleefrequestaplayer"))==0 || p.getName().compareTo(getConfig().getString("spleefrequestbplayer"))==0)) {
-					  //Determine if we're still playing.
-					  int blockwinner=0;
-					  if (getConfig().getString("spleefrequestaplayer").compareTo(p.getName())==0 ||
-							  getConfig().getString("spleefrequestbplayer").compareTo(p.getName())==0) {
-						  //If they are holding something, remove it.
-						  if (p.getItemInHand()!=null) {
-							  p.getInventory().remove(p.getInventory().getHeldItemSlot());
+			  } catch (ConcurrentModificationException ex_e) {
+				  Bukkit.getLogger().warning("Could not check nearby entities in the nether.");
+			  }
+		  }
+	  }
+	  if (Main.SERVER_TICK_TIME%600==0) {
+		  saveAccountsConfig();
+		  if (turnedon==false && Bukkit.getWorld("world").getTime()>13000) {
+			  //Bukkit.getPlayer("sigonasr2").sendMessage("It's night now...");
+			  turnedon=true;
+			  for (int x=1562;x<1645;x++) {
+				  for (int y=64;y<80;y++) {
+					  for (int z=-357;z<-211;z++) {
+						  Block theblock=Bukkit.getWorld("world").getBlockAt(x,y,z);
+						  if (theblock.getType()==Material.REDSTONE_LAMP_OFF) {
+							  theblock.setType(Material.REDSTONE_LAMP_ON);
 						  }
 					  }
-					  if (p.getPlayerTime()-spleef_last_broken_block>=400) {
-						  //WE have come to a standstill. Pick winner based on who has more blocks.
-						  int player_a_blocks=0,player_b_blocks=0;
-						  for (int i=Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getLocation().getBlockX()-4;i<Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getLocation().getBlockX()+4;i++) {
-							  for (int j=Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getLocation().getBlockZ()-4;j<Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getLocation().getBlockZ()+4;j++) {
-								  if (Bukkit.getWorld("world").getBlockAt(i,86,j).getType()==Material.DIRT) {
-									  player_a_blocks+=1;
-								  }
-							  }
+				  }
+			  }
+		  }
+		  if (turnedon==true && Bukkit.getWorld("world").getTime()<13000) {
+			  turnedon=false;
+			  //Bukkit.getPlayer("sigonasr2").sendMessage("It's day now...");
+			  for (int x=1562;x<1645;x++) {
+				  for (int y=64;y<80;y++) {
+					  for (int z=-357;z<-211;z++) {
+						  Block theblock=Bukkit.getWorld("world").getBlockAt(x,y,z);
+						  if (theblock.getType()==Material.REDSTONE_LAMP_ON) {
+							  theblock.setType(Material.REDSTONE_LAMP_OFF);
 						  }
-						  for (int i=Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getLocation().getBlockX()-4;i<Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getLocation().getBlockX()+4;i++) {
-							  for (int j=Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getLocation().getBlockZ()-4;j<Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getLocation().getBlockZ()+4;j++) {
-								  if (Bukkit.getWorld("world").getBlockAt(i,86,j).getType()==Material.DIRT) {
-									  player_b_blocks+=1;
-								  }
-							  }
-						  }
-						  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+"No blocks were destroyed in 20 seconds. The match's victor was determined by the player with the most block area around them.");
-						  if (player_a_blocks>player_b_blocks) {
-							  blockwinner=1;
-						  } else {
-							  blockwinner=2;
-						  }
-					  } else 
-					  if ((p.getLocation().getY()<86.5d || p.getLocation().getZ()<52.0d || p.getLocation().getZ()>65.0d || p.getLocation().getX()>1628.0d || p.getLocation().getX()<1615.0d) || blockwinner!=0) {
-						  //We lose. Other player wins.
-						  getConfig().set("spleefinsession", Boolean.valueOf(false));
-						  //Find out if we're player A, or player B.
-						  Player winningplayer,losingplayer;
-						  if (p.getName().compareTo(getConfig().getString("spleefrequestaplayer"))==0 || blockwinner==2) {
-							  //We're player A.
-							  //Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+getConfig().getString("spleefrequestbplayer")+" is the winner of this spleef game! "+getConfig().getString("spleefrequestaplayer")+" loses.");
-							  losingplayer=p;
-							  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer"));
-	
-							  double val1,val2,value,newval1,newval2;
-							  if (getAccountsConfig().contains(winningplayer.getName()+".spleefrating")) {
-								  val1 = getAccountsConfig().getDouble(winningplayer.getName()+".spleefrating");
-							  } else {
-								  val1 = 1000.0d;
-							  }
-							  if (getAccountsConfig().contains(losingplayer.getName()+".spleefrating")) {
-								  val2 = getAccountsConfig().getDouble(losingplayer.getName()+".spleefrating");
-							  } else {
-								  val2 = 1000.0d;
-							  }
-							  value = 1.0d/(1.0d+Math.pow(10.0d, ((val2-val1)/400.0d)));
-							  if (getAccountsConfig().contains(winningplayer.getName()+".spleefwins")) {
-								  getAccountsConfig().set(winningplayer.getName()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName()+".spleefwins")+1));
-							  } else {
-								  getAccountsConfig().set(winningplayer.getName()+".spleefwins", Integer.valueOf(1));
-							  }
-							  if (getAccountsConfig().contains(winningplayer.getName()+".spleeflosses")) {
-								  getAccountsConfig().set(winningplayer.getName()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName()+".spleeflosses")));
-							  } else {
-								  getAccountsConfig().set(winningplayer.getName()+".spleeflosses", Integer.valueOf(0));
-							  }
-							  if (getAccountsConfig().contains(losingplayer.getName()+".spleefwins")) {
-								  getAccountsConfig().set(losingplayer.getName()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName()+".spleefwins")));
-							  } else {
-								  getAccountsConfig().set(losingplayer.getName()+".spleefwins", Integer.valueOf(0));
-							  }
-							  if (getAccountsConfig().contains(losingplayer.getName()+".spleeflosses")) {
-								  getAccountsConfig().set(losingplayer.getName()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName()+".spleeflosses")+1));
-							  } else {
-								  getAccountsConfig().set(losingplayer.getName()+".spleeflosses", Integer.valueOf(1));
-							  }
-							  newval1 = (val1+Math.round(((50.0d/((getAccountsConfig().getDouble(winningplayer.getName()+".spleefwins")+getAccountsConfig().getDouble(winningplayer.getName()+".spleeflosses"))/20.0d))*(1.0d-value))));
-							  newval2 = (val2+Math.round(((50.0d/((getAccountsConfig().getDouble(losingplayer.getName()+".spleefwins")+getAccountsConfig().getDouble(losingplayer.getName()+".spleeflosses"))/20.0d))*(0.0d-value))));
-							  getAccountsConfig().set(winningplayer.getName()+".spleefrating",Double.valueOf(newval1));
-							  getAccountsConfig().set(losingplayer.getName()+".spleefrating",Double.valueOf(newval2));
-							  Location newloc = winningplayer.getLocation();
-	
-							  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+getConfig().getString("spleefrequestbplayer")+"["+(int)newval1/10+"] is the winner of this spleef game! "+getConfig().getString("spleefrequestaplayer")+"["+(int)newval2/10+"] loses.");
-							  newloc.setX(1622.5d);
-							  newloc.setY(87.0d);
-							  newloc.setZ(51.65d);
-							  winningplayer.teleport(newloc);
-							  updateTopSPLEEFSigns();
-							  //saveAccountsConfig() //Commented out;
-						  } else {
-							  //We're player B.
-							  //Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+getConfig().getString("spleefrequestaplayer")+" is the winner of this spleef game! "+getConfig().getString("spleefrequestbplayer")+" loses.");
-							  losingplayer=p;
-							  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer"));
-							  double val1,val2,value,newval1,newval2;
-							  if (getAccountsConfig().contains(winningplayer.getName()+".spleefrating")) {
-								  val1 = getAccountsConfig().getDouble(winningplayer.getName()+".spleefrating");
-							  } else {
-								  val1 = 1000.0d;
-							  }
-							  if (getAccountsConfig().contains(losingplayer.getName()+".spleefrating")) {
-								  val2 = getAccountsConfig().getDouble(losingplayer.getName()+".spleefrating");
-							  } else {
-								  val2 = 1000.0d;
-							  }
-							  value = 1.0d/(1.0d+Math.pow(10.0d, ((val2-val1)/400.0d)));
-							  if (getAccountsConfig().contains(winningplayer.getName()+".spleefwins")) {
-								  getAccountsConfig().set(winningplayer.getName()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName()+".spleefwins")+1));
-							  } else {
-								  getAccountsConfig().set(winningplayer.getName()+".spleefwins", Integer.valueOf(1));
-							  }
-							  if (getAccountsConfig().contains(winningplayer.getName()+".spleeflosses")) {
-								  getAccountsConfig().set(winningplayer.getName()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName()+".spleeflosses")));
-							  } else {
-								  getAccountsConfig().set(winningplayer.getName()+".spleeflosses", Integer.valueOf(0));
-							  }
-							  if (getAccountsConfig().contains(losingplayer.getName()+".spleefwins")) {
-								  getAccountsConfig().set(losingplayer.getName()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName()+".spleefwins")));
-							  } else {
-								  getAccountsConfig().set(losingplayer.getName()+".spleefwins", Integer.valueOf(0));
-							  }
-							  if (getAccountsConfig().contains(losingplayer.getName()+".spleeflosses")) {
-								  getAccountsConfig().set(losingplayer.getName()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName()+".spleeflosses")+1));
-							  } else {
-								  getAccountsConfig().set(losingplayer.getName()+".spleeflosses", Integer.valueOf(1));
-							  }
-							  newval1 = ((val1+Math.round((50.0d/((getAccountsConfig().getDouble(winningplayer.getName()+".spleefwins")+getAccountsConfig().getDouble(winningplayer.getName()+".spleeflosses"))/20.0d))*(1.0d-value))));
-							  newval2 = ((val2+Math.round((50.0d/((getAccountsConfig().getDouble(losingplayer.getName()+".spleefwins")+getAccountsConfig().getDouble(losingplayer.getName()+".spleeflosses"))/20.0d))*(0.0d-value))));
-							  getAccountsConfig().set(winningplayer.getName()+".spleefrating",Double.valueOf(newval1));
-							  getAccountsConfig().set(losingplayer.getName()+".spleefrating",Double.valueOf(newval2));
-							  Location newloc = winningplayer.getLocation();
-	
-							  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+getConfig().getString("spleefrequestaplayer")+"["+(int)newval1/10+"] is the winner of this spleef game! "+getConfig().getString("spleefrequestbplayer")+"["+(int)newval2/10+"] loses.");
-							  newloc.setX(1622.5d);
-							  newloc.setY(87.0d);
-							  newloc.setZ(51.65d);
-							  winningplayer.teleport(newloc);
-							  updateTopSPLEEFSigns();
-							  //saveAccountsConfig() //Commented out;
-						  }
-						  //Look for the special shovel.
+					  }
+				  }
+			  }
+		  }
+	  }
+	  if (Main.SERVER_TICK_TIME%10==0) {
+		  if (getConfig().getBoolean("spleef4insession")) {
+			  //Check to see if we fall off.
+			  if ((p.getLocation().getX()<1585 || p.getLocation().getX()>1600 || p.getLocation().getZ()<24 || p.getLocation().getZ()>39 || p.getLocation().getY()<86.5d) && (
+					  (p.getName().compareTo(getConfig().getString("spleefrequesta4player"))==0 || p.getName().compareTo(getConfig().getString("spleefrequestb4player"))==0
+					  || p.getName().compareTo(getConfig().getString("spleefrequestc4player"))==0 || p.getName().compareTo(getConfig().getString("spleefrequestd4player"))==0))) {
+				  //You lose.
+				  //See if we're the winner.
+				  int countdead=0; //We're looking for 3.
+				  
+				  
+				  Player winningplayer = p,losingplayer = p;
+				  if (getConfig().getString("spleefrequesta4player").compareTo("none")==0) {
+					  countdead++;
+				  } else {
+					  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0) {
+						  losingplayer=Bukkit.getPlayer(getConfig().getString("spleefrequesta4player"));
+					  } else {
+						  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequesta4player"));
+					  }
+				  }
+				  if (getConfig().getString("spleefrequestb4player").compareTo("none")==0) {
+					  countdead++;
+				  } else {
+					  if (getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0) {
+						  losingplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestb4player"));
+					  } else {
+						  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestb4player"));
+					  }
+				  }
+				  if (getConfig().getString("spleefrequestc4player").compareTo("none")==0) {
+					  countdead++;
+				  } else {
+					  if (getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0) {
+						  losingplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestc4player"));
+					  } else {
+						  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestc4player"));
+					  }
+				  }
+				  if (getConfig().getString("spleefrequestd4player").compareTo("none")==0) {
+					  countdead++;
+				  } else {
+					  if (getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
+						  losingplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestd4player"));
+					  } else {
+						  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestd4player"));
+					  }
+				  }
+				  if (countdead==2) {
+		        		getConfig().set("spleef4insession", Boolean.valueOf(false));
+		        		
+		        		
+		        		
+		        		
+
+		        		//Stand someplace else when you win.
+		        		
+		        		
+		        		//Losing player has losing player stuff happen.
+		        		//This was a player that lost.
+						  //Move them out, give them back their stuff.
+						  Location newloc = p.getLocation();
+						  //Look for the special shovel for the sake of storing it.
 						  /*
-						  ItemStack[] shovelstack = Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getInventory().getContents();
+						  ItemStack[] shovelstack = p.getInventory().getContents();
 						  boolean shovelfound=false;
 						  ItemStack shovel = shovelstack[0];
-						  Bukkit.getPlayer("sigonasr2").sendMessage("Starting shovel check.");
 						  for (int i=0;i<shovelstack.length;i++) {
 							  if (shovelstack[i]!=null && shovelstack[i].getItemMeta().hasDisplayName()==true && shovelstack[i].getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
 								  //We found the shovel!
@@ -2472,57 +2113,434 @@ public void runTick() {
 								  break;
 							  }
 						  }
-						  shovelstack = Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getInventory().getContents();
-						  //Bukkit.getPlayer("sigonasr2").sendMessage("Next shovel inventory check.");
-						  if (!shovelfound) {
-							  for (int i=0;i<shovelstack.length;i++) {
-								  if (shovelstack[i]!=null && shovelstack[i].getItemMeta().hasDisplayName()==true && shovelstack[i].getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
-									  //We found the shovel!
-									  //Bukkit.getPlayer("sigonasr2").sendMessage("Found shovel in inventory.");
-									  shovelfound=true;
-									  shovel=shovelstack[i];
-									  break;
+						  store_shovel = shovel;
+						  */
+						  p.getInventory().clear();
+						  p.getInventory().clear(p.getInventory().getHeldItemSlot());
+						  //Give inventories back.
+						  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0) {
+							  for (int i=0;i<spleef4_inventory_a.length;i++) {
+								  if (spleef4_inventory_a[i]!=null) {
+								  p.getInventory().addItem(spleef4_inventory_a[i]);
 								  }
 							  }
+							  getConfig().set("spleefrequesta4player",String.valueOf("none"));
+						  } else
+						  if (getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0) {
+							  for (int i=0;i<spleef4_inventory_b.length;i++) {
+								  if (spleef4_inventory_b[i]!=null) {
+								  p.getInventory().addItem(spleef4_inventory_b[i]);
+								  }
+							  }
+							  getConfig().set("spleefrequestb4player",String.valueOf("none"));
+						  } else
+						  if (getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0) {
+							  for (int i=0;i<spleef4_inventory_c.length;i++) {
+								  if (spleef4_inventory_c[i]!=null) {
+								  p.getInventory().addItem(spleef4_inventory_c[i]);
+								  }
+							  }
+							  getConfig().set("spleefrequestc4player",String.valueOf("none"));
+						  } else
+						  if (getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
+							  for (int i=0;i<spleef4_inventory_d.length;i++) {
+								  if (spleef4_inventory_d[i]!=null) {
+								  p.getInventory().addItem(spleef4_inventory_d[i]);
+								  }
+							  }
+							  getConfig().set("spleefrequestd4player",String.valueOf("none"));
 						  }
-						  if (shovelfound) {
-							  //Bukkit.getPlayer("sigonasr2").sendMessage("Found a shovel, transporting in chest box.");
-							  Location l1 = new Location(Bukkit.getWorld("world"), 1622, 85, 58);
-							  Chest c=(Chest)Bukkit.getWorld("world").getBlockAt(l1).getState();
-							  c.getBlockInventory().setItem((int)(Math.random()*27.0d), shovel);
-						  }*/
-						  Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getInventory().clear();
-						  Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getInventory().clear();
-							Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getInventory().clear(Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getInventory().getHeldItemSlot());
-							Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getInventory().clear(Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getInventory().getHeldItemSlot());
+						  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+p.getName()+" fell out of the arena and is out of the match!");
+						  
+
+						  newloc = winningplayer.getLocation();
+						  newloc.setX(1583);
+						  newloc.setY(91);
+						  newloc.setZ(31.5);
+						  winningplayer.teleport(newloc);
+						  //Look for the special shovel for the sake of storing it.
+						  /*
+						  shovelstack = winningplayer.getInventory().getContents();
+						  shovelfound=false;
+						  shovel = shovelstack[0];
+						  for (int i=0;i<shovelstack.length;i++) {
+							  if (shovelstack[i]!=null && shovelstack[i].getItemMeta().hasDisplayName()==true && shovelstack[i].getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
+								  //We found the shovel!
+								  //Bukkit.getPlayer("sigonasr2").sendMessage("Found shovel in inventory.");
+								  shovelfound=true;
+								  shovel=shovelstack[i];
+								  break;
+							  }
+						  }
+						  store_shovel = shovel;*/
+						  winningplayer.getInventory().clear();
+						  winningplayer.getInventory().clear(winningplayer.getInventory().getHeldItemSlot());
 						  //Give inventories back.
-						  for (int i=0;i<spleef_inventory_a.length;i++) {
-							  if (spleef_inventory_a[i]!=null) {
-							  Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getInventory().addItem(spleef_inventory_a[i]);
+						  if (getConfig().getString("spleefrequesta4player").compareTo(winningplayer.getName())==0) {
+							  for (int i=0;i<spleef4_inventory_a.length;i++) {
+								  if (spleef4_inventory_a[i]!=null) {
+									  winningplayer.getInventory().addItem(spleef4_inventory_a[i]);
+								  }
+							  }
+							  getConfig().set("spleefrequesta4player",String.valueOf("none"));
+						  } else
+						  if (getConfig().getString("spleefrequestb4player").compareTo(winningplayer.getName())==0) {
+							  for (int i=0;i<spleef4_inventory_b.length;i++) {
+								  if (spleef4_inventory_b[i]!=null) {
+									  winningplayer.getInventory().addItem(spleef4_inventory_b[i]);
+								  }
+							  }
+							  getConfig().set("spleefrequestb4player",String.valueOf("none"));
+						  } else
+						  if (getConfig().getString("spleefrequestc4player").compareTo(winningplayer.getName())==0) {
+							  for (int i=0;i<spleef4_inventory_c.length;i++) {
+								  if (spleef4_inventory_c[i]!=null) {
+									  winningplayer.getInventory().addItem(spleef4_inventory_c[i]);
+								  }
+							  }
+							  getConfig().set("spleefrequestc4player",String.valueOf("none"));
+						  } else
+						  if (getConfig().getString("spleefrequestd4player").compareTo(winningplayer.getName())==0) {
+							  for (int i=0;i<spleef4_inventory_d.length;i++) {
+								  if (spleef4_inventory_d[i]!=null) {
+									  winningplayer.getInventory().addItem(spleef4_inventory_d[i]);
+								  }
+							  }
+							  getConfig().set("spleefrequestd4player",String.valueOf("none"));
+						  }
+						  /*
+						  Location l1 = new Location(Bukkit.getWorld("world"), 1593, 85, 29);
+						  Chest c=(Chest)Bukkit.getWorld("world").getBlockAt(l1).getState();
+						  shovelstack = c.getBlockInventory().getContents();
+						  shovelfound=false;
+						  shovel = shovelstack[0];
+						  for (int i=0;i<shovelstack.length;i++) {
+							  if (shovelstack[i]!=null && shovelstack[i].getItemMeta().hasDisplayName()==true && shovelstack[i].getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
+								  //We found the shovel!
+								  //Bukkit.getPlayer("sigonasr2").sendMessage("Found shovel in inventory.");
+								  shovelfound=true;
+								  shovel=shovelstack[i];
+								  store_shovel = shovel;
+								  break;
 							  }
 						  }
-						  for (int i=0;i<spleef_inventory_b.length;i++) {
-							  if (spleef_inventory_b[i]!=null) {
-							  Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getInventory().addItem(spleef_inventory_b[i]);
+						  l1 = new Location(Bukkit.getWorld("world"), 1593, 85, 34);
+						  c=(Chest)Bukkit.getWorld("world").getBlockAt(l1).getState();
+						  shovelstack = c.getBlockInventory().getContents();
+						  shovelfound=false;
+						  shovel = shovelstack[0];
+						  for (int i=0;i<shovelstack.length;i++) {
+							  if (shovelstack[i]!=null && shovelstack[i].getItemMeta().hasDisplayName()==true && shovelstack[i].getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
+								  //We found the shovel!
+								  //Bukkit.getPlayer("sigonasr2").sendMessage("Found shovel in inventory.");
+								  shovelfound=true;
+								  shovel=shovelstack[i];
+								  store_shovel = shovel;
+								  break;
 							  }
 						  }
-							//Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).updateInventory();
-							//Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).updateInventory();
+						  l1 = new Location(Bukkit.getWorld("world"), 1593, 85, 29);
+						  c=(Chest)Bukkit.getWorld("world").getBlockAt(l1).getState();
+						  if (!c.getBlockInventory().contains(store_shovel)) {
+							  c.getBlockInventory().setItem((int)(Math.random()*27.0d), store_shovel);
+						  }
+						  l1 = new Location(Bukkit.getWorld("world"), 1593, 85, 34);
+						  c=(Chest)Bukkit.getWorld("world").getBlockAt(l1).getState();
+						  if (!c.getBlockInventory().contains(store_shovel)) {
+							  c.getBlockInventory().setItem((int)(Math.random()*27.0d), store_shovel);
+						  }
+						  */
+						  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+winningplayer.getName()+"["+(int)getAccountsConfig().getDouble(winningplayer.getName()+".spleefrating")/10+"] is the winner of this 4-player spleef game!");
+						  getConfig().set("spleeflastrequesttime",Double.valueOf(0.0d));
+		        		getConfig().set("spleefrequesta4player", String.valueOf("none"));
+		        		getConfig().set("spleefrequestb4player", String.valueOf("none"));
+		        		getConfig().set("spleefrequestc4player", String.valueOf("none"));
+		        		getConfig().set("spleefrequestd4player", String.valueOf("none"));
+				  } else
+				  {
+					  //This was a player that lost.
+					  //Move them out, give them back their stuff.
+					  Location newloc = p.getLocation();
+					  newloc.setX(1583);
+					  newloc.setY(91);
+					  newloc.setZ(31.5);
+					  p.teleport(newloc);
+					  /*
+					  //Look for the special shovel for the sake of storing it.
+					  ItemStack[] shovelstack = p.getInventory().getContents();
+					  boolean shovelfound=false;
+					  ItemStack shovel = shovelstack[0];
+					  for (int i=0;i<shovelstack.length;i++) {
+						  if (shovelstack[i]!=null && shovelstack[i].getItemMeta().hasDisplayName()==true && shovelstack[i].getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
+							  //We found the shovel!
+							  //Bukkit.getPlayer("sigonasr2").sendMessage("Found shovel in inventory.");
+							  shovelfound=true;
+							  shovel=shovelstack[i];
+							  break;
+						  }
 					  }
-				  } else {
-					  if (getConfig().getBoolean("spleefinsession") && (p.getName().compareTo(getConfig().getString("spleefrequestaplayer"))!=0 && p.getName().compareTo(getConfig().getString("spleefrequestbplayer"))!=0)) {
-						  if (p.getLocation().getY()>78.0d && p.getLocation().getZ()>53.0d && p.getLocation().getZ()<64.0d && p.getLocation().getX()<1627.0d && p.getLocation().getX()>1616.0d) {
-							  Location newloc = p.getLocation();
-							  newloc.setX(1622.5d);
-							  newloc.setY(87.0d);
-							  newloc.setZ(51.65d);
-							  p.teleport(newloc);
-							  p.sendMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+"You are a spectator! What are you thinking?!");
+					  store_shovel = shovel;*/
+					  p.getInventory().clear();
+					  p.getInventory().clear(p.getInventory().getHeldItemSlot());
+					  //Give inventories back.
+					  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0) {
+						  for (int i=0;i<spleef4_inventory_a.length;i++) {
+							  if (spleef4_inventory_a[i]!=null) {
+							  p.getInventory().addItem(spleef4_inventory_a[i]);
+							  }
+						  }
+						  getConfig().set("spleefrequesta4player",String.valueOf("none"));
+					  } else
+					  if (getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0) {
+						  for (int i=0;i<spleef4_inventory_b.length;i++) {
+							  if (spleef4_inventory_b[i]!=null) {
+							  p.getInventory().addItem(spleef4_inventory_b[i]);
+							  }
+						  }
+						  getConfig().set("spleefrequestb4player",String.valueOf("none"));
+					  } else
+					  if (getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0) {
+						  for (int i=0;i<spleef4_inventory_c.length;i++) {
+							  if (spleef4_inventory_c[i]!=null) {
+							  p.getInventory().addItem(spleef4_inventory_c[i]);
+							  }
+						  }
+						  getConfig().set("spleefrequestc4player",String.valueOf("none"));
+					  } else
+					  if (getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
+						  for (int i=0;i<spleef4_inventory_d.length;i++) {
+							  if (spleef4_inventory_d[i]!=null) {
+							  p.getInventory().addItem(spleef4_inventory_d[i]);
+							  }
+						  }
+						  getConfig().set("spleefrequestd4player",String.valueOf("none"));
+					  }
+					  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+p.getName()+" fell out of the arena and is out of the match!");
+					  
+				  }
+			  }
+			  //Check to see if we are a player in spleef.
+			  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0 ||
+					  getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0 ||
+					  getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0 ||
+					  getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
+				  //If they are holding something, remove it.
+				  if (p.getItemInHand()!=null) {
+					  p.getInventory().remove(p.getInventory().getHeldItemSlot());
+				  }
+			  }
+		  }
+		  
+		  if (getConfig().getBoolean("spleefinsession") && (p.getName().compareTo(getConfig().getString("spleefrequestaplayer"))==0 || p.getName().compareTo(getConfig().getString("spleefrequestbplayer"))==0)) {
+			  //Determine if we're still playing.
+			  int blockwinner=0;
+			  if (getConfig().getString("spleefrequestaplayer").compareTo(p.getName())==0 ||
+					  getConfig().getString("spleefrequestbplayer").compareTo(p.getName())==0) {
+				  //If they are holding something, remove it.
+				  if (p.getItemInHand()!=null) {
+					  p.getInventory().remove(p.getInventory().getHeldItemSlot());
+				  }
+			  }
+			  if (p.getPlayerTime()-spleef_last_broken_block>=400) {
+				  //WE have come to a standstill. Pick winner based on who has more blocks.
+				  int player_a_blocks=0,player_b_blocks=0;
+				  for (int i=Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getLocation().getBlockX()-4;i<Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getLocation().getBlockX()+4;i++) {
+					  for (int j=Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getLocation().getBlockZ()-4;j<Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getLocation().getBlockZ()+4;j++) {
+						  if (Bukkit.getWorld("world").getBlockAt(i,86,j).getType()==Material.DIRT) {
+							  player_a_blocks+=1;
 						  }
 					  }
 				  }
+				  for (int i=Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getLocation().getBlockX()-4;i<Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getLocation().getBlockX()+4;i++) {
+					  for (int j=Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getLocation().getBlockZ()-4;j<Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getLocation().getBlockZ()+4;j++) {
+						  if (Bukkit.getWorld("world").getBlockAt(i,86,j).getType()==Material.DIRT) {
+							  player_b_blocks+=1;
+						  }
+					  }
+				  }
+				  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+"No blocks were destroyed in 20 seconds. The match's victor was determined by the player with the most block area around them.");
+				  if (player_a_blocks>player_b_blocks) {
+					  blockwinner=1;
+				  } else {
+					  blockwinner=2;
+				  }
+			  } else 
+			  if ((p.getLocation().getY()<86.5d || p.getLocation().getZ()<52.0d || p.getLocation().getZ()>65.0d || p.getLocation().getX()>1628.0d || p.getLocation().getX()<1615.0d) || blockwinner!=0) {
+				  //We lose. Other player wins.
+				  getConfig().set("spleefinsession", Boolean.valueOf(false));
+				  //Find out if we're player A, or player B.
+				  Player winningplayer,losingplayer;
+				  if (p.getName().compareTo(getConfig().getString("spleefrequestaplayer"))==0 || blockwinner==2) {
+					  //We're player A.
+					  //Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+getConfig().getString("spleefrequestbplayer")+" is the winner of this spleef game! "+getConfig().getString("spleefrequestaplayer")+" loses.");
+					  losingplayer=p;
+					  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer"));
+
+					  double val1,val2,value,newval1,newval2;
+					  if (getAccountsConfig().contains(winningplayer.getName()+".spleefrating")) {
+						  val1 = getAccountsConfig().getDouble(winningplayer.getName()+".spleefrating");
+					  } else {
+						  val1 = 1000.0d;
+					  }
+					  if (getAccountsConfig().contains(losingplayer.getName()+".spleefrating")) {
+						  val2 = getAccountsConfig().getDouble(losingplayer.getName()+".spleefrating");
+					  } else {
+						  val2 = 1000.0d;
+					  }
+					  value = 1.0d/(1.0d+Math.pow(10.0d, ((val2-val1)/400.0d)));
+					  if (getAccountsConfig().contains(winningplayer.getName()+".spleefwins")) {
+						  getAccountsConfig().set(winningplayer.getName()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName()+".spleefwins")+1));
+					  } else {
+						  getAccountsConfig().set(winningplayer.getName()+".spleefwins", Integer.valueOf(1));
+					  }
+					  if (getAccountsConfig().contains(winningplayer.getName()+".spleeflosses")) {
+						  getAccountsConfig().set(winningplayer.getName()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName()+".spleeflosses")));
+					  } else {
+						  getAccountsConfig().set(winningplayer.getName()+".spleeflosses", Integer.valueOf(0));
+					  }
+					  if (getAccountsConfig().contains(losingplayer.getName()+".spleefwins")) {
+						  getAccountsConfig().set(losingplayer.getName()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName()+".spleefwins")));
+					  } else {
+						  getAccountsConfig().set(losingplayer.getName()+".spleefwins", Integer.valueOf(0));
+					  }
+					  if (getAccountsConfig().contains(losingplayer.getName()+".spleeflosses")) {
+						  getAccountsConfig().set(losingplayer.getName()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName()+".spleeflosses")+1));
+					  } else {
+						  getAccountsConfig().set(losingplayer.getName()+".spleeflosses", Integer.valueOf(1));
+					  }
+					  newval1 = (val1+Math.round(((50.0d/((getAccountsConfig().getDouble(winningplayer.getName()+".spleefwins")+getAccountsConfig().getDouble(winningplayer.getName()+".spleeflosses"))/20.0d))*(1.0d-value))));
+					  newval2 = (val2+Math.round(((50.0d/((getAccountsConfig().getDouble(losingplayer.getName()+".spleefwins")+getAccountsConfig().getDouble(losingplayer.getName()+".spleeflosses"))/20.0d))*(0.0d-value))));
+					  getAccountsConfig().set(winningplayer.getName()+".spleefrating",Double.valueOf(newval1));
+					  getAccountsConfig().set(losingplayer.getName()+".spleefrating",Double.valueOf(newval2));
+					  Location newloc = winningplayer.getLocation();
+
+					  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+getConfig().getString("spleefrequestbplayer")+"["+(int)newval1/10+"] is the winner of this spleef game! "+getConfig().getString("spleefrequestaplayer")+"["+(int)newval2/10+"] loses.");
+					  newloc.setX(1622.5d);
+					  newloc.setY(87.0d);
+					  newloc.setZ(51.65d);
+					  winningplayer.teleport(newloc);
+					  updateTopSPLEEFSigns();
+					  //saveAccountsConfig() //Commented out;
+				  } else {
+					  //We're player B.
+					  //Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+getConfig().getString("spleefrequestaplayer")+" is the winner of this spleef game! "+getConfig().getString("spleefrequestbplayer")+" loses.");
+					  losingplayer=p;
+					  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer"));
+					  double val1,val2,value,newval1,newval2;
+					  if (getAccountsConfig().contains(winningplayer.getName()+".spleefrating")) {
+						  val1 = getAccountsConfig().getDouble(winningplayer.getName()+".spleefrating");
+					  } else {
+						  val1 = 1000.0d;
+					  }
+					  if (getAccountsConfig().contains(losingplayer.getName()+".spleefrating")) {
+						  val2 = getAccountsConfig().getDouble(losingplayer.getName()+".spleefrating");
+					  } else {
+						  val2 = 1000.0d;
+					  }
+					  value = 1.0d/(1.0d+Math.pow(10.0d, ((val2-val1)/400.0d)));
+					  if (getAccountsConfig().contains(winningplayer.getName()+".spleefwins")) {
+						  getAccountsConfig().set(winningplayer.getName()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName()+".spleefwins")+1));
+					  } else {
+						  getAccountsConfig().set(winningplayer.getName()+".spleefwins", Integer.valueOf(1));
+					  }
+					  if (getAccountsConfig().contains(winningplayer.getName()+".spleeflosses")) {
+						  getAccountsConfig().set(winningplayer.getName()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName()+".spleeflosses")));
+					  } else {
+						  getAccountsConfig().set(winningplayer.getName()+".spleeflosses", Integer.valueOf(0));
+					  }
+					  if (getAccountsConfig().contains(losingplayer.getName()+".spleefwins")) {
+						  getAccountsConfig().set(losingplayer.getName()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName()+".spleefwins")));
+					  } else {
+						  getAccountsConfig().set(losingplayer.getName()+".spleefwins", Integer.valueOf(0));
+					  }
+					  if (getAccountsConfig().contains(losingplayer.getName()+".spleeflosses")) {
+						  getAccountsConfig().set(losingplayer.getName()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName()+".spleeflosses")+1));
+					  } else {
+						  getAccountsConfig().set(losingplayer.getName()+".spleeflosses", Integer.valueOf(1));
+					  }
+					  newval1 = ((val1+Math.round((50.0d/((getAccountsConfig().getDouble(winningplayer.getName()+".spleefwins")+getAccountsConfig().getDouble(winningplayer.getName()+".spleeflosses"))/20.0d))*(1.0d-value))));
+					  newval2 = ((val2+Math.round((50.0d/((getAccountsConfig().getDouble(losingplayer.getName()+".spleefwins")+getAccountsConfig().getDouble(losingplayer.getName()+".spleeflosses"))/20.0d))*(0.0d-value))));
+					  getAccountsConfig().set(winningplayer.getName()+".spleefrating",Double.valueOf(newval1));
+					  getAccountsConfig().set(losingplayer.getName()+".spleefrating",Double.valueOf(newval2));
+					  Location newloc = winningplayer.getLocation();
+
+					  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+getConfig().getString("spleefrequestaplayer")+"["+(int)newval1/10+"] is the winner of this spleef game! "+getConfig().getString("spleefrequestbplayer")+"["+(int)newval2/10+"] loses.");
+					  newloc.setX(1622.5d);
+					  newloc.setY(87.0d);
+					  newloc.setZ(51.65d);
+					  winningplayer.teleport(newloc);
+					  updateTopSPLEEFSigns();
+					  //saveAccountsConfig() //Commented out;
+				  }
+				  //Look for the special shovel.
+				  /*
+				  ItemStack[] shovelstack = Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getInventory().getContents();
+				  boolean shovelfound=false;
+				  ItemStack shovel = shovelstack[0];
+				  Bukkit.getPlayer("sigonasr2").sendMessage("Starting shovel check.");
+				  for (int i=0;i<shovelstack.length;i++) {
+					  if (shovelstack[i]!=null && shovelstack[i].getItemMeta().hasDisplayName()==true && shovelstack[i].getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
+						  //We found the shovel!
+						  //Bukkit.getPlayer("sigonasr2").sendMessage("Found shovel in inventory.");
+						  shovelfound=true;
+						  shovel=shovelstack[i];
+						  break;
+					  }
+				  }
+				  shovelstack = Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getInventory().getContents();
+				  //Bukkit.getPlayer("sigonasr2").sendMessage("Next shovel inventory check.");
+				  if (!shovelfound) {
+					  for (int i=0;i<shovelstack.length;i++) {
+						  if (shovelstack[i]!=null && shovelstack[i].getItemMeta().hasDisplayName()==true && shovelstack[i].getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
+							  //We found the shovel!
+							  //Bukkit.getPlayer("sigonasr2").sendMessage("Found shovel in inventory.");
+							  shovelfound=true;
+							  shovel=shovelstack[i];
+							  break;
+						  }
+					  }
+				  }
+				  if (shovelfound) {
+					  //Bukkit.getPlayer("sigonasr2").sendMessage("Found a shovel, transporting in chest box.");
+					  Location l1 = new Location(Bukkit.getWorld("world"), 1622, 85, 58);
+					  Chest c=(Chest)Bukkit.getWorld("world").getBlockAt(l1).getState();
+					  c.getBlockInventory().setItem((int)(Math.random()*27.0d), shovel);
+				  }*/
+				  Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getInventory().clear();
+				  Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getInventory().clear();
+					Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getInventory().clear(Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getInventory().getHeldItemSlot());
+					Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getInventory().clear(Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getInventory().getHeldItemSlot());
+				  //Give inventories back.
+				  for (int i=0;i<spleef_inventory_a.length;i++) {
+					  if (spleef_inventory_a[i]!=null) {
+					  Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).getInventory().addItem(spleef_inventory_a[i]);
+					  }
+				  }
+				  for (int i=0;i<spleef_inventory_b.length;i++) {
+					  if (spleef_inventory_b[i]!=null) {
+					  Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).getInventory().addItem(spleef_inventory_b[i]);
+					  }
+				  }
+					//Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer")).updateInventory();
+					//Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).updateInventory();
 			  }
+		  } else {
+			  if (getConfig().getBoolean("spleefinsession") && (p.getName().compareTo(getConfig().getString("spleefrequestaplayer"))!=0 && p.getName().compareTo(getConfig().getString("spleefrequestbplayer"))!=0)) {
+				  if (p.getLocation().getY()>78.0d && p.getLocation().getZ()>53.0d && p.getLocation().getZ()<64.0d && p.getLocation().getX()<1627.0d && p.getLocation().getX()>1616.0d) {
+					  Location newloc = p.getLocation();
+					  newloc.setX(1622.5d);
+					  newloc.setY(87.0d);
+					  newloc.setZ(51.65d);
+					  p.teleport(newloc);
+					  p.sendMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+"You are a spectator! What are you thinking?!");
+				  }
 			  }
+		  }
+	  }
+	  }
+  this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new  Runnable(){
+		  public void run(){
+			  runTick();
 		  }
 	  }, 1l, 1l);
 }
