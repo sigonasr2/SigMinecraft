@@ -110,6 +110,7 @@ public class Main extends JavaPlugin
   public long last_bank_withdraw_use_time=0;
   public String last_bank_withdraw_user="";
   public long last_boss_dungeon_time=0;
+  public long last_player_death_time=0;
   public long check_nether_time=0;
   public long check_lights_time=0;
   public long check_spleef_game=0;
