@@ -13607,7 +13607,7 @@ class updateInventoryTask implements Runnable {
 							i++;
 						}
 
-						int cost = 0;
+						int cost = anvilInv.getItem(LEVELS).getAmount();
 
 						if (itemBonuses.get(appliedEnchant) == null) {
 							// This bonus doesn't exist. Calculate full cost.
