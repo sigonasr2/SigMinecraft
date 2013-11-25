@@ -9895,7 +9895,7 @@ implements Listener
 							}
 						}
 					}
-				} else if (event.getInventory().getTitle().equalsIgnoreCase("Repair and Enchant")) {
+				} else  if (event.getInventory().getTitle().equalsIgnoreCase("Repair and Enchant")) {
 					final int INPUT = 10;
 					final int MATERIALS = 12;
 					final int MAGIC = 14;
@@ -9917,15 +9917,15 @@ implements Listener
 					if (!anvilClicked) {
 						// Clicked the inventory. Leave the operation alone UNLESS it's a shift-click operation.
 						if (event.isShiftClick()) {
-							// Call the scheduled task to validate and update the inventory
+							// Call the scheduled task to validate and update the inventory 
 							Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
 						}
-					} else {
-						// Clicked the anvil. If GUI items are clicked or an invalid operation happens, cancel the operation.
+					} else { 
+						// Clicked the anvil. If GUI items are clicked or an invalid operation happens, cancel the operation. 
 						if (event.getSlot() == INPUT || event.getSlot() == MATERIALS
 								|| event.getSlot() == MAGIC || event.getSlot() == OUTPUT)
 						{
-							/*
+							/* 
 							 * OUTPUT Block
 							 */
 
@@ -9970,46 +9970,46 @@ implements Listener
 												if (event.getCurrentItem().getType() == Material.ENCHANTED_BOOK && event.getInventory().getItem(MAGIC).getType() == Material.BOOK) {
 													// Halve its durability
 													event.getInventory().getItem(INPUT).setDurability((short)(event.getInventory().getItem(INPUT).getDurability() + (event.getInventory().getItem(INPUT).getType().getMaxDurability() - event.getInventory().getItem(INPUT).getDurability()) / 2));
-
+													
 													// DISENCHANT BEGIN
-													Map<Enchantment,Integer> map = event.getInventory().getItem(INPUT).getEnchantments();
-													for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
-														event.getInventory().getItem(INPUT).removeEnchantment(entry.getKey());
-													}
-													if (event.getInventory().getItem(INPUT).hasItemMeta() && event.getInventory().getItem(INPUT).getItemMeta().hasLore()) {
-														List<String> newlore = new ArrayList<String>();
-														for (int i=0;i<event.getInventory().getItem(INPUT).getItemMeta().getLore().size();i++) {
-															//Remove all lore when unenchanting.
-															//Do not remove -400% durability.
-															if (this.plugin.is_PermanentProperty(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i))) {
-																newlore.add(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i));
-															}
-														}
-														ItemMeta meta = event.getInventory().getItem(INPUT).getItemMeta();
-														meta.setLore(newlore);
-														event.getInventory().getItem(INPUT).setItemMeta(meta);
-													}
+										        	  Map<Enchantment,Integer> map  = event.getInventory().getItem(INPUT).getEnchantments();
+										    		  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
+										    			  event.getInventory().getItem(INPUT).removeEnchantment(entry.getKey());
+										    		  }
+										    		  if (event.getInventory().getItem(INPUT).hasItemMeta() && event.getInventory().getItem(INPUT).getItemMeta().hasLore()) {
+										        		  List<String> newlore = new ArrayList<String>();
+										    			  for (int i=0;i<event.getInventory().getItem(INPUT).getItemMeta().getLore().size();i++) {
+										    				  //Remove all lore when unenchanting.
+										    				  //Do not remove -400% durability.
+															  if (this.plugin.is_PermanentProperty(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i))) {
+																  newlore.add(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i));
+															  }
+										    			  }
+										    			  ItemMeta meta = event.getInventory().getItem(INPUT).getItemMeta();
+										    			  meta.setLore(newlore);
+										    			  event.getInventory().getItem(INPUT).setItemMeta(meta);
+										    		  }
 													// DISENCHANT END
 
 													// Destroy the item if random() exceeds %remaining durability
 													if (Math.random() < (double)(event.getInventory().getItem(INPUT).getType().getMaxDurability() - event.getInventory().getItem(INPUT).getDurability()) / (double)event.getInventory().getItem(INPUT).getType().getMaxDurability()) {
 														event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
 													}
-
+													
 												} else {
 													event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
 												}
-
+												
 												event.getInventory().setItem(MATERIALS, new ItemStack(Material.AIR));
 												event.getInventory().setItem(MAGIC, new ItemStack(Material.AIR));
 
 												// Set XP
 												Bukkit.getPlayer(event.getWhoClicked().getName()).setLevel(Bukkit.getPlayer(event.getWhoClicked().getName()).getLevel() - event.getInventory().getContents()[LEVELS].getAmount());
 
-												// Bukkit.getLogger().info("Item is: " + event.getInventory().getItem(OUTPUT));
+												// Bukkit.getLogger().info("Item is: " + event.getInventory().getItem(OUTPUT));												
 
 												// Play anvil sound
-												if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("IRON") ||
+												if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("IRON") || 
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("GOLD") ||
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("DIAMOND") ||
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("CHAINMAIL")) {
@@ -10020,9 +10020,11 @@ implements Listener
 													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_STONE, 20, 1);
 												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("LEATHER")) {
 													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOL, 20, 1);
-												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("BOW") ||
+												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("BOW") || 
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("FISHING")) {
 													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.ARROW_HIT, 10, 1);
+												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("ENCHANTED")) {
+													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.LEVEL_UP, 10, 1);
 												}
 
 												event.getInventory().setItem(OUTPUT, new ItemStack(Material.AIR));
@@ -10056,31 +10058,31 @@ implements Listener
 													event.getInventory().getItem(INPUT).setDurability((short)(event.getInventory().getItem(INPUT).getDurability() + (event.getInventory().getItem(INPUT).getType().getMaxDurability() - event.getInventory().getItem(INPUT).getDurability()) / 2));
 
 													// DISENCHANT BEGIN
-													Map<Enchantment,Integer> map = event.getInventory().getItem(INPUT).getEnchantments();
-													for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
-														event.getInventory().getItem(INPUT).removeEnchantment(entry.getKey());
-													}
-													if (event.getInventory().getItem(INPUT).hasItemMeta() && event.getInventory().getItem(INPUT).getItemMeta().hasLore()) {
-														List<String> newlore = new ArrayList<String>();
-														for (int i=0;i<event.getInventory().getItem(INPUT).getItemMeta().getLore().size();i++) {
-															//Remove all lore when unenchanting.
-															//Do not remove -400% durability.
-															if (this.plugin.is_PermanentProperty(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i))) {
-																newlore.add(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i));
-															}
-														}
-														ItemMeta meta = event.getInventory().getItem(INPUT).getItemMeta();
-														meta.setLore(newlore);
-														event.getInventory().getItem(INPUT).setItemMeta(meta);
-													}
+										        	  Map<Enchantment,Integer> map  = event.getInventory().getItem(INPUT).getEnchantments();
+										    		  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
+										    			  event.getInventory().getItem(INPUT).removeEnchantment(entry.getKey());
+										    		  }
+										    		  if (event.getInventory().getItem(INPUT).hasItemMeta() && event.getInventory().getItem(INPUT).getItemMeta().hasLore()) {
+										        		  List<String> newlore = new ArrayList<String>();
+										    			  for (int i=0;i<event.getInventory().getItem(INPUT).getItemMeta().getLore().size();i++) {
+										    				  //Remove all lore when unenchanting.
+										    				  //Do not remove -400% durability.
+															  if (this.plugin.is_PermanentProperty(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i))) {
+																  newlore.add(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i));
+															  }
+										    			  }
+										    			  ItemMeta meta = event.getInventory().getItem(INPUT).getItemMeta();
+										    			  meta.setLore(newlore);
+										    			  event.getInventory().getItem(INPUT).setItemMeta(meta);
+										    		  }
 													// DISENCHANT END
 
-
+													
 													// Destroy the item if random() exceeds %remaining durability
 													if (Math.random() < (double)(event.getInventory().getItem(INPUT).getType().getMaxDurability() - event.getInventory().getItem(INPUT).getDurability()) / (double)event.getInventory().getItem(INPUT).getType().getMaxDurability()) {
 														event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
 													}
-
+													
 												} else {
 													event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
 												}
@@ -10091,7 +10093,7 @@ implements Listener
 												Bukkit.getPlayer(event.getWhoClicked().getName()).setLevel(Bukkit.getPlayer(event.getWhoClicked().getName()).getLevel() - event.getInventory().getContents()[LEVELS].getAmount());
 
 												// Play anvil sound
-												if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("IRON") ||
+												if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("IRON") || 
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("GOLD") ||
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("DIAMOND") ||
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("CHAINMAIL")) {
@@ -10102,10 +10104,13 @@ implements Listener
 													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_STONE, 20, 1);
 												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("LEATHER")) {
 													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOL, 20, 1);
-												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("BOW") ||
+												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("BOW") || 
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("FISHING")) {
 													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.ARROW_HIT, 10, 1);
+												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("ENCHANTED")) {
+													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.LEVEL_UP, 10, 1);
 												}
+												
 
 												event.getInventory().setItem(OUTPUT, new ItemStack(Material.AIR));
 												Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
@@ -10117,32 +10122,32 @@ implements Listener
 											if (event.getCurrentItem().getType() == Material.ENCHANTED_BOOK && event.getInventory().getItem(MAGIC).getType() == Material.BOOK) {
 												// Halve its durability
 												event.getInventory().getItem(INPUT).setDurability((short)(event.getInventory().getItem(INPUT).getDurability() + (event.getInventory().getItem(INPUT).getType().getMaxDurability() - event.getInventory().getItem(INPUT).getDurability()) / 2));
-
+												
 												// DISENCHANT BEGIN
-												Map<Enchantment,Integer> map = event.getInventory().getItem(INPUT).getEnchantments();
-												for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
-													event.getInventory().getItem(INPUT).removeEnchantment(entry.getKey());
-												}
-												if (event.getInventory().getItem(INPUT).hasItemMeta() && event.getInventory().getItem(INPUT).getItemMeta().hasLore()) {
-													List<String> newlore = new ArrayList<String>();
-													for (int i=0;i<event.getInventory().getItem(INPUT).getItemMeta().getLore().size();i++) {
-														//Remove all lore when unenchanting.
-														//Do not remove -400% durability.
-														if (this.plugin.is_PermanentProperty(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i))) {
-															newlore.add(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i));
-														}
-													}
-													ItemMeta meta = event.getInventory().getItem(INPUT).getItemMeta();
-													meta.setLore(newlore);
-													event.getInventory().getItem(INPUT).setItemMeta(meta);
-												}
+									        	  Map<Enchantment,Integer> map  = event.getInventory().getItem(INPUT).getEnchantments();
+									    		  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
+									    			  event.getInventory().getItem(INPUT).removeEnchantment(entry.getKey());
+									    		  }
+									    		  if (event.getInventory().getItem(INPUT).hasItemMeta() && event.getInventory().getItem(INPUT).getItemMeta().hasLore()) {
+									        		  List<String> newlore = new ArrayList<String>();
+									    			  for (int i=0;i<event.getInventory().getItem(INPUT).getItemMeta().getLore().size();i++) {
+									    				  //Remove all lore when unenchanting.
+									    				  //Do not remove -400% durability.
+														  if (this.plugin.is_PermanentProperty(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i))) {
+															  newlore.add(event.getInventory().getItem(INPUT).getItemMeta().getLore().get(i));
+														  }
+									    			  }
+									    			  ItemMeta meta = event.getInventory().getItem(INPUT).getItemMeta();
+									    			  meta.setLore(newlore);
+									    			  event.getInventory().getItem(INPUT).setItemMeta(meta);
+									    		  }
 												// DISENCHANT END
 
-												// Destroy the item if random() exceeds %remaining durability
+									    		  // Destroy the item if random() exceeds %remaining durability
 												if (Math.random() < (double)(event.getInventory().getItem(INPUT).getType().getMaxDurability() - event.getInventory().getItem(INPUT).getDurability()) / (double)event.getInventory().getItem(INPUT).getType().getMaxDurability()) {
 													event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
 												}
-
+												
 											} else {
 												event.getInventory().setItem(INPUT, new ItemStack(Material.AIR));
 											}
@@ -10154,7 +10159,7 @@ implements Listener
 											Bukkit.getPlayer(event.getWhoClicked().getName()).setLevel(Bukkit.getPlayer(event.getWhoClicked().getName()).getLevel() - event.getInventory().getContents()[LEVELS].getAmount());
 
 											// Play anvil sound
-											if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("IRON") ||
+											if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("IRON") || 
 													event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("GOLD") ||
 													event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("DIAMOND") ||
 													event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("CHAINMAIL")) {
@@ -10165,9 +10170,11 @@ implements Listener
 												Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_STONE, 20, 1);
 											} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("LEATHER")) {
 												Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOL, 20, 1);
-											} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("BOW") ||
+											} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("BOW") || 
 													event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("FISHING")) {
 												Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.ARROW_HIT, 10, 1);
+											} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("ENCHANTED")) {
+												Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.LEVEL_UP, 10, 1);
 											}
 
 											Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
@@ -10181,14 +10188,14 @@ implements Listener
 							boolean valid = false;
 
 							if (event.isShiftClick() && event.getRawSlot() != OUTPUT) {
-								valid = true; // always valid if shift clicking an anvil slot that isn't the output.
+								valid = true; // always valid if shift clicking an anvil slot that isn't the output. 
 							}
 
 							if (event.getCursor() == null || event.getCursor().getType() == Material.AIR) {
 								valid = true; // always valid if cursor carries nothing
 							} else if (event.getSlotType() == SlotType.CONTAINER && event.getSlot() == INPUT) {
 
-								/*
+								/* 
 								 * INPUT Block
 								 * All tools and armor types, as well as fishing rods and bows.
 								 */
@@ -10196,24 +10203,24 @@ implements Listener
 								// Bukkit.getLogger().info("Anvil INPUT click with this item on mouse: " + event.getCursor().getType().toString());
 
 								/*
-if (event.getCursor().getType().toString().toUpperCase().contains("HELMET") || event.getCursor().getType().toString().toUpperCase().contains("CHESTPLATE") ||
-event.getCursor().getType().toString().toUpperCase().contains("LEGGINGS") || event.getCursor().getType().toString().toUpperCase().contains("BOOTS") ||
-event.getCursor().getType().toString().toUpperCase().contains("PICKAXE") || event.getCursor().getType().toString().toUpperCase().contains("SPADE") ||
-event.getCursor().getType().toString().toUpperCase().contains("HOE") || event.getCursor().getType().toString().toUpperCase().contains("AXE") ||
-event.getCursor().getType().toString().toUpperCase().contains("SWORD") || event.getCursor().getType().toString().toUpperCase().contains("FISHING") ||
-event.getCursor().getType().toString().toUpperCase().contentEquals("BOW")) {
-valid = true;
-}
+								if (event.getCursor().getType().toString().toUpperCase().contains("HELMET") || event.getCursor().getType().toString().toUpperCase().contains("CHESTPLATE") || 
+										event.getCursor().getType().toString().toUpperCase().contains("LEGGINGS") || event.getCursor().getType().toString().toUpperCase().contains("BOOTS") ||
+										event.getCursor().getType().toString().toUpperCase().contains("PICKAXE") || event.getCursor().getType().toString().toUpperCase().contains("SPADE") || 
+										event.getCursor().getType().toString().toUpperCase().contains("HOE") || event.getCursor().getType().toString().toUpperCase().contains("AXE") ||
+										event.getCursor().getType().toString().toUpperCase().contains("SWORD") || event.getCursor().getType().toString().toUpperCase().contains("FISHING") || 
+										event.getCursor().getType().toString().toUpperCase().contentEquals("BOW")) {
+									valid = true;
+								}
 
-if (event.getCursor().getDurability() == 0)
-{
-// Can't put fully repaired item into input slot.
-valid = false;
-}
+								if (event.getCursor().getDurability() == 0)
+								{
+									// Can't put fully repaired item into input slot. 
+									valid = false;
+								}
 								 */
 							} else if (event.getSlotType() == SlotType.CONTAINER && event.getSlot() == MATERIALS) {
 
-								/*
+								/* 
 								 * MATERIALS Block
 								 * Leather, string, wood, cobble, iron, gold, and diamond allowed.
 								 */
@@ -10221,41 +10228,41 @@ valid = false;
 								// Bukkit.getLogger().info("Anvil MATERIALS click with this item on mouse: " + event.getCursor().getType().toString());
 
 								/*
-if (event.getCursor().getType() == Material.LEATHER || event.getCursor().getType() == Material.IRON_INGOT ||
-event.getCursor().getType() == Material.GOLD_INGOT || event.getCursor().getType() == Material.IRON_BLOCK ||
-event.getCursor().getType() == Material.DIAMOND_BLOCK || event.getCursor().getType() == Material.DIAMOND ||
-event.getCursor().getType() == Material.WOOD || event.getCursor().getType() == Material.COBBLESTONE ||
-event.getCursor().getType() == Material.LOG || event.getCursor().getType() == Material.STONE ||
-event.getCursor().getType() == Material.STRING) {
-valid = true;
-}
+								if (event.getCursor().getType() == Material.LEATHER || event.getCursor().getType() == Material.IRON_INGOT || 
+										event.getCursor().getType() == Material.GOLD_INGOT || event.getCursor().getType() == Material.IRON_BLOCK || 
+										event.getCursor().getType() == Material.DIAMOND_BLOCK || event.getCursor().getType() == Material.DIAMOND ||
+										event.getCursor().getType() == Material.WOOD || event.getCursor().getType() == Material.COBBLESTONE || 
+										event.getCursor().getType() == Material.LOG || event.getCursor().getType() == Material.STONE || 
+										event.getCursor().getType() == Material.STRING) {
+									valid = true;
+								}
 								 */
 							} else if (event.getSlotType() == SlotType.CONTAINER && event.getSlot() == MAGIC) {
 
-								/*
+								/* 
 								 * MAGIC Block
 								 * Shards and Enchanted Books allowed.
-								 * Not implemented yet, so nothing is allowed at the moment.
+								 * Not implemented yet, so nothing is allowed at the moment. 
 								 */
 
 								// Bukkit.getLogger().info("Anvil MAGIC click with this item on mouse: " + event.getCursor().getType().toString());
 
 								/*
-if (event.getCursor().getType() == Material.FLINT || event.getCursor().getType() == Material.QUARTZ ||
-event.getCursor().getType() == Material.NETHER_STAR || event.getCursor().getType() == Material.ENCHANTED_BOOK) {
-valid = true;
-}
+					if (event.getCursor().getType() == Material.FLINT || event.getCursor().getType() == Material.QUARTZ || 
+							event.getCursor().getType() == Material.NETHER_STAR || event.getCursor().getType() == Material.ENCHANTED_BOOK) {
+						valid = true;
+					}
 								 */
 							}
 
 							/*
-if (!valid) {
-event.setCancelled(true);
-} else {
-// Update the inventory if it is valid
-// Set up anvil inventory update scheduler
-Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
-}
+							if (!valid) {
+								event.setCancelled(true);
+							} else {
+								// Update the inventory if it is valid
+								// Set up anvil inventory update scheduler
+								Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
+							}
 							 */
 							Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
 						} else {
@@ -10263,7 +10270,7 @@ Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updat
 						}
 					}
 
-				} else if (event.getInventory().getName().equalsIgnoreCase("Notification Options")) {
+				}  else if (event.getInventory().getName().equalsIgnoreCase("Notification Options")) {
 					boolean optionsClicked;
 					if (event.getRawSlot() < 27) {
 						optionsClicked = true;
@@ -13640,9 +13647,11 @@ class updateInventoryTask implements Runnable {
 			boolean isHalloweenItem = false;
 
 			List<String> lore = anvilInv.getItem(INPUT).getItemMeta().getLore();
-			for (int i=0;i<lore.size();i++) {
-				if (lore.get(i).contains(ChatColor.YELLOW+"[Halloween]")) {
-					isHalloweenItem = true;
+			if (lore != null) {
+				for (int i=0;i<lore.size();i++) {
+					if (lore.get(i).contains(ChatColor.YELLOW+"[Halloween]")) {
+						isHalloweenItem = true;
+					}
 				}
 			}
 
@@ -13899,7 +13908,7 @@ class updateInventoryTask implements Runnable {
 					if (itemEnchantments.get(e) == null || bookEnchantments.get(e) > itemEnchantments.get(e)) {
 						// Book enchantment is larger in magnitude. Assign it as a possible outcome.
 						probableEnchantments.put(e, bookEnchantments.get(e));
-					} else if (bookEnchantments.get(e) == itemEnchantments.get(e) && bookEnchantments.get(e) <= 10) {
+					} else if (bookEnchantments.get(e) == itemEnchantments.get(e) && bookEnchantments.get(e) < 10) {
 						// Book enchantment is same in magnitude. Upgrade by one level.
 						probableEnchantments.put(e, bookEnchantments.get(e) + 1);
 					}
@@ -14038,7 +14047,7 @@ class updateInventoryTask implements Runnable {
 							i++;
 						}
 
-						int cost = 0;
+						int cost = anvilInv.getItem(LEVELS).getAmount();
 
 						if (itemBonuses.get(appliedEnchant) == null) {
 							// This bonus doesn't exist. Calculate full cost.
@@ -14083,34 +14092,34 @@ class updateInventoryTask implements Runnable {
 
 							// Bukkit.getLogger().info("Bonus enchantment string: " + appliedEnchant);
 							if (appliedEnchant.equalsIgnoreCase("Critical Chance")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Critical Chance");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Critical Chance");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Armor Penetration")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Armor Penetration");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Armor Penetration");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Life Steal")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Life Steal");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Life Steal");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Attack Speed")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Attack Speed");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Attack Speed");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Damage")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Damage");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Damage");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Health")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Health");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+" "+ChatColor.BLUE+"Health");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Damage Reduction")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Damage Reduction");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Damage Reduction");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Durability")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Durability");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Durability");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Block Chance")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Block Chance");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Block Chance");
 							}
 							if (appliedEnchant.equalsIgnoreCase("Speed Boost Chance")) {
-								bonusesLore.add(ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Speed Boost Chance");
+								bonusesLore.add(0, ChatColor.YELLOW+"+"+magnitude+"% "+ChatColor.BLUE+"Speed Boost Chance");
 							}
 
 							bonusesMeta.setLore(bonusesLore);
@@ -14119,7 +14128,7 @@ class updateInventoryTask implements Runnable {
 						} else {
 							// This enchantment exists. Calculate incremental cost.
 
-							cost += (int)(12 * itemBonuses.get(appliedEnchant) / probableBonuses.get(appliedEnchant)); // Make sure it's at least one level
+							cost += (int)(12d * itemBonuses.get(appliedEnchant) / probableBonuses.get(appliedEnchant)); // Make sure it's at least one level
 							cost = Math.min(60, cost);
 							cost = Math.max(1, cost);
 
@@ -14204,9 +14213,20 @@ class updateInventoryTask implements Runnable {
 			} else if (anvilInv.getItem(MAGIC).getType() == Material.BOOK && anvilInv.getItem(INPUT).getType() != Material.ENCHANTED_BOOK) {
 				// Magic slot is a book. Unenchanting logic goes here.
 				anvilInv.setItem(OUTPUT, new ItemStack(Material.ENCHANTED_BOOK));
-				anvilInv.getItem(OUTPUT).setType(Material.ENCHANTED_BOOK);
+				// anvilInv.getItem(OUTPUT).setType(Material.ENCHANTED_BOOK);
 
-				ItemMeta bookMeta = anvilInv.getItem(INPUT).getItemMeta();
+				ItemMeta bookMeta = anvilInv.getItem(OUTPUT).getItemMeta();
+				
+				// Grab enchantments and lore. This is necessary due to leather armor meta being a different class.
+				Map<Enchantment, Integer> itemEnchantments = anvilInv.getItem(INPUT).getItemMeta().getEnchants(); 
+				
+				for (Enchantment e : itemEnchantments.keySet()) {
+					bookMeta.addEnchant(e, itemEnchantments.get(e), true); // force-add all enchants
+				}
+				
+				List<String> bookLore = anvilInv.getItem(INPUT).getItemMeta().getLore(); // add more filtering code after this later
+				bookMeta.setLore(bookLore);
+				
 				bookMeta.setDisplayName(null);
 				anvilInv.getItem(OUTPUT).setItemMeta(bookMeta);
 
@@ -14223,6 +14243,8 @@ class updateInventoryTask implements Runnable {
 				for (Enchantment e : enchantments.keySet()) {
 					cost += (1 + enchantments.get(e));
 				}
+				
+				cost = Math.min(60, cost);
 
 				ItemStack orbs = new ItemStack(Material.SLIME_BALL);
 
@@ -14297,7 +14319,7 @@ class updateInventoryTask implements Runnable {
 	public double getEnchantmentNumb(String s) {
 		//Parse the string for spaces.
 		String[] enchant = s.split(" ");
-		if (enchant[0].contains(ChatColor.YELLOW+"")) {
+		if (enchant[0].contains(ChatColor.YELLOW+"") && (enchant.length > 1)) {
 			String newstring = ((enchant[0].replace(ChatColor.YELLOW.getChar(), ' ')).replace('%', ' ')).replace(Character.toString((char)0x00A7), Character.toString((char)0x0020));
 			// Bukkit.getLogger().info("Enchant number is "+Double.valueOf(newstring));
 			return Double.valueOf(newstring);
