@@ -2573,7 +2573,7 @@ public void runTick() {
 }
 
 public String healthbar(double curHP,double maxHP) {
-	  //笆�笆�
+	  //隨�ｿｽ隨�ｿｽ
 	  int bits=(int)(Math.ceil(curHP/maxHP*10));
 	  String bar=" ";
 	  if (bits>6) {
@@ -2595,7 +2595,7 @@ public String healthbar(double curHP,double maxHP) {
 }
 
 public String healthbar(double curHP,double maxHP,int hunger) {
-	  //笆�笆�
+	  //隨�ｿｽ隨�ｿｽ
 	  int bits=(int)(Math.ceil(curHP/maxHP*10));
 	  String bar=" ";
 	  if (hunger>=17) {
@@ -3602,6 +3602,13 @@ public void payDay(int time)
     		p.sendMessage(ChatColor.GOLD+"Sorry, there are already "+getConfig().getInt("jobs.MAX_JOBS")+" people in this job!");
     		return false;
     	}
+    	if (getConfig().getInt("jobs."+ValidJobs[matchedjob])==0) {
+    		//Simply set the string.
+    		getConfig().set("jobs."+ValidJobs[matchedjob]+"_members",String.valueOf(p.getName().toLowerCase()));
+    	} else {
+    		//Append to list.
+    		getConfig().set("jobs."+ValidJobs[matchedjob]+"_members",String.valueOf(getConfig().getString("jobs."+ValidJobs[matchedjob]+"_members")+", "+p.getName().toLowerCase()));
+    	}
 		Bukkit.getLogger().info("Well, they are allowed to join this job.");
     	//Add 1 to main config.
     	getConfig().set("jobs."+ValidJobs[matchedjob], Integer.valueOf(getConfig().getInt("jobs."+ValidJobs[matchedjob])+1));
@@ -3716,7 +3723,7 @@ public void payDay(int time)
 			}
 		}
 		JobsDataInfo info = Jobsinfo[getJobSlot(job)];
-		economy.depositPlayer(p.getName().toLowerCase(), amount*(1d+(info.moneymult*getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv"))));
+		economy.depositPlayer(p.getName(), amount*(1d+(info.moneymult*getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv"))));
 		getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp")+exp));
 		if (getAccountsConfig().getDouble(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp")<0) {
 			//It can't be negative.
@@ -3763,7 +3770,7 @@ public void payDay(int time)
 				JobsDataInfo info = Jobsinfo[getJobSlot(job)];
 				if (getJobLv(job,p)<40) {
 				getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv")+1));
-				Bukkit.broadcastMessage(p.getName().toLowerCase()+" is now a Level "+getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
+				Bukkit.broadcastMessage(p.getName()+" is now a Level "+getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
 				if (getJobTotalLvs(p)%5==0) {
 					Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+" has reached Level "+getJobTotalLvs(p)+"!");
 					if ((((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))>0) {
@@ -3804,7 +3811,7 @@ public void payDay(int time)
 			}
 		}
 		JobsDataInfo info = Jobsinfo[getJobSlot(job)];
-		economy.depositPlayer(p.getName().toLowerCase(), amount*(1d+(info.moneymult*getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+slot+"lv"))));
+		economy.depositPlayer(p.getName(), amount*(1d+(info.moneymult*getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+slot+"lv"))));
 	}
 	
 	public ChatColor getJobColor(String job) {
@@ -4535,35 +4542,47 @@ public void payDay(int time)
     	String[] jobs = getJobs(p);
     	//We can remove them from this job.
     	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))) {
+    		//Remove from job members list.
+    		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+"_members").replace(", "+p.getName().toLowerCase(), ""));
+    		/*Try again in case it's the only entry.*/
+    		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+"_members").replace(p.getName().toLowerCase(), ""));
         	//Remove 1 from main config.
         	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))-1));
         	saveConfig();
     		//Remove from job 1.
-        	Bukkit.broadcastMessage(p.getName().toLowerCase()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+ChatColor.WHITE+" job!");
+        	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+ChatColor.WHITE+" job!");
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1", String.valueOf("None"));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1lv", Integer.valueOf(0));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1exp", Double.valueOf(0));
         	//saveAccountsConfig();
         	return true;
     	} else
-    	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))) {
-        	//Remove 1 from main config.
+        	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))) {
+        		//Remove from job members list.
+        		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+"_members").replace(", "+p.getName().toLowerCase(), ""));
+        		/*Try again in case it's the only entry.*/
+        		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+"_members").replace(p.getName().toLowerCase(), ""));
+            	//Remove 1 from main config.
         	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))-1));
         	saveConfig();
     		//Remove from job 2.
-        	Bukkit.broadcastMessage(p.getName().toLowerCase()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+ChatColor.WHITE+" job!");
+        	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+ChatColor.WHITE+" job!");
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2", String.valueOf("None"));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2lv", Integer.valueOf(0));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2exp", Double.valueOf(0));
         	//saveAccountsConfig();
         	return true;
     	} else
-    	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))) {
-        	//Remove 1 from main config.
+        	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))) {
+        		//Remove from job members list.
+        		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+"_members").replace(", "+p.getName().toLowerCase(), ""));
+        		/*Try again in case it's the only entry.*/
+        		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+"_members").replace(p.getName().toLowerCase(), ""));
+            	//Remove 1 from main config.
         	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))-1));
         	saveConfig();
     		//Remove from job 3.
-        	Bukkit.broadcastMessage(p.getName().toLowerCase()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+ChatColor.WHITE+" job!");
+        	Bukkit.broadcastMessage(p.getName()+" has left the "+getJobColor(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+ChatColor.WHITE+" job!");
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3", String.valueOf("None"));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3lv", Integer.valueOf(0));
         	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3exp", Double.valueOf(0));

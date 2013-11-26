@@ -1691,6 +1691,9 @@ public String convertToItemName(String val) {
       if (cmd.getName().toLowerCase().equalsIgnoreCase("jobs") && args.length == 1 && args[0].equalsIgnoreCase("join")) {
 		  p.sendMessage("Usage: "+ChatColor.GREEN+"/jobs join [JobName]"+ChatColor.WHITE+" - Join a job. Type /jobs to see the jobs.");
       } else
+      if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 1 && args[0].equalsIgnoreCase("members")) {
+		  p.sendMessage("Usage: "+ChatColor.GREEN+"/jobs members [JobName]"+ChatColor.WHITE+" - Check all members in a job.");
+      } else
       if (cmd.getName().toLowerCase().equalsIgnoreCase("jobs") && args.length == 1 && args[0].equalsIgnoreCase("leave")) {
 		  p.sendMessage("Usage: "+ChatColor.GREEN+"/jobs leave [JobName]"+ChatColor.WHITE+" - Leave a job. Type /jobs stats to see your jobs.");
       } else
@@ -1712,6 +1715,54 @@ public String convertToItemName(String val) {
       if (cmd.getName().toLowerCase().equalsIgnoreCase("jobs") && args.length == 2 && args[0].equalsIgnoreCase("leave")) {
 		  //Attempt to join the job.
     	  this.plugin.leaveJob(p,args[1]);
+      } else
+      if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 2 && args[0].equalsIgnoreCase("members")) {
+    	  JobsDataInfo[] Jobsinfo = {this.plugin.Woodcutter_job,this.plugin.Miner_job,this.plugin.Builder_job,this.plugin.Digger_job,this.plugin.Farmer_job,this.plugin.Hunter_job,this.plugin.Fisherman_job,this.plugin.Weaponsmith_job,this.plugin.Blacksmith_job,this.plugin.Cook_job,this.plugin.Brewer_job,this.plugin.Enchanter_job,this.plugin.Breeder_job,this.plugin.Explorer_job,this.plugin.Support_job};
+    	  boolean found=false;
+    	  String job = "";
+    	  ChatColor job_color = null;
+    	  for (int i=0;i<this.plugin.ValidJobs.length;i++) {
+    		  if (this.plugin.ValidJobs[i].toLowerCase().equalsIgnoreCase(args[1])) {
+    			  found=true;
+    			  job = this.plugin.ValidJobs[i];
+    			  job_color = this.plugin.getJobColor(this.plugin.ValidJobs[i]);
+    			  break;
+    		  }
+    	  }
+    	  if (found) {
+    		  if (this.plugin.getConfig().contains("jobs."+job+"_members")) {
+    			  p.sendMessage("Players in the "+job_color+job+" job:");
+    			  String[] players = this.plugin.getConfig().getString("jobs."+job+"_members").split(", ");
+    			  char lowest = 'z'+1;
+    			  List<String> sorted_players = new ArrayList<String>();
+    			  for (int i=0;i<players.length;i++) {
+    				  sorted_players.add(players[i]); //Add everyone to the list.
+    			  }
+    			  //Sort them.
+    			  List<String> sorted_list_players = new ArrayList<String>();
+    			  int lowest_slot = -1;
+    			  while (sorted_players.size()>0) {
+    				  for (int i=0;i<sorted_players.size();i++) {
+    					  if (sorted_players.get(i).toCharArray()[0]<lowest) {
+    						  lowest=sorted_players.get(i).toCharArray()[0];
+    						  lowest_slot=i;
+    					  }
+    				  }
+    				  sorted_list_players.add(sorted_players.get(lowest_slot));
+    				  sorted_players.remove(lowest_slot);
+    				  lowest_slot=-1;
+    				  lowest='z'+1;
+    			  }
+    			  for (int i=0;i<sorted_list_players.size();i++) {
+    				  OfflinePlayer q = Bukkit.getOfflinePlayer(sorted_list_players.get(i));
+    				  p.sendMessage("  "+q.getName()+ChatColor.GRAY+ChatColor.ITALIC+" (Lv"+this.plugin.getJobLv(job, q.getName())+")");
+    			  }
+    		  } else {
+        		  p.sendMessage(ChatColor.GOLD+"Sorry, something bad happened! Please report this to an administrator.");
+    		  }
+    	  } else {
+    		  p.sendMessage(ChatColor.RED+"Sorry, that is not a valid job!");
+    	  }
       } else
       if (cmd.getName().toLowerCase().equalsIgnoreCase("jobs") && (args.length == 2 || args.length==3) && args[0].equalsIgnoreCase("info")) {
     	  JobsDataInfo[] Jobsinfo = {this.plugin.Woodcutter_job,this.plugin.Miner_job,this.plugin.Builder_job,this.plugin.Digger_job,this.plugin.Farmer_job,this.plugin.Hunter_job,this.plugin.Fisherman_job,this.plugin.Weaponsmith_job,this.plugin.Blacksmith_job,this.plugin.Cook_job,this.plugin.Brewer_job,this.plugin.Enchanter_job,this.plugin.Breeder_job,this.plugin.Explorer_job,this.plugin.Support_job};
