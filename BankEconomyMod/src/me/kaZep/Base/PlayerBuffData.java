@@ -146,8 +146,8 @@ public class PlayerBuffData {
 		if (!p.isDead()) { //Don't even try to set things if we're dead.
 			base_hplv=20;
 			base_hplv+=hpbufflist.size()*10;
-			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat8")>0) {
-				base_hplv+=this.plugin.getStatBonus(7, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat8")/2);
+			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat8")>0) {
+				base_hplv+=this.plugin.getStatBonus(7, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat8")/2);
 			}
 			//Check player equipment to see if an item could possibly have a health buff.
 			for (int i=0;i<p.getEquipment().getArmorContents().length;i++) {
@@ -184,14 +184,14 @@ public class PlayerBuffData {
 			  } catch (ConcurrentModificationException ex_e) {
 				  Bukkit.getLogger().warning("Potion Effect Collection not accessible while finalizing player speed.");
 			  }
-			if (!hasabsorption && this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat4")>0) {
+			if (!hasabsorption && this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat4")>0) {
 				p.removePotionEffect(PotionEffectType.ABSORPTION);
-				p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION,3590,this.plugin.getStatBonus(3, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat4")/3)/4-1));
-				//p.sendMessage("Absorption level is "+(this.plugin.getStatBonus(3, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat4")/4)/4-1));
+				p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION,3590,this.plugin.getStatBonus(3, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat4")/3)/4-1));
+				//p.sendMessage("Absorption level is "+(this.plugin.getStatBonus(3, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat4")/4)/4-1));
 			}
-			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat2")>0) {
+			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat2")>0) {
 				p.removePotionEffect(PotionEffectType.FAST_DIGGING);
-				p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,399,this.plugin.getStatBonus(1, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat2")/5)/20-1));
+				p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,399,this.plugin.getStatBonus(1, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat2")/5)/20-1));
 			}
 			//p.sendMessage("Health: "+p.getHealth()+"/"+p.getMaxHealth()+" Base HP Level: "+base_hplv);
 			if (p.getHealth()>p.getMaxHealth()) {
@@ -260,13 +260,13 @@ public class PlayerBuffData {
 			}
 			if (last_money_report_time+72000<Main.SERVER_TICK_TIME) {
 				last_money_report_time=Main.SERVER_TICK_TIME;
-				if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify6")) {
+				if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify6")) {
 				    DecimalFormat df = new DecimalFormat("#0.00");
 					p.sendMessage(ChatColor.YELLOW+""+ChatColor.ITALIC+"You have earned $"+df.format(money_gained)+" from your jobs in the past hour.");
 				}
 				money_gained=0;
 			}
-			p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+			p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 		}
 	}
 }
