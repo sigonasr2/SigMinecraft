@@ -55,12 +55,14 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapRenderer;
@@ -237,7 +239,8 @@ public class Main extends JavaPlugin
     getConfig().addDefault("payday.amount", Integer.valueOf(0));
     getConfig().addDefault("fed.mobs", String.valueOf(""));
     getConfig().addDefault("maintenance-mode", Boolean.valueOf(false));
-    getConfig().addDefault("halloween-enabled", Boolean.valueOf(true));
+    getConfig().addDefault("halloween-enabled", Boolean.valueOf(false));
+    getConfig().addDefault("thanksgiving-enabled", Boolean.valueOf(false));
     getConfig().addDefault("item-cube-numb", Integer.valueOf(0));
     getConfig().addDefault("server-tick-time", Long.valueOf(143000000l));
     saveConfig();
@@ -299,6 +302,60 @@ public class Main extends JavaPlugin
     melon_slice.shape("a");
     melon_slice.setIngredient('a', Material.MELON_BLOCK);
     Bukkit.addRecipe(melon_slice);
+    
+    //Add Recipe for nether star crafting.
+    ShapedRecipe nether_star = new ShapedRecipe(new ItemStack(Material.NETHER_STAR, 2));
+    nether_star.shape("aaa", "bbb", "cbd");
+    nether_star.setIngredient('a', new MaterialData(Material.SKULL_ITEM, (byte) 1));
+    nether_star.setIngredient('b', Material.SOUL_SAND);
+    nether_star.setIngredient('c', Material.NETHER_STAR);
+    nether_star.setIngredient('d', Material.DIAMOND);
+    Bukkit.addRecipe(nether_star);
+    
+  //Add Recipe for water source crafting.
+    ItemStack water = new ItemStack(Material.WATER, 8);
+    ItemMeta water_name = water.getItemMeta();
+   
+    List<String> waterlore = new ArrayList<String>();
+    waterlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"Infused with the power of a");
+    waterlore.add(ChatColor.AQUA+"Nether Star"+ChatColor.GRAY+""+ChatColor.ITALIC+", this water can");
+    waterlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"be carried without a bucket,");
+    waterlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"and does not evaporate when");
+    waterlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"placed in the Nether.");
+    water_name.setLore(waterlore);
+    water_name.setDisplayName(ChatColor.AQUA+"Enchanted Water");
+
+    water.setItemMeta(water_name);
+
+    ShapedRecipe nether_water = new ShapedRecipe(water);
+    
+    nether_water.shape("aaa", "aba", "aaa");
+    nether_water.setIngredient('a', Material.WATER_BUCKET);
+    nether_water.setIngredient('b', Material.NETHER_STAR);
+
+    Bukkit.addRecipe(nether_water);
+    
+  //Add Recipe for pocket crafting table
+    ItemStack table = new ItemStack(Material.WORKBENCH);
+    ItemMeta table_name = table.getItemMeta();
+    table_name.setDisplayName(ChatColor.YELLOW+"Pocket Crafting Table");
+   
+    List<String> tablelore = new ArrayList<String>();
+    tablelore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"This workbench can be");
+    tablelore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"used anywhere! Simply");
+    tablelore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"right click to open its");
+    tablelore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"crafting interface.");
+    table_name.setLore(tablelore);
+
+    table.setItemMeta(table_name);
+
+    ShapelessRecipe portable_table = new ShapelessRecipe(table);
+    
+    portable_table.addIngredient(Material.WORKBENCH);
+    portable_table.addIngredient(Material.CHEST);
+    portable_table.addIngredient(Material.IRON_AXE);
+
+    Bukkit.addRecipe(portable_table);
 
     //Add wood slab recombining recipes.
     ShapedRecipe oak_planks = new ShapedRecipe(new ItemStack(Material.WOOD, 1, (short) 0));
@@ -1250,6 +1307,11 @@ public void runTick() {
 					  }
 					  i.setTicksLived(3600);
 				  }
+				  if (getConfig().getBoolean("thanksgiving-enabled") && Bukkit.getWorld("world").hasStorm() && Main.SERVER_TICK_TIME%160==0) {
+					  Item i = null;
+					  i=Bukkit.getWorld("world").dropItemNaturally(p.getLocation().add((int)(Math.random()*20)-(int)(Math.random()*20), 256, (int)(Math.random()*20)-(int)(Math.random()*20)),new ItemStack(Material.EGG));
+					  i.setTicksLived(3600);
+				  }
 				  if (Main.SERVER_TICK_TIME%90==0) {
 					  for (int i=-15;i<=15;i++) {
 						  for (int j=-15;j<=15;j++) {
@@ -1938,6 +2000,7 @@ public void runTick() {
 									  }
 								  }
 							  }
+
 						  }
 					  } catch (ConcurrentModificationException ex_e) {
 						  Bukkit.getLogger().warning("Could not check nearby entities in the nether.");
@@ -2542,7 +2605,7 @@ public void checkJukeboxes() {
     {
     	public void run() {
     	//DURING 'THE END' EVENT ONLY.
-    	if (Math.random()<=0.001) {
+    	if (Math.random()<=0.001 || (getConfig().getBoolean("thanksgiving-enabled") && Math.random()<=0.01)) {
     		//5% chance it will start storming.
     		Bukkit.getWorld("world").setWeatherDuration((int)(Math.random()*6000));
     		Bukkit.getWorld("world").setThundering(true);
@@ -4529,6 +4592,30 @@ public void payDay(int time)
 		return false;
     }
     
+    public boolean is_PocketWorkbench(ItemStack workbench) {
+		if (workbench.hasItemMeta() && workbench.getItemMeta().hasLore()) {
+			//Check to see if the Lore contains anything.
+			for (int i=0;i<workbench.getItemMeta().getLore().size();i++) {
+				if (workbench.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"This workbench can be")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+    public boolean is_LootChest(ItemStack chest) {
+		if (chest.hasItemMeta() && chest.getItemMeta().hasLore()) {
+			//Check to see if the Lore contains anything.
+			for (int i=0;i<chest.getItemMeta().getLore().size();i++) {
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
     public PlayerListener.Cube get_ItemCubeType(ItemStack item_cube) {
 		if (item_cube.hasItemMeta() && item_cube.getItemMeta().hasLore()) {
 			//Check to see if the Lore contains anything.
