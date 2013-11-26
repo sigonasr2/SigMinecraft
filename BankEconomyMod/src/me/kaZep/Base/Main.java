@@ -242,7 +242,8 @@ public class Main extends JavaPlugin
     getConfig().addDefault("payday.amount", Integer.valueOf(0));
     getConfig().addDefault("fed.mobs", String.valueOf(""));
     getConfig().addDefault("maintenance-mode", Boolean.valueOf(false));
-    getConfig().addDefault("halloween-enabled", Boolean.valueOf(true));
+    getConfig().addDefault("halloween-enabled", Boolean.valueOf(false));
+    getConfig().addDefault("thanksgiving-enabled", Boolean.valueOf(false));
     getConfig().addDefault("item-cube-numb", Integer.valueOf(0));
     getConfig().addDefault("server-tick-time", Long.valueOf(143000000l));
     saveConfig();
@@ -2653,7 +2654,7 @@ public void checkJukeboxes() {
     {
     	public void run() {
     	//DURING 'THE END' EVENT ONLY.
-    	if (Math.random()<=0.001) {
+    	if (Math.random()<=0.001 || (getConfig().getBoolean("thanksgiving-enabled") && Math.random()<=0.01)) {
     		//5% chance it will start storming.
     		Bukkit.getWorld("world").setWeatherDuration((int)(Math.random()*6000));
     		Bukkit.getWorld("world").setThundering(true);
