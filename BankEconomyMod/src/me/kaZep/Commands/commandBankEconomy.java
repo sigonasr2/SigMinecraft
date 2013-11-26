@@ -1743,19 +1743,27 @@ public String convertToItemName(String val) {
     			  int lowest_slot = -1;
     			  while (sorted_players.size()>0) {
     				  for (int i=0;i<sorted_players.size();i++) {
-    					  if (sorted_players.get(i).toCharArray()[0]<lowest) {
-    						  lowest=sorted_players.get(i).toCharArray()[0];
-    						  lowest_slot=i;
+    					  if (sorted_players.get(i).length()>0) { //If it's 0, for some reason it didn't read this name right....Skip it.
+	    					  if (sorted_players.get(i).toCharArray()[0]<lowest) {
+	    						  lowest=sorted_players.get(i).toCharArray()[0];
+	    						  lowest_slot=i;
+	    					  }
     					  }
     				  }
-    				  sorted_list_players.add(sorted_players.get(lowest_slot));
-    				  sorted_players.remove(lowest_slot);
-    				  lowest_slot=-1;
-    				  lowest='z'+1;
+    				  if (lowest_slot!=-1) {
+	    				  sorted_list_players.add(sorted_players.get(lowest_slot));
+	    				  sorted_players.remove(lowest_slot);
+	    				  lowest_slot=-1;
+	    				  lowest='z'+1;
+    				  }
     			  }
-    			  for (int i=0;i<sorted_list_players.size();i++) {
-    				  OfflinePlayer q = Bukkit.getOfflinePlayer(sorted_list_players.get(i));
-    				  p.sendMessage("  "+q.getName()+ChatColor.GRAY+ChatColor.ITALIC+" (Lv"+this.plugin.getJobLv(job, q.getName())+")");
+    			  if (sorted_list_players.size()>0) {
+	    			  for (int i=0;i<sorted_list_players.size();i++) {
+	    				  OfflinePlayer q = Bukkit.getOfflinePlayer(sorted_list_players.get(i));
+	    				  p.sendMessage("  "+q.getName()+ChatColor.GRAY+ChatColor.ITALIC+" (Lv"+this.plugin.getJobLv(job, q.getName().toLowerCase())+")");
+	    			  }
+    			  } else {
+    				  p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"- No one in this job yet. -");
     			  }
     		  } else {
         		  p.sendMessage(ChatColor.GOLD+"Sorry, something bad happened! Please report this to an administrator.");

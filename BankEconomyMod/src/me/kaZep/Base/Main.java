@@ -3650,11 +3650,13 @@ public void payDay(int time)
 	}
 	
 	public String[] getJobs(String p) {
+		p=p.toLowerCase();
 		String[] string= {getAccountsConfig().getString(p+".jobs.job1"),getAccountsConfig().getString(p+".jobs.job2"),getAccountsConfig().getString(p+".jobs.job3")};
 		return string;
 	}
 	
 	public boolean PlayerinJob(String p,String job) {
+		p=p.toLowerCase();
 		String[] jobs = getJobs(p);
 		for (int i=0;i<jobs.length;i++) {
 			if (job.equalsIgnoreCase(jobs[i])) {
@@ -4099,6 +4101,7 @@ public void payDay(int time)
 	}
 	
 	public int getJobLv(String job, String p) {
+		p=p.toLowerCase();
 		if (PlayerinJob(p,job)) {
 			int slot=-1;
 			//Check which slot contains our job.
@@ -4542,10 +4545,18 @@ public void payDay(int time)
     	String[] jobs = getJobs(p);
     	//We can remove them from this job.
     	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))) {
-    		//Remove from job members list.
-    		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+"_members").replace(", "+p.getName().toLowerCase(), ""));
-    		/*Try again in case it's the only entry.*/
-    		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))+"_members").replace(p.getName().toLowerCase(), ""));
+    		String[] s = getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members").split(", ");
+    		String s2 = "";
+    		for (int i=0;i<s.length;i++) {
+    			if (!s[i].equalsIgnoreCase(p.getName().toLowerCase())) {
+    				if (s2.equals("")) {
+    					s2 = s[i];
+    				} else {
+    					s2 += ", "+s[i];
+    				}
+    			}
+    		}
+    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members", s2);
         	//Remove 1 from main config.
         	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))-1));
         	saveConfig();
@@ -4558,11 +4569,18 @@ public void payDay(int time)
         	return true;
     	} else
         	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))) {
-        		//Remove from job members list.
-        		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+"_members").replace(", "+p.getName().toLowerCase(), ""));
-        		/*Try again in case it's the only entry.*/
-        		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))+"_members").replace(p.getName().toLowerCase(), ""));
-            	//Remove 1 from main config.
+        		String[] s = getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members").split(", ");
+        		String s2 = "";
+        		for (int i=0;i<s.length;i++) {
+        			if (!s[i].equalsIgnoreCase(p.getName().toLowerCase())) {
+        				if (s2.equals("")) {
+        					s2 = s[i];
+        				} else {
+        					s2 += ", "+s[i];
+        				}
+        			}
+        		}
+        		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members", s2);
         	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))-1));
         	saveConfig();
     		//Remove from job 2.
@@ -4574,11 +4592,18 @@ public void payDay(int time)
         	return true;
     	} else
         	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))) {
-        		//Remove from job members list.
-        		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+"_members").replace(", "+p.getName().toLowerCase(), ""));
-        		/*Try again in case it's the only entry.*/
-        		getConfig().set("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+"_members", getConfig().getString("jobs."+job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))+"_members").replace(p.getName().toLowerCase(), ""));
-            	//Remove 1 from main config.
+        		String[] s = getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members").split(", ");
+        		String s2 = "";
+        		for (int i=0;i<s.length;i++) {
+        			if (!s[i].equalsIgnoreCase(p.getName().toLowerCase())) {
+        				if (s2.equals("")) {
+        					s2 = s[i];
+        				} else {
+        					s2 += ", "+s[i];
+        				}
+        			}
+        		}
+        		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members", s2);
         	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))-1));
         	saveConfig();
     		//Remove from job 3.
