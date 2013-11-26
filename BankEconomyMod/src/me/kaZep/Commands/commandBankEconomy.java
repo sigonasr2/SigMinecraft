@@ -1586,7 +1586,7 @@ public String convertToItemName(String val) {
 		            		is_in_vehicle=true;
 		            		vehicle = p.getVehicle();
 		            	}
-		            	if (target.getName().toLowerCase() == this.plugin.getAccountsConfig().getString(p.getName().toLowerCase().toLowerCase() + ".teleplayer")) {
+		            	if (target.getName() == this.plugin.getAccountsConfig().getString(p.getName().toLowerCase().toLowerCase() + ".teleplayer")) {
 			            	//Determine distance of player to other player.
 			            	double otherx = target.getLocation().getX();
 			            	double othery = target.getLocation().getY();

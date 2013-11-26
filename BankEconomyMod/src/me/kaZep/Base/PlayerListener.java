@@ -12642,10 +12642,10 @@ implements Listener
 				//Deposit all the money into their account.
 				val = this.plugin.economy.getBalance(e.getPlayer().getName());
 				this.plugin.economy.withdrawPlayer(e.getPlayer().getName(), val);
-				double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money");
-				this.plugin.getAccountsConfig().set(e.getPlayer().getName() + ".money", Double.valueOf(mymoney+val));
+				double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money");
+				this.plugin.getAccountsConfig().set(e.getPlayer().getName().toLowerCase() + ".money", Double.valueOf(mymoney+val));
 				//this.plugin.saveAccountsConfig();
-				e.getPlayer().sendMessage(ChatColor.GREEN+"Deposited $" + df.format(val) + " into your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")));
+				e.getPlayer().sendMessage(ChatColor.GREEN+"Deposited $" + df.format(val) + " into your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")));
 				this.plugin.last_bank_deposit_use_time=0;
 			} else {
 				try {
@@ -12655,10 +12655,10 @@ implements Listener
 						//Deposit the money into their account.
 						//this.plugin.economy.bankDeposit(e.getPlayer().getName(), val);
 						this.plugin.economy.withdrawPlayer(e.getPlayer().getName(), val);
-						double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money");
-						this.plugin.getAccountsConfig().set(e.getPlayer().getName() + ".money", Double.valueOf(mymoney+val));
+						double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money");
+						this.plugin.getAccountsConfig().set(e.getPlayer().getName().toLowerCase() + ".money", Double.valueOf(mymoney+val));
 						//this.plugin.saveAccountsConfig();
-						e.getPlayer().sendMessage(ChatColor.GREEN+"Deposited $" + df.format(val) + " into your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")));
+						e.getPlayer().sendMessage(ChatColor.GREEN+"Deposited $" + df.format(val) + " into your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")));
 						this.plugin.last_bank_deposit_use_time=0;
 					} else {
 						e.getPlayer().sendMessage(ChatColor.RED+"You are not holding that much! " + ChatColor.YELLOW +"Enter a value equal to or lower than $" + ChatColor.GREEN+ df.format(this.plugin.economy.getBalance(e.getPlayer().getName())) + "" + ChatColor.GRAY + ChatColor.ITALIC + " (Remember you can also use the word all)");
@@ -12676,27 +12676,27 @@ implements Listener
 				double val=0;
 				if (e.getMessage().equalsIgnoreCase("all")) {
 					//Withdraw all the money in their account.
-					val = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money");
-					this.plugin.getAccountsConfig().set(e.getPlayer().getName() + ".money", Double.valueOf(0));
+					val = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money");
+					this.plugin.getAccountsConfig().set(e.getPlayer().getName().toLowerCase() + ".money", Double.valueOf(0));
 					//this.plugin.saveAccountsConfig();
 					this.plugin.economy.depositPlayer(e.getPlayer().getName(), val);
-					e.getPlayer().sendMessage(ChatColor.GREEN+"Withdrawed $" + df.format(val) + " from your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")));
+					e.getPlayer().sendMessage(ChatColor.GREEN+"Withdrawed $" + df.format(val) + " from your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")));
 					this.plugin.last_bank_withdraw_use_time=0;
 				} else {
 					try {
 						val = Double.parseDouble(e.getMessage());
 						//Make sure the user is holding at least that much money.
-						if (this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")>=val && val>0) {
+						if (this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")>=val && val>0) {
 							//Deposit the money into their account.
 							//this.plugin.economy.bankDeposit(e.getPlayer().getName(), val);
 							this.plugin.economy.depositPlayer(e.getPlayer().getName(), val);
-							double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money");
-							this.plugin.getAccountsConfig().set(e.getPlayer().getName() + ".money", Double.valueOf(mymoney-val));
+							double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money");
+							this.plugin.getAccountsConfig().set(e.getPlayer().getName().toLowerCase() + ".money", Double.valueOf(mymoney-val));
 							//this.plugin.saveAccountsConfig();
-							e.getPlayer().sendMessage(ChatColor.GREEN+"Withdrawed $" + df.format(val) + " from your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")));
+							e.getPlayer().sendMessage(ChatColor.GREEN+"Withdrawed $" + df.format(val) + " from your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")));
 							this.plugin.last_bank_withdraw_use_time=0;
 						} else {
-							e.getPlayer().sendMessage(ChatColor.RED+"You do not have that much! " + ChatColor.YELLOW +"Enter a value equal to or lower than $" + ChatColor.GREEN+ df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")) + "" + ChatColor.GRAY + ChatColor.ITALIC + " (Remember you can also use the word all)");
+							e.getPlayer().sendMessage(ChatColor.RED+"You do not have that much! " + ChatColor.YELLOW +"Enter a value equal to or lower than $" + ChatColor.GREEN+ df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")) + "" + ChatColor.GRAY + ChatColor.ITALIC + " (Remember you can also use the word all)");
 							this.plugin.last_bank_withdraw_use_time=Main.SERVER_TICK_TIME;
 						}
 					} catch (NumberFormatException ex_e) {
