@@ -62,6 +62,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapRenderer;
@@ -302,6 +303,60 @@ public class Main extends JavaPlugin
     melon_slice.shape("a");
     melon_slice.setIngredient('a', Material.MELON_BLOCK);
     Bukkit.addRecipe(melon_slice);
+    
+    //Add Recipe for nether star crafting.
+    ShapedRecipe nether_star = new ShapedRecipe(new ItemStack(Material.NETHER_STAR, 2));
+    nether_star.shape("aaa", "bbb", "cbd");
+    nether_star.setIngredient('a', new MaterialData(Material.SKULL_ITEM, (byte) 1));
+    nether_star.setIngredient('b', Material.SOUL_SAND);
+    nether_star.setIngredient('c', Material.NETHER_STAR);
+    nether_star.setIngredient('d', Material.DIAMOND);
+    Bukkit.addRecipe(nether_star);
+    
+  //Add Recipe for water source crafting.
+    ItemStack water = new ItemStack(Material.WATER, 8);
+    ItemMeta water_name = water.getItemMeta();
+   
+    List<String> waterlore = new ArrayList<String>();
+    waterlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"Infused with the power of a");
+    waterlore.add(ChatColor.AQUA+"Nether Star"+ChatColor.GRAY+""+ChatColor.ITALIC+", this water can");
+    waterlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"be carried without a bucket,");
+    waterlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"and does not evaporate when");
+    waterlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"placed in the Nether.");
+    water_name.setLore(waterlore);
+    water_name.setDisplayName(ChatColor.AQUA+"Enchanted Water");
+
+    water.setItemMeta(water_name);
+
+    ShapedRecipe nether_water = new ShapedRecipe(water);
+    
+    nether_water.shape("aaa", "aba", "aaa");
+    nether_water.setIngredient('a', Material.WATER_BUCKET);
+    nether_water.setIngredient('b', Material.NETHER_STAR);
+
+    Bukkit.addRecipe(nether_water);
+    
+  //Add Recipe for pocket crafting table
+    ItemStack table = new ItemStack(Material.WORKBENCH);
+    ItemMeta table_name = water.getItemMeta();
+    table_name.setDisplayName(ChatColor.YELLOW+"Pocket Crafting Table");
+   
+    List<String> tablelore = new ArrayList<String>();
+    tablelore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"This workbench can be");
+    tablelore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"used anywhere! Simply");
+    tablelore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"right click to open its");
+    tablelore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"crafting interface.");
+    table_name.setLore(tablelore);
+
+    table.setItemMeta(table_name);
+
+    ShapelessRecipe portable_table = new ShapelessRecipe(table);
+    
+    portable_table.addIngredient(Material.WORKBENCH);
+    portable_table.addIngredient(Material.CHEST);
+    portable_table.addIngredient(Material.IRON_AXE);
+
+    Bukkit.addRecipe(portable_table);
 
     //Add wood slab recombining recipes.
     ShapedRecipe oak_planks = new ShapedRecipe(new ItemStack(Material.WOOD, 1, (short) 0));
@@ -4702,6 +4757,18 @@ public void payDay(int time)
 		}
 		return false;
     }
+    
+    public boolean is_PocketWorkbench(ItemStack workbench) {
+		if (workbench.hasItemMeta() && workbench.getItemMeta().hasLore()) {
+			//Check to see if the Lore contains anything.
+			for (int i=0;i<workbench.getItemMeta().getLore().size();i++) {
+				if (workbench.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"This workbench can be")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
     
     public PlayerListener.Cube get_ItemCubeType(ItemStack item_cube) {
 		if (item_cube.hasItemMeta() && item_cube.getItemMeta().hasLore()) {

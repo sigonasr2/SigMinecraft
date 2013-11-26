@@ -4423,7 +4423,7 @@ implements Listener
 		if (result.getResult().getType()==Material.MELON_BLOCK) {
 			result.setResult(new ItemStack(Material.AIR));
 		}
-
+		
 		// Increase stairs recipe efficiency
 		if (result.getResult().getType()==Material.WOOD_STAIRS) {
 			result.setResult(new ItemStack(Material.WOOD_STAIRS, 8));
@@ -9061,7 +9061,13 @@ implements Listener
 			e.setCancelled(true);
 		}
 		if (this.plugin.is_ItemCube(e.getItemInHand())) {
+			p.updateInventory();
 			e.setCancelled(true);
+		}
+		if (this.plugin.is_PocketWorkbench(e.getItemInHand())) {
+			p.updateInventory();
+			e.setCancelled(true);
+			return;
 		}
 		return;
 	}
@@ -9886,6 +9892,11 @@ implements Listener
 						event.setCancelled(true);
 						return;
 					}
+				}
+				if (this.plugin.is_PocketWorkbench(event.getCurrentItem()) && event.getClick()==ClickType.RIGHT) {
+					p.openWorkbench(null, true);
+					event.setCancelled(true);
+					return;
 				}
 			}
 		}else
@@ -12936,6 +12947,12 @@ implements Listener
 				e.setCancelled(true);
 				return;
 			}
+			if (p.getItemInHand()!=null && this.plugin.is_PocketWorkbench(p.getItemInHand())) {
+				p.openWorkbench(null, true);
+				e.setCancelled(true);
+				return;
+			}
+			
 		}
 		if (blockAction == Action.RIGHT_CLICK_BLOCK) {
 			/*//CREATE THE GIANT PUMPKIN
