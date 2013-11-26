@@ -580,6 +580,32 @@ public String convertToItemName(String val) {
 				    
 				    p.getWorld().dropItemNaturally(p.getLocation(), chest);
   			  }
+  			  if (args[0].equalsIgnoreCase("thanksgiving")) {
+  				  if (this.plugin.getConfig().getBoolean("thanksgiving-enabled")) {
+  					  this.plugin.getConfig().set("thanksgiving-enabled", Boolean.valueOf(false));
+  					  p.sendMessage("Thanksgiving event disabled.");
+  				  } else {
+  					  this.plugin.getConfig().set("thanksgiving-enabled", Boolean.valueOf(true));
+  					  p.sendMessage("Thanksgiving event enabled.");
+  				  }
+  				  this.plugin.saveConfig();
+  			  }
+  			  if (args[0].equalsIgnoreCase("loot")) {
+					ItemStack chest = new ItemStack(Material.CHEST);
+				    ItemMeta chest_name = chest.getItemMeta();
+				    chest_name.setDisplayName(ChatColor.YELLOW+"Closed Chest");
+				   
+				    List<String> chestlore = new ArrayList<String>();
+				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
+				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"It feels heavy; there");
+				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"might be items inside.");
+				    chest_name.setLore(chestlore);
+
+				    chest.setItemMeta(chest_name);
+				    
+				    p.getWorld().dropItemNaturally(p.getLocation(), chest);
+  			  }
             } else
             if (cmd.getName().equalsIgnoreCase("event") && args.length==2 && p.hasPermission("maintenance-mode-admin")) {
   			  if (args[0].equalsIgnoreCase("head")) {

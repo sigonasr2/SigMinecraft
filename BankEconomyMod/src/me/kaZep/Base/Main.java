@@ -1388,6 +1388,11 @@ public void runTick() {
 					  i=Bukkit.getWorld("world").dropItemNaturally(p.getLocation().add((int)(Math.random()*20)-(int)(Math.random()*20), 256, (int)(Math.random()*20)-(int)(Math.random()*20)),new ItemStack(Material.EGG));
 					  i.setTicksLived(3600);
 				  }
+				  if (getConfig().getBoolean("thanksgiving-enabled") && Bukkit.getWorld("world").hasStorm() && Main.SERVER_TICK_TIME%160==0) {
+					  Item i = null;
+					  i=Bukkit.getWorld("world").dropItemNaturally(p.getLocation().add((int)(Math.random()*20)-(int)(Math.random()*20), 256, (int)(Math.random()*20)-(int)(Math.random()*20)),new ItemStack(Material.EGG));
+					  i.setTicksLived(3600);
+				  }
 				  if (Main.SERVER_TICK_TIME%90==0) {
 					  for (int i=-15;i<=15;i++) {
 						  for (int j=-15;j<=15;j++) {
