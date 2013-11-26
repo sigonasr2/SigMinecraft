@@ -10118,18 +10118,18 @@ implements Listener
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("GOLD") ||
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("DIAMOND") ||
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("CHAINMAIL")) {
-													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.BLAZE_HIT, 10, 1);
+													Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.BLAZE_HIT, 10, 1);
 												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("WOOD")) {
-													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOD, 20, 1);
+													Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOD, 20, 1);
 												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("STONE")) {
-													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_STONE, 20, 1);
+													Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_STONE, 20, 1);
 												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("LEATHER")) {
-													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOL, 20, 1);
+													Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOL, 20, 1);
 												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("BOW") || 
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("FISHING")) {
-													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.ARROW_HIT, 10, 1);
+													Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.ARROW_HIT, 10, 1);
 												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("ENCHANTED")) {
-													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.LEVEL_UP, 10, 1);
+													Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.LEVEL_UP, 10, 1);
 												}
 
 												event.getInventory().setItem(OUTPUT, new ItemStack(Material.AIR));
@@ -10202,18 +10202,18 @@ implements Listener
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("GOLD") ||
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("DIAMOND") ||
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("CHAINMAIL")) {
-													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.BLAZE_HIT, 10, 1);
+													Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.BLAZE_HIT, 10, 1);
 												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("WOOD")) {
-													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOD, 20, 1);
+													Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOD, 20, 1);
 												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("STONE")) {
-													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_STONE, 20, 1);
+													Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_STONE, 20, 1);
 												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("LEATHER")) {
-													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOL, 20, 1);
+													Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOL, 20, 1);
 												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("BOW") || 
 														event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("FISHING")) {
-													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.ARROW_HIT, 10, 1);
+													Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.ARROW_HIT, 10, 1);
 												} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("ENCHANTED")) {
-													Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.LEVEL_UP, 10, 1);
+													Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.LEVEL_UP, 10, 1);
 												}
 												
 
@@ -10268,18 +10268,18 @@ implements Listener
 													event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("GOLD") ||
 													event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("DIAMOND") ||
 													event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("CHAINMAIL")) {
-												Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.BLAZE_HIT, 10, 1);
+												Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.BLAZE_HIT, 10, 1);
 											} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("WOOD")) {
-												Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOD, 20, 1);
+												Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOD, 20, 1);
 											} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("STONE")) {
-												Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_STONE, 20, 1);
+												Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_STONE, 20, 1);
 											} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("LEATHER")) {
-												Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOL, 20, 1);
+												Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.DIG_WOOL, 20, 1);
 											} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("BOW") || 
 													event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("FISHING")) {
-												Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.ARROW_HIT, 10, 1);
+												Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.ARROW_HIT, 10, 1);
 											} else if (event.getInventory().getItem(OUTPUT).getType().toString().toUpperCase().contains("ENCHANTED")) {
-												Bukkit.getPlayer(event.getWhoClicked().getName()).playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.LEVEL_UP, 10, 1);
+												Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.LEVEL_UP, 10, 1);
 											}
 
 											Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
