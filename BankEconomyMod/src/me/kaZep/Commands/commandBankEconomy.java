@@ -1572,7 +1572,7 @@ public String convertToItemName(String val) {
 		            		is_in_vehicle=true;
 		            		vehicle = p.getVehicle();
 		            	}
-		            	if (target.getName() == this.plugin.getAccountsConfig().getString(p.getName().toLowerCase().toLowerCase() + ".teleplayer")) {
+		            	if (target.getName().equalsIgnoreCase(this.plugin.getAccountsConfig().getString(p.getName().toLowerCase() + ".teleplayer"))) {
 			            	//Determine distance of player to other player.
 			            	double otherx = target.getLocation().getX();
 			            	double othery = target.getLocation().getY();
@@ -1631,7 +1631,7 @@ public String convertToItemName(String val) {
 			            		//Allow teleport to occur.
 						        p.sendMessage("Teleporting to "+ChatColor.GREEN+target.getName().toLowerCase()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". Type the command again to teleport.");
 				  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".teletime", Double.valueOf(p.getPlayerTime()));
-				  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".teleplayer", String.valueOf(target.getName().toLowerCase()));
+				  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".teleplayer", String.valueOf(target.getName()));
 			            	} else {
 						        p.sendMessage("Teleporting to "+ChatColor.GREEN+target.getName().toLowerCase()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". You do not have enough in the bank for that.");
 			            	}
