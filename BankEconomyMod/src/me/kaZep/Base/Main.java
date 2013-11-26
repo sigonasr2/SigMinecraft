@@ -56,6 +56,7 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.Inventory;
@@ -338,7 +339,7 @@ public class Main extends JavaPlugin
     
   //Add Recipe for pocket crafting table
     ItemStack table = new ItemStack(Material.WORKBENCH);
-    ItemMeta table_name = water.getItemMeta();
+    ItemMeta table_name = table.getItemMeta();
     table_name.setDisplayName(ChatColor.YELLOW+"Pocket Crafting Table");
    
     List<String> tablelore = new ArrayList<String>();
@@ -1353,6 +1354,11 @@ public void runTick() {
 					  }
 					  i.setTicksLived(3600);
 				  }
+				  if (getConfig().getBoolean("thanksgiving-enabled") && Bukkit.getWorld("world").hasStorm() && Main.SERVER_TICK_TIME%160==0) {
+					  Item i = null;
+					  i=Bukkit.getWorld("world").dropItemNaturally(p.getLocation().add((int)(Math.random()*20)-(int)(Math.random()*20), 256, (int)(Math.random()*20)-(int)(Math.random()*20)),new ItemStack(Material.EGG));
+					  i.setTicksLived(3600);
+				  }
 				  if (Main.SERVER_TICK_TIME%90==0) {
 					  for (int i=-15;i<=15;i++) {
 						  for (int j=-15;j<=15;j++) {
@@ -2041,6 +2047,7 @@ public void runTick() {
 									  }
 								  }
 							  }
+
 						  }
 					  } catch (ConcurrentModificationException ex_e) {
 						  Bukkit.getLogger().warning("Could not check nearby entities in the nether.");
@@ -4769,7 +4776,19 @@ public void payDay(int time)
 		}
 		return false;
 	}
-    
+
+    public boolean is_LootChest(ItemStack chest) {
+		if (chest.hasItemMeta() && chest.getItemMeta().hasLore()) {
+			//Check to see if the Lore contains anything.
+			for (int i=0;i<chest.getItemMeta().getLore().size();i++) {
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
     public PlayerListener.Cube get_ItemCubeType(ItemStack item_cube) {
 		if (item_cube.hasItemMeta() && item_cube.getItemMeta().hasLore()) {
 			//Check to see if the Lore contains anything.

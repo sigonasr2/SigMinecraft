@@ -18,6 +18,8 @@ import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 //import net.minecraft.server.v1_4_R1.EntityWolf;
 
+
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -840,6 +842,17 @@ implements Listener
 		}
 	}
 
+    @EventHandler
+    public void onPlayerItemConsume(PlayerItemConsumeEvent e) {
+    	Player p = e.getPlayer();
+    	if (e.getItem().getType() == Material.COOKED_CHICKEN) {
+    		p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 18000, 0), true);
+    		p.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 18000, 4), true);
+    		p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 18000, 2), true);
+    		p.playSound(p.getLocation(), Sound.CHICKEN_IDLE, 0.9f, 1);
+    	}
+    }
+    
 	@EventHandler
 	public void onFurnaceItemConsume(FurnaceBurnEvent e) {
 		String owner="";
@@ -2109,7 +2122,13 @@ implements Listener
 				s.setSkeletonType(SkeletonType.WITHER);
 				s.setMaxHealth(150);
 				s.setHealth(s.getMaxHealth());
-				s.getEquipment().setItemInHand(new ItemStack(Material.IRON_SWORD));
+
+				ItemStack sword = new ItemStack(Material.STONE_SWORD);
+				  sword.addEnchantment(Enchantment.DAMAGE_ALL, (int)(Math.random() * 3) + 2);
+				  sword.addEnchantment(Enchantment.KNOCKBACK, (int)(Math.random()) + 1);
+				  sword.addEnchantment(Enchantment.FIRE_ASPECT, (int)(Math.random()) + 1);
+
+				s.getEquipment().setItemInHand(sword);
 			}
 		}break;
 		case SLIME: {
@@ -6350,6 +6369,25 @@ implements Listener
 					f.getType()==EntityType.SPIDER || 
 					f.getType()==EntityType.CREEPER || 
 					f.getType()==EntityType.ENDERMAN) {
+				
+				
+				if (this.plugin.getConfig().getBoolean("thanksgiving-enabled") && Math.random()<=0.005) {
+					// 0.5% chance of loot chest dropping
+					ItemStack chest = new ItemStack(Material.CHEST);
+				    ItemMeta chest_name = chest.getItemMeta();
+				    chest_name.setDisplayName(ChatColor.YELLOW+"Closed Chest");
+				   
+				    List<String> chestlore = new ArrayList<String>();
+				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
+				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"It feels heavy; there");
+				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"might be items inside.");
+				    chest_name.setLore(chestlore);
+
+				    chest.setItemMeta(chest_name);
+				    
+				    f.getWorld().dropItemNaturally(f.getLocation(), chest);
+				}
 				//if (Math.random()<=0.005) {
 				/*
 			  if (Math.random()<=0.005) {
@@ -9069,6 +9107,19 @@ implements Listener
 			e.setCancelled(true);
 			return;
 		}
+		if (this.plugin.is_LootChest(e.getItemInHand())) {
+			e.setCancelled(true);
+			if (e.getItemInHand().getAmount() > 1) {
+				e.getItemInHand().setAmount(e.getItemInHand().getAmount() - 1);
+			} else {
+				e.getPlayer().setItemInHand(null);
+			}
+			e.getPlayer().getWorld().dropItemNaturally(e.getBlockPlaced().getLocation(), getGoodie());
+			p.sendMessage(ChatColor.GREEN+"You open the chest and find treasure inside!");
+			p.playSound(p.getLocation(), Sound.ORB_PICKUP, 10, 1);
+			p.updateInventory();
+			return;
+		}
 		return;
 	}
 
@@ -10928,6 +10979,9 @@ implements Listener
 				)) {
 			allow=false;
 		}
+		if (this.plugin.getConfig().getBoolean("thanksgiving-enabled") && i.getItemStack().getType()==Material.EGG) {
+			allow=false;
+		}
 		if (i.getItemStack().getType()==Material.BEDROCK) { //Add a hard check.
 			allow=false;
 		}
@@ -11136,6 +11190,500 @@ implements Listener
 						}
 					}
 				}
+		}
+	}
+
+	@EventHandler
+	public void onEggThrow(ProjectileHitEvent e) {
+		LivingEntity l = e.getEntity().getShooter();
+		if (l!=null && l.getType()==EntityType.PLAYER && e.getEntity().getType() == EntityType.EGG && this.plugin.getConfig().getBoolean("thanksgiving-enabled")) {
+			// Threw an egg during thanksgiving. Generate loot. 
+			Location loc = e.getEntity().getLocation(); 
+			ItemStack item = null;
+			
+			switch ((int)(Math.random()*111.01)) {
+				case 0:{
+					item = new ItemStack(Material.WOOD_HOE);
+				}break;
+				case 1:{
+					item = new ItemStack(Material.WOOD_AXE);
+				}break;
+				case 2:{
+					item = new ItemStack(Material.WOOD_SWORD);
+				}break;
+				case 3:{
+					item = new ItemStack(Material.WOOD_SPADE);
+				}break;
+				case 4:{
+					item = new ItemStack(Material.WOOD_PICKAXE);
+				}break;
+				case 5:{
+					item = new ItemStack(Material.SIGN);
+				}break;
+				case 6:
+				case 7:
+				case 8:
+				case 9:
+				case 10:{
+					item = new ItemStack(Material.STICK);
+				}break;
+				case 11:
+				case 12:
+				case 13:
+				case 14:
+				case 15:
+				case 16:{
+					item = new ItemStack(Material.DIRT);
+				}break;
+				case 17:
+				case 18:
+				case 19:{
+					item = new ItemStack(Material.GRASS);
+				}break;
+				case 20:
+				case 21:
+				case 22:{
+					item = new ItemStack(Material.GRAVEL);
+				}break;
+				case 23:{
+					item = new ItemStack(Material.PUMPKIN);
+				}break;
+				case 24:{
+					item = new ItemStack(Material.SOUL_SAND);
+				}break;
+				case 25:
+				case 26:{
+					item = new ItemStack(Material.NETHERRACK);
+				}break;
+				case 27:{
+					item = new ItemStack(Material.BONE);
+				}break;
+				case 28:
+				case 29:{
+					item = new ItemStack(Material.ROTTEN_FLESH);
+				}break;
+				case 30:{
+					item = new ItemStack(Material.GRILLED_PORK);
+				}break;
+				case 31:{
+					item = new ItemStack(Material.COOKED_BEEF);
+				}break;
+				case 32:{
+					item = new ItemStack(Material.COOKED_FISH);
+				}break;
+				case 33:
+				case 34:{
+					item = new ItemStack(Material.APPLE);
+				}break;
+				case 35:
+				case 36:{
+					item = new ItemStack(Material.BREAD);
+				}break;
+				case 37:{
+					item = new ItemStack(Material.CAKE);
+				}break;
+				case 38:{
+					item = new ItemStack(Material.PAPER);
+				}break;
+				case 39:
+				case 40:{
+					item = new ItemStack(Material.SUGAR_CANE);
+				}break;
+				case 41:{
+					item = new ItemStack(Material.SUGAR);
+				}break;
+				case 42:{
+					item = new ItemStack(Material.FEATHER);
+				}break;
+				case 43:{
+					item = new ItemStack(Material.WOOD);
+				}break;
+				case 44:{
+					item = new ItemStack(Material.LOG);
+				}break;
+				case 45:
+				case 46:{
+					item = new ItemStack(Material.CLAY_BALL);
+				}break;
+				case 47:{
+					item = new ItemStack(Material.CLAY);
+				}break;
+				case 48:{
+					item = new ItemStack(Material.SLIME_BALL);
+				}break;
+				case 49:{
+					item = new ItemStack(Material.REDSTONE);
+				}break;
+				case 50:{
+					item = new ItemStack(Material.GLOWSTONE_DUST);
+				}break;
+				case 51:{
+					item = new ItemStack(Material.COAL);
+				}break;
+				case 52:{
+					item = new ItemStack(Material.FERMENTED_SPIDER_EYE);
+				}break;
+				case 53:{
+					item = new ItemStack(Material.IRON_INGOT);
+				}break;
+				case 54:{
+					item = new ItemStack(Material.GOLD_NUGGET);
+				}break;
+				case 55:{
+					item = new ItemStack(Material.FLINT);
+				}break;
+				case 56:{
+					item = new ItemStack(Material.ARROW);
+				}break;
+				case 57:{
+					item = new ItemStack(Material.SAPLING);
+				}break;
+				case 58:{
+					item = new ItemStack(Material.POTATO_ITEM);
+				}break;
+				case 59:{
+					item = new ItemStack(Material.CARROT_ITEM);
+				}break;
+				case 60:{
+					item = new ItemStack(Material.PORK);
+				}break;
+				case 61:{
+					item = new ItemStack(Material.FLOWER_POT_ITEM);
+				}break;
+				case 62:{
+					item = new ItemStack(Material.RAW_BEEF);
+				}break;
+				case 63:{
+					item = new ItemStack(Material.RAW_FISH);
+				}break;
+				case 64:{
+					item = new ItemStack(Material.MELON);
+				}break;
+				case 65:{
+					item = new ItemStack(Material.CACTUS);
+				}break;
+				case 66:{
+					item = new ItemStack(Material.LEATHER);
+				}break;
+				case 67:{
+					item = new ItemStack(Material.STRING);
+				}break;
+				case 68:{
+					item = new ItemStack(Material.WOOL);
+				}break;
+				case 69:{
+					item = new ItemStack(Material.QUARTZ);
+				}break;
+				case 70:
+				case 71:
+				case 72:
+				case 73:
+				case 74:
+				case 75:
+				case 76:
+				case 77:
+				case 78:
+				case 79:{
+					item = new ItemStack(Material.TORCH);
+				}break;
+				case 80:
+				case 81:
+				case 82:{
+					item = new ItemStack(Material.SAND);
+				}break;
+				case 83:{
+					item = new ItemStack(Material.SANDSTONE);
+				}break;
+				case 84:{
+					item = new ItemStack(Material.GLASS);
+				}break;
+				case 85:{
+					item = new ItemStack(Material.GLASS_BOTTLE);
+				}break;
+				case 86:{
+					item = new ItemStack(Material.SULPHUR);
+				}break;
+				case 87:{
+					item = new ItemStack(Material.INK_SACK);
+				}break;
+				case 88:{
+					item = new ItemStack(Material.BRICK);
+				}break;
+				case 89:{
+					item = new ItemStack(Material.BOOK);
+				}break;
+				case 90:{
+					item = new ItemStack(Material.RED_MUSHROOM);
+				}break;
+				case 91:{
+					item = new ItemStack(Material.BROWN_MUSHROOM);
+				}break;
+				case 92:{
+					item = new ItemStack(Material.SNOW_BALL);
+				}break;
+				case 93:{
+					item = new ItemStack(Material.FENCE);
+				}break;
+				case 94:{
+					item = new ItemStack(Material.NETHER_BRICK_ITEM);
+				}break;
+				case 95:{
+					item = new ItemStack(Material.WATER_LILY);
+				}break;
+				case 96:{
+					item = new ItemStack(Material.COBBLESTONE);
+				}break;
+				case 97:{
+					item = new ItemStack(Material.STONE);
+				}break;
+				case 98:{
+					item = new ItemStack(Material.VINE);
+				}break;
+				case 99:{
+					item = new ItemStack(Material.WHEAT);
+				}break;
+				case 100:
+				case 101:
+				case 102:
+				case 103:
+				case 104:{
+					// Uncommon items here
+					switch((int)(Math.random() * 40)){
+						case 0:{
+							item = new ItemStack(Material.WATCH);
+						}break;
+						case 1:{
+							item = new ItemStack(Material.WORKBENCH);
+						}break;
+						case 2:{
+							item = new ItemStack(Material.FURNACE);
+						}break;
+						case 3:{
+							item = new ItemStack(Material.REDSTONE_ORE);
+						}break;
+						case 4:{
+							item = new ItemStack(Material.ANVIL);
+						}break;
+						case 5:{
+							item = new ItemStack(Material.CAULDRON);
+						}break;
+						case 6:{
+							item = new ItemStack(Material.ENDER_CHEST);
+						}break;
+						case 7:{
+							item = new ItemStack(Material.GLOWSTONE);
+						}break;
+						case 8:{
+							item = new ItemStack(Material.LAVA_BUCKET);
+						}break;
+						case 9:{
+							item = new ItemStack(Material.QUARTZ_BLOCK);
+						}break;
+						case 10:{
+							item = new ItemStack(Material.LAPIS_ORE);
+						}break;
+						case 11:{
+							item = new ItemStack(Material.CHEST);
+						}break;
+						case 12:{
+							item = new ItemStack(Material.TRAPPED_CHEST);
+						}break;
+						case 13:{
+							item = new ItemStack(Material.NETHER_STALK);
+						}break;
+						case 14:{
+							item = new ItemStack(Material.COMPASS);
+						}break;
+						case 15:{
+							item = new ItemStack(Material.IRON_DOOR);
+						}break;
+						case 16:{
+							item = new ItemStack(Material.COAL_ORE);
+						}break;
+						case 17:{
+							item = new ItemStack(Material.JUKEBOX);
+						}break;
+						case 18:{
+							item = new ItemStack(Material.ENCHANTMENT_TABLE);
+						}break;
+						case 19:{
+							item = new ItemStack(Material.BOOKSHELF);
+						}break;
+						case 20:{
+							item = new ItemStack(Material.DISPENSER);
+						}break;
+						case 21:{
+							item = new ItemStack(Material.DIODE);
+						}break;
+						case 22:{
+							item = new ItemStack(Material.MINECART);
+						}break;
+						case 23:{
+							item = new ItemStack(Material.ITEM_FRAME);
+						}break;
+						case 24:{
+							item = new ItemStack(Material.BREWING_STAND_ITEM);
+						}break;
+						case 25:{
+							item = new ItemStack(Material.HOPPER);
+						}break;
+						case 26:{
+							item = new ItemStack(Material.DAYLIGHT_DETECTOR);
+						}break;
+						case 27:{
+							item = new ItemStack(Material.PISTON_BASE);
+						}break;
+						case 28:{
+							item = new ItemStack(Material.RAILS);
+						}break;
+						case 29:{
+							item = new ItemStack(Material.POWERED_RAIL);
+						}break;
+						case 30:{
+							item = new ItemStack(Material.DETECTOR_RAIL);
+						}break;
+						case 31:{
+							item = new ItemStack(Material.ICE);
+						}break;
+						case 32:{
+							item = new ItemStack(Material.TNT);
+						}break;
+						case 33:{
+							item = new ItemStack(Material.LADDER);
+						}break;
+						case 34:{
+							item = new ItemStack(Material.MAGMA_CREAM);
+						}break;
+						case 35:{
+							item = new ItemStack(Material.FIREBALL);
+						}break;
+						case 36:{
+							item = new ItemStack(Material.FLINT_AND_STEEL);
+						}break;
+						case 37:{
+							item = new ItemStack(Material.FENCE_GATE);
+						}break;
+						case 38:{
+							item = new ItemStack(Material.FISHING_ROD);
+						}break;
+						case 39:{
+							item = new ItemStack(Material.BED);
+						}break;
+					}
+				}break;
+				case 105:{
+					item = new ItemStack(Material.OBSIDIAN);
+				}break;
+				case 106:{
+					// Rare items here
+					switch((int)(Math.random() * 20)){
+						case 0:{
+							item = new ItemStack(Material.MYCEL);
+						}break;
+						case 1:{
+							item = new ItemStack(Material.EMERALD);
+						}break;
+						case 2:{
+							item = new ItemStack(Material.DIAMOND);
+						}break;
+						case 3:{
+							item = new ItemStack(Material.GOLD_INGOT);
+						}break;
+						case 4:{
+							item = new ItemStack(Material.GOLDEN_APPLE);
+						}break;
+						case 5:{
+							item = new ItemStack(Material.GOLDEN_CARROT);
+						}break;
+						case 6:{
+							item = new ItemStack(Material.IRON_BARDING);
+						}break;
+						case 7:{
+							item = new ItemStack(Material.IRON_AXE);
+						}break;
+						case 8:{
+							item = new ItemStack(Material.IRON_PICKAXE);
+						}break;
+						case 9:{
+							item = new ItemStack(Material.IRON_SPADE);
+						}break;
+						case 10:{
+							item = new ItemStack(Material.IRON_SWORD);
+						}break;
+						case 11:{
+							item = new ItemStack(Material.ENDER_STONE);
+						}break;
+						case 12:{
+							item = new ItemStack(Material.NAME_TAG);
+						}break;
+						case 13:{
+							item = new ItemStack(Material.REDSTONE_COMPARATOR);
+						}break;
+						case 14:{
+							item = new ItemStack(Material.GHAST_TEAR);
+						}break;
+						case 15:{
+							item = new ItemStack(Material.EMPTY_MAP);
+						}break;
+						case 16:{
+							item = new ItemStack(Material.GOLD_BARDING);
+						}break;
+						case 17:{
+							item = new ItemStack(Material.DIAMOND_SWORD);
+						}break;
+						case 18:{
+							item = new ItemStack(Material.DIAMOND_SPADE);
+						}break;
+						case 19:{
+							item = new ItemStack(Material.DIAMOND_PICKAXE);
+						}break;
+						case 20:{
+							// ULTRA RARES WHOO
+							switch((int)(Math.random() * 25)){
+								case 0:{
+									item = new ItemStack(Material.DIAMOND_BARDING);
+								}break;
+								case 1:
+								case 2:
+								case 3:{
+									item = new ItemStack(Material.SKULL_ITEM);
+									item.setData(new MaterialData(Material.SKULL_ITEM, (byte) 1));
+								}break;
+								case 4:{
+									item = new ItemStack(Material.BEACON);
+								}break;
+								case 5:{
+									item = new ItemStack(Material.DRAGON_EGG);
+								}break;
+								default:{
+									// Roll failed; generate standard item
+									item = new ItemStack(Material.BOAT);
+								}
+							}
+						}break;
+					}
+				}break;
+				case 107:{
+					item = new ItemStack(Material.COOKIE, 8);
+				}break;
+				case 108:{
+					item = new ItemStack(Material.SEEDS, 42);
+				}break;
+				case 109:{
+					item = new ItemStack(Material.PAINTING, 16);
+				}break;
+				case 110:{
+					item = getGoodie(0);
+				}break;
+				default: {
+					item = getGoodie(1);
+				}
+			}
+			e.getEntity().getWorld().dropItemNaturally(loc, item);
+
+			ExperienceOrb exp = (ExperienceOrb)l.getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.EXPERIENCE_ORB);
+			exp.setExperience((int)(Math.random() * 5) + 1);
+			
 		}
 	}
 
@@ -12950,6 +13498,19 @@ implements Listener
 			if (p.getItemInHand()!=null && this.plugin.is_PocketWorkbench(p.getItemInHand())) {
 				p.openWorkbench(null, true);
 				e.setCancelled(true);
+				return;
+			}
+			if (this.plugin.is_LootChest(p.getItemInHand())) {
+				e.setCancelled(true);
+				if (p.getItemInHand().getAmount() > 1) {
+					p.getItemInHand().setAmount(p.getItemInHand().getAmount() - 1);
+				} else {
+					p.setItemInHand(null);
+				}
+				p.getWorld().dropItemNaturally(p.getLocation(), getGoodie());
+				p.sendMessage(ChatColor.GREEN+"You open the chest and find treasure inside!");
+				p.playSound(p.getLocation(), Sound.ORB_PICKUP, 10, 1);
+				p.updateInventory();
 				return;
 			}
 			
