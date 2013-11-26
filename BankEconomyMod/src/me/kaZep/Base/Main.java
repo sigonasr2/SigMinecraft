@@ -517,11 +517,11 @@ public class Main extends JavaPlugin
     		Color.fromRGB(133, 184, 133),
     		Color.fromRGB(133, 184, 159),
     		Color.fromRGB(159, 184, 133)),
-    		"Thin and light armor made for" +
+    		"Thin and light armor made for\n" +
     		"nimble and precise movement.",
-    		"When getting hit, you will gain" +
+    		"When getting hit, you will gain\n" +
     		"40% movement speed.",
-    		"Every 20% of bonus movement speed" +
+    		"Every 20% of bonus movement speed\n" +
     		"gives you 10% block chance.",
     		"When jumping, you cannot be hit.");
     ItemSetList.addSet(set);
