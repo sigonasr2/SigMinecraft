@@ -20,6 +20,7 @@ import net.milkbowl.vault.economy.EconomyResponse;
 
 
 
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -5248,6 +5249,70 @@ implements Listener
 			}
 		}
 	}
+	
+    public void open_LootChest(int tier, Location loc) {
+    	
+    	// 1 = single item
+    	// 2 = mythic item
+    	// 3 = plentiful items
+    	// 4 = multiple items
+		switch (tier) {
+			case 1: {
+				loc.getWorld().dropItemNaturally(loc, getGoodie(0));
+			}break;
+			case 2: {
+				loc.getWorld().dropItemNaturally(loc, getGoodie(1));
+			}break;
+			case 3: {
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.LOG, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.RAW_FISH, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.BOOKSHELF, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.CLAY, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.EXP_BOTTLE, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.OBSIDIAN, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.MOSSY_COBBLESTONE, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.HAY_BLOCK, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.QUARTZ_BLOCK, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.NETHER_BRICK, (int)(Math.random() * 64) + 1));
+				} else {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.WOOL, (int)(Math.random() * 64) + 1));
+				}
+			}break;
+			case 4: {
+				// Drop at least one stack, and five rolls for a 20% chance at an extra stack.
+				loc.getWorld().dropItemNaturally(loc, getGoodie(0));
+				for (int i = 0; i < 5; i++) {
+					if (Math.random() < 0.2) {
+						loc.getWorld().dropItemNaturally(loc, getGoodie(0));
+					}
+
+				}
+			}break;
+			case 5: {
+				// OMG NOT CODED YET WTF THIS SHOULDN'T HAPPEN
+			}break;
+		}
+	}
+
 
 	public ItemStack getGoodie() {
 		return getGoodie(0);
@@ -5989,22 +6054,9 @@ implements Listener
 					f.getType()==EntityType.ENDERMAN) {
 				
 				
-				if (this.plugin.getConfig().getBoolean("thanksgiving-enabled") && Math.random()<=0.005) {
+				if (this.plugin.getConfig().getBoolean("thanksgiving-enabled") && Math.random()<=0.01) {
 					// 0.5% chance of loot chest dropping
-					ItemStack chest = new ItemStack(Material.CHEST);
-				    ItemMeta chest_name = chest.getItemMeta();
-				    chest_name.setDisplayName(ChatColor.YELLOW+"Closed Chest");
-				   
-				    List<String> chestlore = new ArrayList<String>();
-				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
-				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
-				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"It feels heavy; there");
-				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"might be items inside.");
-				    chest_name.setLore(chestlore);
-
-				    chest.setItemMeta(chest_name);
-				    
-				    f.getWorld().dropItemNaturally(f.getLocation(), chest);
+				    f.getWorld().dropItemNaturally(f.getLocation(), this.plugin.generate_LootChest());
 				}
 				//if (Math.random()<=0.005) {
 				/*
@@ -6403,6 +6455,10 @@ implements Listener
 	@EventHandler
 	public void onFishCatch(PlayerFishEvent e) {
 		if (e.getState()==State.CAUGHT_FISH) {
+			if (this.plugin.getConfig().getBoolean("thanksgiving-enabled") && Math.random() < 0.10) {
+				// 5% chance of fishing up a loot chest
+				e.getPlayer().getWorld().dropItemNaturally(e.getPlayer().getLocation(), this.plugin.generate_LootChest());
+			}
 			Player p = e.getPlayer();
 			if (this.plugin.PlayerinJob(p, "Fisherman")) {
 				this.plugin.gainMoneyExp(p,"Fisherman",0.175,3);
@@ -9068,13 +9124,17 @@ implements Listener
 			return;
 		}
 		if (this.plugin.is_LootChest(e.getItemInHand())) {
+			open_LootChest(this.plugin.get_LootChestTier(e.getItemInHand()), e.getBlockPlaced().getLocation());
+
+			
 			e.setCancelled(true);
 			if (e.getItemInHand().getAmount() > 1) {
 				e.getItemInHand().setAmount(e.getItemInHand().getAmount() - 1);
 			} else {
 				e.getPlayer().setItemInHand(null);
 			}
-			e.getPlayer().getWorld().dropItemNaturally(e.getBlockPlaced().getLocation(), getGoodie());
+			// e.getPlayer().getWorld().dropItemNaturally(e.getBlockPlaced().getLocation(), getGoodie());
+			
 			p.sendMessage(ChatColor.GREEN+"You open the chest and find treasure inside!");
 			p.playSound(p.getLocation(), Sound.ORB_PICKUP, 10, 1);
 			p.updateInventory();
@@ -12978,7 +13038,7 @@ implements Listener
 		//We have to attempt to insert the item in the Item Cube.
 		Cube cube_type = null;
 		int identifier=-1;
-		if (item_cube.getItemMeta().getLore()!=null) {
+		if (item_cube.getItemMeta().getLore()!=null && isItemCube(item_cube)) {
 			//Check to see if the Lore contains anything.
 			for (int i=0;i<item_cube.getItemMeta().getLore().size();i++) {
 				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.")) {
@@ -13085,13 +13145,15 @@ implements Listener
 				return;
 			}
 			if (this.plugin.is_LootChest(p.getItemInHand())) {
+				open_LootChest(this.plugin.get_LootChestTier(p.getItemInHand()), p.getLocation());
+				
 				e.setCancelled(true);
 				if (p.getItemInHand().getAmount() > 1) {
 					p.getItemInHand().setAmount(p.getItemInHand().getAmount() - 1);
 				} else {
 					p.setItemInHand(null);
 				}
-				p.getWorld().dropItemNaturally(p.getLocation(), getGoodie());
+				
 				p.sendMessage(ChatColor.GREEN+"You open the chest and find treasure inside!");
 				p.playSound(p.getLocation(), Sound.ORB_PICKUP, 10, 1);
 				p.updateInventory();

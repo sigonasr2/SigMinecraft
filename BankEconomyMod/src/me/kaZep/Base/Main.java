@@ -83,6 +83,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.bukkit.enchantments.Enchantment;
 
@@ -2907,7 +2908,13 @@ public void checkJukeboxes() {
 	    				}
     				}
     			}
-    			list[i].getScoreboard().getTeam(list[i].getName()).setSuffix(healthbar(list[i].getHealth(),list[i].getMaxHealth(),list[i].getFoodLevel()));
+    			list[i].getScoreboard().getTeam(list[i].getName().toLowerCase()).setSuffix(healthbar(list[i].getHealth(),list[i].getMaxHealth(),list[i].getFoodLevel()));
+    			
+    			/* Team t = list[i].getScoreboard().getTeam(list[i].getName());
+    			double hp = list[i].getHealth();
+    			double maxhp = list[i].getMaxHealth();
+    			int food = list[i].getFoodLevel();
+    			t.setSuffix(healthbar(hp, maxhp, food)); */
     		}
           LOGGING_UPDATE_COUNTS++; //3
 	  		  for (int i=0;i<supportmoblist.size();i++) {
@@ -4688,6 +4695,100 @@ public void payDay(int time)
 		return false;
 	}
 
+    public int get_LootChestTier(ItemStack chest) {
+		if (chest.hasItemMeta() && chest.getItemMeta().hasLore()) {
+			//Check to see if the Lore contains anything.
+			for (int i=0;i<chest.getItemMeta().getLore().size();i++) {
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"Something is rattling")) {
+					return 1; // Single loot
+				}
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"You feel powerful magic")) {
+					return 2; // Mythic loot
+				}
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"It is very heavy; there")) {
+					return 3; // Quantity loot
+				}
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"You can feel a variety of")) {
+					return 4; // Multiloot
+				}
+			}
+			
+			
+		}
+		return 0;
+    }
+    
+    public ItemStack generate_LootChest() {
+    	return generate_LootChest(-1);
+    }
+    
+    public ItemStack generate_LootChest(int tier) {
+    	ItemStack chest = new ItemStack(Material.CHEST);
+	    ItemMeta chest_name = chest.getItemMeta();
+	    List<String> chestlore = new ArrayList<String>();
+	    double rand = 1; // Randomly generated number determined by fair dice roll.  
+	    
+	    if (tier == -1) {
+		    rand = Math.random();
+		    // No argument, randomize
+	    }
+	    if (tier == 0) {
+	    	// Invalid chest, don't return anything
+		    Bukkit.getLogger().warning("Invalid loot chest detected! This should never happen.");
+		    return null;
+	    }
+	    
+	    if (rand < 0.005 || tier == 2) {
+	    	// Generate a mythic chest
+	    	chest_name.setDisplayName(ChatColor.LIGHT_PURPLE+"Mythic Chest");
+		 	   
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"You feel powerful magic");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"emanating from within;");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"it must contain epic");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"equipment!");
+		    chest_name.setLore(chestlore);
+
+		    chest.setItemMeta(chest_name);
+	    } else if (rand < 0.02 || tier == 3) {
+	    	// Generate a loaded goods chest
+	    	chest_name.setDisplayName(ChatColor.AQUA+"Heavy Chest");
+		 	   
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"It is very heavy; there");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"may be lots of loot within!");
+		    chest_name.setLore(chestlore);
+
+		    chest.setItemMeta(chest_name);
+	    } else if (rand < 0.1 || tier == 4) {
+	    	// Generate a double chest
+	    	chest_name.setDisplayName(ChatColor.YELLOW+"Closed Chest");
+		 	   
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"You can feel a variety of");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"items rattling around inside.");
+		    chest_name.setLore(chestlore);
+
+		    chest.setItemMeta(chest_name);
+	    } else {
+		    chest_name.setDisplayName(ChatColor.YELLOW+"Closed Chest");
+			   
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"Something is rattling");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"around inside; it may");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"contain valuables!");
+		    chest_name.setLore(chestlore);
+
+		    chest.setItemMeta(chest_name);
+	    }
+	    
+	    return chest;
+    }
+    
     public PlayerListener.Cube get_ItemCubeType(ItemStack item_cube) {
 		if (item_cube.hasItemMeta() && item_cube.getItemMeta().hasLore()) {
 			//Check to see if the Lore contains anything.
