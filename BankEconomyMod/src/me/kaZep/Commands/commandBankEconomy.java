@@ -1733,7 +1733,7 @@ public String convertToItemName(String val) {
     		  if (this.plugin.getConfig().contains("jobs."+job+"_members")) {
     			  p.sendMessage("Players in the "+job_color+job+" job:");
     			  String[] players = this.plugin.getConfig().getString("jobs."+job+"_members").split(", ");
-    			  char lowest = 'z'+1;
+    			  int lowest = 40;
     			  List<String> sorted_players = new ArrayList<String>();
     			  for (int i=0;i<players.length;i++) {
     				  sorted_players.add(players[i]); //Add everyone to the list.
@@ -1744,8 +1744,8 @@ public String convertToItemName(String val) {
     			  while (sorted_players.size()>0) {
     				  for (int i=0;i<sorted_players.size();i++) {
     					  if (sorted_players.get(i).length()>0) { //If it's 0, for some reason it didn't read this name right....Skip it.
-	    					  if (sorted_players.get(i).toCharArray()[0]<lowest) {
-	    						  lowest=sorted_players.get(i).toCharArray()[0];
+	    					  if (this.plugin.getJobLv(job, p)<lowest) {
+	    						  lowest=this.plugin.getJobLv(job, p);
 	    						  lowest_slot=i;
 	    					  }
     					  }
@@ -1754,7 +1754,7 @@ public String convertToItemName(String val) {
 	    				  sorted_list_players.add(sorted_players.get(lowest_slot));
 	    				  sorted_players.remove(lowest_slot);
 	    				  lowest_slot=-1;
-	    				  lowest='z'+1;
+	    				  lowest=40;
     				  }
     			  }
     			  if (sorted_list_players.size()>0) {
