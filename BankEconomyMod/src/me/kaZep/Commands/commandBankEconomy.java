@@ -1744,8 +1744,8 @@ public String convertToItemName(String val) {
     			  while (sorted_players.size()>0) {
     				  for (int i=0;i<sorted_players.size();i++) {
     					  if (sorted_players.get(i).length()>0) { //If it's 0, for some reason it didn't read this name right....Skip it.
-	    					  if (this.plugin.getJobLv(job, p)<lowest) {
-	    						  lowest=this.plugin.getJobLv(job, p);
+	    					  if (this.plugin.getJobLv(job, sorted_players.get(i))<lowest) {
+	    						  lowest=this.plugin.getJobLv(job, sorted_players.get(i));
 	    						  lowest_slot=i;
 	    					  }
     					  }
