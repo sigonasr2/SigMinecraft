@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -27,8 +28,10 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Effect;
+import org.bukkit.FireworkEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -49,6 +52,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
@@ -61,6 +65,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.map.MapRenderer;
@@ -78,6 +83,10 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.Vector;
 import org.bukkit.enchantments.Enchantment;
+
+import sig.ItemSets.ColorSet;
+import sig.ItemSets.ItemSet;
+import sig.ItemSets.ItemSetList;
 
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
@@ -166,6 +175,7 @@ public class Main extends JavaPlugin
   public static List<RecyclingCenterNode> recycling_center_list = null;
   public DamageAPI DMGCALC = null;
   public long lastMessage = 0;
+  public static ItemSetList ItemSetList = null;
   
 
   public FileWriter outputStream = null;
@@ -497,6 +507,24 @@ public class Main extends JavaPlugin
     item_cube.setIngredient('b', Material.HOPPER);
     item_cube.setIngredient('c', Material.EMERALD_BLOCK);
     Bukkit.addRecipe(item_cube);
+    
+
+    ItemSetList = new ItemSetList();
+    ItemSetList.Init();
+    //Create a list of item sets.
+    ItemSet set = new ItemSet("Acrobat",new ColorSet(
+    		Color.fromRGB(149, 193, 149),
+    		Color.fromRGB(133, 184, 133),
+    		Color.fromRGB(133, 184, 159),
+    		Color.fromRGB(159, 184, 133)),
+    		"Thin and light armor made for" +
+    		"nimble and precise movement.",
+    		"When getting hit, you will gain" +
+    		"40% movement speed.",
+    		"Every 20% of bonus movement speed" +
+    		"gives you 10% block chance.",
+    		"When jumping, you cannot be hit.");
+    ItemSetList.addSet(set);
     
     DMGCALC = new DamageAPI();
     //System.out.println("Running BankEconomy in "+this.getDataFolder().getAbsolutePath());
@@ -928,9 +956,9 @@ public class Main extends JavaPlugin
     		"Everyone around you gains +10 more Maximum Health.", 
     		"Everyone around you gains +4 Armor. Everyone's hunger degrades at half the speed. Players with 8 HP or less take half the damage from hits.", 
     		"Everyone around you gains Regeneration. You gain +10 Armor. Everyone around you gains +20 more Maximum Health. You gain +50 more maximum health. Everyone around you including yourself moves 20% faster.");
-  }
+}
 
-  public void onDisable()
+public void onDisable()
   {
 	  getConfig().set("server-tick-time", Long.valueOf(SERVER_TICK_TIME));
 	  saveConfig();
@@ -4582,5 +4610,55 @@ public void payDay(int time)
   	  } else {
   		  return 0;
   	  }
+    }
+
+    
+    private static Method getMethod(Class<?> cl, String method)
+    {
+        for (Method m : cl.getMethods())
+            if (m.getName().equals(method))
+                return m;
+        return null;
+    }
+
+
+    /**
+     * Explodes random firework on location
+     * 
+     * @param loc
+     *            Location to explode
+     */
+    public static void playFirework(Location loc)
+    {
+        Random gen = new Random();
+        try
+        {
+            Firework fw = loc.getWorld().spawn(loc, Firework.class);
+            Method d0 = getMethod(loc.getWorld().getClass(), "getHandle");
+            Method d2 = getMethod(fw.getClass(), "getHandle");
+            Object o3 = d0.invoke(loc.getWorld(), (Object[]) null);
+            Object o4 = d2.invoke(fw, (Object[]) null);
+            Method d1 = getMethod(o3.getClass(), "broadcastEntityEffect");
+            FireworkMeta data = fw.getFireworkMeta();
+            data.addEffect(FireworkEffect
+                    .builder()
+                    .with(FireworkEffect.Type.values()[gen
+                            .nextInt(FireworkEffect.Type.values().length)])
+                    .flicker(gen.nextBoolean())
+                    .trail(gen.nextBoolean())
+                    .withColor(
+                            Color.fromRGB(gen.nextInt(255), gen.nextInt(255),
+                                    gen.nextInt(255)))
+                    .withFade(
+                            Color.fromRGB(gen.nextInt(255), gen.nextInt(255),
+                                    gen.nextInt(255))).build());
+            fw.setFireworkMeta(data);
+            d1.invoke(o3, new Object[] { o4, (byte) 17 });
+            fw.remove();
+        }
+        catch (Exception ex)
+        {
+            // not a Beta1.4.6R0.2 Server
+        }
     }
 }

@@ -3429,21 +3429,6 @@ implements Listener
 				}
 			}
 			if (this.plugin.PlayerinJob(p, "Miner")) {
-				if (this.plugin.getJobLv("Miner", p)>=10) {
-					//Half chance to set the durability back by one.
-					if (p.getItemInHand().getType()==Material.WOOD_PICKAXE ||
-							p.getItemInHand().getType()==Material.STONE_PICKAXE ||
-							p.getItemInHand().getType()==Material.GOLD_PICKAXE ||
-							p.getItemInHand().getType()==Material.IRON_PICKAXE ||
-							p.getItemInHand().getType()==Material.DIAMOND_PICKAXE) {
-						if (p.getItemInHand().getDurability()>0) {
-							if (Math.random()>=0.5) {
-								p.getItemInHand().setDurability((short)(p.getItemInHand().getDurability()-1));
-								p.updateInventory();
-							}
-						}
-					}
-				}
 				if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
 					if (e.getBlock().getType()==Material.STONE) {
 						this.plugin.gainMoneyExp(p,"Miner",0.0025,1);
@@ -5249,15 +5234,15 @@ implements Listener
 		return getGoodie(0);
 	}
 
-	public ItemStack getGoodie(int rar /*1=Mythical 0=Normal*/) {
+	public ItemStack getGoodie(int rar /*1=Mythical 0=Normal -1=Only an equipment*/) {
 		ItemStack item = null;
-		if (Math.random()<0.33) {
+		if (Math.random()<0.33 || rar==-1) {
 			//Add a weapon/armor piece.
 			int rand = (int)(Math.random()*5);
 			String type = "";
 			String type2 = "";
-			int rarity=0; //0 = Normal, 1 = Rare, 2 = Legendary, 3 = Mythical
-			switch ((int)(Math.random()*20)) {
+			int rarity=0; //0 = Normal, 1 = Rare, 2 = Legendary, 3 = Mythical, 4 = Set
+			switch ((int)(Math.random()*22)) {
 			case 0:
 			case 1:
 			case 2:
@@ -5283,12 +5268,51 @@ implements Listener
 			case 17:{
 				rarity=2;
 			}break;
-			case 19:{
+			case 19:
+			case 20:{
+				rarity=4;
+			}break;
+			case 21:{
 				rarity=3;
 			}break;
 			}
 			if (rar==1) {
 				rarity=3;
+			}
+			if (rar==-1) {
+				if (Math.random()<=0.05) {
+					rarity=4;
+				} else {
+					rarity=(int)(Math.random()*3);
+				}
+			}
+			if (rarity==4) {
+				//Drop a leather piece / diamond sword that's mysterious. It will have 0 durability, so cannot be used until identified.
+				ItemStack i = null;
+				switch ((int)(Math.random()*10)) {
+					case 0:{
+						i = new ItemStack(Material.DIAMOND_SWORD);
+					}break;
+					case 1:{
+						i = new ItemStack(Material.LEATHER_CHESTPLATE);
+					}break;
+					case 2:{
+						i = new ItemStack(Material.LEATHER_BOOTS);
+					}break;
+					case 3:{
+						i = new ItemStack(Material.LEATHER_HELMET);
+					}break;
+					case 4:{
+						i = new ItemStack(Material.LEATHER_LEGGINGS);
+					}break;
+					default:{
+						i = new ItemStack(Material.LEATHER);
+					}
+				}
+				if (i.getType()==Material.LEATHER) {
+					//We will drop a leather piece that builds a set item.
+					
+				}
 			}
 			switch (rand) {
 			case 0: {
