@@ -1372,16 +1372,14 @@ public void runTick() {
 										  }
 									  } 
 									  if (nearbylist2.size()<5) {
-										  if (Math.random()<=0.2d) {
-											  int l=0;
-											  while (l<5) {
-												  //CreatureSpawner spawner = (CreatureSpawner)Bukkit.getWorld("world").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getState();
-												  Location testloc = new Location(Bukkit.getWorld("world"),spawner.getLocation().getX()+Math.random()*2-Math.random()*2,spawner.getLocation().getY()+Math.random()*5,spawner.getLocation().getZ()+Math.random()*2-Math.random()*2);
-												  if (p.getNearbyEntities(15, 15, 5).size()<50 && Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR || Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.WEB) {
-													  Bukkit.getWorld("world").spawnCreature(testloc,spawner.getCreatureType());
-												  }
-												  l++;
+										  int l=0;
+										  while (l<5) {
+											  //CreatureSpawner spawner = (CreatureSpawner)Bukkit.getWorld("world").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getState();
+											  Location testloc = new Location(Bukkit.getWorld("world"),spawner.getLocation().getX()+Math.random()*2-Math.random()*2,spawner.getLocation().getY()+Math.random()*5,spawner.getLocation().getZ()+Math.random()*2-Math.random()*2);
+											  if (p.getNearbyEntities(15, 15, 5).size()<50 && Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR || Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.WEB) {
+												  Bukkit.getWorld("world").spawnCreature(testloc,spawner.getCreatureType());
 											  }
+											  l++;
 										  }
 									  }
 								  }
