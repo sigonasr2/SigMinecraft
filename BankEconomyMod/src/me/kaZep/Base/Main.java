@@ -3741,7 +3741,7 @@ public void payDay(int time)
 			//Level up! Level up! YEAH!
 			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp", Double.valueOf(getAccountsConfig().getDouble(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"exp")-getJobExp(job,getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv"))));
 			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv", Integer.valueOf(getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv")+1));
-			Bukkit.broadcastMessage(p.getName().toLowerCase()+" is now a Level "+getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
+			Bukkit.broadcastMessage(p.getName()+" is now a Level "+getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(slot+1)+"lv")+" "+getJobColor(job)+job+ChatColor.WHITE+".");
 			if (getJobTotalLvs(p)%5==0) {
 				Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+" has reached Level "+getJobTotalLvs(p)+"!");
 				if ((((getJobTotalLvs(p)/5+1)-getStatPointTotal(p)))>0) {

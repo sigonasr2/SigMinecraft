@@ -1580,7 +1580,7 @@ public String convertToItemName(String val) {
 			            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase().toLowerCase() + ".money");
 			            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
 			            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
-			            	finalcost = finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
+			            	finalcost += finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
 			            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
 			            	if (mymoney>=finalcost) {
 			            		//Allow teleport to occur.
@@ -1591,7 +1591,7 @@ public String convertToItemName(String val) {
 				        		  //Give exp for doing so.
 				        		  //this.plugin.gainMoneyExp(p,"Support",0,100);
 				        	  }
-				        	  p.sendMessage("Teleported to "+ChatColor.GREEN+target.getName().toLowerCase()+ChatColor.WHITE+" for $"+ChatColor.YELLOW+df.format(finalcost)+ChatColor.WHITE+". New Account balance: $"+df.format(mymoney-finalcost));
+				        	  p.sendMessage("Teleported to "+ChatColor.GREEN+target.getName()+ChatColor.WHITE+" for $"+ChatColor.YELLOW+df.format(finalcost)+ChatColor.WHITE+". New Account balance: $"+df.format(mymoney-finalcost));
 				        	  target.sendMessage(ChatColor.GREEN+p.getName().toLowerCase()+ChatColor.WHITE+" teleported to your location.");
 				        	  if (is_in_vehicle) {
 				        		  vehicle.eject();
@@ -1627,7 +1627,7 @@ public String convertToItemName(String val) {
 			            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase().toLowerCase() + ".money");
 			            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
 			            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
-			            	finalcost = finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
+			            	finalcost += finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
 			            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
 			            	if (mymoney>=finalcost) {
 			            		//Allow teleport to occur.
