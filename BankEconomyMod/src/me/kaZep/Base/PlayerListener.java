@@ -7060,7 +7060,9 @@ implements Listener
 	@EventHandler
 	public void onPlayerOnFire(EntityCombustEvent e) {
 		if (e.getEntity() instanceof LivingEntity) {
-			doFireAspectDamage(((LivingEntity)e.getEntity()), this.plugin);
+			if (!((LivingEntity)(e.getEntity())).hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
+				doFireAspectDamage(((LivingEntity)e.getEntity()), this.plugin);
+			}
 		}
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			Player p = (Player)e.getEntity();
