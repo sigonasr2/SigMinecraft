@@ -20,6 +20,7 @@ import net.milkbowl.vault.economy.EconomyResponse;
 
 
 
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -241,31 +242,31 @@ implements Listener
 		//Get list of all players on the server.
 		OfflinePlayer playerlist[] = Bukkit.getOfflinePlayers();
 		for (int i=0;i<playerlist.length;i++) {
-			if (this.plugin.getAccountsConfig().contains(playerlist[i].getName())) {
-				if (this.plugin.getAccountsConfig().contains(playerlist[i].getName()+".spleefrating") && this.plugin.getAccountsConfig().getInt(playerlist[i].getName()+".spleefwins")+this.plugin.getAccountsConfig().getInt(playerlist[i].getName()+".spleeflosses")>=20) {
-					if (this.plugin.getAccountsConfig().getDouble(playerlist[i].getName()+".spleefrating")>rating[0]) {
+			if (this.plugin.getAccountsConfig().contains(playerlist[i].getName().toLowerCase())) {
+				if (this.plugin.getAccountsConfig().contains(playerlist[i].getName().toLowerCase()+".spleefrating") && this.plugin.getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleefwins")+this.plugin.getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleeflosses")>=20) {
+					if (this.plugin.getAccountsConfig().getDouble(playerlist[i].getName().toLowerCase()+".spleefrating")>rating[0]) {
 						//This beats the top record, move everything down.
 						name[2]=name[1];rating[2]=rating[1];wins[2]=wins[1];losses[2]=losses[1];
 						name[1]=name[0];rating[1]=rating[0];wins[1]=wins[0];losses[1]=losses[0];
 						name[0]=playerlist[i].getName();
-						rating[0]=(int)this.plugin.getAccountsConfig().getDouble(playerlist[i].getName()+".spleefrating");
-						wins[0]=this.plugin.getAccountsConfig().getInt(playerlist[i].getName()+".spleefwins");
-						losses[0]=this.plugin.getAccountsConfig().getInt(playerlist[i].getName()+".spleeflosses");
+						rating[0]=(int)this.plugin.getAccountsConfig().getDouble(playerlist[i].getName().toLowerCase()+".spleefrating");
+						wins[0]=this.plugin.getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleefwins");
+						losses[0]=this.plugin.getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleeflosses");
 					} else
-						if (this.plugin.getAccountsConfig().getDouble(playerlist[i].getName()+".spleefrating")>rating[1]) {
+						if (this.plugin.getAccountsConfig().getDouble(playerlist[i].getName().toLowerCase()+".spleefrating")>rating[1]) {
 							//This beats the 2nd record, move everything down.
 							name[2]=name[1];rating[2]=rating[1];wins[2]=wins[1];losses[2]=losses[1];
 							name[1]=playerlist[i].getName();
-							rating[1]=(int)this.plugin.getAccountsConfig().getDouble(playerlist[i].getName()+".spleefrating");
-							wins[1]=this.plugin.getAccountsConfig().getInt(playerlist[i].getName()+".spleefwins");
-							losses[1]=this.plugin.getAccountsConfig().getInt(playerlist[i].getName()+".spleeflosses");
+							rating[1]=(int)this.plugin.getAccountsConfig().getDouble(playerlist[i].getName().toLowerCase()+".spleefrating");
+							wins[1]=this.plugin.getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleefwins");
+							losses[1]=this.plugin.getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleeflosses");
 						} else
-							if (this.plugin.getAccountsConfig().getDouble(playerlist[i].getName()+".spleefrating")>rating[2]) {
+							if (this.plugin.getAccountsConfig().getDouble(playerlist[i].getName().toLowerCase()+".spleefrating")>rating[2]) {
 								//This beats the 3rd record, move everything down.
 								name[2]=playerlist[i].getName();
-								rating[2]=(int)this.plugin.getAccountsConfig().getDouble(playerlist[i].getName()+".spleefrating");
-								wins[2]=this.plugin.getAccountsConfig().getInt(playerlist[i].getName()+".spleefwins");
-								losses[2]=this.plugin.getAccountsConfig().getInt(playerlist[i].getName()+".spleeflosses");
+								rating[2]=(int)this.plugin.getAccountsConfig().getDouble(playerlist[i].getName().toLowerCase()+".spleefrating");
+								wins[2]=this.plugin.getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleefwins");
+								losses[2]=this.plugin.getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleeflosses");
 							}
 				}
 			}
@@ -322,7 +323,7 @@ implements Listener
 		if (this.plugin.getAccountsConfig().getBoolean("halloween-enabled")) {
 			e.setAmount(e.getAmount()*2);
 		}
-		if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify3")) {
+		if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify3")) {
 			p.sendMessage(ChatColor.DARK_GREEN+""+ChatColor.ITALIC+"Gained "+e.getAmount()+" exp.");
 		}
 	}
@@ -964,7 +965,7 @@ implements Listener
 			this.plugin.animallist.add(new EntityInteractData(e.getRightClicked().getUniqueId(), p.getName()));
 		} else {
 			//Modify the owner.
-			this.plugin.animallist.get(slot).setOwner(p.getName());
+			this.plugin.animallist.get(slot).setOwner(p.getName().toLowerCase());
 		}
 		if (p.getItemInHand().getType()==Material.WHEAT) {
 			if (e.getRightClicked().getType()==EntityType.COW) {
@@ -1411,11 +1412,11 @@ implements Listener
 		} else {
 			Bukkit.getWorld("world").setDifficulty(Difficulty.HARD);
 		}
-		if (p.getScoreboard().getTeam(p.getName())!=null) {
-			tempteam=p.getScoreboard().getTeam(p.getName());
+		if (p.getScoreboard().getTeam(p.getName().toLowerCase())!=null) {
+			tempteam=p.getScoreboard().getTeam(p.getName().toLowerCase());
 			tempteam.unregister();
 		}
-		tempteam=p.getScoreboard().registerNewTeam(p.getName());
+		tempteam=p.getScoreboard().registerNewTeam(p.getName().toLowerCase());
 		if (p.hasPermission("group.moderator")) {
 			tempteam.setPrefix(ChatColor.GREEN+"");
 		}
@@ -1443,7 +1444,7 @@ implements Listener
 				p.getInventory().getArmorContents()[i].setItemMeta(meta);
 			}
 		}
-		/*if (p.getName().equalsIgnoreCase("AaMay")) {
+		/*if (p.getName().toLowerCase().equalsIgnoreCase("AaMay")) {
     	p.removePotionEffect(PotionEffectType.SPEED);
     }
 		 */
@@ -1511,7 +1512,7 @@ implements Listener
 			}
 			String name = players.next().getName();
 			playerslist += name;
-			if (name.compareToIgnoreCase(p.getName())==0) {
+			if (name.compareToIgnoreCase(p.getName().toLowerCase())==0) {
 				playerwhitelisted=true;
 			}
 		}
@@ -1539,55 +1540,55 @@ implements Listener
 		 */
 		//System.out.println("Whitelisted Players: "+playerslist);
 		//System.out.println("Maximum Air: "+p.getMaximumAir());
-		if (!this.plugin.getAccountsConfig().contains(p.getName())) {
+		if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase())) {
 			//This is a brand new player.
-			Main.economy.withdrawPlayer(p.getName(), Main.economy.getBalance(p.getName()));
-			Main.economy.depositPlayer(p.getName(), 70);
-			this.plugin.getAccountsConfig().set(p.getName() + ".status", Boolean.valueOf(true));
-			this.plugin.getAccountsConfig().set(p.getName() + ".money", Double.valueOf(this.plugin.getConfig().getDouble("start-balance")));
-			this.plugin.getAccountsConfig().set(p.getName() + ".revived", Boolean.valueOf(true));
-			this.plugin.getAccountsConfig().set(p.getName() + ".spleefrating", Double.valueOf(1000.0d));
-			this.plugin.getAccountsConfig().set(p.getName() + ".spleefwins", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".spleeflosses", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job1", String.valueOf("None"));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job1lv", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job1exp", Double.valueOf(0.0d));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job2", String.valueOf("None"));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job2lv", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job2exp", Double.valueOf(0.0d));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job3", String.valueOf("None"));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job3lv", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.job3exp", Double.valueOf(0.0d));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.ultimate", String.valueOf("None"));
-			this.plugin.getAccountsConfig().set(p.getName() + ".jobs.ultimatesealed", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat1", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat2", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat3", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat4", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat5", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat6", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat7", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat8", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat9", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat10", Integer.valueOf(0));
-			this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify1", Boolean.valueOf(true));
-			this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify2", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify3", Boolean.valueOf(true));
-			this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify4", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify5", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify6", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest1", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest2", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest3", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest4", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest5", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest6", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest7", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest8", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest9", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest10", Boolean.valueOf(false));
-			this.plugin.getAccountsConfig().set(p.getName()+".bonus.witherskeleton", Integer.valueOf(0));
-			this.plugin.saveAccountsConfig();
+			Main.economy.withdrawPlayer(p.getName().toLowerCase(), Main.economy.getBalance(p.getName().toLowerCase()));
+			Main.economy.depositPlayer(p.getName().toLowerCase(), 70);
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".status", Boolean.valueOf(true));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".money", Double.valueOf(this.plugin.getConfig().getDouble("start-balance")));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".revived", Boolean.valueOf(true));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".spleefrating", Double.valueOf(1000.0d));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".spleefwins", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".spleeflosses", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job1", String.valueOf("None"));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job1lv", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job1exp", Double.valueOf(0.0d));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job2", String.valueOf("None"));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job2lv", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job2exp", Double.valueOf(0.0d));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job3", String.valueOf("None"));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job3lv", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job3exp", Double.valueOf(0.0d));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimate", String.valueOf("None"));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimatesealed", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat1", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat2", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat3", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat4", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat5", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat6", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat7", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat8", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat9", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat10", Integer.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify1", Boolean.valueOf(true));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify2", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify3", Boolean.valueOf(true));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify4", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify5", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify6", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest1", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest2", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest3", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest4", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest5", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest6", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest7", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest8", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest9", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest10", Boolean.valueOf(false));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".bonus.witherskeleton", Integer.valueOf(0));
+			//this.plugin.saveAccountsConfig();
 			System.out.println("[BankEconomy] Bank account created for " + p.getName() + ".");
 			if (playerwhitelisted) {
 				Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE+"New player "+ChatColor.ITALIC+ChatColor.GOLD+p.getName()+ChatColor.RESET+ChatColor.LIGHT_PURPLE+" has joined the game.");
@@ -1606,35 +1607,35 @@ implements Listener
 			DecimalFormat df = new DecimalFormat("#0.00");
 			p.sendMessage(ChatColor.DARK_AQUA+"For a list of all changes made to this server, visit: http://z-gamers.net/changelog.html");
 			p.sendMessage("----------------------------");
-			p.sendMessage(ChatColor.YELLOW+"Current Money Balance: $ "+df.format(Main.economy.bankBalance(p.getName()).balance)+", Bank Balance: $"+df.format(this.plugin.getAccountsConfig().getDouble(p.getName()+".money")));
+			p.sendMessage(ChatColor.YELLOW+"Current Money Balance: $ "+df.format(Main.economy.bankBalance(p.getName().toLowerCase()).balance)+", Bank Balance: $"+df.format(this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase()+".money")));
 			//Update account information for the stat point update.
-			if (!this.plugin.getAccountsConfig().contains(p.getName() + ".bonus.witherskeleton")) {
-				this.plugin.getAccountsConfig().set(p.getName()+".bonus.witherskeleton", Integer.valueOf(0));
-				this.plugin.saveAccountsConfig();
+			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".bonus.witherskeleton")) {
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".bonus.witherskeleton", Integer.valueOf(0));
+				//this.plugin.saveAccountsConfig();
 			}
-			if (!this.plugin.getAccountsConfig().contains(p.getName() + ".stats.stat1")) {
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat1", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat2", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat3", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat4", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat5", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat6", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat7", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat8", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat9", Integer.valueOf(0));
-				this.plugin.getAccountsConfig().set(p.getName() + ".stats.stat10", Integer.valueOf(0));
-				this.plugin.saveAccountsConfig();
+			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".stats.stat1")) {
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat1", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat2", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat3", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat4", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat5", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat6", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat7", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat8", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat9", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat10", Integer.valueOf(0));
+				//this.plugin.saveAccountsConfig();
 				System.out.println("Updated " + p.getName() + "'s data with stat point update.");
 			}
 			//Update account information for notification settings.
-			if (!this.plugin.getAccountsConfig().contains(p.getName() + ".settings.notify1")) {
-				this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify1", Boolean.valueOf(true));
-				this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify2", Boolean.valueOf(false));
-				this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify3", Boolean.valueOf(true));
-				this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify4", Boolean.valueOf(false));
-				this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify5", Boolean.valueOf(false));
-				this.plugin.getAccountsConfig().set(p.getName() + ".settings.notify6", Boolean.valueOf(false));
-				this.plugin.saveAccountsConfig();
+			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".settings.notify1")) {
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify1", Boolean.valueOf(true));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify2", Boolean.valueOf(false));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify3", Boolean.valueOf(true));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify4", Boolean.valueOf(false));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify5", Boolean.valueOf(false));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".settings.notify6", Boolean.valueOf(false));
+				//this.plugin.saveAccountsConfig();
 				System.out.println("Updated " + p.getName() + "'s data with nofitications update.");
 			}
 			if (this.plugin.getConfig().getBoolean("halloween-enabled")) {
@@ -1648,9 +1649,9 @@ implements Listener
 					}
 				}
 				if (!full) {
-					if (!this.plugin.getAccountsConfig().contains(p.getName() + ".join.halloween_book")) {
-						this.plugin.getAccountsConfig().set(p.getName() + ".join.halloween_book", Boolean.valueOf(true));
-						this.plugin.saveAccountsConfig();
+					if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".join.halloween_book")) {
+						this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".join.halloween_book", Boolean.valueOf(true));
+						//this.plugin.saveAccountsConfig();
 						System.out.println("Updated " + p.getName() + "'s data with a Halloween Book.");
 						ItemStack book = new ItemStack(Material.WRITTEN_BOOK);
 						BookMeta bookdata = (BookMeta)book.getItemMeta();
@@ -1666,9 +1667,9 @@ implements Listener
 						book.setItemMeta(bookdata);
 						p.getInventory().addItem(book);
 					}
-					if (!this.plugin.getAccountsConfig().contains(p.getName() + ".join.halloween_vote_signs")) {
-						this.plugin.getAccountsConfig().set(p.getName() + ".join.halloween_vote_signs", Boolean.valueOf(true));
-						this.plugin.saveAccountsConfig();
+					if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".join.halloween_vote_signs")) {
+						this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".join.halloween_vote_signs", Boolean.valueOf(true));
+						//this.plugin.saveAccountsConfig();
 						ItemStack sign = new ItemStack(Material.SIGN,2);
 						ItemMeta meta = sign.getItemMeta();
 						meta.setDisplayName(ChatColor.BLUE+p.getName());
@@ -1677,31 +1678,31 @@ implements Listener
 						p.sendMessage("You have received 2 vote signs. Go vote at the Pumpkin Patch for the best pumpkin! (Note that voting for yourself does not count. Please vote the best of the others' pumpkins.)");
 					}
 				} else {
-					if (!this.plugin.getAccountsConfig().contains(p.getName() + ".join.halloween_vote_signs")) {
+					if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".join.halloween_vote_signs")) {
 						p.sendMessage("You do not have enough room in your inventory to receive Pumpkin vote signs. Clear some of your inventory and then rejoin.");
 					}
 				}
-				if (!this.plugin.getAccountsConfig().contains(p.getName() + ".halloween.chest1")) {
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest1", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest2", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest3", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest4", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest5", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest6", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest7", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest8", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest9", Boolean.valueOf(false));
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.chest10", Boolean.valueOf(false));
-					this.plugin.saveAccountsConfig();
+				if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".halloween.chest1")) {
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest1", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest2", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest3", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest4", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest5", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest6", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest7", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest8", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest9", Boolean.valueOf(false));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.chest10", Boolean.valueOf(false));
+					//this.plugin.saveAccountsConfig();
 				}
-				if (!this.plugin.getAccountsConfig().contains(p.getName() + ".jobs.ultimate")) {
-					this.plugin.getAccountsConfig().set(p.getName() + ".jobs.ultimate", String.valueOf("None"));
-					this.plugin.getAccountsConfig().set(p.getName() + ".jobs.ultimatesealed", Boolean.valueOf(false));
-					this.plugin.saveAccountsConfig();
+				if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".jobs.ultimate")) {
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimate", String.valueOf("None"));
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimatesealed", Boolean.valueOf(false));
+					//this.plugin.saveAccountsConfig();
 				}
-				if (!this.plugin.getAccountsConfig().contains(p.getName() + ".halloween.wand")) {
-					this.plugin.getAccountsConfig().set(p.getName() + ".halloween.wand", Long.valueOf(Main.SERVER_TICK_TIME));
-					this.plugin.saveAccountsConfig();
+				if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".halloween.wand")) {
+					this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".halloween.wand", Long.valueOf(Main.SERVER_TICK_TIME));
+					//this.plugin.saveAccountsConfig();
 				}
 			}
 			//Check if this player has unallocated stat points.
@@ -1711,8 +1712,8 @@ implements Listener
 				p.sendMessage(ChatColor.GOLD+"");
 			}
 			//Set Stat Point specific stuff here.
-			if (this.plugin.getAccountsConfig().getInt(p.getName() + ".stats.stat10")>0) {
-				p.setMaximumAir(300+this.plugin.getStatBonus(9, this.plugin.getAccountsConfig().getInt(p.getName() + ".stats.stat10"))*20);
+			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase() + ".stats.stat10")>0) {
+				p.setMaximumAir(300+this.plugin.getStatBonus(9, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase() + ".stats.stat10"))*20);
 			}
 			if (p.getLocation().getY()>78.0d && p.getLocation().getZ()>53.0d && p.getLocation().getZ()<64.0d && p.getLocation().getX()<1627.0d && p.getLocation().getX()>1616.0d) {
 				//In a spleef zone. Kick this player out.
@@ -1726,7 +1727,7 @@ implements Listener
 		}
 		boolean found=false;
 		for (int i=0;i<this.plugin.playerdata_list.size();i++) {
-			if (this.plugin.playerdata_list.get(i).data.getName().compareToIgnoreCase(p.getName())==0) {
+			if (this.plugin.playerdata_list.get(i).data.getName().compareToIgnoreCase(p.getName().toLowerCase())==0) {
 				found=true;
 				break;
 			}
@@ -1740,7 +1741,7 @@ implements Listener
 		}
 		if (this.plugin.PlayerinJob(p, "Explorer")) {
 			//Add to explorer array.
-			this.plugin.explorerlist.add(new ExplorerData(p.getName(), p.getLocation().getX(), p.getLocation().getZ()));
+			this.plugin.explorerlist.add(new ExplorerData(p.getName().toLowerCase(), p.getLocation().getX(), p.getLocation().getZ()));
 		}
 		this.plugin.hitmoblist.add(new EntityHitData(p));
 		if (this.plugin.PlayerinJob(p, "Support")) {
@@ -1754,7 +1755,7 @@ implements Listener
 			//Figure out potion effects when player joins.
 			while (effects.hasNext()) {
 				PotionEffect nexteffect = effects.next();
-				//Bukkit.getLogger().info(p.getName()+" w/buff "+nexteffect.getType().getName()+" for "+nexteffect.getDuration()/20+" sec.");
+				//Bukkit.getLogger().info(p.getName().toLowerCase()+" w/buff "+nexteffect.getType().getName()+" for "+nexteffect.getDuration()/20+" sec.");
 				/*if (nexteffect.getType().getName().compareTo(PotionEffectType.JUMP.getName())==0) {
 					p.removePotionEffect(PotionEffectType.JUMP);
 					p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 360000, nexteffect.getAmplifier()+2, true));
@@ -2445,6 +2446,13 @@ implements Listener
 					double levelsmult=1.0;
 					if (totallvs>20*levelsmult) {
 						if (totallvs<40*levelsmult) {
+							//Can't have baby zombies at this level.
+							if (e.getEntity().getType()==EntityType.ZOMBIE) {
+								Zombie z = (Zombie)e.getEntity();
+								if (z.isBaby()) {
+									z.setBaby(false);
+								}
+							}
 							//Sometimes wear leather armor. Only for Skeletons and Zombies.
 							if (e.getEntity().getType()==EntityType.SKELETON || e.getEntity().getType()==EntityType.ZOMBIE) {
 								LivingEntity l = (LivingEntity) e.getEntity();
@@ -2463,6 +2471,13 @@ implements Listener
 							}
 						} else
 							if (totallvs<60*levelsmult) {
+								//Can't have baby zombies at this level.
+								if (e.getEntity().getType()==EntityType.ZOMBIE) {
+									Zombie z = (Zombie)e.getEntity();
+									if (z.isBaby()) {
+										z.setBaby(false);
+									}
+								}
 								//Wear leather armor a bit more often. Sometimes a chain piece here or there. Include a Wooden sword usually.
 								if (e.getEntity().getType()==EntityType.SKELETON || e.getEntity().getType()==EntityType.ZOMBIE) {
 									LivingEntity l = (LivingEntity) e.getEntity();
@@ -3036,6 +3051,15 @@ implements Listener
 				}
 			}
 		}
+		
+		if (e.getEntity() instanceof Zombie) {
+			Zombie z = (Zombie)e.getEntity();
+			if (z.isBaby() && z.getCustomName()!=null && !z.getCustomName().contains("Ninja")) {
+				//Can't have weird special baby zombies.
+				z.setBaby(false);
+			}
+		}
+		
 		if (e.getEntity().getType()==EntityType.EXPERIENCE_ORB) {
 			Bukkit.getWorld("world").spawnEntity(e.getEntity().getLocation(),e.getEntity().getType());
 		}
@@ -4068,10 +4092,10 @@ implements Listener
 			if ((e.getBlock().getX()==1585 && e.getBlock().getZ()>=24 && e.getBlock().getZ()<=39) || (e.getBlock().getX()==1600 && e.getBlock().getZ()>=24 && e.getBlock().getZ()<=39) || (e.getBlock().getZ()==24 && e.getBlock().getX()>=1585 && e.getBlock().getX()<=1600) || (e.getBlock().getZ()==39 && e.getBlock().getX()>=1585 && e.getBlock().getX()<=1600)) {
 				e.setCancelled(true);
 			}
-			if (this.plugin.getConfig().getBoolean("spleefinsession")==true && (this.plugin.getConfig().getString("spleefrequestaplayer").compareTo(p.getName())==0 || this.plugin.getConfig().getString("spleefrequestbplayer").compareTo(p.getName())==0)) {
+			if (this.plugin.getConfig().getBoolean("spleefinsession")==true && (this.plugin.getConfig().getString("spleefrequestaplayer").compareTo(p.getName().toLowerCase())==0 || this.plugin.getConfig().getString("spleefrequestbplayer").compareTo(p.getName().toLowerCase())==0)) {
 				this.plugin.spleef_last_broken_block=p.getPlayerTime();
 			}
-			if (this.plugin.getConfig().getBoolean("spleef4insession")==true && (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0 || this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0 || this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0 || this.plugin.getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0)) {
+			if (this.plugin.getConfig().getBoolean("spleef4insession")==true && (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName().toLowerCase())==0 || this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName().toLowerCase())==0 || this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName().toLowerCase())==0 || this.plugin.getConfig().getString("spleefrequestd4player").compareTo(p.getName().toLowerCase())==0)) {
 				this.plugin.spleef4_last_broken_block=p.getPlayerTime();
 			}
 			if (p.getItemInHand()!=null && p.getItemInHand().getItemMeta()!=null && p.getItemInHand().getItemMeta().hasDisplayName()==true && p.getItemInHand().getItemMeta().getDisplayName().compareTo("Spleef Wooden Shovel")==0) {
@@ -4159,12 +4183,12 @@ implements Listener
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 			@Override
 			public void run() {
-				p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+				p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 			}
 		},5);
 		if (e.getItem().getType()==Material.MILK_BUCKET) {
 			for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
-				if (this.plugin.SPEED_CONTROL.get(i).p.getName().equalsIgnoreCase(p.getName())) {
+				if (this.plugin.SPEED_CONTROL.get(i).p.getName().equalsIgnoreCase(p.getName().toLowerCase())) {
 					this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME;
 					this.plugin.SPEED_CONTROL.get(i).potion_spdlv=0;
 					break;
@@ -4177,7 +4201,7 @@ implements Listener
 				if (pot.getType()==PotionType.SPEED) {
 					//p.sendMessage("This is a speed "+pot.getLevel()+" potion.");
 					for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
-						if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
+						if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName().toLowerCase())==0) {
 							this.plugin.SPEED_CONTROL.get(i).potion_spdlv=pot.getLevel();
 							if (pot.hasExtendedDuration()) {
 								this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+4800;
@@ -4222,12 +4246,12 @@ implements Listener
 							Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 								@Override
 								public void run() {
-									p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+									p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 								}
 							},5);
 							if (p!=shooter) {
 								//Award the support.
-								//Bukkit.getPlayer("sigonasr2").sendMessage(p.getName()+" got hit by your potion!");
+								//Bukkit.getPlayer("sigonasr2").sendMessage(p.getName().toLowerCase()+" got hit by your potion!");
 								//Iterator<PotionEffect> effects = e.getPotion().getEffects().iterator();
 								try {
 									Collection<PotionEffect> effects = e.getPotion().getEffects();
@@ -4239,7 +4263,7 @@ implements Listener
 										if (nextpotioneffect.getType().getName().compareTo("SPEED")==0) {
 											this.plugin.gainMoneyExp(shooter,"Support",0.15,6);
 											for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
-												if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
+												if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName().toLowerCase())==0) {
 													this.plugin.SPEED_CONTROL.get(i).potion_spdlv=nextpotioneffect.getAmplifier();
 													this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+nextpotioneffect.getDuration();
 													this.plugin.SPEED_CONTROL.get(i).updatePlayerSpd();
@@ -4260,7 +4284,7 @@ implements Listener
 												if (p.getHealth()/p.getMaxHealth()<=0.30) {
 													this.plugin.gainMoneyExp(shooter,"Support",2.40,120);
 													//shooter.sendMessage("This is a big heal.");
-													p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+													p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 												}
 												//this.plugin.gainMoneyExp(shooter,"Support",0.30,14);
 												if (p.getHealth()+12>p.getMaxHealth()) {
@@ -4291,7 +4315,7 @@ implements Listener
 								  if (nextpotioneffect.getType().getName().compareTo("SPEED")==0) {
 									  this.plugin.gainMoneyExp(shooter,"Support",0.15,6);
 									  for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
-										  if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
+										  if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName().toLowerCase())==0) {
 											  this.plugin.SPEED_CONTROL.get(i).potion_spdlv=nextpotioneffect.getAmplifier();
 											  this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+nextpotioneffect.getDuration();
 											  this.plugin.SPEED_CONTROL.get(i).updatePlayerSpd();
@@ -4334,7 +4358,7 @@ implements Listener
 											//this.plugin.gainMoneyExp(shooter,"Support",0.15,6);
 											//Apply this potion effect to our player buff data. 
 											for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
-												if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
+												if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName().toLowerCase())==0) {
 													this.plugin.SPEED_CONTROL.get(i).potion_spdlv=nextpotioneffect.getAmplifier();
 													this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+nextpotioneffect.getDuration();
 													this.plugin.SPEED_CONTROL.get(i).updatePlayerSpd();
@@ -4349,7 +4373,7 @@ implements Listener
 													p.setHealth(p.getHealth()+12);
 												}
 												//shooter.sendMessage("This is a heal.");
-												p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+												p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 											}
 										}
 									}
@@ -4368,7 +4392,7 @@ implements Listener
 							Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 								@Override
 								public void run() {
-									p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+									p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 								}
 							},5);
 							try {
@@ -4385,7 +4409,7 @@ implements Listener
 										//this.plugin.gainMoneyExp(shooter,"Support",0.15,6);
 										//Apply this potion effect to our player buff data. 
 										for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
-											if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
+											if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName().toLowerCase())==0) {
 												this.plugin.SPEED_CONTROL.get(i).potion_spdlv=nextpotioneffect.getAmplifier();
 												this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+nextpotioneffect.getDuration();
 												this.plugin.SPEED_CONTROL.get(i).updatePlayerSpd();
@@ -5669,6 +5693,133 @@ implements Listener
 			}
 		}
 	}
+	
+    public void open_LootChest(int tier, Location loc) {
+    	
+    	// 1 = single item
+    	// 2 = mythic item
+    	// 3 = plentiful items
+    	// 4 = multiple items
+		switch (tier) {
+			case 1: {
+				loc.getWorld().dropItemNaturally(loc, getGoodie(0));
+			}break;
+			case 2: {
+				loc.getWorld().dropItemNaturally(loc, getGoodie(1));
+			}break;
+			case 3: {
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.LOG, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.RAW_FISH, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.BOOKSHELF, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.CLAY, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.EXP_BOTTLE, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.OBSIDIAN, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.MOSSY_COBBLESTONE, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.HAY_BLOCK, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.QUARTZ_BLOCK, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.NETHER_BRICK, (int)(Math.random() * 64) + 1));
+				} else {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.WOOL, (int)(Math.random() * 64) + 1));
+				}
+			}break;
+			case 4: {
+				// Drop at least one stack, and five rolls for a 20% chance at an extra stack.
+				loc.getWorld().dropItemNaturally(loc, getGoodie(0));
+				for (int i = 0; i < 5; i++) {
+					if (Math.random() < 0.2) {
+						loc.getWorld().dropItemNaturally(loc, getGoodie(0));
+					}
+
+				}
+			}break;
+			case 5: {
+				// OMG NOT CODED YET WTF THIS SHOULDN'T HAPPEN
+			}break;
+		}
+	}
+	
+    public void open_LootChest(int tier, Location loc) {
+    	
+    	// 1 = single item
+    	// 2 = mythic item
+    	// 3 = plentiful items
+    	// 4 = multiple items
+		switch (tier) {
+			case 1: {
+				loc.getWorld().dropItemNaturally(loc, getGoodie(0));
+			}break;
+			case 2: {
+				loc.getWorld().dropItemNaturally(loc, getGoodie(1));
+			}break;
+			case 3: {
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.LOG, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.RAW_FISH, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.BOOKSHELF, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.CLAY, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.EXP_BOTTLE, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.OBSIDIAN, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.MOSSY_COBBLESTONE, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.HAY_BLOCK, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.QUARTZ_BLOCK, (int)(Math.random() * 64) + 1));
+				} else 
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.NETHER_BRICK, (int)(Math.random() * 64) + 1));
+				} else {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.WOOL, (int)(Math.random() * 64) + 1));
+				}
+			}break;
+			case 4: {
+				// Drop at least one stack, and five rolls for a 20% chance at an extra stack.
+				loc.getWorld().dropItemNaturally(loc, getGoodie(0));
+				for (int i = 0; i < 5; i++) {
+					if (Math.random() < 0.2) {
+						loc.getWorld().dropItemNaturally(loc, getGoodie(0));
+					}
+
+				}
+			}break;
+			case 5: {
+				// OMG NOT CODED YET WTF THIS SHOULDN'T HAPPEN
+			}break;
+		}
+	}
+
 
 	public ItemStack getGoodie() {
 		return getGoodie(0);
@@ -5718,6 +5869,41 @@ implements Listener
 			}
 			if (rar==1) {
 				rarity=3;
+			}
+			if (rar==-1) {
+				if (Math.random()<=0.05) {
+					rarity=4;
+				} else {
+					rarity=(int)(Math.random()*3);
+				}
+			}
+			if (rarity==4) {
+				//Drop a leather piece / diamond sword that's mysterious. It will have 0 durability, so cannot be used until identified.
+				ItemStack i = null;
+				switch ((int)(Math.random()*10)) {
+					case 0:{
+						i = new ItemStack(Material.DIAMOND_SWORD);
+					}break;
+					case 1:{
+						i = new ItemStack(Material.LEATHER_CHESTPLATE);
+					}break;
+					case 2:{
+						i = new ItemStack(Material.LEATHER_BOOTS);
+					}break;
+					case 3:{
+						i = new ItemStack(Material.LEATHER_HELMET);
+					}break;
+					case 4:{
+						i = new ItemStack(Material.LEATHER_LEGGINGS);
+					}break;
+					default:{
+						i = new ItemStack(Material.LEATHER);
+					}
+				}
+				if (i.getType()==Material.LEATHER) {
+					//We will drop a leather piece that builds a set item.
+					
+				}
 			}
 			if (rar==-1) {
 				if (Math.random()<=0.05) {
@@ -6402,30 +6588,19 @@ implements Listener
 				|| e.getEntity().getType()==EntityType.PIG || e.getEntity().getType()==EntityType.COW || e.getEntity().getType()==EntityType.OCELOT || e.getEntity().getType()==EntityType.WOLF
 				|| e.getEntity().getType()==EntityType.MUSHROOM_COW) {
 			LivingEntity f = e.getEntity();
-			if (f.getType()==EntityType.ZOMBIE || 
-					f.getType()==EntityType.SKELETON || 
-					f.getType()==EntityType.PIG_ZOMBIE || 
-					f.getType()==EntityType.SPIDER || 
-					f.getType()==EntityType.CREEPER || 
-					f.getType()==EntityType.ENDERMAN) {
-				
-				
-				if (this.plugin.getConfig().getBoolean("thanksgiving-enabled") && Math.random()<=0.005) {
+			if (f instanceof Monster) {
+				if (this.plugin.getConfig().getBoolean("thanksgiving-enabled") && Math.random()<=0.01) {
 					// 0.5% chance of loot chest dropping
-					ItemStack chest = new ItemStack(Material.CHEST);
-				    ItemMeta chest_name = chest.getItemMeta();
-				    chest_name.setDisplayName(ChatColor.YELLOW+"Closed Chest");
-				   
-				    List<String> chestlore = new ArrayList<String>();
-				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
-				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
-				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"It feels heavy; there");
-				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"might be items inside.");
-				    chest_name.setLore(chestlore);
-
-				    chest.setItemMeta(chest_name);
-				    
-				    f.getWorld().dropItemNaturally(f.getLocation(), chest);
+				    f.getWorld().dropItemNaturally(f.getLocation(), this.plugin.generate_LootChest());
+				}
+				if (f instanceof Zombie) {
+					Zombie z = (Zombie)f;
+					if (z.isBaby()) {
+						//Randomly drop a loot chest sometimes. (4.5% of the time.)
+						if (Math.random() <= 0.045) {
+							z.getWorld().dropItemNaturally(z.getLocation(), this.plugin.generate_LootChest());
+						}
+					}
 				}
 				//if (Math.random()<=0.005) {
 				/*
@@ -6684,7 +6859,7 @@ implements Listener
 						this.plugin.gainMoneyExp(p,"Hunter",275.00,7800);
 					}
 				}
-				if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify3")) {
+				if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify3")) {
 					p.sendMessage(ChatColor.DARK_GREEN+""+ChatColor.ITALIC+"Gained "+e.getDroppedExp()+" exp.");
 				}
 				if (this.plugin.getConfig().getBoolean("halloween-enabled") && p.getWorld().getName().equalsIgnoreCase("world") && (e.getEntity() instanceof Sheep)) {
@@ -6723,11 +6898,11 @@ implements Listener
 			Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 				@Override
 				public void run() {
-					p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+					p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 				}
 			},5);
-			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat9")>0) {
-				if (Math.random()<=this.plugin.getStatBonus(8, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat9"))/100.0d) {
+			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat9")>0) {
+				if (Math.random()<=this.plugin.getStatBonus(8, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat9"))/100.0d) {
 					e.setFoodLevel(e.getFoodLevel()+1);
 				}
 			}
@@ -6824,6 +6999,10 @@ implements Listener
 	@EventHandler
 	public void onFishCatch(PlayerFishEvent e) {
 		if (e.getState()==State.CAUGHT_FISH) {
+			if (this.plugin.getConfig().getBoolean("thanksgiving-enabled") && Math.random() < 0.10) {
+				// 5% chance of fishing up a loot chest
+				e.getPlayer().getWorld().dropItemNaturally(e.getPlayer().getLocation(), this.plugin.generate_LootChest());
+			}
 			Player p = e.getPlayer();
 			if (this.plugin.PlayerinJob(p, "Fisherman")) {
 				this.plugin.gainMoneyExp(p,"Fisherman",0.175,3);
@@ -7053,26 +7232,26 @@ implements Listener
 		}
 		// 笆�笆�(Player)e.getPlayer()).sendMessage(((Player)e.getPlayer()).getScoreboard().getPlayerTeam((OfflinePlayer)e.getPlayer()).getName());
 		Player p = (Player)e.getPlayer();
-		p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.DARK_GRAY+"");
+		p.getScoreboard().getTeam(p.getName().toLowerCase()).setPrefix(ChatColor.DARK_GRAY+"");
 		if (p.hasPermission("group.moderator")) {
-			p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.DARK_GREEN+"");
+			p.getScoreboard().getTeam(p.getName().toLowerCase()).setPrefix(ChatColor.DARK_GREEN+"");
 		}
 		if (p.hasPermission("group.administrators")) {
-			p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.DARK_PURPLE+"");
+			p.getScoreboard().getTeam(p.getName().toLowerCase()).setPrefix(ChatColor.DARK_PURPLE+"");
 		}
 		if (this.plugin.getConfig().getBoolean("halloween-enabled")) {
 			for (int m=0;m<e.getInventory().getSize();m++) {
 				if (e.getInventory().getContents()[m]!=null && e.getInventory().getContents()[m].getType()==Material.PUMPKIN_PIE) { 
 					if (e.getInventory().getContents()[m].getItemMeta().getDisplayName()!=null && e.getInventory().getContents()[m].getItemMeta().getDisplayName().contains("Pie ")) {
 						int numb = Integer.valueOf(e.getInventory().getContents()[m].getItemMeta().getDisplayName().replace("Pie ",""));
-						if (this.plugin.getAccountsConfig().getBoolean(p.getName()+".halloween.chest"+numb)) {
+						if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".halloween.chest"+numb)) {
 							p.closeInventory();
 							p.sendMessage("You already got this magic pie!");
 							e.setCancelled(true);
 						} else {
 							//Show the user a fake inventory containing the magic pie.
-							this.plugin.getAccountsConfig().set(p.getName()+".halloween.chest"+numb, Boolean.valueOf(true));
-							this.plugin.saveAccountsConfig();
+							this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".halloween.chest"+numb, Boolean.valueOf(true));
+							//this.plugin.saveAccountsConfig();
 							p.closeInventory();
 							e.setCancelled(true);
 							Inventory a = Bukkit.createInventory(p, 9);
@@ -7180,7 +7359,7 @@ implements Listener
 		p.setRemainingAir(p.getMaximumAir());
 		this.plugin.REVIVE_EFFECT=90;
 		this.plugin.REVIVE_EFFECT_LOC = p.getLocation();
-		PersistentExplorerList ev = new PersistentExplorerList(p.getName());
+		PersistentExplorerList ev = new PersistentExplorerList(p.getName().toLowerCase());
 		ev.event=0;
 		this.plugin.explorers.add(ev);
 	}
@@ -7250,7 +7429,7 @@ implements Listener
 			Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 				@Override
 				public void run() {
-					p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+					p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 				}
 			},5);
 			//p.sendMessage("Your Health: "+p.getHealth()+", Damage: "+e.getDamage()+", Actual: "+this.plugin.DMGCALC.getDamage(p, e.getDamage(), DamageCause.ENTITY_ATTACK));
@@ -7269,12 +7448,12 @@ implements Listener
 					//Check to see if our "fatal s	urvivor" effect is available.
 					boolean survivor=false;
 					for (int i=0;i<this.plugin.explorers.size();i++) {
-						if (this.plugin.explorers.get(i).event==0 && this.plugin.explorers.get(i).name.compareTo(p.getName())==0) {
+						if (this.plugin.explorers.get(i).event==0 && this.plugin.explorers.get(i).name.compareTo(p.getName().toLowerCase())==0) {
 							survivor=true;
 							break;
 						}
 					}
-					PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+					PersistentExplorerList eve = new PersistentExplorerList(p.getName().toLowerCase());
 					eve.event=1;
 					eve.data=p.getExp();
 					eve.data2=p.getLevel();
@@ -7293,7 +7472,7 @@ implements Listener
 				}
 			}
 			final double player_starthp = p.getHealth();
-			if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName()+".settings.notify5") && e.getCause()!=DamageCause.ENTITY_ATTACK && e.getCause()!=DamageCause.ENTITY_EXPLOSION && e.getDamage()!=0) {
+			if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5") && e.getCause()!=DamageCause.ENTITY_ATTACK && e.getCause()!=DamageCause.ENTITY_EXPLOSION && e.getDamage()!=0) {
 				final Main plugin = this.plugin;
 				Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 					@Override
@@ -7308,12 +7487,12 @@ implements Listener
 								//Check to see if our "fatal s	urvivor" effect is available.
 								boolean survivor=false;
 								for (int i=0;i<plugin.explorers.size();i++) {
-									if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName())==0) {
+									if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName().toLowerCase())==0) {
 										survivor=true;
 										break;
 									}
 								}
-								PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+								PersistentExplorerList eve = new PersistentExplorerList(p.getName().toLowerCase());
 								eve.event=1;
 								eve.data=p.getExp();
 								eve.data2=p.getLevel();
@@ -7342,7 +7521,7 @@ implements Listener
 
 	@EventHandler
 	public void onPlayerPickup(PlayerPickupItemEvent e) {
-		if (this.plugin.getAccountsConfig().getBoolean(e.getPlayer().getName()+".settings.notify1")) {
+		if (this.plugin.getAccountsConfig().getBoolean(e.getPlayer().getName().toLowerCase()+".settings.notify1")) {
 			Player p = e.getPlayer();
 			String temp = e.getItem().getItemStack().getType().name().replace("_", " ");
 			char[] mod = temp.toCharArray();
@@ -7404,8 +7583,8 @@ implements Listener
 		}
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			Player p = (Player)e.getEntity();
-			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat6")>0) {
-				p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, (this.plugin.getStatBonus(5, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat6"))/3)*20, 0));
+			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat6")>0) {
+				p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, (this.plugin.getStatBonus(5, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat6"))/3)*20, 0));
 			}
 		}
 	}
@@ -7414,7 +7593,7 @@ implements Listener
 	public void onRegainHealth(EntityRegainHealthEvent e) {
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			final Player p = (Player)e.getEntity();
-			p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+			p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 			boolean regen_high=false;
 			int duration=0;
 			if (e.getRegainReason()==RegainReason.MAGIC_REGEN) {
@@ -7449,8 +7628,8 @@ implements Listener
 					}, 1L);
 				}
 			}
-			if (this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat1")>0) {
-				e.setAmount(e.getAmount()+this.plugin.getStatBonus(0, this.plugin.getAccountsConfig().getInt(p.getName()+".stats.stat1")/6));
+			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat1")>0) {
+				e.setAmount(e.getAmount()+this.plugin.getStatBonus(0, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat1")/6));
 			}
 		}
 	}
@@ -7729,12 +7908,12 @@ implements Listener
 									//Check to see if our "fatal s	urvivor" effect is available.
 									boolean survivor=false;
 									for (int i=0;i<plugin.explorers.size();i++) {
-										if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName())==0) {
+										if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName().toLowerCase())==0) {
 											survivor=true;
 											break;
 										}
 									}
-									PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+									PersistentExplorerList eve = new PersistentExplorerList(p.getName().toLowerCase());
 									eve.event=1;
 									eve.data=p.getExp();
 									eve.data2=p.getLevel();
@@ -7764,10 +7943,10 @@ implements Listener
 					}
 				}, 1L);
 				e.setDamage(e.getDamage()/2.0d);}
-			p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+			p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 			int slot=0;
 			for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
-				if (this.plugin.SPEED_CONTROL.get(i).p.getName().equals(p.getName())) {
+				if (this.plugin.SPEED_CONTROL.get(i).p.getName().equals(p.getName().toLowerCase())) {
 					slot=i;
 					break;
 				}
@@ -8108,7 +8287,7 @@ implements Listener
 			if (Math.random()<=speed_boost_chance/100.0d) {
 				int data=-1;
 				for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
-					if (this.plugin.SPEED_CONTROL.get(i).p.getName().equalsIgnoreCase(p.getName())) {
+					if (this.plugin.SPEED_CONTROL.get(i).p.getName().equalsIgnoreCase(p.getName().toLowerCase())) {
 						data=i;
 						break;
 					}
@@ -8230,7 +8409,7 @@ implements Listener
 		if (e.getEntity().getType()==EntityType.PLAYER && e.getDamager().getType()==EntityType.ZOMBIE) {
 			LivingEntity enemy = (LivingEntity)e.getDamager();
 			Player p = (Player)e.getEntity();
-			p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+			p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 			double throughdmg=0;
 			double maxdmg=0;
 			if (enemy.getCustomName()!=null && (enemy.getCustomName().compareTo(ChatColor.YELLOW+"Charge Zombie")==0 || enemy.getCustomName().compareTo(ChatColor.DARK_PURPLE+"Charge Zombie III")==0)) {
@@ -8249,12 +8428,12 @@ implements Listener
 								//Check to see if our "fatal s	urvivor" effect is available.
 								boolean survivor=false;
 								for (int i=0;i<plugin.explorers.size();i++) {
-									if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName())==0) {
+									if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName().toLowerCase())==0) {
 										survivor=true;
 										break;
 									}
 								}
-								PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+								PersistentExplorerList eve = new PersistentExplorerList(p.getName().toLowerCase());
 								eve.event=1;
 								eve.data=p.getExp();
 								eve.data2=p.getLevel();
@@ -8282,12 +8461,12 @@ implements Listener
 								//Check to see if our "fatal s	urvivor" effect is available.
 								boolean survivor=false;
 								for (int i=0;i<plugin.explorers.size();i++) {
-									if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName())==0) {
+									if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName().toLowerCase())==0) {
 										survivor=true;
 										break;
 									}
 								}
-								PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+								PersistentExplorerList eve = new PersistentExplorerList(p.getName().toLowerCase());
 								eve.event=1;
 								eve.data=p.getExp();
 								eve.data2=p.getLevel();
@@ -8346,12 +8525,12 @@ implements Listener
 									//Check to see if our "fatal s	urvivor" effect is available.
 									boolean survivor=false;
 									for (int i=0;i<plugin.explorers.size();i++) {
-										if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName())==0) {
+										if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName().toLowerCase())==0) {
 											survivor=true;
 											break;
 										}
 									}
-									PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+									PersistentExplorerList eve = new PersistentExplorerList(p.getName().toLowerCase());
 									eve.event=1;
 									eve.data=p.getExp();
 									eve.data2=p.getLevel();
@@ -8384,12 +8563,12 @@ implements Listener
 									//Check to see if our "fatal s	urvivor" effect is available.
 									boolean survivor=false;
 									for (int i=0;i<plugin.explorers.size();i++) {
-										if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName())==0) {
+										if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName().toLowerCase())==0) {
 											survivor=true;
 											break;
 										}
 									}
-									PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+									PersistentExplorerList eve = new PersistentExplorerList(p.getName().toLowerCase());
 									eve.event=1;
 									eve.data=p.getExp();
 									eve.data2=p.getLevel();
@@ -8474,7 +8653,7 @@ implements Listener
 						e.setDamage(0);
 						e.setCancelled(true);
 					}
-					p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+					p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 					//p.sendMessage("No Damage Ticks: "+f.getNoDamageTicks());
 					ItemStack item = p.getItemInHand();
 					double critical_chance=0,armor_pen=0,life_steal=0,attack_speed=0,dmg=0,armor_pen_dmg=0;
@@ -8627,7 +8806,7 @@ implements Listener
 				} else {
 					if (((Projectile)e.getDamager()).getShooter()!=null && ((Projectile)e.getDamager()).getShooter().getType()==EntityType.PLAYER) {
 						final Player p = (Player)((Projectile)e.getDamager()).getShooter();
-						p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+						p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 						ItemStack item = p.getItemInHand();
 						double critical_chance=0,armor_pen=0,life_steal=0,attack_speed=0,dmg=0,armor_pen_dmg=0;
 						if (item.getType()==Material.BOW && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) { //Make sure we are using a ranged weapon.
@@ -8797,9 +8976,9 @@ implements Listener
 			}
 			if (f.getKiller()!=null && f.getKiller().getType()==EntityType.PLAYER) {
 				Player p = f.getKiller();
-				p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+				p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 				//p.sendMessage(f.getType()+" is mad at you.");
-				//if (p.getName().equalsIgnoreCase("sigonasr2")) {p.sendMessage("You are the killer of "+f.getCustomName()+".");}
+				//if (p.getName().toLowerCase().equalsIgnoreCase("sigonasr2")) {p.sendMessage("You are the killer of "+f.getCustomName()+".");}
 				if (this.plugin.PlayerinJob(p, "Hunter")) {
 					if (e.getEntity().getType()==EntityType.SQUID) {
 						this.plugin.gainMoneyExp(p,"Hunter",0.00,1);
@@ -9127,10 +9306,10 @@ implements Listener
 					}
 				}
 		}
-		if (this.plugin.getConfig().getBoolean("spleefinsession")==true && (this.plugin.getConfig().getString("spleefrequestaplayer").compareTo(p.getName())==0 || this.plugin.getConfig().getString("spleefrequestbplayer").compareTo(p.getName())==0)) {
+		if (this.plugin.getConfig().getBoolean("spleefinsession")==true && (this.plugin.getConfig().getString("spleefrequestaplayer").compareTo(p.getName().toLowerCase())==0 || this.plugin.getConfig().getString("spleefrequestbplayer").compareTo(p.getName().toLowerCase())==0)) {
 			e.setCancelled(true);
 		}
-		if (this.plugin.getConfig().getBoolean("spleef4insession")==true && (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0 || this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0 || this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0 || this.plugin.getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0)) {
+		if (this.plugin.getConfig().getBoolean("spleef4insession")==true && (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName().toLowerCase())==0 || this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName().toLowerCase())==0 || this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName().toLowerCase())==0 || this.plugin.getConfig().getString("spleefrequestd4player").compareTo(p.getName().toLowerCase())==0)) {
 			e.setCancelled(true);
 		}
 		if (e.getItemInHand().getType()==Material.getMaterial(127)) {
@@ -9147,13 +9326,17 @@ implements Listener
 			return;
 		}
 		if (this.plugin.is_LootChest(e.getItemInHand())) {
+			open_LootChest(this.plugin.get_LootChestTier(e.getItemInHand()), e.getBlockPlaced().getLocation());
+
+			
 			e.setCancelled(true);
 			if (e.getItemInHand().getAmount() > 1) {
 				e.getItemInHand().setAmount(e.getItemInHand().getAmount() - 1);
 			} else {
 				e.getPlayer().setItemInHand(null);
 			}
-			e.getPlayer().getWorld().dropItemNaturally(e.getBlockPlaced().getLocation(), getGoodie());
+			// e.getPlayer().getWorld().dropItemNaturally(e.getBlockPlaced().getLocation(), getGoodie());
+			
 			p.sendMessage(ChatColor.GREEN+"You open the chest and find treasure inside!");
 			p.playSound(p.getLocation(), Sound.ORB_PICKUP, 10, 1);
 			p.updateInventory();
@@ -9488,12 +9671,12 @@ implements Listener
 	public void onInventoryCloseEvent(InventoryCloseEvent e) {
 		Player p = (Player)e.getPlayer();
 		//Bukkit.getLogger().info("GEt close inventory event.");
-		p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.WHITE+"");
+		p.getScoreboard().getTeam(p.getName().toLowerCase()).setPrefix(ChatColor.WHITE+"");
 		if (p.hasPermission("group.moderator")) {
-			p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.GREEN+"");
+			p.getScoreboard().getTeam(p.getName().toLowerCase()).setPrefix(ChatColor.GREEN+"");
 		}
 		if (p.hasPermission("group.administrators")) {
-			p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.LIGHT_PURPLE+"");
+			p.getScoreboard().getTeam(p.getName().toLowerCase()).setPrefix(ChatColor.LIGHT_PURPLE+"");
 		}
 		if (e.getInventory().getName().contains("Item Cube")) {
 			int identifier=-1;
@@ -9514,13 +9697,13 @@ implements Listener
 			if (e.getInventory().getTitle().equalsIgnoreCase("Notification Options")) {
 				//We have to save the notification settings for this player.
 				FileConfiguration savefile = this.plugin.getAccountsConfig();
-				savefile.set(p.getName()+".settings.notify1", Boolean.valueOf(e.getInventory().getItem(2).getType()==Material.REDSTONE_TORCH_ON));
-				savefile.set(p.getName()+".settings.notify2", Boolean.valueOf(e.getInventory().getItem(6).getType()==Material.REDSTONE_TORCH_ON));
-				savefile.set(p.getName()+".settings.notify3", Boolean.valueOf(e.getInventory().getItem(11).getType()==Material.REDSTONE_TORCH_ON));
-				savefile.set(p.getName()+".settings.notify4", Boolean.valueOf(e.getInventory().getItem(15).getType()==Material.REDSTONE_TORCH_ON));
-				savefile.set(p.getName()+".settings.notify5", Boolean.valueOf(e.getInventory().getItem(20).getType()==Material.REDSTONE_TORCH_ON));
-				savefile.set(p.getName()+".settings.notify6", Boolean.valueOf(e.getInventory().getItem(24).getType()==Material.REDSTONE_TORCH_ON));
-				this.plugin.saveAccountsConfig();
+				savefile.set(p.getName().toLowerCase()+".settings.notify1", Boolean.valueOf(e.getInventory().getItem(2).getType()==Material.REDSTONE_TORCH_ON));
+				savefile.set(p.getName().toLowerCase()+".settings.notify2", Boolean.valueOf(e.getInventory().getItem(6).getType()==Material.REDSTONE_TORCH_ON));
+				savefile.set(p.getName().toLowerCase()+".settings.notify3", Boolean.valueOf(e.getInventory().getItem(11).getType()==Material.REDSTONE_TORCH_ON));
+				savefile.set(p.getName().toLowerCase()+".settings.notify4", Boolean.valueOf(e.getInventory().getItem(15).getType()==Material.REDSTONE_TORCH_ON));
+				savefile.set(p.getName().toLowerCase()+".settings.notify5", Boolean.valueOf(e.getInventory().getItem(20).getType()==Material.REDSTONE_TORCH_ON));
+				savefile.set(p.getName().toLowerCase()+".settings.notify6", Boolean.valueOf(e.getInventory().getItem(24).getType()==Material.REDSTONE_TORCH_ON));
+				//this.plugin.saveAccountsConfig();
 			}
 		if (e.getInventory().getTitle().equalsIgnoreCase("Repair and Enchant")) {
 			// We have to return the items the player placed inside the anvil
@@ -10750,7 +10933,7 @@ implements Listener
 			}
 			if (this.plugin.getJobLv("Cook", p)>=10 && crafteditem==true) {
 				//This is an ugly fix for the problem...But it works somehow.
-				//Player newp = Bukkit.getPlayer(p.getName());
+				//Player newp = Bukkit.getPlayer(p.getName().toLowerCase());
 				p.getInventory().addItem(new ItemStack(item.getType(),amount,item.getDurability(),item.getData().getData()));
 			}
 		}
@@ -11779,7 +11962,7 @@ implements Listener
 	  if (this.plugin.getConfig().getBoolean("spleef4insession")) {
 		  //Check to see if we fall off.
 		  if ((p.getLocation().getX()<1585 || p.getLocation().getX()>1600 || p.getLocation().getZ()<24 || p.getLocation().getZ()>39 || p.getLocation().getY()<86.5d) && (
-				  (p.getName().compareTo(this.plugin.getConfig().getString("spleefrequesta4player"))==0 || p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestb4player"))==0
+				  (p.getName().toLowerCase().compareTo(this.plugin.getConfig().getString("spleefrequesta4player"))==0 || p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestb4player"))==0
 				  || p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestc4player"))==0 || p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestd4player"))==0))) {
 			  //You lose.
 			  //See if we're the winner.
@@ -11790,7 +11973,7 @@ implements Listener
 			  if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo("none")==0) {
 				  countdead++;
 			  } else {
-				  if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0) {
+				  if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName().toLowerCase())==0) {
 					  losingplayer=Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequesta4player"));
 				  } else {
 					  winningplayer=Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequesta4player"));
@@ -11799,7 +11982,7 @@ implements Listener
 			  if (this.plugin.getConfig().getString("spleefrequestb4player").compareTo("none")==0) {
 				  countdead++;
 			  } else {
-				  if (this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0) {
+				  if (this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName().toLowerCase())==0) {
 					  losingplayer=Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequestb4player"));
 				  } else {
 					  winningplayer=Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequestb4player"));
@@ -11808,7 +11991,7 @@ implements Listener
 			  if (this.plugin.getConfig().getString("spleefrequestc4player").compareTo("none")==0) {
 				  countdead++;
 			  } else {
-				  if (this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0) {
+				  if (this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName().toLowerCase())==0) {
 					  losingplayer=Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequestc4player"));
 				  } else {
 					  winningplayer=Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequestc4player"));
@@ -11817,7 +12000,7 @@ implements Listener
 			  if (this.plugin.getConfig().getString("spleefrequestd4player").compareTo("none")==0) {
 				  countdead++;
 			  } else {
-				  if (this.plugin.getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
+				  if (this.plugin.getConfig().getString("spleefrequestd4player").compareTo(p.getName().toLowerCase())==0) {
 					  losingplayer=Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequestd4player"));
 				  } else {
 					  winningplayer=Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequestd4player"));
@@ -11841,7 +12024,7 @@ implements Listener
 					  p.getInventory().clear();
 					  p.getInventory().clear(p.getInventory().getHeldItemSlot());
 					  //Give inventories back.
-					  if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0) {
+					  if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName().toLowerCase())==0) {
 						  for (int i=0;i<this.plugin.spleef4_inventory_a.length;i++) {
 							  if (this.plugin.spleef4_inventory_a[i]!=null) {
 							  p.getInventory().addItem(this.plugin.spleef4_inventory_a[i]);
@@ -11849,7 +12032,7 @@ implements Listener
 						  }
 						  this.plugin.getConfig().set("spleefrequesta4player",String.valueOf("none"));
 					  } else
-					  if (this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0) {
+					  if (this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName().toLowerCase())==0) {
 						  for (int i=0;i<this.plugin.spleef4_inventory_b.length;i++) {
 							  if (this.plugin.spleef4_inventory_b[i]!=null) {
 							  p.getInventory().addItem(this.plugin.spleef4_inventory_b[i]);
@@ -11857,7 +12040,7 @@ implements Listener
 						  }
 						  this.plugin.getConfig().set("spleefrequestb4player",String.valueOf("none"));
 					  } else
-					  if (this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0) {
+					  if (this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName().toLowerCase())==0) {
 						  for (int i=0;i<this.plugin.spleef4_inventory_c.length;i++) {
 							  if (this.plugin.spleef4_inventory_c[i]!=null) {
 							  p.getInventory().addItem(this.plugin.spleef4_inventory_c[i]);
@@ -11865,7 +12048,7 @@ implements Listener
 						  }
 						  this.plugin.getConfig().set("spleefrequestc4player",String.valueOf("none"));
 					  } else
-					  if (this.plugin.getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
+					  if (this.plugin.getConfig().getString("spleefrequestd4player").compareTo(p.getName().toLowerCase())==0) {
 						  for (int i=0;i<this.plugin.spleef4_inventory_d.length;i++) {
 							  if (this.plugin.spleef4_inventory_d[i]!=null) {
 							  p.getInventory().addItem(this.plugin.spleef4_inventory_d[i]);
@@ -11935,7 +12118,7 @@ implements Listener
 				  p.getInventory().clear();
 				  p.getInventory().clear(p.getInventory().getHeldItemSlot());
 				  //Give inventories back.
-				  if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0) {
+				  if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName().toLowerCase())==0) {
 					  for (int i=0;i<this.plugin.spleef4_inventory_a.length;i++) {
 						  if (this.plugin.spleef4_inventory_a[i]!=null) {
 						  p.getInventory().addItem(this.plugin.spleef4_inventory_a[i]);
@@ -11943,7 +12126,7 @@ implements Listener
 					  }
 					  this.plugin.getConfig().set("spleefrequesta4player",String.valueOf("none"));
 				  } else
-				  if (this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0) {
+				  if (this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName().toLowerCase())==0) {
 					  for (int i=0;i<this.plugin.spleef4_inventory_b.length;i++) {
 						  if (this.plugin.spleef4_inventory_b[i]!=null) {
 						  p.getInventory().addItem(this.plugin.spleef4_inventory_b[i]);
@@ -11951,7 +12134,7 @@ implements Listener
 					  }
 					  this.plugin.getConfig().set("spleefrequestb4player",String.valueOf("none"));
 				  } else
-				  if (this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0) {
+				  if (this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName().toLowerCase())==0) {
 					  for (int i=0;i<this.plugin.spleef4_inventory_c.length;i++) {
 						  if (this.plugin.spleef4_inventory_c[i]!=null) {
 						  p.getInventory().addItem(this.plugin.spleef4_inventory_c[i]);
@@ -11959,7 +12142,7 @@ implements Listener
 					  }
 					  this.plugin.getConfig().set("spleefrequestc4player",String.valueOf("none"));
 				  } else
-				  if (this.plugin.getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
+				  if (this.plugin.getConfig().getString("spleefrequestd4player").compareTo(p.getName().toLowerCase())==0) {
 					  for (int i=0;i<this.plugin.spleef4_inventory_d.length;i++) {
 						  if (this.plugin.spleef4_inventory_d[i]!=null) {
 						  p.getInventory().addItem(this.plugin.spleef4_inventory_d[i]);
@@ -11972,10 +12155,10 @@ implements Listener
 			  }
 		  }
 		  //Check to see if we are a player in spleef.
-		  if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0 ||
-				  this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0 ||
-				  this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0 ||
-				  this.plugin.getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
+		  if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName().toLowerCase())==0 ||
+				  this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName().toLowerCase())==0 ||
+				  this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName().toLowerCase())==0 ||
+				  this.plugin.getConfig().getString("spleefrequestd4player").compareTo(p.getName().toLowerCase())==0) {
 			  //If they are holding something, remove it.
 			  if (p.getItemInHand()!=null) {
 				  p.getInventory().remove(p.getInventory().getHeldItemSlot());
@@ -11983,11 +12166,11 @@ implements Listener
 		  }
 	  }
 
-	  if (this.plugin.getConfig().getBoolean("spleefinsession") && (p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))==0 || p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestbplayer"))==0)) {
+	  if (this.plugin.getConfig().getBoolean("spleefinsession") && (p.getName().toLowerCase().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))==0 || p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestbplayer"))==0)) {
 		  //Determine if we're still playing.
 		  int blockwinner=0;
-		  if (this.plugin.getConfig().getString("spleefrequestaplayer").compareTo(p.getName())==0 ||
-				  this.plugin.getConfig().getString("spleefrequestbplayer").compareTo(p.getName())==0) {
+		  if (this.plugin.getConfig().getString("spleefrequestaplayer").compareTo(p.getName().toLowerCase())==0 ||
+				  this.plugin.getConfig().getString("spleefrequestbplayer").compareTo(p.getName().toLowerCase())==0) {
 			  //If they are holding something, remove it.
 			  if (p.getItemInHand()!=null) {
 				  p.getInventory().remove(p.getInventory().getHeldItemSlot());
@@ -12022,7 +12205,7 @@ implements Listener
 			  this.plugin.getConfig().set("spleefinsession", Boolean.valueOf(false));
 			  //Find out if we're player A, or player B.
 			  Player winningplayer,losingplayer;
-			  if (p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))==0 || blockwinner==2) {
+			  if (p.getName().toLowerCase().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))==0 || blockwinner==2) {
 				  //We're player A.
 				  //Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+this.plugin.getConfig().getString("spleefrequestbplayer")+" is the winner of this spleef game! "+this.plugin.getConfig().getString("spleefrequestaplayer")+" loses.");
 				  losingplayer=p;
@@ -12144,7 +12327,7 @@ implements Listener
 				//Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequestbplayer")).updateInventory();
 		  }
 	  } else {
-		  if (this.plugin.getConfig().getBoolean("spleefinsession") && (p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))!=0 && p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestbplayer"))!=0)) {
+		  if (this.plugin.getConfig().getBoolean("spleefinsession") && (p.getName().toLowerCase().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))!=0 && p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestbplayer"))!=0)) {
 			  if (p.getLocation().getY()>78.0d && p.getLocation().getZ()>53.0d && p.getLocation().getZ()<64.0d && p.getLocation().getX()<1627.0d && p.getLocation().getX()>1616.0d) {
 				  Location newloc = p.getLocation();
 				  newloc.setX(1622.5d);
@@ -12181,7 +12364,7 @@ implements Listener
 			p.closeInventory();
 		}
 		for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
-			if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName())==0) {
+			if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName().toLowerCase())==0) {
 				p.removePotionEffect(PotionEffectType.SPEED);
 				//If they have a "speed" potion, give it back.
 				p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((this.plugin.SPEED_CONTROL.get(i).potion_time-Main.SERVER_TICK_TIME)*2), this.plugin.SPEED_CONTROL.get(i).potion_spdlv, true));
@@ -12195,17 +12378,18 @@ implements Listener
 				list[i].playSound(list[i].getLocation(), Sound.NOTE_PLING, 8, 0.7f);
 			}
 		}
-		if (!this.plugin.getAccountsConfig().getBoolean(p.getName()+".revived")) {
-			this.plugin.getAccountsConfig().set(p.getName() + ".revived", Boolean.valueOf(true));
-			this.plugin.saveAccountsConfig();
-		}
-		if (this.plugin.getConfig().getBoolean("spleefinsession") && (p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))==0 || p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestbplayer"))==0)) {
+		/*Makes no sense as to why this is here.
+		if (!this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".revived")) {
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".revived", Boolean.valueOf(true));
+			//this.plugin.saveAccountsConfig();
+		}*/
+		if (this.plugin.getConfig().getBoolean("spleefinsession") && (p.getName().toLowerCase().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))==0 || p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestbplayer"))==0)) {
 			//This player was in spleef. End the spleef session as if this player lost.
 			//We lose. Other player wins.
 			this.plugin.getConfig().set("spleefinsession", Boolean.valueOf(false));
 			//Find out if we're player A, or player B.
 			Player winningplayer,losingplayer;
-			if (p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))==0) {
+			if (p.getName().toLowerCase().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))==0) {
 				//We're player A.
 				losingplayer=p;
 				winningplayer=Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequestbplayer"));
@@ -12252,7 +12436,7 @@ implements Listener
 				newloc.setZ(51.65d);
 				winningplayer.teleport(newloc);
 				updateTopSPLEEFSigns();
-				this.plugin.saveAccountsConfig();
+				//this.plugin.saveAccountsConfig();
 			} else {
 				//We're player B.
 				winningplayer=Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequestaplayer"));
@@ -12300,7 +12484,7 @@ implements Listener
 				newloc.setZ(51.65d);
 				winningplayer.teleport(newloc);
 				updateTopSPLEEFSigns();
-				this.plugin.saveAccountsConfig();
+				//this.plugin.saveAccountsConfig();
 			}
 
 			//Look for the special shovel.
@@ -12354,7 +12538,7 @@ implements Listener
 		if (this.plugin.PlayerinJob(p, "Hunter")) {
 			//Add to explorer array.
 			for (int i=0;i<this.plugin.hunterplayers.size();i++) {
-				if (this.plugin.hunterplayers.get(i).getName().compareTo(p.getName())==0) {
+				if (this.plugin.hunterplayers.get(i).getName().compareTo(p.getName().toLowerCase())==0) {
 					//This is us.
 					this.plugin.hunterplayers.remove(i);
 					i--;
@@ -12365,7 +12549,7 @@ implements Listener
 		if (this.plugin.PlayerinJob(p, "Support")) {
 			//Add to explorer array.
 			for (int i=0;i<this.plugin.supportplayers.size();i++) {
-				if (this.plugin.supportplayers.get(i).p.getName().compareTo(p.getName())==0) {
+				if (this.plugin.supportplayers.get(i).p.getName().compareTo(p.getName().toLowerCase())==0) {
 					//This is us.
 					this.plugin.supportplayers.remove(i);
 					i--;
@@ -12376,7 +12560,7 @@ implements Listener
 		if (this.plugin.PlayerinJob(p, "Explorer")) {
 			//Add to explorer array.
 			for (int i=0;i<this.plugin.explorerlist.size();i++) {
-				if (this.plugin.explorerlist.get(i).player.compareTo(p.getName())==0) {
+				if (this.plugin.explorerlist.get(i).player.compareTo(p.getName().toLowerCase())==0) {
 					//This is us.
 					this.plugin.explorerlist.remove(i);
 					i--;
@@ -12393,7 +12577,7 @@ implements Listener
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 			@Override
 			public void run() {
-				p.getScoreboard().getTeam(p.getName()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+				p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 			}
 		},20);
 	}
@@ -12406,19 +12590,19 @@ implements Listener
 
 		final Player p = e.getEntity();
 		this.plugin.last_player_death_time = Main.SERVER_TICK_TIME;
-		e.setDeathMessage(e.getDeathMessage().replace(p.getScoreboard().getTeam(p.getName()).getPrefix()+p.getName()+p.getScoreboard().getTeam(p.getName()).getSuffix(),p.getName()));
-		p.getScoreboard().getTeam(p.getName()).setSuffix("");
+		e.setDeathMessage(e.getDeathMessage().replace(p.getScoreboard().getTeam(p.getName().toLowerCase()).getPrefix()+p.getName()+p.getScoreboard().getTeam(p.getName().toLowerCase()).getSuffix(),p.getName()));
+		p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix("");
 		boolean survivor=false;
 		if (this.plugin.PlayerinJob(p, "Explorer")) {
 			if (this.plugin.getJobLv("Explorer", p)>=10) {
 				//Check to see if our "fatal s	urvivor" effect is available.
 				for (int i=0;i<this.plugin.explorers.size();i++) {
-					if (this.plugin.explorers.get(i).event==0 && this.plugin.explorers.get(i).name.compareTo(p.getName())==0) {
+					if (this.plugin.explorers.get(i).event==0 && this.plugin.explorers.get(i).name.compareTo(p.getName().toLowerCase())==0) {
 						survivor=true;
 						break;
 					}
 				}
-				PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+				PersistentExplorerList eve = new PersistentExplorerList(p.getName().toLowerCase());
 				eve.event=1;
 				eve.data=p.getExp();
 				eve.data2=p.getLevel();
@@ -12483,7 +12667,7 @@ implements Listener
 				String message = "You lost $%amount because you died.";
 				DecimalFormat df = new DecimalFormat("#0.00");
 				loseAmount = Double.parseDouble(df.format(loseAmount));
-				if (Main.economy.has(p.getName(), loseAmount)) {
+				if (Main.economy.has(p.getName().toLowerCase(), loseAmount)) {
 					plugin.getLogger().info("Player " + p.getName() + "'s getting withdrawed with " + loseAmount + "$");
 					Main.economy.withdrawPlayer(p.getName(), loseAmount);
 					message = message.replaceAll("%amount", String.valueOf(loseAmount));
@@ -12495,7 +12679,7 @@ implements Listener
 				p.sendMessage(message);
 			}
 			if (plugin.PlayerinJob(p,"Explorer")) {
-				PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+				PersistentExplorerList eve = new PersistentExplorerList(p.getName().toLowerCase());
 				eve.event=2;
 				eve.expiretime=Main.SERVER_TICK_TIME+3600;
 				plugin.explorers.add(eve);
@@ -12505,20 +12689,20 @@ implements Listener
 			double deathY = p.getLocation().getY();
 			double deathZ = p.getLocation().getZ();
 			String deathWorld = p.getLocation().getWorld().getName();
-			plugin.getAccountsConfig().set(p.getName() + ".deathpointX",Double.valueOf(deathX));
-			plugin.getAccountsConfig().set(p.getName() + ".deathpointY",Double.valueOf(deathY));
-			plugin.getAccountsConfig().set(p.getName() + ".deathpointZ",Double.valueOf(deathZ));
-			plugin.getAccountsConfig().set(p.getName() + ".deathworld",String.valueOf(deathWorld));
-			plugin.getAccountsConfig().set(p.getName() + ".revived",Boolean.valueOf(false));
-			plugin.getAccountsConfig().set(p.getName() + ".revivetime",Long.valueOf(Main.SERVER_TICK_TIME));
-			plugin.saveAccountsConfig();
+			plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".deathpointX",Double.valueOf(deathX));
+			plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".deathpointY",Double.valueOf(deathY));
+			plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".deathpointZ",Double.valueOf(deathZ));
+			plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".deathworld",String.valueOf(deathWorld));
+			plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".revived",Boolean.valueOf(false));
+			plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".revivetime",Long.valueOf(Main.SERVER_TICK_TIME));
+			//plugin.saveAccountsConfig();
 			double mincost = plugin.getConfig().getDouble("revive-cost-rate");
 			if (p.getBedSpawnLocation()!=null) {
 				mincost *= Math.abs(p.getBedSpawnLocation().getX()-deathX)+Math.abs(p.getBedSpawnLocation().getY()-deathY)+Math.abs(p.getBedSpawnLocation().getZ()-deathZ);
 			} else {
 				mincost *= Math.abs(Bukkit.getWorld("world").getSpawnLocation().getX()-deathX)+Math.abs(Bukkit.getWorld("world").getSpawnLocation().getY()-deathY)+Math.abs(Bukkit.getWorld("world").getSpawnLocation().getZ()-deathZ);
 			}
-			double mymoney = plugin.getAccountsConfig().getDouble(p.getName() + ".money");
+			double mymoney = plugin.getAccountsConfig().getDouble(p.getName().toLowerCase() + ".money");
 			double finalcost = (mincost*plugin.getConfig().getDouble("revive-cost-rate")) + (mymoney*plugin.getConfig().getDouble("revive-cost-tax"));
 			if (plugin.PlayerinJob(p, "Explorer") && plugin.getJobLv("Explorer", p)>=20) {
 				finalcost*=0.25;
@@ -12673,10 +12857,10 @@ implements Listener
 				//Deposit all the money into their account.
 				val = this.plugin.economy.getBalance(e.getPlayer().getName());
 				this.plugin.economy.withdrawPlayer(e.getPlayer().getName(), val);
-				double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money");
-				this.plugin.getAccountsConfig().set(e.getPlayer().getName() + ".money", Double.valueOf(mymoney+val));
-				this.plugin.saveAccountsConfig();
-				e.getPlayer().sendMessage(ChatColor.GREEN+"Deposited $" + df.format(val) + " into your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")));
+				double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money");
+				this.plugin.getAccountsConfig().set(e.getPlayer().getName().toLowerCase() + ".money", Double.valueOf(mymoney+val));
+				//this.plugin.saveAccountsConfig();
+				e.getPlayer().sendMessage(ChatColor.GREEN+"Deposited $" + df.format(val) + " into your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")));
 				this.plugin.last_bank_deposit_use_time=0;
 			} else {
 				try {
@@ -12686,10 +12870,10 @@ implements Listener
 						//Deposit the money into their account.
 						//this.plugin.economy.bankDeposit(e.getPlayer().getName(), val);
 						this.plugin.economy.withdrawPlayer(e.getPlayer().getName(), val);
-						double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money");
-						this.plugin.getAccountsConfig().set(e.getPlayer().getName() + ".money", Double.valueOf(mymoney+val));
-						this.plugin.saveAccountsConfig();
-						e.getPlayer().sendMessage(ChatColor.GREEN+"Deposited $" + df.format(val) + " into your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")));
+						double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money");
+						this.plugin.getAccountsConfig().set(e.getPlayer().getName().toLowerCase() + ".money", Double.valueOf(mymoney+val));
+						//this.plugin.saveAccountsConfig();
+						e.getPlayer().sendMessage(ChatColor.GREEN+"Deposited $" + df.format(val) + " into your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")));
 						this.plugin.last_bank_deposit_use_time=0;
 					} else {
 						e.getPlayer().sendMessage(ChatColor.RED+"You are not holding that much! " + ChatColor.YELLOW +"Enter a value equal to or lower than $" + ChatColor.GREEN+ df.format(this.plugin.economy.getBalance(e.getPlayer().getName())) + "" + ChatColor.GRAY + ChatColor.ITALIC + " (Remember you can also use the word all)");
@@ -12707,27 +12891,27 @@ implements Listener
 				double val=0;
 				if (e.getMessage().equalsIgnoreCase("all")) {
 					//Withdraw all the money in their account.
-					val = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money");
-					this.plugin.getAccountsConfig().set(e.getPlayer().getName() + ".money", Double.valueOf(0));
-					this.plugin.saveAccountsConfig();
+					val = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money");
+					this.plugin.getAccountsConfig().set(e.getPlayer().getName().toLowerCase() + ".money", Double.valueOf(0));
+					//this.plugin.saveAccountsConfig();
 					this.plugin.economy.depositPlayer(e.getPlayer().getName(), val);
-					e.getPlayer().sendMessage(ChatColor.GREEN+"Withdrawed $" + df.format(val) + " from your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")));
+					e.getPlayer().sendMessage(ChatColor.GREEN+"Withdrawed $" + df.format(val) + " from your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")));
 					this.plugin.last_bank_withdraw_use_time=0;
 				} else {
 					try {
 						val = Double.parseDouble(e.getMessage());
 						//Make sure the user is holding at least that much money.
-						if (this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")>=val && val>0) {
+						if (this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")>=val && val>0) {
 							//Deposit the money into their account.
 							//this.plugin.economy.bankDeposit(e.getPlayer().getName(), val);
 							this.plugin.economy.depositPlayer(e.getPlayer().getName(), val);
-							double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money");
-							this.plugin.getAccountsConfig().set(e.getPlayer().getName() + ".money", Double.valueOf(mymoney-val));
-							this.plugin.saveAccountsConfig();
-							e.getPlayer().sendMessage(ChatColor.GREEN+"Withdrawed $" + df.format(val) + " from your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")));
+							double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money");
+							this.plugin.getAccountsConfig().set(e.getPlayer().getName().toLowerCase() + ".money", Double.valueOf(mymoney-val));
+							//this.plugin.saveAccountsConfig();
+							e.getPlayer().sendMessage(ChatColor.GREEN+"Withdrawed $" + df.format(val) + " from your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")));
 							this.plugin.last_bank_withdraw_use_time=0;
 						} else {
-							e.getPlayer().sendMessage(ChatColor.RED+"You do not have that much! " + ChatColor.YELLOW +"Enter a value equal to or lower than $" + ChatColor.GREEN+ df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName() + ".money")) + "" + ChatColor.GRAY + ChatColor.ITALIC + " (Remember you can also use the word all)");
+							e.getPlayer().sendMessage(ChatColor.RED+"You do not have that much! " + ChatColor.YELLOW +"Enter a value equal to or lower than $" + ChatColor.GREEN+ df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")) + "" + ChatColor.GRAY + ChatColor.ITALIC + " (Remember you can also use the word all)");
 							this.plugin.last_bank_withdraw_use_time=Main.SERVER_TICK_TIME;
 						}
 					} catch (NumberFormatException ex_e) {
@@ -13009,7 +13193,7 @@ implements Listener
 		//We have to attempt to insert the item in the Item Cube.
 		Cube cube_type = null;
 		int identifier=-1;
-		if (item_cube.getItemMeta().getLore()!=null) {
+		if (item_cube.getItemMeta().getLore()!=null && isItemCube(item_cube)) {
 			//Check to see if the Lore contains anything.
 			for (int i=0;i<item_cube.getItemMeta().getLore().size();i++) {
 				if (item_cube.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.AQUA+"Contains 9 item slots.")) {
@@ -13511,18 +13695,20 @@ implements Listener
 		
 		if (this.plugin.PlayerinJob(p, "Explorer")) {
 			for (int i=0;i<this.plugin.explorerlist.size();i++) {
-				if (this.plugin.explorerlist.get(i).player.compareTo(p.getName())==0) {
+				if (this.plugin.explorerlist.get(i).player.compareTo(p.getName().toLowerCase())==0) {
 					this.plugin.explorerlist.get(i).lastinteract=e.getMaterial();
 				}
 			}
 		}
+		/*
+		/*
 		if (e.getAction()==Action.RIGHT_CLICK_AIR || e.getAction()==Action.RIGHT_CLICK_BLOCK) {
 			if (p.getItemInHand()!=null && (p.getItemInHand().getType()==Material.FLINT_AND_STEEL || p.getItemInHand().getType()==Material.LAVA_BUCKET)) {
 				if (this.plugin.PlayerinJob(p, "Support")) {
 					this.plugin.setMoneyExp(p, "Support", 0, 0);
 				}
 			}
-		}
+		}*/
 		if (e.getAction()==Action.RIGHT_CLICK_AIR || (e.getAction()==Action.RIGHT_CLICK_BLOCK && p.isSneaking())) {
 			boolean largechest=false;
 			boolean smallchest=false;
@@ -13544,13 +13730,15 @@ implements Listener
 				return;
 			}
 			if (this.plugin.is_LootChest(p.getItemInHand())) {
+				open_LootChest(this.plugin.get_LootChestTier(p.getItemInHand()), p.getLocation());
+				
 				e.setCancelled(true);
 				if (p.getItemInHand().getAmount() > 1) {
 					p.getItemInHand().setAmount(p.getItemInHand().getAmount() - 1);
 				} else {
 					p.setItemInHand(null);
 				}
-				p.getWorld().dropItemNaturally(p.getLocation(), getGoodie());
+				
 				p.sendMessage(ChatColor.GREEN+"You open the chest and find treasure inside!");
 				p.playSound(p.getLocation(), Sound.ORB_PICKUP, 10, 1);
 				p.updateInventory();
@@ -13582,7 +13770,7 @@ implements Listener
 	    }*/
 			//Bukkit.getWorld("world").createExplosion(p.getLocation().getX(),p.getLocation().getY(),p.getLocation().getZ(),3f,false,true);
 			/*
-    	if (p.getName().compareToIgnoreCase("AaMay")==0) {
+    	if (p.getName().toLowerCase().compareToIgnoreCase("AaMay")==0) {
     		LivingEntity f = (LivingEntity)Bukkit.getWorld("world").spawnEntity(p.getLocation(), EntityType.CREEPER);
     		f.setCustomName(ChatColor.GOLD+"Destructive Creeper II");
     		f.setCustomNameVisible(true);
@@ -13603,8 +13791,8 @@ implements Listener
 					e.getItem().getType()==Material.RECORD_10 || e.getItem().getType()==Material.RECORD_11 ||
 					e.getItem().getType()==Material.RECORD_12 || e.getItem().getType()==Material.GOLD_RECORD ||
 					e.getItem().getType()==Material.GREEN_RECORD)) {
-				//if (p.getName().compareTo("sigonasr2")==0) {p.sendMessage("This is a jukebox.");}
-				//if (p.getName().compareTo("sigonasr2")==0) {p.sendMessage("Item in hand: "+e.getItem().getType().toString());}
+				//if (p.getName().toLowerCase().compareTo("sigonasr2")==0) {p.sendMessage("This is a jukebox.");}
+				//if (p.getName().toLowerCase().compareTo("sigonasr2")==0) {p.sendMessage("Item in hand: "+e.getItem().getType().toString());}
 				boolean contains=false;
 				for (int i=0;i<this.plugin.jukeboxlist.size();i++){
 					if (this.plugin.jukeboxlist.get(i).getJukebox().equals(e.getClickedBlock())) {
@@ -13614,7 +13802,7 @@ implements Listener
 				}
 				if (!contains) {
 					this.plugin.jukeboxlist.add(new JukeboxData(e.getClickedBlock(), e.getItem().getType(), 100, getSongDuration(e.getItem().getType()), Main.SERVER_TICK_TIME));
-					if (p.getName().compareTo("sigonasr2")==0) {p.sendMessage("Added this jukebox to the list.");}
+					if (p.getName().toLowerCase().compareTo("sigonasr2")==0) {p.sendMessage("Added this jukebox to the list.");}
 				}
 			}
 			if (this.plugin.getConfig().getBoolean("halloween-enabled") && this.plugin.getConfig().getBoolean("maintenance-mode") && p.hasPermission("maintenance-mode-admin")) {
@@ -13639,12 +13827,12 @@ implements Listener
 				}
 			}
 			/*
-     if (p.getName().compareTo("sigonasr2")==0) {
+     if (p.getName().toLowerCase().compareTo("sigonasr2")==0) {
     	 int v=2;
     	 final Vector direction = p.getEyeLocation().getDirection().multiply(v);
     	 Bukkit.getWorld("world").spawnEntity(p.getEyeLocation().add(direction.getX(), direction.getY(), direction.getZ()), EntityType.SILVERFISH);
      }*/
-			//if (p.getName().compareTo("sigonasr2")==0) {Bukkit.getPlayer("sigonasr2").sendMessage("This block is at "+e.getClickedBlock().getX()+" "+e.getClickedBlock().getY()+" "+e.getClickedBlock().getZ()+" Data value:"+e.getClickedBlock().getData());}
+			//if (p.getName().toLowerCase().compareTo("sigonasr2")==0) {Bukkit.getPlayer("sigonasr2").sendMessage("This block is at "+e.getClickedBlock().getX()+" "+e.getClickedBlock().getY()+" "+e.getClickedBlock().getZ()+" Data value:"+e.getClickedBlock().getData());}
 			if ((e.getClickedBlock().getState() instanceof BrewingStand)) {
 				BrewingStand brewingstand = (BrewingStand)e.getClickedBlock().getState();
 				//Bukkit.getPlayer("sigonasr2").sendMessage("This is a furnace "+furnace.getBurnTime()+","+furnace.getCookTime());
@@ -13656,8 +13844,8 @@ implements Listener
 						contains=true;
 						//If it exists, just set the new owner.
 						if (brewingstand.getBrewingTime()==0) {
-							this.plugin.brewingstandlist.get(i).setOwner(p.getName());
-							//Bukkit.getPlayer("sigonasr2").sendMessage(p.getName()+" is the new owner of furnace.");
+							this.plugin.brewingstandlist.get(i).setOwner(p.getName().toLowerCase());
+							//Bukkit.getPlayer("sigonasr2").sendMessage(p.getName().toLowerCase()+" is the new owner of furnace.");
 							this.plugin.brewingstandlist.get(i).resetTime();
 						}
 						break;
@@ -13665,7 +13853,7 @@ implements Listener
 				}
 				if (!contains) {
 					this.plugin.brewingstandlist.add(new BrewingStandData(e.getClickedBlock().getLocation(), p.getName()));
-					//Bukkit.getPlayer("sigonasr2").sendMessage(p.getName()+" is the new owner of brewingstand. (Added to list)");
+					//Bukkit.getPlayer("sigonasr2").sendMessage(p.getName().toLowerCase()+" is the new owner of brewingstand. (Added to list)");
 				}
 			} else
 				if ((e.getClickedBlock().getState() instanceof Furnace)) {
@@ -13679,8 +13867,8 @@ implements Listener
 							contains=true;
 							//If it exists, just set the new owner.
 							if (furnace.getBurnTime()==0) {
-								this.plugin.furnacelist.get(i).setOwner(p.getName());
-								//Bukkit.getPlayer("sigonasr2").sendMessage(p.getName()+" is the new owner of furnace.");
+								this.plugin.furnacelist.get(i).setOwner(p.getName().toLowerCase());
+								//Bukkit.getPlayer("sigonasr2").sendMessage(p.getName().toLowerCase()+" is the new owner of furnace.");
 								this.plugin.furnacelist.get(i).resetTime();
 							}
 							break;
@@ -13688,7 +13876,7 @@ implements Listener
 					}
 					if (!contains) {
 						this.plugin.furnacelist.add(new FurnaceData(e.getClickedBlock().getLocation(), p.getName()));
-						//Bukkit.getPlayer("sigonasr2").sendMessage(p.getName()+" is the new owner of furnace. (Added to list)");
+						//Bukkit.getPlayer("sigonasr2").sendMessage(p.getName().toLowerCase()+" is the new owner of furnace. (Added to list)");
 					}
 				} else
 					if ((e.getClickedBlock().getState() instanceof Sign)) {
@@ -13698,27 +13886,27 @@ implements Listener
 							if (!this.plugin.getConfig().getBoolean("spleef4insession")) {
 								if (p.getPlayerTime()-this.plugin.getConfig().getDouble("spleeflastrequesttime")<400) {
 									if (this.plugin.getConfig().getString("spleefrequestb4player").compareTo("none")==0) {
-										if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName())!=0) {
-											this.plugin.getConfig().set("spleefrequestb4player", String.valueOf(p.getName()));
+										if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName().toLowerCase())!=0) {
+											this.plugin.getConfig().set("spleefrequestb4player", String.valueOf(p.getName().toLowerCase()));
 											this.plugin.getConfig().set("spleeflastrequesttime", Double.valueOf(p.getPlayerTime()));
 											Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+"Spleef Player "+p.getName()+" joined the 4-player spleef game. 2 more players need to join within 20 seconds.");
 											this.plugin.saveConfig();
 										}
 									} else 
 										if (this.plugin.getConfig().getString("spleefrequestc4player").compareTo("none")==0) {
-											if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName())!=0 &&
-													this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName())!=0) {
-												this.plugin.getConfig().set("spleefrequestc4player", String.valueOf(p.getName()));
+											if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName().toLowerCase())!=0 &&
+													this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName().toLowerCase())!=0) {
+												this.plugin.getConfig().set("spleefrequestc4player", String.valueOf(p.getName().toLowerCase()));
 												this.plugin.getConfig().set("spleeflastrequesttime", Double.valueOf(p.getPlayerTime()));
 												Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+"Spleef Player "+p.getName()+" joined the 4-player spleef game. 1 more player needs to join within 20 seconds.");
 												this.plugin.saveConfig();
 											}
 										} else 
 											if (this.plugin.getConfig().getString("spleefrequestd4player").compareTo("none")==0) {
-												if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName())!=0 &&
-														this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName())!=0 &&
-														this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName())!=0) {
-													this.plugin.getConfig().set("spleefrequestd4player", String.valueOf(p.getName()));
+												if (this.plugin.getConfig().getString("spleefrequesta4player").compareTo(p.getName().toLowerCase())!=0 &&
+														this.plugin.getConfig().getString("spleefrequestb4player").compareTo(p.getName().toLowerCase())!=0 &&
+														this.plugin.getConfig().getString("spleefrequestc4player").compareTo(p.getName().toLowerCase())!=0) {
+													this.plugin.getConfig().set("spleefrequestd4player", String.valueOf(p.getName().toLowerCase()));
 													this.plugin.getConfig().set("spleeflastrequesttime", Double.valueOf(p.getPlayerTime()));
 													Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+"Spleef Player "+p.getName()+" joined the 4-player spleef game.");
 													this.plugin.saveConfig();
@@ -13799,7 +13987,7 @@ implements Listener
 								} else {
 									//First request.
 									//Reset all previous requests.	
-									this.plugin.getConfig().set("spleefrequesta4player", String.valueOf(p.getName()));
+									this.plugin.getConfig().set("spleefrequesta4player", String.valueOf(p.getName().toLowerCase()));
 									this.plugin.getConfig().set("spleefrequestb4player", String.valueOf("none"));
 									this.plugin.getConfig().set("spleefrequestc4player", String.valueOf("none"));
 									this.plugin.getConfig().set("spleefrequestd4player", String.valueOf("none"));
@@ -13814,19 +14002,19 @@ implements Listener
 								//If not requested already.
 								if (!this.plugin.getConfig().getBoolean("spleefinsession")) {
 									if (p.getPlayerTime()-this.plugin.getConfig().getDouble("spleefrequestbtime")>400) {
-										if (p.getPlayerTime()-this.plugin.getConfig().getDouble("spleefrequestatime")>400 && (p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestbplayer"))!=0 || p.getPlayerTime()-this.plugin.getConfig().getDouble("spleefrequestbtime")>400)) {
+										if (p.getPlayerTime()-this.plugin.getConfig().getDouble("spleefrequestatime")>400 && (p.getName().toLowerCase().compareTo(this.plugin.getConfig().getString("spleefrequestbplayer"))!=0 || p.getPlayerTime()-this.plugin.getConfig().getDouble("spleefrequestbtime")>400)) {
 											Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+"Spleef Player "+p.getName()+" requested a game in slot A. Join within 20 seconds.");
 											this.plugin.getConfig().set("spleefrequestatime", Double.valueOf(p.getPlayerTime()));
-											this.plugin.getConfig().set("spleefrequestaplayer", String.valueOf(p.getName()));
+											this.plugin.getConfig().set("spleefrequestaplayer", String.valueOf(p.getName().toLowerCase()));
 										}
 									} else {
-										if (p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestbplayer"))!=0) {
+										if (p.getName().toLowerCase().compareTo(this.plugin.getConfig().getString("spleefrequestbplayer"))!=0) {
 											//This is a confirmed Spleef game.
 											int playerarating,playerbrating;
 											Player playera,playerb;
 											playera=p;
 											this.plugin.getConfig().set("spleefrequestatime", Double.valueOf(p.getPlayerTime()));
-											this.plugin.getConfig().set("spleefrequestaplayer", String.valueOf(p.getName()));
+											this.plugin.getConfig().set("spleefrequestaplayer", String.valueOf(p.getName().toLowerCase()));
 											playerb=Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequestbplayer"));
 											if (this.plugin.getAccountsConfig().contains(this.plugin.getConfig().getString("spleefrequestaplayer")+".spleefrating")) {
 												playerarating=(int)this.plugin.getAccountsConfig().getDouble(this.plugin.getConfig().getString("spleefrequestaplayer")+".spleefrating")/10;
@@ -13883,25 +14071,25 @@ implements Listener
 										}
 									}
 									this.plugin.saveConfig();
-									this.plugin.saveAccountsConfig();
+									//this.plugin.saveAccountsConfig();
 								}
 							} else
 								if (sign.getBlock().getX()==1620 && sign.getBlock().getY()==83 && sign.getBlock().getZ()==45) { //Side B Request.
 									//If not requested already.
 									if (!this.plugin.getConfig().getBoolean("spleefinsession")) {
 										if (p.getPlayerTime()-this.plugin.getConfig().getDouble("spleefrequestatime")>400) {
-											if (p.getPlayerTime()-this.plugin.getConfig().getDouble("spleefrequestbtime")>400 && (p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))!=0 || p.getPlayerTime()-this.plugin.getConfig().getDouble("spleefrequestatime")>400)) {
+											if (p.getPlayerTime()-this.plugin.getConfig().getDouble("spleefrequestbtime")>400 && (p.getName().toLowerCase().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))!=0 || p.getPlayerTime()-this.plugin.getConfig().getDouble("spleefrequestatime")>400)) {
 												Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+"Spleef Player "+p.getName()+" requested a game in slot B. Join within 20 seconds.");
 												this.plugin.getConfig().set("spleefrequestbtime", Double.valueOf(p.getPlayerTime()));
-												this.plugin.getConfig().set("spleefrequestbplayer", String.valueOf(p.getName()));
+												this.plugin.getConfig().set("spleefrequestbplayer", String.valueOf(p.getName().toLowerCase()));
 											}
 										} else {
-											if (p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))!=0) {
+											if (p.getName().toLowerCase().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))!=0) {
 												//This is a confirmed Spleef game.
 												int playerarating,playerbrating;
 												Player playera,playerb;
 												this.plugin.getConfig().set("spleefrequestbtime", Double.valueOf(p.getPlayerTime()));
-												this.plugin.getConfig().set("spleefrequestbplayer", String.valueOf(p.getName()));
+												this.plugin.getConfig().set("spleefrequestbplayer", String.valueOf(p.getName().toLowerCase()));
 												playera=Bukkit.getPlayer(this.plugin.getConfig().getString("spleefrequestaplayer"));
 												playerb=p;
 												if (this.plugin.getAccountsConfig().contains(this.plugin.getConfig().getString("spleefrequestaplayer")+".spleefrating")) {
@@ -13954,7 +14142,7 @@ implements Listener
 											}
 										}
 										this.plugin.saveConfig();
-										this.plugin.saveAccountsConfig();
+										//this.plugin.saveAccountsConfig();
 									}
 								}
 						if (stats) {
@@ -13963,22 +14151,22 @@ implements Listener
 									/*double value = Double.parseDouble(arg0);
               double total = actMon + value;
               if (value <= actHand) {
-                this.plugin.getAccountsConfig().set(p.getName() + ".money", Double.valueOf(total));
+                this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".money", Double.valueOf(total));
                 this.plugin.saveAccountsConfig();
                 if (value <= 1)
                   p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " You added " + value + " " + currencySG + " to your bank account.");
                 else {
                   p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " You added " + value + " " + currencyPL + " to your bank account.");
                 }
-                Main.economy.withdrawPlayer(p.getName(), value);
+                Main.economy.withdrawPlayer(p.getName().toLowerCase(), value);
               } else {
                 p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " Sorry, you can't deposit that amount of money.");
               }*/
 									//If they were using the withdraw bank before, clear them from it.
-									if (this.plugin.last_bank_withdraw_user.equalsIgnoreCase(p.getName())) {
+									if (this.plugin.last_bank_withdraw_user.equalsIgnoreCase(p.getName().toLowerCase())) {
 										this.plugin.last_bank_withdraw_user="";
 									}
-									if (this.plugin.last_bank_deposit_use_time+200<Main.SERVER_TICK_TIME || this.plugin.last_bank_deposit_user.equalsIgnoreCase(p.getName())) {
+									if (this.plugin.last_bank_deposit_use_time+200<Main.SERVER_TICK_TIME || this.plugin.last_bank_deposit_user.equalsIgnoreCase(p.getName().toLowerCase())) {
 										this.plugin.last_bank_deposit_user=p.getName();
 										this.plugin.last_bank_deposit_use_time=Main.SERVER_TICK_TIME;
 										p.sendMessage(ChatColor.DARK_GREEN+"[Bank]" + ChatColor.AQUA +" Please enter the amount of money in chat that you would like to deposit. " + ChatColor.YELLOW + "(Type all to deposit every dollar you are holding.)");
@@ -13989,20 +14177,20 @@ implements Listener
 									/*int value = Integer.parseInt(sign.getLine(2));
               double total = actMon - value;
               if (value <= actMon) {
-                this.plugin.getAccountsConfig().set(p.getName() + ".money", Double.valueOf(total));
+                this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".money", Double.valueOf(total));
                 this.plugin.saveAccountsConfig();
                 if (value <= 1)
                   p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " You withdrawn " + value + " " + currencySG + " from your bank account.");
                 else {
                   p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " You withdrawn " + value + " " + currencyPL + " from your bank account.");
                 }
-                Main.economy.depositPlayer(p.getName(), value);
+                Main.economy.depositPlayer(p.getName().toLowerCase(), value);
               } else {
                 p.sendMessage("�ｧ2[BankEconomy]" + ChatColor.AQUA + " Sorry, you can't withdraw that amount of money.");
               }*/
-									if (this.plugin.last_bank_withdraw_use_time+200<Main.SERVER_TICK_TIME || this.plugin.last_bank_withdraw_user.equalsIgnoreCase(p.getName())) {
+									if (this.plugin.last_bank_withdraw_use_time+200<Main.SERVER_TICK_TIME || this.plugin.last_bank_withdraw_user.equalsIgnoreCase(p.getName().toLowerCase())) {
 										//If they were using the deposit bank before, clear them from it.
-										if (this.plugin.last_bank_deposit_user.equalsIgnoreCase(p.getName())) {
+										if (this.plugin.last_bank_deposit_user.equalsIgnoreCase(p.getName().toLowerCase())) {
 											this.plugin.last_bank_deposit_user="";
 										}
 										this.plugin.last_bank_withdraw_user=p.getName();

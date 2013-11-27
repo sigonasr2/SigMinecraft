@@ -4,10 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import me.kaZep.Base.Main;
+import net.jmhertlein.mctowns.MCTowns;
+import net.jmhertlein.mctowns.MCTownsPlugin;
+import net.jmhertlein.mctowns.database.TownManager;
+import net.jmhertlein.mctowns.structure.Town;
 import me.kaZep.Commands.JobsDataInfo.Job;
 import net.milkbowl.vault.economy.Economy;
 
@@ -55,7 +61,7 @@ public class commandBankEconomy
   String usage = "ÅòbUsage:";
   String invARG = "ÅòcInvalid argument. Please use Åò2/bankeconomyÅòc to see a full list of commands.";
   String invARGT2 = "ÅòcInvalid argument or insufficient permissions.";
-  String offlinePlayer = "ÅòcPlayer not found.";
+  String offlinePlayer = "ÅòcPlayer / Town not found.";
   String accountDisabled = "ÅòcYour account is disabled.";
 
   String cmdInfo = "ÅòaYour bank balance isÅòb";
@@ -76,9 +82,9 @@ public class commandBankEconomy
   String notEnoughMoney = "ÅòaYou do not own that amount of money.";
   String succesfullDeposited = "ÅòaYou have depositedÅòb";
   String succesfullWithdraw = "ÅòaYou have withdrawnÅòb";
-  String cmdTransferToPlayer1 = "ÅòaYou have transferedÅòb";
+  String cmdTransferToPlayer1 = "ÅòaYou have transferredÅòb";
   String cmdTransferToPlayer2 = "ÅòatoÅòb";
-  String cmdTransferToTarget1 = "Åòahas transfered to youÅòb";
+  String cmdTransferToTarget1 = "Åòahas transferred to youÅòb";
   String cmdTransferSameNick = "ÅòaYou can't transfer money to yourself.";
   String cmdEditAvaibleActions = "ÅòaAvaible actions: status, balance";
   String cmdEditDisabledToPlayer1 = "ÅòaYou have disabled";
@@ -349,7 +355,7 @@ public String convertToItemName(String val) {
         p.sendMessage(this.prefix + " " + this.accountDisabled);
       else if (status) {
         if ((args.length == 0)) {
-	        if (cmd.getName().equalsIgnoreCase("sp")) {
+	        if (cmd.getName().toLowerCase().equalsIgnoreCase("sp")) {
 			  //Show a list of all stat points and what you have currently allocated.
 	        	p.sendMessage("");
 	        	p.sendMessage("Stat Listing shown as: "+ChatColor.AQUA+"Cost, "+ChatColor.YELLOW+"Current Buff, "+ChatColor.RED+"Next Level, "+ChatColor.GREEN+" Description");
@@ -369,10 +375,10 @@ public String convertToItemName(String val) {
 	        		p.sendMessage(ChatColor.GOLD+"Type "+ChatColor.BLUE+ChatColor.BOLD+"/sp #"+ChatColor.RESET+ChatColor.GOLD+" with the number of the buff you want to add a point to. (You have "+((this.plugin.getJobTotalLvs(p)/5+1)-this.plugin.getStatPointTotal(p))+" stat point"+(((this.plugin.getJobTotalLvs(p)/5+1)-this.plugin.getStatPointTotal(p))==1?"":"s")+".)");
 	        	}
 	        } else
-          if (cmd.getName().equalsIgnoreCase("tele")) {
+          if (cmd.getName().toLowerCase().equalsIgnoreCase("tele")) {
 			  p.sendMessage("Usage: "+ChatColor.RED+"/tele to "+ChatColor.GREEN+" <player>"+ChatColor.WHITE+" - Teleport to a player for a cost.");
           } else
-          if (cmd.getName().equalsIgnoreCase("settings")) {
+          if (cmd.getName().toLowerCase().equalsIgnoreCase("settings")) {
 			  Inventory i = Bukkit.createInventory(p, 27, "Notification Options");
 			  int count=-1;
 			  ItemStack temp,on,off;
@@ -398,12 +404,12 @@ public String convertToItemName(String val) {
 			  temp.setItemMeta(temp_meta);i.setItem(count+=3, temp);on.setItemMeta(temp_meta);off.setItemMeta(temp_meta); i.setItem(count+=1, (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify6")?on:off));
 			  p.openInventory(i);
           } else
-          if (cmd.getName().equalsIgnoreCase("event")) {
+          if (cmd.getName().toLowerCase().equalsIgnoreCase("event")) {
 			  if (p.hasPermission("maintenance-mode-admin")) {
 				  p.sendMessage("Events available: halloween, thanksgiving. Use: /event <eventname>");
 			  }
           } else
-          if (cmd.getName().equalsIgnoreCase("maintenance")) {
+          if (cmd.getName().toLowerCase().equalsIgnoreCase("maintenance")) {
 			  if (p.hasPermission("maintenance-mode-admin")) {
 				  if (this.plugin.getConfig().getBoolean("maintenance-mode")) {
 					  this.plugin.getConfig().set("maintenance-mode", Boolean.valueOf(false));
@@ -415,13 +421,13 @@ public String convertToItemName(String val) {
 				  this.plugin.saveConfig();
 			  }
           } else
-          if (cmd.getName().equalsIgnoreCase("transfer")) {
+          if (cmd.getName().toLowerCase().equalsIgnoreCase("transfer")) {
 			  p.sendMessage("Usage: "+ChatColor.RED+"/transfer name money"+ChatColor.WHITE+" - Transfer money to a player.");
           } else
-          if (cmd.getName().equalsIgnoreCase("revive")) {
+          if (cmd.getName().toLowerCase().equalsIgnoreCase("revive")) {
 			  p.sendMessage("Usage: "+ChatColor.RED+"/revive me "+ChatColor.WHITE+" - Revive to the last location you died at.");
           } else
-          if (cmd.getName().equalsIgnoreCase("unenchant")) {
+          if (cmd.getName().toLowerCase().equalsIgnoreCase("unenchant")) {
         	  Map<Enchantment,Integer> map  = p.getItemInHand().getEnchantments();
     		  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
     			  p.getItemInHand().removeEnchantment(entry.getKey());
@@ -483,11 +489,11 @@ public String convertToItemName(String val) {
         	  }
           }
           else
-          if (cmd.getName().equalsIgnoreCase("ticktime")) {
+          if (cmd.getName().toLowerCase().equalsIgnoreCase("ticktime")) {
     		  p.sendMessage("Current Server Time: "+ChatColor.GRAY+""+ChatColor.ITALIC+Main.SERVER_TICK_TIME);
           }
           else
-          if (cmd.getName().equalsIgnoreCase("jobs")) {
+          if (cmd.getName().toLowerCase().equalsIgnoreCase("jobs")) {
         	  FileConfiguration config = this.plugin.getConfig();
         	  int MAXJOBS = config.getInt("jobs.MAX_JOBS");
 			  p.sendMessage(ChatColor.GOLD+" Blacksmith ("+config.getInt("jobs.Blacksmith")+"/"+MAXJOBS+")");
@@ -543,7 +549,7 @@ public String convertToItemName(String val) {
               "- Reloads config and accounts.");
           }
         } else 
-            if (cmd.getName().equalsIgnoreCase("event") && args.length==1 && p.hasPermission("maintenance-mode-admin")) {
+            if (cmd.getName().toLowerCase().equalsIgnoreCase("event") && args.length==1 && p.hasPermission("maintenance-mode-admin")) {
   			  if (args[0].equalsIgnoreCase("halloween")) {
   				  if (this.plugin.getConfig().getBoolean("halloween-enabled")) {
   					  this.plugin.getConfig().set("halloween-enabled", Boolean.valueOf(false));
@@ -565,21 +571,7 @@ public String convertToItemName(String val) {
   				  this.plugin.saveConfig();
   			  }
   			  if (args[0].equalsIgnoreCase("loot")) {
-					ItemStack chest = new ItemStack(Material.CHEST);
-				    ItemMeta chest_name = chest.getItemMeta();
-				    chest_name.setDisplayName(ChatColor.YELLOW+"Closed Chest");
-				   
-				    List<String> chestlore = new ArrayList<String>();
-				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
-				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
-				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"It feels heavy; there");
-				    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"might be items inside.");
-				    chest_name.setLore(chestlore);
-
-				    chest.setItemMeta(chest_name);
-				    
-				    p.getWorld().dropItemNaturally(p.getLocation(), chest);
-  			  }
+  				p.getWorld().dropItemNaturally(p.getLocation(), this.plugin.generate_LootChest());  			  }
   			  if (args[0].equalsIgnoreCase("thanksgiving")) {
   				  if (this.plugin.getConfig().getBoolean("thanksgiving-enabled")) {
   					  this.plugin.getConfig().set("thanksgiving-enabled", Boolean.valueOf(false));
@@ -607,7 +599,7 @@ public String convertToItemName(String val) {
 				    p.getWorld().dropItemNaturally(p.getLocation(), chest);
   			  }
             } else
-            if (cmd.getName().equalsIgnoreCase("event") && args.length==2 && p.hasPermission("maintenance-mode-admin")) {
+            if (cmd.getName().toLowerCase().equalsIgnoreCase("event") && args.length==2 && p.hasPermission("maintenance-mode-admin")) {
   			  if (args[0].equalsIgnoreCase("head")) {
   				  ItemStack m = new ItemStack(Material.SKULL_ITEM, 64, (short)SkullType.PLAYER.ordinal());
       				SkullMeta skullMeta = (SkullMeta) m.getItemMeta();
@@ -1262,44 +1254,44 @@ public String convertToItemName(String val) {
   				  this.plugin.saveConfig();
   			  }
             } else
-            if (cmd.getName().equalsIgnoreCase("dungeon") && p.hasPermission("maintenance-mode-admin") && args.length==1) {
+            if (cmd.getName().toLowerCase().equalsIgnoreCase("dungeon") && p.hasPermission("maintenance-mode-admin") && args.length==1) {
           	  //Dungeon x = new Dungeon(new Location(Bukkit.getWorld("world"),-8990,0,-4),new Location(Bukkit.getWorld("world"),50,255,50),Integer.valueOf(args[0]));
             } else
-        	if (cmd.getName().equalsIgnoreCase("transfer") && args.length==1) {
+        	if (cmd.getName().toLowerCase().equalsIgnoreCase("transfer") && args.length==1) {
   			  p.sendMessage("Usage: "+ChatColor.RED+"/transfer name money"+ChatColor.WHITE+" - Transfer money to a player.");
         	}
         	else
-        	if (cmd.getName().equalsIgnoreCase("transfer") && args.length==2) {
+        	if (cmd.getName().toLowerCase().equalsIgnoreCase("transfer") && args.length==2) {
                 double amount = Double.parseDouble(args[1].replaceAll("[^0-9\\.]", ""));
                 Player target = p.getServer().getPlayer(args[0]);
                 if (target == null) {
                   p.sendMessage(this.prefix + " " + this.offlinePlayer);
                 }
-                else if (target.getName() == p.getName()) {
+                else if (target.getName().toLowerCase() == p.getName().toLowerCase()) {
                   p.sendMessage(this.prefix + " " + this.cmdTransferSameNick);
                 }
                 else if (amount > playerBankBalance) {
                   p.sendMessage(this.prefix + " " + this.notEnoughMoney);
                 } else if (amount <= playerBankBalance) {
                   double totalWithdraw = playerBankBalance - amount;
-                  double totalDeposit = amount + this.plugin.getAccountsConfig().getInt(target.getName() + ".money");
+                  double totalDeposit = amount + this.plugin.getAccountsConfig().getInt(target.getName().toLowerCase() + ".money");
 
                   this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".money", Double.valueOf(totalWithdraw));
                   this.plugin.getAccountsConfig().set(target.getName() + ".money", Double.valueOf(totalDeposit));
                   this.plugin.saveAccountsConfig();
 
                   if (amount > 1.0D) {
-                    p.sendMessage(this.prefix + " " + this.cmdTransferToPlayer1 + " " + amount + currencyPlural + " " + this.cmdTransferToPlayer2 + " " + target.getName() + "Åòa.");
-                    target.sendMessage(this.prefix + " Åòb" + p.getName() + " " + this.cmdTransferToTarget1 + " " + amount + currencyPlural + "Åòa.");
+                    p.sendMessage(this.prefix + " " + this.cmdTransferToPlayer1 + " " + amount + currencyPlural + " " + this.cmdTransferToPlayer2 + " " + target.getName().toLowerCase() + "Åòa.");
+                    target.sendMessage(this.prefix + " Åòb" + p.getName().toLowerCase() + " " + this.cmdTransferToTarget1 + " " + amount + currencyPlural + "Åòa.");
                   } else if (amount <= 1.0D) {
-                    p.sendMessage(this.prefix + " " + this.cmdTransferToPlayer1 + " " + amount + currencySingular + " " + this.cmdTransferToPlayer2 + " " + target.getName() + "Åòa.");
-                    target.sendMessage(this.prefix + " Åòb" + p.getName() + " " + this.cmdTransferToTarget1 + " " + amount + currencySingular + "Åòa.");
+                    p.sendMessage(this.prefix + " " + this.cmdTransferToPlayer1 + " " + amount + currencySingular + " " + this.cmdTransferToPlayer2 + " " + target.getName().toLowerCase() + "Åòa.");
+                    target.sendMessage(this.prefix + " Åòb" + p.getName().toLowerCase() + " " + this.cmdTransferToTarget1 + " " + amount + currencySingular + "Åòa.");
                   }
                 }
                   
         	}
         	else
-        	if (cmd.getName().equalsIgnoreCase("sp") && args.length==1) {
+        	if (cmd.getName().toLowerCase().equalsIgnoreCase("sp") && args.length==1) {
   			  try {
         		int readvalue = Integer.valueOf(args[0]);
                 if (readvalue<=10 && readvalue>=1) {
@@ -1403,7 +1395,7 @@ public String convertToItemName(String val) {
 				  p.sendMessage(ChatColor.RED+"The inputted slot is not a valid number.");
 			  }
             }
-        else if (cmd.getName().equalsIgnoreCase("bankeconomy") && (args[0].equalsIgnoreCase("info")) && (p.hasPermission("bankeconomy.info"))) {
+        else if (cmd.getName().toLowerCase().equalsIgnoreCase("bankeconomy") && (args[0].equalsIgnoreCase("info")) && (p.hasPermission("bankeconomy.info"))) {
           if (args.length == 1) {
             if (playerBankBalance <= 1)
               p.sendMessage(this.prefix + " " + this.cmdInfo + " " + playerBankBalance + currencySingular + "Åòa.");
@@ -1413,7 +1405,7 @@ public String convertToItemName(String val) {
           else
             p.sendMessage(this.invARG);
         }
-        else if (cmd.getName().equalsIgnoreCase("bankeconomy") && (args[0].equalsIgnoreCase("check")) && (p.hasPermission("bankeconomy.check"))) {
+        else if (cmd.getName().toLowerCase().equalsIgnoreCase("bankeconomy") && (args[0].equalsIgnoreCase("check")) && (p.hasPermission("bankeconomy.check"))) {
           if (args.length == 1) {
             p.sendMessage(this.prefix + " " + this.usage + " " + this.cmdCheckARG1);
           } else if (args.length == 2) {
@@ -1422,18 +1414,18 @@ public String convertToItemName(String val) {
             if (target == null) {
               p.sendMessage(this.prefix + " " + this.offlinePlayer);
             } else {
-              int targetBalance = this.plugin.getAccountsConfig().getInt(target.getName() + ".money");
+              int targetBalance = this.plugin.getAccountsConfig().getInt(target.getName().toLowerCase() + ".money");
 
               if (targetBalance <= 1)
-                p.sendMessage(this.prefix + "Åòa " + target.getName() + this.cmdCheckReponsePlayer + " " + targetBalance + currencySingular);
+                p.sendMessage(this.prefix + "Åòa " + target.getName().toLowerCase() + this.cmdCheckReponsePlayer + " " + targetBalance + currencySingular);
               else if (targetBalance > 1)
-                p.sendMessage(this.prefix + "Åòa " + target.getName() + this.cmdCheckReponsePlayer + " " + targetBalance + currencyPlural);
+                p.sendMessage(this.prefix + "Åòa " + target.getName().toLowerCase() + this.cmdCheckReponsePlayer + " " + targetBalance + currencyPlural);
             }
           }
           else {
             p.sendMessage(this.invARG);
           }
-        } else if (cmd.getName().equalsIgnoreCase("bankeconomy") && (args[0].equalsIgnoreCase("reset")) && (p.hasPermission("bankeconomy.reset"))) {
+        } else if (cmd.getName().toLowerCase().equalsIgnoreCase("bankeconomy") && (args[0].equalsIgnoreCase("reset")) && (p.hasPermission("bankeconomy.reset"))) {
           if (args.length == 1) {
             p.sendMessage(this.prefix + " " + this.usage + " " + this.cmdResetARG1);
           } else if (args.length == 2) {
@@ -1442,11 +1434,11 @@ public String convertToItemName(String val) {
             if (target == null) {
               p.sendMessage(this.prefix + " " + this.offlinePlayer);
             } else {
-              this.plugin.getAccountsConfig().set(target.getName() + ".money", Integer.valueOf(0));
-              this.plugin.saveAccountsConfig();
+              this.plugin.getAccountsConfig().set(target.getName().toLowerCase() + ".money", Integer.valueOf(0));
+              //this.plugin.saveAccountsConfig();
 
-              p.sendMessage(this.prefix + " " + this.cmdResetToPlayer1 + " " + target.getName() + this.cmdResetToPlayer2);
-              target.sendMessage(this.prefix + " Åòa" + p.getName() + " " + this.cmdResetToTarget);
+              p.sendMessage(this.prefix + " " + this.cmdResetToPlayer1 + " " + target.getName().toLowerCase() + this.cmdResetToPlayer2);
+              target.sendMessage(this.prefix + " Åòa" + p.getName().toLowerCase() + " " + this.cmdResetToTarget);
             }
           } else {
             p.sendMessage(this.invARG);
@@ -1461,7 +1453,7 @@ public String convertToItemName(String val) {
           }
           p.sendMessage(this.invARG);
         }
-        else if (cmd.getName().equalsIgnoreCase("bankeconomy") && (args[0].equalsIgnoreCase("transfer")) && (p.hasPermission("bankeconomy.transfer"))) {
+        else if (cmd.getName().toLowerCase().equalsIgnoreCase("bankeconomy") && (args[0].equalsIgnoreCase("transfer")) && (p.hasPermission("bankeconomy.transfer"))) {
           if (args.length == 1) {
             p.sendMessage(this.prefix + " " + this.usage + " " + this.cmdTransferARG1);
           } else if (args.length == 2) {
@@ -1473,25 +1465,25 @@ public String convertToItemName(String val) {
             if (target == null) {
               p.sendMessage(this.prefix + " " + this.offlinePlayer);
             }
-            else if (target.getName() == p.getName()) {
+            else if (target.getName().toLowerCase() == p.getName().toLowerCase()) {
               p.sendMessage(this.prefix + " " + this.cmdTransferSameNick);
             }
             else if (amount > playerBankBalance) {
               p.sendMessage(this.prefix + " " + this.notEnoughMoney);
             } else if (amount <= playerBankBalance) {
               double totalWithdraw = playerBankBalance - amount;
-              double totalDeposit = amount + this.plugin.getAccountsConfig().getInt(target.getName() + ".money");
+              double totalDeposit = amount + this.plugin.getAccountsConfig().getInt(target.getName().toLowerCase() + ".money");
 
               this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".money", Double.valueOf(totalWithdraw));
               this.plugin.getAccountsConfig().set(target.getName() + ".money", Double.valueOf(totalDeposit));
               this.plugin.saveAccountsConfig();
 
               if (amount > 1.0D) {
-                p.sendMessage(this.prefix + " " + this.cmdTransferToPlayer1 + " " + amount + currencyPlural + " " + this.cmdTransferToPlayer2 + " " + target.getName() + "Åòa.");
-                target.sendMessage(this.prefix + " Åòb" + p.getName() + " " + this.cmdTransferToTarget1 + " " + amount + currencyPlural + "Åòa.");
+                p.sendMessage(this.prefix + " " + this.cmdTransferToPlayer1 + " " + amount + currencyPlural + " " + this.cmdTransferToPlayer2 + " " + target.getName().toLowerCase() + "Åòa.");
+                target.sendMessage(this.prefix + " Åòb" + p.getName().toLowerCase() + " " + this.cmdTransferToTarget1 + " " + amount + currencyPlural + "Åòa.");
               } else if (amount <= 1.0D) {
-                p.sendMessage(this.prefix + " " + this.cmdTransferToPlayer1 + " " + amount + currencySingular + " " + this.cmdTransferToPlayer2 + " " + target.getName() + "Åòa.");
-                target.sendMessage(this.prefix + " Åòb" + p.getName() + " " + this.cmdTransferToTarget1 + " " + amount + currencySingular + "Åòa.");
+                p.sendMessage(this.prefix + " " + this.cmdTransferToPlayer1 + " " + amount + currencySingular + " " + this.cmdTransferToPlayer2 + " " + target.getName().toLowerCase() + "Åòa.");
+                target.sendMessage(this.prefix + " Åòb" + p.getName().toLowerCase() + " " + this.cmdTransferToTarget1 + " " + amount + currencySingular + "Åòa.");
               }
             }
           }
@@ -1499,7 +1491,7 @@ public String convertToItemName(String val) {
           {
             p.sendMessage(this.invARG);
           }
-        } else if (cmd.getName().equalsIgnoreCase("bankeconomy") && (args[0].equalsIgnoreCase("edit")) && (p.hasPermission("bankeconomy.edit"))) {
+        } else if (cmd.getName().toLowerCase().equalsIgnoreCase("bankeconomy") && (args[0].equalsIgnoreCase("edit")) && (p.hasPermission("bankeconomy.edit"))) {
           if (args.length == 1) {
             p.sendMessage(this.prefix + " " + this.usage + " " + this.cmdEditARG1);
             p.sendMessage(this.prefix + " " + this.cmdEditAvaibleActions);
@@ -1516,24 +1508,24 @@ public String convertToItemName(String val) {
             }
             else if (args[1].equalsIgnoreCase("status")) {
               if (amount == 1.0D) {
-                this.plugin.getAccountsConfig().set(target.getName() + ".status", Boolean.valueOf(true));
-                this.plugin.saveAccountsConfig();
+                this.plugin.getAccountsConfig().set(target.getName().toLowerCase() + ".status", Boolean.valueOf(true));
+                //this.plugin.saveAccountsConfig();
 
-                p.sendMessage(this.prefix + " " + this.cmdEditEnableToPlayer1 + " " + p.getName() + this.cmdEditEnableToPlayer2);
+                p.sendMessage(this.prefix + " " + this.cmdEditEnableToPlayer1 + " " + p.getName().toLowerCase() + this.cmdEditEnableToPlayer2);
               } else if (amount == 0.0D) {
-                this.plugin.getAccountsConfig().set(target.getName() + ".status", Boolean.valueOf(false));
-                this.plugin.saveAccountsConfig();
+                this.plugin.getAccountsConfig().set(target.getName().toLowerCase() + ".status", Boolean.valueOf(false));
+                //this.plugin.saveAccountsConfig();
 
-                p.sendMessage(this.prefix + " " + this.cmdEditDisabledToPlayer1 + " " + p.getName() + this.cmdEditDisabledToPlayer2);
+                p.sendMessage(this.prefix + " " + this.cmdEditDisabledToPlayer1 + " " + p.getName().toLowerCase() + this.cmdEditDisabledToPlayer2);
               }
             } else if (args[1].equalsIgnoreCase("balance")) {
-              this.plugin.getAccountsConfig().set(target.getName() + ".money", Double.valueOf(amount));
-              this.plugin.saveAccountsConfig();
+              this.plugin.getAccountsConfig().set(target.getName().toLowerCase() + ".money", Double.valueOf(amount));
+              //this.plugin.saveAccountsConfig();
 
               if (amount > 1.0D)
-                p.sendMessage(this.prefix + " " + this.cmdEditAmountSetPlayer1 + " Åòb" + amount + currencyPlural + " " + this.cmdEditAmountSetPlayer2 + " " + target.getName() + this.cmdEditAmountSetPlayer3);
+                p.sendMessage(this.prefix + " " + this.cmdEditAmountSetPlayer1 + " Åòb" + amount + currencyPlural + " " + this.cmdEditAmountSetPlayer2 + " " + target.getName().toLowerCase() + this.cmdEditAmountSetPlayer3);
               else if (amount <= 1.0D)
-                p.sendMessage(this.prefix + " " + this.cmdEditAmountSetPlayer1 + " Åòb" + amount + currencySingular + " " + this.cmdEditAmountSetPlayer2 + " " + target.getName() + this.cmdEditAmountSetPlayer3);
+                p.sendMessage(this.prefix + " " + this.cmdEditAmountSetPlayer1 + " Åòb" + amount + currencySingular + " " + this.cmdEditAmountSetPlayer2 + " " + target.getName().toLowerCase() + this.cmdEditAmountSetPlayer3);
             }
             else {
               p.sendMessage(this.prefix + " " + this.cmdEditAvaibleActions);
@@ -1543,7 +1535,7 @@ public String convertToItemName(String val) {
             p.sendMessage(this.invARG);
           }
         } 
-      else if (cmd.getName().equalsIgnoreCase("revive") &&  args[0].equalsIgnoreCase("me")) {
+      else if (cmd.getName().toLowerCase().equalsIgnoreCase("revive") &&  args[0].equalsIgnoreCase("me")) {
           DecimalFormat df = new DecimalFormat("#0.00");
           double deathX = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase() + ".deathpointX");
           double deathY = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase() + ".deathpointY");
@@ -1607,17 +1599,17 @@ public String convertToItemName(String val) {
 		    				p2.setMaximumNoDamageTicks(20);
 		    			}
 		    		},100);
-	        	  Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+ChatColor.WHITE+" decided to revive.");
+	        	  Bukkit.broadcastMessage(ChatColor.GREEN+p.getName().toLowerCase()+ChatColor.WHITE+" decided to revive.");
 	          } else {
 	        	  p.sendMessage("You cannot revive. You need to have $"+df.format(finalcost)+" to do so.");
 	          }
           } else {
         	  p.sendMessage("You haven't died. So you cannot revive.");
           }
-          this.plugin.saveAccountsConfig();
+          //this.plugin.saveAccountsConfig();
           return true;
       } 
-      else if (cmd.getName().equalsIgnoreCase("revive") && (args[0].equalsIgnoreCase("amount"))) {
+      else if (cmd.getName().toLowerCase().equalsIgnoreCase("revive") && (args[0].equalsIgnoreCase("amount"))) {
           DecimalFormat df = new DecimalFormat("#0.00");
           double deathX = p.getLocation().getX();
           double deathY = p.getLocation().getY();
@@ -1636,7 +1628,7 @@ public String convertToItemName(String val) {
     	  p.sendMessage("You need to have $"+df.format(finalcost)+" to revive.");
           return true;
       }
-      else if (cmd.getName().equalsIgnoreCase("tele") && (args[0].equalsIgnoreCase("to"))) {
+      else if (cmd.getName().toLowerCase().equalsIgnoreCase("tele") && (args[0].equalsIgnoreCase("to"))) {
           DecimalFormat df = new DecimalFormat("#0.00");
     	  if (p.getPlayerTime()-this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase() + ".teletime")<400) {
     		  if (args.length==1) {
@@ -1645,7 +1637,96 @@ public String convertToItemName(String val) {
         		  //Teleport.
 		            Player target = p.getServer().getPlayer(args[1]);
 		            if (target == null) {
-		              p.sendMessage(this.prefix + " " + this.offlinePlayer);
+		            	//It could be a town name. Check
+		            	TownManager t = MCTownsPlugin.getPlugin().getTownManager();
+            			Bukkit.getLogger().info("Town Manager started:"+ t.toString());
+		            	Town teleport_town = null;
+		            	Collection<Town> towns = t.getTownsCollection();
+		            	for (Town towny : towns) {
+		            		if (towny!=null) {
+			            		if (towny.getTownName().equalsIgnoreCase(args[1])) {
+			            			teleport_town = towny;
+			            			break;
+			            		} else {
+			            			Bukkit.getLogger().info("This was town "+towny.getTownName());
+			            		}
+		            		}
+		            	}
+		            	//Iterate through collection, seeing if we can find the town.
+		            	if (teleport_town == null) {
+		            		p.sendMessage(this.prefix + " " + this.offlinePlayer);
+		            	} else {
+			            	boolean is_in_vehicle = false;
+			            	Entity vehicle = null;
+			            	if (p.isInsideVehicle()) {
+			            		is_in_vehicle=true;
+			            		vehicle = p.getVehicle();
+			            	}
+			            	if (teleport_town.getTownName().equalsIgnoreCase(this.plugin.getAccountsConfig().getString(p.getName().toLowerCase() + ".teleplayer"))) {
+				            	//Determine distance of player to other player.
+				            	double otherx = teleport_town.getSpawn(Bukkit.getServer()).getX();
+				            	double othery = teleport_town.getSpawn(Bukkit.getServer()).getY();
+				            	double otherz = teleport_town.getSpawn(Bukkit.getServer()).getZ();
+				            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase().toLowerCase() + ".money");
+				            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
+				            	//Bukkit.getLogger().info("finalcost1:"+finalcost);
+				            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
+				            	//Bukkit.getLogger().info("finalcost2:"+finalcost);
+				            	finalcost += finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
+				            	//Bukkit.getLogger().info("finalcost3:"+finalcost);
+				            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
+				            	if (mymoney>=finalcost) {
+				            		//Allow teleport to occur.
+				  	        	  this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".money", mymoney-finalcost);
+				  	        	  this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".teletime", Double.valueOf(0.0d));
+					        	  //this.plugin.saveAccountsConfig();
+					        	  if (this.plugin.PlayerinJob(p, "Support")) {
+					        		  //Give exp for doing so.
+					        		  //this.plugin.gainMoneyExp(p,"Support",0,100);
+					        	  }
+					        	  p.sendMessage("Teleported to "+ChatColor.GREEN+teleport_town.getTownName()+ChatColor.WHITE+" for $"+ChatColor.YELLOW+df.format(finalcost)+ChatColor.WHITE+". New Account balance: $"+df.format(mymoney-finalcost));
+					        	  Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+ChatColor.WHITE+" teleported to "+ChatColor.YELLOW+teleport_town.getTownName()+".");
+					        	  if (is_in_vehicle) {
+					        		  vehicle.eject();
+					        		  p.eject();
+					        		  final Player p2 = p;
+					        		  final Town target2 = teleport_town;
+					        		  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+					        		      @Override
+					        		      public void run() {
+					        		    		  p2.teleport(target2.getSpawn(Bukkit.getServer()));
+					        		      }
+					        		  	},5);
+					        	  } else {
+				        			  p.teleport(teleport_town.getSpawn(Bukkit.getServer()));
+					        	  }
+				            	} else {
+						          p.sendMessage("You need $"+ChatColor.YELLOW+df.format(finalcost)+" in the bank to teleport to "+ChatColor.GREEN+teleport_town.getTownName()+ChatColor.WHITE+"!");
+				            	}
+			            	} else {
+			            		//Setup another town.
+				            	//Determine distance of player to new town.
+				            	double otherx = teleport_town.getSpawn(Bukkit.getServer()).getX();
+				            	double othery = teleport_town.getSpawn(Bukkit.getServer()).getY();
+				            	double otherz = teleport_town.getSpawn(Bukkit.getServer()).getZ();
+				            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase().toLowerCase() + ".money");
+				            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
+				            	Bukkit.getLogger().info("finalcost1:"+finalcost);
+				            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
+				            	Bukkit.getLogger().info("finalcost2:"+finalcost);
+				            	finalcost += finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
+				            	Bukkit.getLogger().info("finalcost3:"+finalcost);
+				            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
+				            	if (mymoney>=finalcost) {
+				            		//Allow teleport to occur.
+							        p.sendMessage("Teleporting to "+ChatColor.GREEN+teleport_town.getTownName()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". Type the command again to teleport.");
+					  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".teletime", Double.valueOf(p.getPlayerTime()));
+					  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".teleplayer", String.valueOf(teleport_town.getTownName()));
+				            	} else {
+							        p.sendMessage("Teleporting to "+ChatColor.GREEN+teleport_town.getTownName()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". You do not have enough in the bank for that.");
+				            	}
+			            	}
+		            	}
 		            } else {
 		            	boolean is_in_vehicle = false;
 		            	Entity vehicle = null;
@@ -1660,7 +1741,11 @@ public String convertToItemName(String val) {
 			            	double otherz = target.getLocation().getZ();
 			            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase() + ".money");
 			            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
+			            	//Bukkit.getLogger().info("finalcost1:"+finalcost);
 			            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
+			            	//Bukkit.getLogger().info("finalcost2:"+finalcost);
+			            	finalcost += finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
+			            	//Bukkit.getLogger().info("finalcost3:"+finalcost);
 			            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
 			            	if (mymoney>=finalcost) {
 			            		//Allow teleport to occur.
@@ -1706,7 +1791,11 @@ public String convertToItemName(String val) {
 			            	double otherz = target.getLocation().getZ();
 			            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase() + ".money");
 			            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
+			            	Bukkit.getLogger().info("finalcost1:"+finalcost);
 			            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
+			            	Bukkit.getLogger().info("finalcost2:"+finalcost);
+			            	finalcost += finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
+			            	Bukkit.getLogger().info("finalcost3:"+finalcost);
 			            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
 			            	if (mymoney>=finalcost) {
 			            		//Allow teleport to occur.
@@ -1714,7 +1803,7 @@ public String convertToItemName(String val) {
 				  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".teletime", Double.valueOf(p.getPlayerTime()));
 				  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".teleplayer", String.valueOf(target.getName()));
 			            	} else {
-						        p.sendMessage("Teleporting to "+ChatColor.GREEN+target.getName()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". You do not have enough in the bank for that.");
+						        p.sendMessage("Teleporting to "+ChatColor.GREEN+target.getName().toLowerCase()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". You do not have enough in the bank for that.");
 			            	}
 		            	}
 		            }
@@ -1727,7 +1816,47 @@ public String convertToItemName(String val) {
 	    		  //Teleport.
 		            Player target = p.getServer().getPlayer(args[1]);
 		            if (target == null) {
-		              p.sendMessage(this.prefix + " " + this.offlinePlayer);
+		            	//It could be a town name. Check
+		            	TownManager t = MCTownsPlugin.getPlugin().getTownManager();
+            			Bukkit.getLogger().info("Town Manager started:"+ t.toString());
+		            	Town teleport_town = null;
+		            	Collection<Town> towns = t.getTownsCollection();
+		            	for (Town towny : towns) {
+		            		if (towny!=null) {
+			            		if (towny.getTownName().equalsIgnoreCase(args[1])) {
+			            			teleport_town = towny;
+			            			break;
+			            		} else {
+			            			Bukkit.getLogger().info("This was town "+towny.getTownName());
+			            		}
+		            		}
+		            	}
+		            	if (teleport_town == null) {
+		            		p.sendMessage(this.prefix + " " + this.offlinePlayer);
+		            	} else {
+		            		//We can attempt to teleport to this town's spawn point. Find out the point and how much it costs.
+		            		Location spawn_point = teleport_town.getSpawn(Bukkit.getServer());
+			            	//Determine distance of player to town..
+			            	double otherx = spawn_point.getX();
+			            	double othery = spawn_point.getY();
+			            	double otherz = spawn_point.getZ();
+			            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase().toLowerCase() + ".money");
+			            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
+			            	//Bukkit.getLogger().info("finalcost1:"+finalcost);
+			            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
+			            	//Bukkit.getLogger().info("finalcost2:"+finalcost);
+			            	finalcost += finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
+			            	//Bukkit.getLogger().info("finalcost3:"+finalcost);
+			            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
+			            	if (mymoney>=finalcost) {
+			            		//Allow teleport to occur.
+						        p.sendMessage("Teleporting to "+ChatColor.GREEN+teleport_town.getTownName()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". Type the command again to teleport.");
+				  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".teletime", Double.valueOf(p.getPlayerTime()));
+				  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".teleplayer", String.valueOf(teleport_town.getTownName().toLowerCase()));
+			            	} else {
+						        p.sendMessage("Teleporting to "+ChatColor.GREEN+teleport_town.getTownName()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". You do not have enough in the bank for that.");
+			            	}
+		            	}
 		            } else {
 		            	//Determine distance of player to other player.
 		            	double otherx = target.getLocation().getX();
@@ -1735,7 +1864,11 @@ public String convertToItemName(String val) {
 		            	double otherz = target.getLocation().getZ();
 		            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase() + ".money");
 		            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
+		            	//Bukkit.getLogger().info("finalcost1:"+finalcost);
 		            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
+		            	//Bukkit.getLogger().info("finalcost2:"+finalcost);
+		            	finalcost += finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
+		            	//Bukkit.getLogger().info("finalcost3:"+finalcost);
 		            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
 		            	if (mymoney>=finalcost) {
 		            		//Allow teleport to occur.
@@ -1743,31 +1876,34 @@ public String convertToItemName(String val) {
 			  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".teletime", Double.valueOf(p.getPlayerTime()));
 			  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".teleplayer", String.valueOf(target.getName()));
 		            	} else {
-					        p.sendMessage("Teleporting to "+ChatColor.GREEN+target.getName()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". You do not have enough in the bank for that.");
+					        p.sendMessage("Teleporting to "+ChatColor.GREEN+target.getName().toLowerCase()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". You do not have enough in the bank for that.");
 		            	}
 		            }
 			  }
     	  }
           return true;
       } else
-      if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 1 && args[0].equalsIgnoreCase("info")) {
+      if (cmd.getName().toLowerCase().equalsIgnoreCase("jobs") && args.length == 1 && args[0].equalsIgnoreCase("info")) {
 		  p.sendMessage("Usage: "+ChatColor.GREEN+"/jobs info [JobName]"+ChatColor.WHITE+" - Get information about a job.");
 		  p.sendMessage("Usage: "+ChatColor.GREEN+"/jobs info [JobName] "+ChatColor.LIGHT_PURPLE+"[lv]"+ChatColor.WHITE+" - Get information about a job at a certain job level.");
 		  p.sendMessage("     Type /jobs to see the jobs.");
       } else
-      if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 1 && args[0].equalsIgnoreCase("join")) {
+      if (cmd.getName().toLowerCase().equalsIgnoreCase("jobs") && args.length == 1 && args[0].equalsIgnoreCase("join")) {
 		  p.sendMessage("Usage: "+ChatColor.GREEN+"/jobs join [JobName]"+ChatColor.WHITE+" - Join a job. Type /jobs to see the jobs.");
       } else
       if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 1 && args[0].equalsIgnoreCase("members")) {
 		  p.sendMessage("Usage: "+ChatColor.GREEN+"/jobs members [JobName]"+ChatColor.WHITE+" - Check all members in a job.");
       } else
-      if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 1 && args[0].equalsIgnoreCase("leave")) {
+      if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 1 && args[0].equalsIgnoreCase("members")) {
+		  p.sendMessage("Usage: "+ChatColor.GREEN+"/jobs members [JobName]"+ChatColor.WHITE+" - Check all members in a job.");
+      } else
+      if (cmd.getName().toLowerCase().equalsIgnoreCase("jobs") && args.length == 1 && args[0].equalsIgnoreCase("leave")) {
 		  p.sendMessage("Usage: "+ChatColor.GREEN+"/jobs leave [JobName]"+ChatColor.WHITE+" - Leave a job. Type /jobs stats to see your jobs.");
       } else
       if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 1 && args[0].equalsIgnoreCase("buffs")) {
 		  p.sendMessage("Usage: "+ChatColor.GREEN+"/jobs buffs [JobName]"+ChatColor.WHITE+" - Get buffs information about a job. Type /jobs to see the jobs.");
       } else
-      if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 2 && args[0].equalsIgnoreCase("ultimate")) {
+      if (cmd.getName().toLowerCase().equalsIgnoreCase("jobs") && args.length == 2 && args[0].equalsIgnoreCase("ultimate")) {
 		  //Attempt to join the job.
     	  this.plugin.setUltimate(p,args[1]);
       } else
@@ -1775,11 +1911,11 @@ public String convertToItemName(String val) {
 		  //Attempt to level up the job.
     	  this.plugin.levelUpJob(p,args[1]);
       } else
-      if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 2 && args[0].equalsIgnoreCase("join")) {
+      if (cmd.getName().toLowerCase().equalsIgnoreCase("jobs") && args.length == 2 && args[0].equalsIgnoreCase("join")) {
 		  //Attempt to join the job.
     	  this.plugin.joinJob(p,args[1]);
       } else
-      if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 2 && args[0].equalsIgnoreCase("leave")) {
+      if (cmd.getName().toLowerCase().equalsIgnoreCase("jobs") && args.length == 2 && args[0].equalsIgnoreCase("leave")) {
 		  //Attempt to join the job.
     	  this.plugin.leaveJob(p,args[1]);
       } else
@@ -1831,7 +1967,67 @@ public String convertToItemName(String val) {
     		  p.sendMessage(ChatColor.RED+"Sorry, that is not a valid job!");
     	  }
       } else
-      if (cmd.getName().equalsIgnoreCase("jobs") && (args.length == 2 || args.length==3) && args[0].equalsIgnoreCase("info")) {
+      if (cmd.getName().equalsIgnoreCase("jobs") && args.length == 2 && args[0].equalsIgnoreCase("members")) {
+    	  JobsDataInfo[] Jobsinfo = {this.plugin.Woodcutter_job,this.plugin.Miner_job,this.plugin.Builder_job,this.plugin.Digger_job,this.plugin.Farmer_job,this.plugin.Hunter_job,this.plugin.Fisherman_job,this.plugin.Weaponsmith_job,this.plugin.Blacksmith_job,this.plugin.Cook_job,this.plugin.Brewer_job,this.plugin.Enchanter_job,this.plugin.Breeder_job,this.plugin.Explorer_job,this.plugin.Support_job};
+    	  boolean found=false;
+    	  String job = "";
+    	  ChatColor job_color = null;
+    	  for (int i=0;i<this.plugin.ValidJobs.length;i++) {
+    		  if (this.plugin.ValidJobs[i].toLowerCase().equalsIgnoreCase(args[1])) {
+    			  found=true;
+    			  job = this.plugin.ValidJobs[i];
+    			  job_color = this.plugin.getJobColor(this.plugin.ValidJobs[i]);
+    			  break;
+    		  }
+    	  }
+    	  if (found) {
+    		  if (this.plugin.getConfig().contains("jobs."+job+"_members")) {
+    			  p.sendMessage("Players in the "+job_color+job+" job:");
+    			  String[] players = this.plugin.getConfig().getString("jobs."+job+"_members").split(", ");
+    			  int lowest = 999999;
+    			  List<String> sorted_players = new ArrayList<String>();
+    			  for (int i=0;i<players.length;i++) {
+    				  sorted_players.add(players[i]); //Add everyone to the list.
+    				  Bukkit.getLogger().info("Add player "+players[i]);
+    			  }
+    			  //Sort them.
+    			  List<String> sorted_list_players = new ArrayList<String>();
+    			  int lowest_slot = -1;
+    			  while (sorted_players.size()>0) {
+    				  for (int i=0;i<sorted_players.size();i++) {
+    					  if (sorted_players.get(i).length()>0) { //If it's 0, for some reason it didn't read this name right....Skip it.
+	    					  if (this.plugin.getJobLv(job, sorted_players.get(i))<lowest) {
+	    						  lowest=this.plugin.getJobLv(job, sorted_players.get(i));
+	    						  lowest_slot=i;
+	    					  }
+    					  }
+    				  }
+    				  if (lowest_slot!=-1) {
+	    				  sorted_list_players.add(sorted_players.get(lowest_slot));
+	    				  sorted_players.remove(lowest_slot);
+	    				  lowest_slot=-1;
+	    				  lowest=999999;
+    				  } else {
+    	        		  p.sendMessage(ChatColor.GOLD+"Sorry, something bad happened! Please report this to an administrator. (EC1)");
+    					  break; //Something bad happened.
+    				  }
+    			  }
+    			  if (sorted_list_players.size()>0) {
+	    			  for (int i=0;i<sorted_list_players.size();i++) {
+	    				  OfflinePlayer q = Bukkit.getOfflinePlayer(sorted_list_players.get(i));
+	    				  p.sendMessage("  "+q.getName()+ChatColor.GRAY+ChatColor.ITALIC+" (Lv"+this.plugin.getJobLv(job, q.getName().toLowerCase())+")");
+	    			  }
+    			  } else {
+    				  p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"- No one in this job yet. -");
+    			  }
+    		  } else {
+        		  p.sendMessage(ChatColor.GOLD+"Sorry, something bad happened! Please report this to an administrator. (EC0)");
+    		  }
+    	  } else {
+    		  p.sendMessage(ChatColor.RED+"Sorry, that is not a valid job!");
+    	  }
+      } else
+      if (cmd.getName().toLowerCase().equalsIgnoreCase("jobs") && (args.length == 2 || args.length==3) && args[0].equalsIgnoreCase("info")) {
     	  JobsDataInfo[] Jobsinfo = {this.plugin.Woodcutter_job,this.plugin.Miner_job,this.plugin.Builder_job,this.plugin.Digger_job,this.plugin.Hunter_job,this.plugin.Fisherman_job,this.plugin.Weaponsmith_job,this.plugin.Blacksmith_job,this.plugin.Cook_job,this.plugin.Brewer_job,this.plugin.Enchanter_job,this.plugin.Breeder_job,this.plugin.Explorer_job,this.plugin.Support_job};
     	  boolean found=false;
     	  int matchedjob=0;
@@ -1885,7 +2081,7 @@ public String convertToItemName(String val) {
     	  }
 		  p.sendMessage("");
       } else
-      if (cmd.getName().equalsIgnoreCase("jobs") && (args.length == 2) && args[0].equalsIgnoreCase("buffs")) {
+      if (cmd.getName().toLowerCase().equalsIgnoreCase("jobs") && (args.length == 2) && args[0].equalsIgnoreCase("buffs")) {
     	  JobsDataInfo[] Jobsinfo = {this.plugin.Woodcutter_job,this.plugin.Miner_job,this.plugin.Builder_job,this.plugin.Digger_job,this.plugin.Hunter_job,this.plugin.Fisherman_job,this.plugin.Weaponsmith_job,this.plugin.Blacksmith_job,this.plugin.Cook_job,this.plugin.Brewer_job,this.plugin.Enchanter_job,this.plugin.Breeder_job,this.plugin.Explorer_job,this.plugin.Support_job};
     	  boolean found=false;
     	  int slot=0;
@@ -1919,7 +2115,7 @@ public String convertToItemName(String val) {
     		  p.sendMessage(ChatColor.ITALIC+"Note that only one ultimate buff can be chosen. And CANNOT BE CHANGED.");
     	  }
       } else
-      if (cmd.getName().equalsIgnoreCase("jobs") && (args.length == 1 || args.length==2) && args[0].equalsIgnoreCase("stats")) {
+      if (cmd.getName().toLowerCase().equalsIgnoreCase("jobs") && (args.length == 1 || args.length==2) && args[0].equalsIgnoreCase("stats")) {
     	  if (args.length==1) {
     		  //Show your stats.
     		  p.sendMessage("");
@@ -1940,7 +2136,7 @@ public String convertToItemName(String val) {
     					  boolean discovered=false;
     					  long timeleft=0;
     					  for (int j=0;j<this.plugin.explorers.size();j++) {
-    						  if (this.plugin.explorers.get(j).name.compareToIgnoreCase(p.getName())==0 && this.plugin.explorers.get(j).event==0) {
+    						  if (this.plugin.explorers.get(j).name.compareToIgnoreCase(p.getName().toLowerCase().toLowerCase())==0 && this.plugin.explorers.get(j).event==0) {
     							  discovered=true;
     							  timeleft=this.plugin.explorers.get(j).expiretime-this.plugin.SERVER_TICK_TIME;
     						  }
@@ -1957,16 +2153,16 @@ public String convertToItemName(String val) {
     		  if (Bukkit.getPlayer(args[1])!=null) {
 				  //This is the player. Show job stats.
 	    		  p.sendMessage("");
-	    		  p.sendMessage(Bukkit.getPlayer(args[1]).getName()+"'s jobs:");
+	    		  p.sendMessage(Bukkit.getPlayer(args[1]).getName().toLowerCase()+"'s jobs:");
 	    		  String[] joblist=this.plugin.getJobs(Bukkit.getPlayer(args[1]));
 	    		  for (int i=0;i<joblist.length;i++) {
 	    			  if (!joblist[i].equalsIgnoreCase("None")) {
-	    				  int mylv=this.plugin.getAccountsConfig().getInt(Bukkit.getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"lv");
+	    				  int mylv=this.plugin.getAccountsConfig().getInt(Bukkit.getPlayer(args[1]).getName().toLowerCase()+".jobs.job"+(i+1)+"lv");
 
 	    				  if (mylv==40) {
-	    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(Bukkit.getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"exp"))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
+	    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(Bukkit.getPlayer(args[1]).getName().toLowerCase()+".jobs.job"+(i+1)+"exp"))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
 	    				  } else {
-	    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(Bukkit.getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"exp"))+"/"+Math.round(this.plugin.getJobExp(joblist[i], this.plugin.getAccountsConfig().getInt(Bukkit.getPlayer(args[1]).getName()+".jobs.job"+(i+1)+"lv")))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
+	    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(Bukkit.getPlayer(args[1]).getName().toLowerCase()+".jobs.job"+(i+1)+"exp"))+"/"+Math.round(this.plugin.getJobExp(joblist[i], this.plugin.getAccountsConfig().getInt(Bukkit.getPlayer(args[1]).getName().toLowerCase()+".jobs.job"+(i+1)+"lv")))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
 	    				  }
     					  
 	    				  if (joblist[i].equalsIgnoreCase("Explorer") && this.plugin.getJobLv(joblist[i], Bukkit.getPlayer(args[1]))>=10) {
@@ -1974,7 +2170,7 @@ public String convertToItemName(String val) {
 	    					  boolean discovered=false;
 	    					  long timeleft=0;
 	    					  for (int j=0;j<this.plugin.explorers.size();j++) {
-	    						  if (this.plugin.explorers.get(j).name.compareToIgnoreCase(Bukkit.getPlayer(args[1]).getName())==0 && this.plugin.explorers.get(j).event==0) {
+	    						  if (this.plugin.explorers.get(j).name.compareToIgnoreCase(Bukkit.getPlayer(args[1]).getName().toLowerCase())==0 && this.plugin.explorers.get(j).event==0) {
 	    							  discovered=true;
 	    							  timeleft=this.plugin.explorers.get(j).expiretime-this.plugin.SERVER_TICK_TIME;
 	    						  }
@@ -1990,29 +2186,29 @@ public String convertToItemName(String val) {
     		  if (!found) {
 	    		  OfflinePlayer q = Bukkit.getOfflinePlayer(args[1]);
 	    		  //Try a search in the config directly.
-	    		  if (this.plugin.getAccountsConfig().contains(q.getName())) {
+	    		  if (this.plugin.getAccountsConfig().contains(q.getName().toLowerCase())) {
 	    			  //This player seems to exist. Check out their stats.
 		    		  p.sendMessage("");
-		    		  p.sendMessage(q.getName()+"'s jobs:");
-		    		  String[] joblist=this.plugin.getJobs(q.getName());
+		    		  p.sendMessage(q.getName().toLowerCase()+"'s jobs:");
+		    		  String[] joblist=this.plugin.getJobs(q.getName().toLowerCase());
 		    		  for (int i=0;i<joblist.length;i++) {
 		    			  if (joblist[i]!=null) {
 		    				  Bukkit.getLogger().info("JobList "+i+": "+joblist[i]);
 		    			  }
 		    			  if (!joblist[i].equalsIgnoreCase("None")) {
-		    				  int mylv=this.plugin.getAccountsConfig().getInt(q.getName()+".jobs.job"+(i+1)+"lv");
+		    				  int mylv=this.plugin.getAccountsConfig().getInt(q.getName().toLowerCase()+".jobs.job"+(i+1)+"lv");
 		    				  if (mylv==40) {
-		    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(q.getName()+".jobs.job"+(i+1)+"exp"))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
+		    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(q.getName().toLowerCase()+".jobs.job"+(i+1)+"exp"))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
 		    				  } else {
-		    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(q.getName()+".jobs.job"+(i+1)+"exp"))+"/"+Math.round(this.plugin.getJobExp(joblist[i], this.plugin.getAccountsConfig().getInt(q.getName()+".jobs.job"+(i+1)+"lv")))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
+		    					  p.sendMessage("Lv"+mylv+" "+this.plugin.getJobColor(joblist[i])+joblist[i]+ChatColor.WHITE+": "+Math.round(this.plugin.getAccountsConfig().getInt(q.getName().toLowerCase()+".jobs.job"+(i+1)+"exp"))+"/"+Math.round(this.plugin.getJobExp(joblist[i], this.plugin.getAccountsConfig().getInt(q.getName().toLowerCase()+".jobs.job"+(i+1)+"lv")))+"xp   "+ChatColor.BLUE+(mylv>=5?"+Lv5 Buff":"")+ChatColor.GREEN+(mylv>=10?" +Lv10 Buff":"")+ChatColor.GOLD+(mylv>=20?" +Lv20 Buff":""));
 		    				  }
 		    			  }
-		    			  if (joblist[i].equalsIgnoreCase("Explorer") && this.plugin.getJobLv(joblist[i], q.getName())>=10) {
+		    			  if (joblist[i].equalsIgnoreCase("Explorer") && this.plugin.getJobLv(joblist[i], q.getName().toLowerCase())>=10) {
 	    					  //Check to see if the buff is on cooldown for this player or not.
 	    					  boolean discovered=false;
 	    					  long timeleft=0;
 	    					  for (int j=0;j<this.plugin.explorers.size();j++) {
-	    						  if (this.plugin.explorers.get(j).name.compareToIgnoreCase(q.getName())==0 && this.plugin.explorers.get(j).event==0) {
+	    						  if (this.plugin.explorers.get(j).name.compareToIgnoreCase(q.getName().toLowerCase())==0 && this.plugin.explorers.get(j).event==0) {
 	    							  discovered=true;
 	    							  timeleft=this.plugin.explorers.get(j).expiretime-this.plugin.SERVER_TICK_TIME;
 	    						  }

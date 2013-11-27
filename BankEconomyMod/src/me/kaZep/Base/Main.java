@@ -24,6 +24,7 @@ import java.text.*;
 import me.kaZep.Commands.JobsDataInfo;
 import me.kaZep.Commands.JobsDataInfo.Job;
 import me.kaZep.Commands.commandBankEconomy;
+import net.jmhertlein.mctowns.MCTowns;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
@@ -67,6 +68,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -84,6 +86,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.bukkit.enchantments.Enchantment;
 
@@ -222,6 +225,10 @@ public class Main extends JavaPlugin
     getServer().getPluginManager().registerEvents(this.pl, this);
     
     cleaned=false;
+    
+    if (Bukkit.getPluginManager().isPluginEnabled("MCTowns")) {
+    	Bukkit.getLogger().info("MCTowns loaded.");
+    }
     
     PluginDescriptionFile pdf = getDescription();
     System.out.println("[" + getDescription().getName() + "] Status: Activated (mb: kaZep)");
@@ -577,11 +584,11 @@ public class Main extends JavaPlugin
     		Color.fromRGB(133, 184, 133),
     		Color.fromRGB(133, 184, 159),
     		Color.fromRGB(159, 184, 133)),
-    		"Thin and light armor made for" +
+    		"Thin and light armor made for\n" +
     		"nimble and precise movement.",
-    		"When getting hit, you will gain" +
+    		"When getting hit, you will gain\n" +
     		"40% movement speed.",
-    		"Every 20% of bonus movement speed" +
+    		"Every 20% of bonus movement speed\n" +
     		"gives you 10% block chance.",
     		"When jumping, you cannot be hit.");
     ItemSetList.addSet(set);
@@ -1064,6 +1071,7 @@ public class Main extends JavaPlugin
 
 public void onDisable()
   {
+	saveAccountsConfig();
 	  getConfig().set("server-tick-time", Long.valueOf(SERVER_TICK_TIME));
 	  saveConfig();
 	  saveAccountsConfig();
@@ -1078,31 +1086,31 @@ public void onDisable()
 	  //Get list of all players on the server.
 	  OfflinePlayer playerlist[] = Bukkit.getOfflinePlayers();
 	  for (int i=0;i<playerlist.length;i++) {
-		  if (getAccountsConfig().contains(playerlist[i].getName())) {
-			  if (getAccountsConfig().contains(playerlist[i].getName()+".spleefrating") && getAccountsConfig().getInt(playerlist[i].getName()+".spleefwins")+getAccountsConfig().getInt(playerlist[i].getName()+".spleeflosses")>=20) {
-				  if (getAccountsConfig().getDouble(playerlist[i].getName()+".spleefrating")>rating[0]) {
+		  if (getAccountsConfig().contains(playerlist[i].getName().toLowerCase())) {
+			  if (getAccountsConfig().contains(playerlist[i].getName().toLowerCase()+".spleefrating") && getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleefwins")+getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleeflosses")>=20) {
+				  if (getAccountsConfig().getDouble(playerlist[i].getName().toLowerCase()+".spleefrating")>rating[0]) {
 					  //This beats the top record, move everything down.
 					  name[2]=name[1];rating[2]=rating[1];wins[2]=wins[1];losses[2]=losses[1];
 					  name[1]=name[0];rating[1]=rating[0];wins[1]=wins[0];losses[1]=losses[0];
-					  name[0]=playerlist[i].getName();
-					  rating[0]=(int)getAccountsConfig().getDouble(playerlist[i].getName()+".spleefrating");
-					  wins[0]=getAccountsConfig().getInt(playerlist[i].getName()+".spleefwins");
-					  losses[0]=getAccountsConfig().getInt(playerlist[i].getName()+".spleeflosses");
+					  name[0]=playerlist[i].getName().toLowerCase();
+					  rating[0]=(int)getAccountsConfig().getDouble(playerlist[i].getName().toLowerCase()+".spleefrating");
+					  wins[0]=getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleefwins");
+					  losses[0]=getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleeflosses");
 				  } else
-				  if (getAccountsConfig().getDouble(playerlist[i].getName()+".spleefrating")>rating[1]) {
+				  if (getAccountsConfig().getDouble(playerlist[i].getName().toLowerCase()+".spleefrating")>rating[1]) {
 					  //This beats the 2nd record, move everything down.
 					  name[2]=name[1];rating[2]=rating[1];wins[2]=wins[1];losses[2]=losses[1];
-					  name[1]=playerlist[i].getName();
-					  rating[1]=(int)getAccountsConfig().getDouble(playerlist[i].getName()+".spleefrating");
-					  wins[1]=getAccountsConfig().getInt(playerlist[i].getName()+".spleefwins");
-					  losses[1]=getAccountsConfig().getInt(playerlist[i].getName()+".spleeflosses");
+					  name[1]=playerlist[i].getName().toLowerCase();
+					  rating[1]=(int)getAccountsConfig().getDouble(playerlist[i].getName().toLowerCase()+".spleefrating");
+					  wins[1]=getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleefwins");
+					  losses[1]=getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleeflosses");
 				  } else
-				  if (getAccountsConfig().getDouble(playerlist[i].getName()+".spleefrating")>rating[2]) {
+				  if (getAccountsConfig().getDouble(playerlist[i].getName().toLowerCase()+".spleefrating")>rating[2]) {
 					  //This beats the 3rd record, move everything down.
-					  name[2]=playerlist[i].getName();
-					  rating[2]=(int)getAccountsConfig().getDouble(playerlist[i].getName()+".spleefrating");
-					  wins[2]=getAccountsConfig().getInt(playerlist[i].getName()+".spleefwins");
-					  losses[2]=getAccountsConfig().getInt(playerlist[i].getName()+".spleeflosses");
+					  name[2]=playerlist[i].getName().toLowerCase();
+					  rating[2]=(int)getAccountsConfig().getDouble(playerlist[i].getName().toLowerCase()+".spleefrating");
+					  wins[2]=getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleefwins");
+					  losses[2]=getAccountsConfig().getInt(playerlist[i].getName().toLowerCase()+".spleeflosses");
 				  }
 			  }
 		  }
@@ -1312,7 +1320,7 @@ public void runTick() {
 			  Player p = Bukkit.getOnlinePlayers()[zx];
 			  //p.sendMessage("That's item slot #"+p.getInventory().getHeldItemSlot());
 			  /*
-			  if (p.getName().compareTo("sigonasr2")==0) {
+			  if (p.getName().toLowerCase().compareTo("sigonasr2")==0) {
 				  //Packet61WorldEvent packet = new Packet61WorldEvent(2004, p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ(), 0, false);
 				  
 				  //((CraftPlayer)t).getHandle().netServerHandler.sendPacket(packet);
@@ -1424,16 +1432,14 @@ public void runTick() {
 										  }
 									  } 
 									  if (nearbylist2.size()<5) {
-										  if (Math.random()<=0.2d) {
-											  int l=0;
-											  while (l<5) {
-												  //CreatureSpawner spawner = (CreatureSpawner)Bukkit.getWorld("world").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getState();
-												  Location testloc = new Location(Bukkit.getWorld("world"),spawner.getLocation().getX()+Math.random()*2-Math.random()*2,spawner.getLocation().getY()+Math.random()*5,spawner.getLocation().getZ()+Math.random()*2-Math.random()*2);
-												  if (p.getNearbyEntities(15, 15, 5).size()<50 && Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR || Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.WEB) {
-													  Bukkit.getWorld("world").spawnCreature(testloc,spawner.getCreatureType());
-												  }
-												  l++;
+										  int l=0;
+										  while (l<5) {
+											  //CreatureSpawner spawner = (CreatureSpawner)Bukkit.getWorld("world").getBlockAt(p.getLocation().getBlockX()+i,p.getLocation().getBlockY()+k,p.getLocation().getBlockZ()+j).getState();
+											  Location testloc = new Location(Bukkit.getWorld("world"),spawner.getLocation().getX()+Math.random()*2-Math.random()*2,spawner.getLocation().getY()+Math.random()*5,spawner.getLocation().getZ()+Math.random()*2-Math.random()*2);
+											  if (p.getNearbyEntities(15, 15, 5).size()<50 && Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.AIR || Bukkit.getWorld("world").getBlockAt(testloc).getType()==Material.WEB) {
+												  Bukkit.getWorld("world").spawnCreature(testloc,spawner.getCreatureType());
 											  }
+											  l++;
 										  }
 									  }
 								  }
@@ -2089,7 +2095,7 @@ public void runTick() {
 				  }
 			  }
 			  if (Main.SERVER_TICK_TIME%600==0) {
-				  saveAccountsConfig();
+				  saveAccountsConfig(); //Save account data once every 30 seconds.
 				  if (turnedon==false && Bukkit.getWorld("world").getTime()>13000) {
 					  //Bukkit.getPlayer("sigonasr2").sendMessage("It's night now...");
 					  turnedon=true;
@@ -2123,7 +2129,7 @@ public void runTick() {
 				  if (getConfig().getBoolean("spleef4insession")) {
 					  //Check to see if we fall off.
 					  if ((p.getLocation().getX()<1585 || p.getLocation().getX()>1600 || p.getLocation().getZ()<24 || p.getLocation().getZ()>39 || p.getLocation().getY()<86.5d) && (
-							  (p.getName().compareTo(getConfig().getString("spleefrequesta4player"))==0 || p.getName().compareTo(getConfig().getString("spleefrequestb4player"))==0
+							  (p.getName().toLowerCase().compareTo(getConfig().getString("spleefrequesta4player"))==0 || p.getName().compareTo(getConfig().getString("spleefrequestb4player"))==0
 							  || p.getName().compareTo(getConfig().getString("spleefrequestc4player"))==0 || p.getName().compareTo(getConfig().getString("spleefrequestd4player"))==0))) {
 						  //You lose.
 						  //See if we're the winner.
@@ -2134,7 +2140,7 @@ public void runTick() {
 						  if (getConfig().getString("spleefrequesta4player").compareTo("none")==0) {
 							  countdead++;
 						  } else {
-							  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0) {
+							  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName().toLowerCase())==0) {
 								  losingplayer=Bukkit.getPlayer(getConfig().getString("spleefrequesta4player"));
 							  } else {
 								  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequesta4player"));
@@ -2143,7 +2149,7 @@ public void runTick() {
 						  if (getConfig().getString("spleefrequestb4player").compareTo("none")==0) {
 							  countdead++;
 						  } else {
-							  if (getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0) {
+							  if (getConfig().getString("spleefrequestb4player").compareTo(p.getName().toLowerCase())==0) {
 								  losingplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestb4player"));
 							  } else {
 								  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestb4player"));
@@ -2152,7 +2158,7 @@ public void runTick() {
 						  if (getConfig().getString("spleefrequestc4player").compareTo("none")==0) {
 							  countdead++;
 						  } else {
-							  if (getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0) {
+							  if (getConfig().getString("spleefrequestc4player").compareTo(p.getName().toLowerCase())==0) {
 								  losingplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestc4player"));
 							  } else {
 								  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestc4player"));
@@ -2161,7 +2167,7 @@ public void runTick() {
 						  if (getConfig().getString("spleefrequestd4player").compareTo("none")==0) {
 							  countdead++;
 						  } else {
-							  if (getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
+							  if (getConfig().getString("spleefrequestd4player").compareTo(p.getName().toLowerCase())==0) {
 								  losingplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestd4player"));
 							  } else {
 								  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestd4player"));
@@ -2200,7 +2206,7 @@ public void runTick() {
 								  p.getInventory().clear();
 								  p.getInventory().clear(p.getInventory().getHeldItemSlot());
 								  //Give inventories back.
-								  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0) {
+								  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName().toLowerCase())==0) {
 									  for (int i=0;i<spleef4_inventory_a.length;i++) {
 										  if (spleef4_inventory_a[i]!=null) {
 										  p.getInventory().addItem(spleef4_inventory_a[i]);
@@ -2208,7 +2214,7 @@ public void runTick() {
 									  }
 									  getConfig().set("spleefrequesta4player",String.valueOf("none"));
 								  } else
-								  if (getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0) {
+								  if (getConfig().getString("spleefrequestb4player").compareTo(p.getName().toLowerCase())==0) {
 									  for (int i=0;i<spleef4_inventory_b.length;i++) {
 										  if (spleef4_inventory_b[i]!=null) {
 										  p.getInventory().addItem(spleef4_inventory_b[i]);
@@ -2216,7 +2222,7 @@ public void runTick() {
 									  }
 									  getConfig().set("spleefrequestb4player",String.valueOf("none"));
 								  } else
-								  if (getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0) {
+								  if (getConfig().getString("spleefrequestc4player").compareTo(p.getName().toLowerCase())==0) {
 									  for (int i=0;i<spleef4_inventory_c.length;i++) {
 										  if (spleef4_inventory_c[i]!=null) {
 										  p.getInventory().addItem(spleef4_inventory_c[i]);
@@ -2224,7 +2230,7 @@ public void runTick() {
 									  }
 									  getConfig().set("spleefrequestc4player",String.valueOf("none"));
 								  } else
-								  if (getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
+								  if (getConfig().getString("spleefrequestd4player").compareTo(p.getName().toLowerCase())==0) {
 									  for (int i=0;i<spleef4_inventory_d.length;i++) {
 										  if (spleef4_inventory_d[i]!=null) {
 										  p.getInventory().addItem(spleef4_inventory_d[i]);
@@ -2258,7 +2264,7 @@ public void runTick() {
 								  winningplayer.getInventory().clear();
 								  winningplayer.getInventory().clear(winningplayer.getInventory().getHeldItemSlot());
 								  //Give inventories back.
-								  if (getConfig().getString("spleefrequesta4player").compareTo(winningplayer.getName())==0) {
+								  if (getConfig().getString("spleefrequesta4player").compareTo(winningplayer.getName().toLowerCase())==0) {
 									  for (int i=0;i<spleef4_inventory_a.length;i++) {
 										  if (spleef4_inventory_a[i]!=null) {
 											  winningplayer.getInventory().addItem(spleef4_inventory_a[i]);
@@ -2266,7 +2272,7 @@ public void runTick() {
 									  }
 									  getConfig().set("spleefrequesta4player",String.valueOf("none"));
 								  } else
-								  if (getConfig().getString("spleefrequestb4player").compareTo(winningplayer.getName())==0) {
+								  if (getConfig().getString("spleefrequestb4player").compareTo(winningplayer.getName().toLowerCase())==0) {
 									  for (int i=0;i<spleef4_inventory_b.length;i++) {
 										  if (spleef4_inventory_b[i]!=null) {
 											  winningplayer.getInventory().addItem(spleef4_inventory_b[i]);
@@ -2274,7 +2280,7 @@ public void runTick() {
 									  }
 									  getConfig().set("spleefrequestb4player",String.valueOf("none"));
 								  } else
-								  if (getConfig().getString("spleefrequestc4player").compareTo(winningplayer.getName())==0) {
+								  if (getConfig().getString("spleefrequestc4player").compareTo(winningplayer.getName().toLowerCase())==0) {
 									  for (int i=0;i<spleef4_inventory_c.length;i++) {
 										  if (spleef4_inventory_c[i]!=null) {
 											  winningplayer.getInventory().addItem(spleef4_inventory_c[i]);
@@ -2282,7 +2288,7 @@ public void runTick() {
 									  }
 									  getConfig().set("spleefrequestc4player",String.valueOf("none"));
 								  } else
-								  if (getConfig().getString("spleefrequestd4player").compareTo(winningplayer.getName())==0) {
+								  if (getConfig().getString("spleefrequestd4player").compareTo(winningplayer.getName().toLowerCase())==0) {
 									  for (int i=0;i<spleef4_inventory_d.length;i++) {
 										  if (spleef4_inventory_d[i]!=null) {
 											  winningplayer.getInventory().addItem(spleef4_inventory_d[i]);
@@ -2332,7 +2338,7 @@ public void runTick() {
 									  c.getBlockInventory().setItem((int)(Math.random()*27.0d), store_shovel);
 								  }
 								  */
-								  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+winningplayer.getName()+"["+(int)getAccountsConfig().getDouble(winningplayer.getName()+".spleefrating")/10+"] is the winner of this 4-player spleef game!");
+								  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+winningplayer.getName().toLowerCase()+"["+(int)getAccountsConfig().getDouble(winningplayer.getName().toLowerCase().toLowerCase()+".spleefrating")/10+"] is the winner of this 4-player spleef game!");
 								  getConfig().set("spleeflastrequesttime",Double.valueOf(0.0d));
 				        		getConfig().set("spleefrequesta4player", String.valueOf("none"));
 				        		getConfig().set("spleefrequestb4player", String.valueOf("none"));
@@ -2365,7 +2371,7 @@ public void runTick() {
 							  p.getInventory().clear();
 							  p.getInventory().clear(p.getInventory().getHeldItemSlot());
 							  //Give inventories back.
-							  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0) {
+							  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName().toLowerCase())==0) {
 								  for (int i=0;i<spleef4_inventory_a.length;i++) {
 									  if (spleef4_inventory_a[i]!=null) {
 									  p.getInventory().addItem(spleef4_inventory_a[i]);
@@ -2373,7 +2379,7 @@ public void runTick() {
 								  }
 								  getConfig().set("spleefrequesta4player",String.valueOf("none"));
 							  } else
-							  if (getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0) {
+							  if (getConfig().getString("spleefrequestb4player").compareTo(p.getName().toLowerCase())==0) {
 								  for (int i=0;i<spleef4_inventory_b.length;i++) {
 									  if (spleef4_inventory_b[i]!=null) {
 									  p.getInventory().addItem(spleef4_inventory_b[i]);
@@ -2381,7 +2387,7 @@ public void runTick() {
 								  }
 								  getConfig().set("spleefrequestb4player",String.valueOf("none"));
 							  } else
-							  if (getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0) {
+							  if (getConfig().getString("spleefrequestc4player").compareTo(p.getName().toLowerCase())==0) {
 								  for (int i=0;i<spleef4_inventory_c.length;i++) {
 									  if (spleef4_inventory_c[i]!=null) {
 									  p.getInventory().addItem(spleef4_inventory_c[i]);
@@ -2389,7 +2395,7 @@ public void runTick() {
 								  }
 								  getConfig().set("spleefrequestc4player",String.valueOf("none"));
 							  } else
-							  if (getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
+							  if (getConfig().getString("spleefrequestd4player").compareTo(p.getName().toLowerCase())==0) {
 								  for (int i=0;i<spleef4_inventory_d.length;i++) {
 									  if (spleef4_inventory_d[i]!=null) {
 									  p.getInventory().addItem(spleef4_inventory_d[i]);
@@ -2402,10 +2408,10 @@ public void runTick() {
 						  }
 					  }
 					  //Check to see if we are a player in spleef.
-					  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName())==0 ||
-							  getConfig().getString("spleefrequestb4player").compareTo(p.getName())==0 ||
-							  getConfig().getString("spleefrequestc4player").compareTo(p.getName())==0 ||
-							  getConfig().getString("spleefrequestd4player").compareTo(p.getName())==0) {
+					  if (getConfig().getString("spleefrequesta4player").compareTo(p.getName().toLowerCase())==0 ||
+							  getConfig().getString("spleefrequestb4player").compareTo(p.getName().toLowerCase())==0 ||
+							  getConfig().getString("spleefrequestc4player").compareTo(p.getName().toLowerCase())==0 ||
+							  getConfig().getString("spleefrequestd4player").compareTo(p.getName().toLowerCase())==0) {
 						  //If they are holding something, remove it.
 						  if (p.getItemInHand()!=null) {
 							  p.getInventory().remove(p.getInventory().getHeldItemSlot());
@@ -2413,11 +2419,11 @@ public void runTick() {
 					  }
 				  }
 				  
-				  if (getConfig().getBoolean("spleefinsession") && (p.getName().compareTo(getConfig().getString("spleefrequestaplayer"))==0 || p.getName().compareTo(getConfig().getString("spleefrequestbplayer"))==0)) {
+				  if (getConfig().getBoolean("spleefinsession") && (p.getName().toLowerCase().compareTo(getConfig().getString("spleefrequestaplayer"))==0 || p.getName().compareTo(getConfig().getString("spleefrequestbplayer"))==0)) {
 					  //Determine if we're still playing.
 					  int blockwinner=0;
-					  if (getConfig().getString("spleefrequestaplayer").compareTo(p.getName())==0 ||
-							  getConfig().getString("spleefrequestbplayer").compareTo(p.getName())==0) {
+					  if (getConfig().getString("spleefrequestaplayer").compareTo(p.getName().toLowerCase())==0 ||
+							  getConfig().getString("spleefrequestbplayer").compareTo(p.getName().toLowerCase())==0) {
 						  //If they are holding something, remove it.
 						  if (p.getItemInHand()!=null) {
 							  p.getInventory().remove(p.getInventory().getHeldItemSlot());
@@ -2452,48 +2458,48 @@ public void runTick() {
 						  getConfig().set("spleefinsession", Boolean.valueOf(false));
 						  //Find out if we're player A, or player B.
 						  Player winningplayer,losingplayer;
-						  if (p.getName().compareTo(getConfig().getString("spleefrequestaplayer"))==0 || blockwinner==2) {
+						  if (p.getName().toLowerCase().compareTo(getConfig().getString("spleefrequestaplayer"))==0 || blockwinner==2) {
 							  //We're player A.
 							  //Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+getConfig().getString("spleefrequestbplayer")+" is the winner of this spleef game! "+getConfig().getString("spleefrequestaplayer")+" loses.");
 							  losingplayer=p;
 							  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer"));
 	
 							  double val1,val2,value,newval1,newval2;
-							  if (getAccountsConfig().contains(winningplayer.getName()+".spleefrating")) {
-								  val1 = getAccountsConfig().getDouble(winningplayer.getName()+".spleefrating");
+							  if (getAccountsConfig().contains(winningplayer.getName().toLowerCase()+".spleefrating")) {
+								  val1 = getAccountsConfig().getDouble(winningplayer.getName().toLowerCase()+".spleefrating");
 							  } else {
 								  val1 = 1000.0d;
 							  }
-							  if (getAccountsConfig().contains(losingplayer.getName()+".spleefrating")) {
-								  val2 = getAccountsConfig().getDouble(losingplayer.getName()+".spleefrating");
+							  if (getAccountsConfig().contains(losingplayer.getName().toLowerCase()+".spleefrating")) {
+								  val2 = getAccountsConfig().getDouble(losingplayer.getName().toLowerCase()+".spleefrating");
 							  } else {
 								  val2 = 1000.0d;
 							  }
 							  value = 1.0d/(1.0d+Math.pow(10.0d, ((val2-val1)/400.0d)));
-							  if (getAccountsConfig().contains(winningplayer.getName()+".spleefwins")) {
-								  getAccountsConfig().set(winningplayer.getName()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName()+".spleefwins")+1));
+							  if (getAccountsConfig().contains(winningplayer.getName().toLowerCase()+".spleefwins")) {
+								  getAccountsConfig().set(winningplayer.getName().toLowerCase()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName().toLowerCase()+".spleefwins")+1));
 							  } else {
-								  getAccountsConfig().set(winningplayer.getName()+".spleefwins", Integer.valueOf(1));
+								  getAccountsConfig().set(winningplayer.getName().toLowerCase()+".spleefwins", Integer.valueOf(1));
 							  }
-							  if (getAccountsConfig().contains(winningplayer.getName()+".spleeflosses")) {
-								  getAccountsConfig().set(winningplayer.getName()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName()+".spleeflosses")));
+							  if (getAccountsConfig().contains(winningplayer.getName().toLowerCase()+".spleeflosses")) {
+								  getAccountsConfig().set(winningplayer.getName().toLowerCase()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName().toLowerCase()+".spleeflosses")));
 							  } else {
-								  getAccountsConfig().set(winningplayer.getName()+".spleeflosses", Integer.valueOf(0));
+								  getAccountsConfig().set(winningplayer.getName().toLowerCase()+".spleeflosses", Integer.valueOf(0));
 							  }
-							  if (getAccountsConfig().contains(losingplayer.getName()+".spleefwins")) {
-								  getAccountsConfig().set(losingplayer.getName()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName()+".spleefwins")));
+							  if (getAccountsConfig().contains(losingplayer.getName().toLowerCase()+".spleefwins")) {
+								  getAccountsConfig().set(losingplayer.getName().toLowerCase()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName().toLowerCase()+".spleefwins")));
 							  } else {
-								  getAccountsConfig().set(losingplayer.getName()+".spleefwins", Integer.valueOf(0));
+								  getAccountsConfig().set(losingplayer.getName().toLowerCase()+".spleefwins", Integer.valueOf(0));
 							  }
-							  if (getAccountsConfig().contains(losingplayer.getName()+".spleeflosses")) {
-								  getAccountsConfig().set(losingplayer.getName()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName()+".spleeflosses")+1));
+							  if (getAccountsConfig().contains(losingplayer.getName().toLowerCase()+".spleeflosses")) {
+								  getAccountsConfig().set(losingplayer.getName().toLowerCase()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName().toLowerCase()+".spleeflosses")+1));
 							  } else {
-								  getAccountsConfig().set(losingplayer.getName()+".spleeflosses", Integer.valueOf(1));
+								  getAccountsConfig().set(losingplayer.getName().toLowerCase()+".spleeflosses", Integer.valueOf(1));
 							  }
-							  newval1 = (val1+Math.round(((50.0d/((getAccountsConfig().getDouble(winningplayer.getName()+".spleefwins")+getAccountsConfig().getDouble(winningplayer.getName()+".spleeflosses"))/20.0d))*(1.0d-value))));
-							  newval2 = (val2+Math.round(((50.0d/((getAccountsConfig().getDouble(losingplayer.getName()+".spleefwins")+getAccountsConfig().getDouble(losingplayer.getName()+".spleeflosses"))/20.0d))*(0.0d-value))));
-							  getAccountsConfig().set(winningplayer.getName()+".spleefrating",Double.valueOf(newval1));
-							  getAccountsConfig().set(losingplayer.getName()+".spleefrating",Double.valueOf(newval2));
+							  newval1 = (val1+Math.round(((50.0d/((getAccountsConfig().getDouble(winningplayer.getName().toLowerCase()+".spleefwins")+getAccountsConfig().getDouble(winningplayer.getName().toLowerCase()+".spleeflosses"))/20.0d))*(1.0d-value))));
+							  newval2 = (val2+Math.round(((50.0d/((getAccountsConfig().getDouble(losingplayer.getName().toLowerCase()+".spleefwins")+getAccountsConfig().getDouble(losingplayer.getName().toLowerCase()+".spleeflosses"))/20.0d))*(0.0d-value))));
+							  getAccountsConfig().set(winningplayer.getName().toLowerCase()+".spleefrating",Double.valueOf(newval1));
+							  getAccountsConfig().set(losingplayer.getName().toLowerCase()+".spleefrating",Double.valueOf(newval2));
 							  Location newloc = winningplayer.getLocation();
 	
 							  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+getConfig().getString("spleefrequestbplayer")+"["+(int)newval1/10+"] is the winner of this spleef game! "+getConfig().getString("spleefrequestaplayer")+"["+(int)newval2/10+"] loses.");
@@ -2509,41 +2515,41 @@ public void runTick() {
 							  losingplayer=p;
 							  winningplayer=Bukkit.getPlayer(getConfig().getString("spleefrequestaplayer"));
 							  double val1,val2,value,newval1,newval2;
-							  if (getAccountsConfig().contains(winningplayer.getName()+".spleefrating")) {
-								  val1 = getAccountsConfig().getDouble(winningplayer.getName()+".spleefrating");
+							  if (getAccountsConfig().contains(winningplayer.getName().toLowerCase()+".spleefrating")) {
+								  val1 = getAccountsConfig().getDouble(winningplayer.getName().toLowerCase()+".spleefrating");
 							  } else {
 								  val1 = 1000.0d;
 							  }
-							  if (getAccountsConfig().contains(losingplayer.getName()+".spleefrating")) {
-								  val2 = getAccountsConfig().getDouble(losingplayer.getName()+".spleefrating");
+							  if (getAccountsConfig().contains(losingplayer.getName().toLowerCase()+".spleefrating")) {
+								  val2 = getAccountsConfig().getDouble(losingplayer.getName().toLowerCase()+".spleefrating");
 							  } else {
 								  val2 = 1000.0d;
 							  }
 							  value = 1.0d/(1.0d+Math.pow(10.0d, ((val2-val1)/400.0d)));
-							  if (getAccountsConfig().contains(winningplayer.getName()+".spleefwins")) {
-								  getAccountsConfig().set(winningplayer.getName()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName()+".spleefwins")+1));
+							  if (getAccountsConfig().contains(winningplayer.getName().toLowerCase()+".spleefwins")) {
+								  getAccountsConfig().set(winningplayer.getName().toLowerCase()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName().toLowerCase()+".spleefwins")+1));
 							  } else {
-								  getAccountsConfig().set(winningplayer.getName()+".spleefwins", Integer.valueOf(1));
+								  getAccountsConfig().set(winningplayer.getName().toLowerCase()+".spleefwins", Integer.valueOf(1));
 							  }
-							  if (getAccountsConfig().contains(winningplayer.getName()+".spleeflosses")) {
-								  getAccountsConfig().set(winningplayer.getName()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName()+".spleeflosses")));
+							  if (getAccountsConfig().contains(winningplayer.getName().toLowerCase()+".spleeflosses")) {
+								  getAccountsConfig().set(winningplayer.getName().toLowerCase()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(winningplayer.getName().toLowerCase()+".spleeflosses")));
 							  } else {
-								  getAccountsConfig().set(winningplayer.getName()+".spleeflosses", Integer.valueOf(0));
+								  getAccountsConfig().set(winningplayer.getName().toLowerCase()+".spleeflosses", Integer.valueOf(0));
 							  }
-							  if (getAccountsConfig().contains(losingplayer.getName()+".spleefwins")) {
-								  getAccountsConfig().set(losingplayer.getName()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName()+".spleefwins")));
+							  if (getAccountsConfig().contains(losingplayer.getName().toLowerCase()+".spleefwins")) {
+								  getAccountsConfig().set(losingplayer.getName().toLowerCase()+".spleefwins", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName().toLowerCase()+".spleefwins")));
 							  } else {
-								  getAccountsConfig().set(losingplayer.getName()+".spleefwins", Integer.valueOf(0));
+								  getAccountsConfig().set(losingplayer.getName().toLowerCase()+".spleefwins", Integer.valueOf(0));
 							  }
-							  if (getAccountsConfig().contains(losingplayer.getName()+".spleeflosses")) {
-								  getAccountsConfig().set(losingplayer.getName()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName()+".spleeflosses")+1));
+							  if (getAccountsConfig().contains(losingplayer.getName().toLowerCase()+".spleeflosses")) {
+								  getAccountsConfig().set(losingplayer.getName().toLowerCase()+".spleeflosses", Integer.valueOf(getAccountsConfig().getInt(losingplayer.getName().toLowerCase()+".spleeflosses")+1));
 							  } else {
-								  getAccountsConfig().set(losingplayer.getName()+".spleeflosses", Integer.valueOf(1));
+								  getAccountsConfig().set(losingplayer.getName().toLowerCase()+".spleeflosses", Integer.valueOf(1));
 							  }
-							  newval1 = ((val1+Math.round((50.0d/((getAccountsConfig().getDouble(winningplayer.getName()+".spleefwins")+getAccountsConfig().getDouble(winningplayer.getName()+".spleeflosses"))/20.0d))*(1.0d-value))));
-							  newval2 = ((val2+Math.round((50.0d/((getAccountsConfig().getDouble(losingplayer.getName()+".spleefwins")+getAccountsConfig().getDouble(losingplayer.getName()+".spleeflosses"))/20.0d))*(0.0d-value))));
-							  getAccountsConfig().set(winningplayer.getName()+".spleefrating",Double.valueOf(newval1));
-							  getAccountsConfig().set(losingplayer.getName()+".spleefrating",Double.valueOf(newval2));
+							  newval1 = ((val1+Math.round((50.0d/((getAccountsConfig().getDouble(winningplayer.getName().toLowerCase()+".spleefwins")+getAccountsConfig().getDouble(winningplayer.getName().toLowerCase()+".spleeflosses"))/20.0d))*(1.0d-value))));
+							  newval2 = ((val2+Math.round((50.0d/((getAccountsConfig().getDouble(losingplayer.getName().toLowerCase()+".spleefwins")+getAccountsConfig().getDouble(losingplayer.getName().toLowerCase()+".spleeflosses"))/20.0d))*(0.0d-value))));
+							  getAccountsConfig().set(winningplayer.getName().toLowerCase()+".spleefrating",Double.valueOf(newval1));
+							  getAccountsConfig().set(losingplayer.getName().toLowerCase()+".spleefrating",Double.valueOf(newval2));
 							  Location newloc = winningplayer.getLocation();
 	
 							  Bukkit.broadcastMessage(ChatColor.RED+"[SPLEEF] "+ChatColor.YELLOW+getConfig().getString("spleefrequestaplayer")+"["+(int)newval1/10+"] is the winner of this spleef game! "+getConfig().getString("spleefrequestbplayer")+"["+(int)newval2/10+"] loses.");
@@ -2607,7 +2613,7 @@ public void runTick() {
 							//Bukkit.getPlayer(getConfig().getString("spleefrequestbplayer")).updateInventory();
 					  }
 				  } else {
-					  if (getConfig().getBoolean("spleefinsession") && (p.getName().compareTo(getConfig().getString("spleefrequestaplayer"))!=0 && p.getName().compareTo(getConfig().getString("spleefrequestbplayer"))!=0)) {
+					  if (getConfig().getBoolean("spleefinsession") && (p.getName().toLowerCase().compareTo(getConfig().getString("spleefrequestaplayer"))!=0 && p.getName().compareTo(getConfig().getString("spleefrequestbplayer"))!=0)) {
 						  if (p.getLocation().getY()>78.0d && p.getLocation().getZ()>53.0d && p.getLocation().getZ()<64.0d && p.getLocation().getX()<1627.0d && p.getLocation().getX()>1616.0d) {
 							  Location newloc = p.getLocation();
 							  newloc.setX(1622.5d);
@@ -2625,7 +2631,7 @@ public void runTick() {
 }
 
 public String healthbar(double curHP,double maxHP) {
-	  //笆�笆�
+	  //隨�ｿｽ隨�ｿｽ
 	  int bits=(int)(Math.ceil(curHP/maxHP*10));
 	  String bar=" ";
 	  if (bits>6) {
@@ -2647,7 +2653,7 @@ public String healthbar(double curHP,double maxHP) {
 }
 
 public String healthbar(double curHP,double maxHP,int hunger) {
-	  //笆�笆�
+	  //隨�ｿｽ隨�ｿｽ
 	  int bits=(int)(Math.ceil(curHP/maxHP*10));
 	  String bar=" ";
 	  if (hunger>=17) {
@@ -2705,7 +2711,7 @@ public void checkJukeboxes() {
     		  Player p = Bukkit.getPlayer(explorers.get(i).name);
         	  if (explorers.get(i).event==1 && Bukkit.getPlayer(explorers.get(i).name)!=null && !Bukkit.getPlayer(explorers.get(i).name).isDead()) {
         		  if (getJobLv("Explorer", p)>=10) {
-    				  PersistentExplorerList eve = new PersistentExplorerList(p.getName());
+    				  PersistentExplorerList eve = new PersistentExplorerList(p.getName().toLowerCase());
     				  eve.event=1;
     				  eve.data=p.getExp();
     				  eve.data2=p.getLevel();
@@ -2713,12 +2719,12 @@ public void checkJukeboxes() {
     				  explorers.add(eve);
         		  }
         	  }
-			  if (explorers.get(i).event==1 && explorers.get(i).name.compareTo(p.getName())==0) {
+			  if (explorers.get(i).event==1 && explorers.get(i).name.compareTo(p.getName().toLowerCase())==0) {
 				  exppoint=i;
 				  //p.setTotalExperience(p.getTotalExperience()+explorers.get(j).data);
 				  //p.sendMessage("Your experience: "+explorers.get(i).data+"/"+p.getTotalExperience());
 			  } else
-			  if (explorers.get(i).event==2 && explorers.get(i).name.compareTo(p.getName())==0) {
+			  if (explorers.get(i).event==2 && explorers.get(i).name.compareTo(p.getName().toLowerCase())==0) {
 				  deadpoint=i;
 			  }
 			  if (exppoint!=-1 && deadpoint!=-1) {
@@ -2965,7 +2971,13 @@ public void checkJukeboxes() {
 	    				}
     				}
     			}
-    			list[i].getScoreboard().getTeam(list[i].getName()).setSuffix(healthbar(list[i].getHealth(),list[i].getMaxHealth(),list[i].getFoodLevel()));
+    			list[i].getScoreboard().getTeam(list[i].getName().toLowerCase()).setSuffix(healthbar(list[i].getHealth(),list[i].getMaxHealth(),list[i].getFoodLevel()));
+    			
+    			/* Team t = list[i].getScoreboard().getTeam(list[i].getName());
+    			double hp = list[i].getHealth();
+    			double maxhp = list[i].getMaxHealth();
+    			int food = list[i].getFoodLevel();
+    			t.setSuffix(healthbar(hp, maxhp, food)); */
     		}
           LOGGING_UPDATE_COUNTS++; //3
 	  		  for (int i=0;i<supportmoblist.size();i++) {
@@ -3425,16 +3437,16 @@ public void payDay(int time)
           allOnlineP.sendMessage(ChatColor.DARK_GREEN+"<=========["+ChatColor.LIGHT_PURPLE+"Interest"+ChatColor.DARK_GREEN+"]=========>");
           DecimalFormat df = new DecimalFormat("#0.00");
           allOnlineP.sendMessage(ChatColor.GOLD+"The money interest has been delivered to all players. ("+df.format((double)(Main.this.getConfig().getDouble("payday.amount")*100))+"% interest rate)");
-          allOnlineP.sendMessage(ChatColor.GOLD+"Your Balance: $"+df.format((getAccountsConfig().getDouble(allOnlineP.getName() + ".money")))+" -> $"+df.format(((Main.this.getConfig().getDouble("payday.amount")*(getAccountsConfig().getDouble(allOnlineP.getName() + ".money"))+getAccountsConfig().getDouble(allOnlineP.getName() + ".money")))));
+          allOnlineP.sendMessage(ChatColor.GOLD+"Your Balance: $"+df.format((getAccountsConfig().getDouble(allOnlineP.getName().toLowerCase() + ".money")))+" -> $"+df.format(((Main.this.getConfig().getDouble("payday.amount")*(getAccountsConfig().getDouble(allOnlineP.getName().toLowerCase() + ".money"))+getAccountsConfig().getDouble(allOnlineP.getName().toLowerCase() + ".money")))));
           allOnlineP.sendMessage(ChatColor.DARK_GREEN+"<==========================>");
-          getAccountsConfig().set(allOnlineP.getName() + ".money", ((Main.this.getConfig().getDouble("payday.amount")*(getAccountsConfig().getDouble(allOnlineP.getName() + ".money"))+getAccountsConfig().getDouble(allOnlineP.getName() + ".money"))));
-          //Main.economy.depositPlayer(allOnlineP.getName(), (Main.this.getConfig().getDouble("payday.amount")*Main.economy.bankBalance(allOnlineP.getName()).balance));
+          getAccountsConfig().set(allOnlineP.getName().toLowerCase() + ".money", ((Main.this.getConfig().getDouble("payday.amount")*(getAccountsConfig().getDouble(allOnlineP.getName().toLowerCase() + ".money"))+getAccountsConfig().getDouble(allOnlineP.getName().toLowerCase() + ".money"))));
+          //Main.economy.depositPlayer(allOnlineP.getName().toLowerCase(), (Main.this.getConfig().getDouble("payday.amount")*Main.economy.bankBalance(allOnlineP.getName().toLowerCase()).balance));
         }
         for (OfflinePlayer allOnlineP : Bukkit.getOfflinePlayers()) {
         	if (!allOnlineP.isOnline()) {
-        		getAccountsConfig().set(allOnlineP.getName() + ".money", ((Main.this.getConfig().getDouble("payday.amount")*(getAccountsConfig().getDouble(allOnlineP.getName() + ".money"))+getAccountsConfig().getDouble(allOnlineP.getName() + ".money"))));
+        		getAccountsConfig().set(allOnlineP.getName().toLowerCase() + ".money", ((Main.this.getConfig().getDouble("payday.amount")*(getAccountsConfig().getDouble(allOnlineP.getName().toLowerCase() + ".money"))+getAccountsConfig().getDouble(allOnlineP.getName().toLowerCase() + ".money"))));
         	}
-            //Main.economy.depositPlayer(allOnlineP.getName(), (Main.this.getConfig().getDouble("payday.amount")*Main.economy.bankBalance(allOnlineP.getName()).balance));
+            //Main.economy.depositPlayer(allOnlineP.getName().toLowerCase(), (Main.this.getConfig().getDouble("payday.amount")*Main.economy.bankBalance(allOnlineP.getName().toLowerCase()).balance));
         }
         //saveAccountsConfig() //Commented out;
         List<UUID> expired_uuids = new ArrayList<UUID>();
@@ -3675,6 +3687,13 @@ public void payDay(int time)
     		//Append to list.
     		getConfig().set("jobs."+ValidJobs[matchedjob]+"_members",String.valueOf(getConfig().getString("jobs."+ValidJobs[matchedjob]+"_members")+", "+p.getName().toLowerCase()));
     	}
+    	if (getConfig().getInt("jobs."+ValidJobs[matchedjob])==0) {
+    		//Simply set the string.
+    		getConfig().set("jobs."+ValidJobs[matchedjob]+"_members",String.valueOf(p.getName().toLowerCase()));
+    	} else {
+    		//Append to list.
+    		getConfig().set("jobs."+ValidJobs[matchedjob]+"_members",String.valueOf(getConfig().getString("jobs."+ValidJobs[matchedjob]+"_members")+", "+p.getName().toLowerCase()));
+    	}
 		Bukkit.getLogger().info("Well, they are allowed to join this job.");
     	//Add 1 to main config.
     	getConfig().set("jobs."+ValidJobs[matchedjob], Integer.valueOf(getConfig().getInt("jobs."+ValidJobs[matchedjob])+1));
@@ -3691,7 +3710,7 @@ public void payDay(int time)
     		}
     	}
     	if (ValidJobs[matchedjob].compareTo("Explorer")==0) {
-    	    explorerlist.add(new ExplorerData(p.getName(), p.getLocation().getX(), p.getLocation().getZ()));
+    	    explorerlist.add(new ExplorerData(p.getName().toLowerCase(), p.getLocation().getX(), p.getLocation().getZ()));
     	}
     	if (ValidJobs[matchedjob].compareTo("Support")==0) {
     	    supportplayers.add(new SupportPlayer(p));
@@ -3705,7 +3724,7 @@ public void payDay(int time)
     	getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(openslot+1)+"exp", Double.valueOf(0));
     	//saveAccountsConfig() //Commented out;
 		Bukkit.getLogger().info("Set job data.");
-    	Bukkit.broadcastMessage(p.getName()+" has joined the "+JobColors[matchedjob]+ValidJobs[matchedjob]+ChatColor.WHITE+" job!");
+    	Bukkit.broadcastMessage(p.getName().toLowerCase()+" has joined the "+JobColors[matchedjob]+ValidJobs[matchedjob]+ChatColor.WHITE+" job!");
     	p.sendMessage("You can check out your job progress anytime with "+ChatColor.GOLD+"/jobs stats"+ChatColor.WHITE+".");
     	return true;
     }
@@ -3715,11 +3734,13 @@ public void payDay(int time)
 	}
 	
 	public String[] getJobs(String p) {
+		p=p.toLowerCase();
 		String[] string= {getAccountsConfig().getString(p.toLowerCase()+".jobs.job1"),getAccountsConfig().getString(p.toLowerCase()+".jobs.job2"),getAccountsConfig().getString(p.toLowerCase()+".jobs.job3")};
 		return string;
 	}
 	
 	public boolean PlayerinJob(String p,String job) {
+		p=p.toLowerCase();
 		String[] jobs = getJobs(p);
 		for (int i=0;i<jobs.length;i++) {
 			if (job.equalsIgnoreCase(jobs[i])) {
@@ -3785,7 +3806,7 @@ public void payDay(int time)
 		}
 		//Add to how much we've earned so far.
 		for (int i=0;i<SPEED_CONTROL.size();i++) {
-			if (SPEED_CONTROL.get(i).p.getName().equalsIgnoreCase(p.getName())) {
+			if (SPEED_CONTROL.get(i).p.getName().equalsIgnoreCase(p.getName().toLowerCase())) {
 				SPEED_CONTROL.get(i).money_gained+=amount;
 				break;
 			}
@@ -3875,7 +3896,7 @@ public void payDay(int time)
 		}
 		//Add to how much we've earned so far.
 		for (int i=0;i<SPEED_CONTROL.size();i++) {
-			if (SPEED_CONTROL.get(i).p.getName().equalsIgnoreCase(p.getName())) {
+			if (SPEED_CONTROL.get(i).p.getName().equalsIgnoreCase(p.getName().toLowerCase())) {
 				SPEED_CONTROL.get(i).money_gained+=amount;
 				break;
 			}
@@ -4176,6 +4197,7 @@ public void payDay(int time)
 	}
 	
 	public int getJobLv(String job, String p) {
+		p=p.toLowerCase();
 		if (PlayerinJob(p,job)) {
 			int slot=-1;
 			//Check which slot contains our job.
@@ -4697,10 +4719,18 @@ public void payDay(int time)
     	String[] jobs = getJobs(p);
     	//We can remove them from this job.
     	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))) {
-    		//Remove from job members list.
-    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members").replace(", "+p.getName().toLowerCase(), ""));
-    		/*Try again in case it's the only entry.*/
-    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members").replace(p.getName().toLowerCase(), ""));
+    		String[] s = getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members").split(", ");
+    		String s2 = "";
+    		for (int i=0;i<s.length;i++) {
+    			if (!s[i].equalsIgnoreCase(p.getName().toLowerCase())) {
+    				if (s2.equals("")) {
+    					s2 = s[i];
+    				} else {
+    					s2 += ", "+s[i];
+    				}
+    			}
+    		}
+    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1")+"_members", s2);
         	//Remove 1 from main config.
         	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job1"))-1));
         	saveConfig();
@@ -4713,12 +4743,19 @@ public void payDay(int time)
         	//saveAccountsConfig() //Commented out;
         	return true;
     	} else
-    	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))) {
-    		//Remove from job members list.
-    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members").replace(", "+p.getName().toLowerCase(), ""));
-    		/*Try again in case it's the only entry.*/
-    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members").replace(p.getName().toLowerCase(), ""));
-        	//Remove 1 from main config.
+    		if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))) {
+        		String[] s = getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members").split(", ");
+        		String s2 = "";
+        		for (int i=0;i<s.length;i++) {
+        			if (!s[i].equalsIgnoreCase(p.getName().toLowerCase())) {
+        				if (s2.equals("")) {
+        					s2 = s[i];
+        				} else {
+        					s2 += ", "+s[i];
+        				}
+        			}
+        		}
+        		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2")+"_members", s2);
         	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job2"))-1));
         	saveConfig();
     		//Remove from job 2.
@@ -4730,12 +4767,19 @@ public void payDay(int time)
         	//saveAccountsConfig() //Commented out;
         	return true;
     	} else
-    	if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))) {
-    		//Remove from job members list.
-    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members").replace(", "+p.getName().toLowerCase(), ""));
-    		/*Try again in case it's the only entry.*/
-    		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members", getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members").replace(p.getName().toLowerCase(), ""));
-        	//Remove 1 from main config.
+    		if (job.equalsIgnoreCase(getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))) {
+        		String[] s = getConfig().getString("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members").split(", ");
+        		String s2 = "";
+        		for (int i=0;i<s.length;i++) {
+        			if (!s[i].equalsIgnoreCase(p.getName().toLowerCase())) {
+        				if (s2.equals("")) {
+        					s2 = s[i];
+        				} else {
+        					s2 += ", "+s[i];
+        				}
+        			}
+        		}
+        		getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3")+"_members", s2);
         	getConfig().set("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"), Integer.valueOf(getConfig().getInt("jobs."+getAccountsConfig().getString(p.getName().toLowerCase()+".jobs.job3"))-1));
         	saveConfig();
     		//Remove from job 3.
@@ -4823,6 +4867,100 @@ public void payDay(int time)
 		return false;
 	}
 
+    public int get_LootChestTier(ItemStack chest) {
+		if (chest.hasItemMeta() && chest.getItemMeta().hasLore()) {
+			//Check to see if the Lore contains anything.
+			for (int i=0;i<chest.getItemMeta().getLore().size();i++) {
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"Something is rattling")) {
+					return 1; // Single loot
+				}
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"You feel powerful magic")) {
+					return 2; // Mythic loot
+				}
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"It is very heavy; there")) {
+					return 3; // Quantity loot
+				}
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"You can feel a variety of")) {
+					return 4; // Multiloot
+				}
+			}
+			
+			
+		}
+		return 0;
+    }
+    
+    public ItemStack generate_LootChest() {
+    	return generate_LootChest(-1);
+    }
+    
+    public ItemStack generate_LootChest(int tier) {
+    	ItemStack chest = new ItemStack(Material.CHEST);
+	    ItemMeta chest_name = chest.getItemMeta();
+	    List<String> chestlore = new ArrayList<String>();
+	    double rand = 1; // Randomly generated number determined by fair dice roll.  
+	    
+	    if (tier == -1) {
+		    rand = Math.random();
+		    // No argument, randomize
+	    }
+	    if (tier == 0) {
+	    	// Invalid chest, don't return anything
+		    Bukkit.getLogger().warning("Invalid loot chest detected! This should never happen.");
+		    return null;
+	    }
+	    
+	    if (rand < 0.005 || tier == 2) {
+	    	// Generate a mythic chest
+	    	chest_name.setDisplayName(ChatColor.LIGHT_PURPLE+"Mythic Chest");
+		 	   
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"You feel powerful magic");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"emanating from within;");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"it must contain epic");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"equipment!");
+		    chest_name.setLore(chestlore);
+
+		    chest.setItemMeta(chest_name);
+	    } else if (rand < 0.02 || tier == 3) {
+	    	// Generate a loaded goods chest
+	    	chest_name.setDisplayName(ChatColor.AQUA+"Heavy Chest");
+		 	   
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"It is very heavy; there");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"may be lots of loot within!");
+		    chest_name.setLore(chestlore);
+
+		    chest.setItemMeta(chest_name);
+	    } else if (rand < 0.1 || tier == 4) {
+	    	// Generate a double chest
+	    	chest_name.setDisplayName(ChatColor.YELLOW+"Closed Chest");
+		 	   
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"You can feel a variety of");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"items rattling around inside.");
+		    chest_name.setLore(chestlore);
+
+		    chest.setItemMeta(chest_name);
+	    } else {
+		    chest_name.setDisplayName(ChatColor.YELLOW+"Closed Chest");
+			   
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"Something is rattling");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"around inside; it may");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"contain valuables!");
+		    chest_name.setLore(chestlore);
+
+		    chest.setItemMeta(chest_name);
+	    }
+	    
+	    return chest;
+    }
+    
     public PlayerListener.Cube get_ItemCubeType(ItemStack item_cube) {
 		if (item_cube.hasItemMeta() && item_cube.getItemMeta().hasLore()) {
 			//Check to see if the Lore contains anything.
