@@ -559,9 +559,13 @@ public String convertToItemName(String val) {
   				  }
   			  }
   			  if (args[0].equalsIgnoreCase("loot")) {
-  				p.getWorld().dropItemNaturally(p.getLocation(), this.plugin.generate_LootChest());  			  }
+  				p.getWorld().dropItemNaturally(p.getLocation(), this.plugin.generate_LootChest());  			  
+  			  }
             } else
             if (cmd.getName().toLowerCase().equalsIgnoreCase("event") && args.length==2 && p.hasPermission("maintenance-mode-admin")) {
+			  if (args[0].equalsIgnoreCase("loot")) {
+	  				p.getWorld().dropItemNaturally(p.getLocation(), this.plugin.generate_LootChest(Integer.valueOf(args[1])));  			  
+  			  }
   			  if (args[0].equalsIgnoreCase("head")) {
   				  ItemStack m = new ItemStack(Material.SKULL_ITEM, 64, (short)SkullType.PLAYER.ordinal());
       				SkullMeta skullMeta = (SkullMeta) m.getItemMeta();

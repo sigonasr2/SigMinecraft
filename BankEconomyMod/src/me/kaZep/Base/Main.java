@@ -3716,7 +3716,7 @@ public void payDay(int time)
 	public void gainMoneyExp(Player p,String job,double amount,double exp) {
 		String[] jobs = getJobs(p);
 		int slot=-1;
-		if (getConfig().getBoolean("halloween-enabled")) {
+		if (getConfig().getBoolean("halloween-enabled") || getConfig().getBoolean("thanksgiving-enabled")) {
 			amount*=2;
 			exp*=2;
 		}
@@ -3805,7 +3805,7 @@ public void payDay(int time)
 	public void gainMoney(Player p,String job,double amount) {
 		String[] jobs = getJobs(p);
 		int slot=-1;
-		if (getConfig().getBoolean("halloween-enabled")) {
+		if (getConfig().getBoolean("halloween-enabled") || getConfig().getBoolean("thanksgiving-enabled")) {
 			amount*=2;
 		}
 		//Add to how much we've earned so far.
@@ -4716,6 +4716,9 @@ public void payDay(int time)
 				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"You can feel a variety of")) {
 					return 4; // Multiloot
 				}
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"A torrential flow of dark")) {
+					return 5; // Chaos loot
+				}
 			}
 			
 			
@@ -4767,9 +4770,23 @@ public void payDay(int time)
 		    chest_name.setLore(chestlore);
 
 		    chest.setItemMeta(chest_name);
-	    } else if (rand < 0.1 || tier == 4) {
-	    	// Generate a double chest
-	    	chest_name.setDisplayName(ChatColor.YELLOW+"Closed Chest");
+	    } else if (rand < 0.04 || tier == 5) {
+	    	// Generate a chaos chest
+	    	chest_name.setDisplayName(ChatColor.RED+"Chaos Chest");
+		 	   
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A torrential flow of dark");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"energy causes the chest to");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"shake uncontrollably! You");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"have absolutely zero idea");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"what may be inside.");
+		    chest_name.setLore(chestlore);
+
+		    chest.setItemMeta(chest_name);
+	    } else if (rand < 0.12 || tier == 4) {
+	    	// Generate a loaded chest
+	    	chest_name.setDisplayName(ChatColor.YELLOW+"Loaded Chest");
 		 	   
 		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
 		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
