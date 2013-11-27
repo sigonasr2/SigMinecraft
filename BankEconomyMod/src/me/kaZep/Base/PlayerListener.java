@@ -847,7 +847,7 @@ implements Listener
     @EventHandler
     public void onPlayerItemConsume(PlayerItemConsumeEvent e) {
     	Player p = e.getPlayer();
-    	if (e.getItem().getType() == Material.COOKED_CHICKEN) {
+    	if (e.getItem().getType() == Material.COOKED_CHICKEN && this.plugin.getConfig().getBoolean("thanksgiving-enabled")) {
     		p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 18000, 0), true);
     		p.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 18000, 4), true);
     		p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 18000, 2), true);
