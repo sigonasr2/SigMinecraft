@@ -44,6 +44,8 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import sig.ItemSets.DiabloDropsHook;
+
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -528,6 +530,32 @@ public String convertToItemName(String val) {
   					  p.sendMessage("Thanksgiving event enabled.");
   				  }
   				  this.plugin.saveConfig();
+  			  }
+  			  if (args[0].equalsIgnoreCase("diablodrops")) {
+  				  //Generates a random diablodrops item. Just like if you did /diablodrops
+  				  p.getWorld().dropItemNaturally(p.getLocation(), DiabloDropsHook.getRandomItem());
+  			  }
+  			  if (args[0].equalsIgnoreCase("diablodrops_mat")) {
+  				  //Generates diamond swords that have random diablodrops attributes.
+  				  p.getWorld().dropItemNaturally(p.getLocation(), DiabloDropsHook.getRandomItem(Material.DIAMOND_SWORD));
+  			  }
+  			  if (args[0].equalsIgnoreCase("diablodrops_tier")) {
+  				  //Only drops legendary tier diablodrops items. (Orange lettering, high stats.)
+  				  p.getWorld().dropItemNaturally(p.getLocation(), DiabloDropsHook.getTierItem(Tier.Legendary));
+  			  }
+  			  if (args[0].equalsIgnoreCase("diablodrops_mat+tier")) {
+  				  //Only drops diamond chestplates that are unidentified.
+  				  p.getWorld().dropItemNaturally(p.getLocation(), DiabloDropsHook.getTierItem(Material.DIAMOND_CHESTPLATE, Tier.Unidentified));
+  			  }
+  			  if (args[0].equalsIgnoreCase("diablodrops_item")) {
+  				  //Only drops Iron Axes. Basically the same as the material version, but accepts an ItemStack (Which may have additional properties, or may be unidentified!)
+  				  p.getWorld().dropItemNaturally(p.getLocation(), DiabloDropsHook.getItem(new ItemStack(Material.IRON_AXE)));
+  			  }
+  			  if (args[0].equalsIgnoreCase("diablodrops_chestloot")) {
+  				  if (p.getTargetBlock(null, 5).getType()==Material.CHEST) {
+  					  //Fills a chest you look at with 20 random diablodrops items.
+  					  DiabloDropsHook.fillChest(p.getTargetBlock(null, 5), 20);
+  				  }
   			  }
   			  if (args[0].equalsIgnoreCase("loot")) {
   				p.getWorld().dropItemNaturally(p.getLocation(), this.plugin.generate_LootChest());  			  }
