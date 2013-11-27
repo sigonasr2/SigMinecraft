@@ -45,6 +45,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import sig.ItemSets.DiabloDropsHook;
+import sig.ItemSets.DiabloDropsHook.Tier;
 
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
