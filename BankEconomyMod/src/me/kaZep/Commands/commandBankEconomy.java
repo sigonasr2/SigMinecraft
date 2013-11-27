@@ -4,10 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import me.kaZep.Base.Main;
+import net.jmhertlein.mctowns.MCTowns;
+import net.jmhertlein.mctowns.MCTownsPlugin;
+import net.jmhertlein.mctowns.database.TownManager;
+import net.jmhertlein.mctowns.structure.Town;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
@@ -54,7 +60,7 @@ public class commandBankEconomy
   String usage = "ÅòbUsage:";
   String invARG = "ÅòcInvalid argument. Please use Åò2/bankeconomyÅòc to see a full list of commands.";
   String invARGT2 = "ÅòcInvalid argument or insufficient permissions.";
-  String offlinePlayer = "ÅòcPlayer not found.";
+  String offlinePlayer = "ÅòcPlayer / Town not found.";
   String accountDisabled = "ÅòcYour account is disabled.";
 
   String cmdInfo = "ÅòaYour bank balance isÅòb";
@@ -1564,7 +1570,96 @@ public String convertToItemName(String val) {
         		  //Teleport.
 		            Player target = p.getServer().getPlayer(args[1]);
 		            if (target == null) {
-		              p.sendMessage(this.prefix + " " + this.offlinePlayer);
+		            	//It could be a town name. Check
+		            	TownManager t = MCTownsPlugin.getPlugin().getTownManager();
+            			Bukkit.getLogger().info("Town Manager started:"+ t.toString());
+		            	Town teleport_town = null;
+		            	Collection<Town> towns = t.getTownsCollection();
+		            	for (Town towny : towns) {
+		            		if (towny!=null) {
+			            		if (towny.getTownName().equalsIgnoreCase(args[1])) {
+			            			teleport_town = towny;
+			            			break;
+			            		} else {
+			            			Bukkit.getLogger().info("This was town "+towny.getTownName());
+			            		}
+		            		}
+		            	}
+		            	//Iterate through collection, seeing if we can find the town.
+		            	if (teleport_town == null) {
+		            		p.sendMessage(this.prefix + " " + this.offlinePlayer);
+		            	} else {
+			            	boolean is_in_vehicle = false;
+			            	Entity vehicle = null;
+			            	if (p.isInsideVehicle()) {
+			            		is_in_vehicle=true;
+			            		vehicle = p.getVehicle();
+			            	}
+			            	if (teleport_town.getTownName().equalsIgnoreCase(this.plugin.getAccountsConfig().getString(p.getName().toLowerCase() + ".teleplayer"))) {
+				            	//Determine distance of player to other player.
+				            	double otherx = teleport_town.getSpawn(Bukkit.getServer()).getX();
+				            	double othery = teleport_town.getSpawn(Bukkit.getServer()).getY();
+				            	double otherz = teleport_town.getSpawn(Bukkit.getServer()).getZ();
+				            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase().toLowerCase() + ".money");
+				            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
+				            	//Bukkit.getLogger().info("finalcost1:"+finalcost);
+				            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
+				            	//Bukkit.getLogger().info("finalcost2:"+finalcost);
+				            	finalcost += finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
+				            	//Bukkit.getLogger().info("finalcost3:"+finalcost);
+				            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
+				            	if (mymoney>=finalcost) {
+				            		//Allow teleport to occur.
+				  	        	  this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".money", mymoney-finalcost);
+				  	        	  this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".teletime", Double.valueOf(0.0d));
+					        	  //this.plugin.saveAccountsConfig();
+					        	  if (this.plugin.PlayerinJob(p, "Support")) {
+					        		  //Give exp for doing so.
+					        		  //this.plugin.gainMoneyExp(p,"Support",0,100);
+					        	  }
+					        	  p.sendMessage("Teleported to "+ChatColor.GREEN+teleport_town.getTownName()+ChatColor.WHITE+" for $"+ChatColor.YELLOW+df.format(finalcost)+ChatColor.WHITE+". New Account balance: $"+df.format(mymoney-finalcost));
+					        	  Bukkit.broadcastMessage(ChatColor.GREEN+p.getName()+ChatColor.WHITE+" teleported to "+ChatColor.YELLOW+teleport_town.getTownName()+".");
+					        	  if (is_in_vehicle) {
+					        		  vehicle.eject();
+					        		  p.eject();
+					        		  final Player p2 = p;
+					        		  final Town target2 = teleport_town;
+					        		  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+					        		      @Override
+					        		      public void run() {
+					        		    		  p2.teleport(target2.getSpawn(Bukkit.getServer()));
+					        		      }
+					        		  	},5);
+					        	  } else {
+				        			  p.teleport(teleport_town.getSpawn(Bukkit.getServer()));
+					        	  }
+				            	} else {
+						          p.sendMessage("You need $"+ChatColor.YELLOW+df.format(finalcost)+" in the bank to teleport to "+ChatColor.GREEN+teleport_town.getTownName()+ChatColor.WHITE+"!");
+				            	}
+			            	} else {
+			            		//Setup another town.
+				            	//Determine distance of player to new town.
+				            	double otherx = teleport_town.getSpawn(Bukkit.getServer()).getX();
+				            	double othery = teleport_town.getSpawn(Bukkit.getServer()).getY();
+				            	double otherz = teleport_town.getSpawn(Bukkit.getServer()).getZ();
+				            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase().toLowerCase() + ".money");
+				            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
+				            	Bukkit.getLogger().info("finalcost1:"+finalcost);
+				            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
+				            	Bukkit.getLogger().info("finalcost2:"+finalcost);
+				            	finalcost += finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
+				            	Bukkit.getLogger().info("finalcost3:"+finalcost);
+				            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
+				            	if (mymoney>=finalcost) {
+				            		//Allow teleport to occur.
+							        p.sendMessage("Teleporting to "+ChatColor.GREEN+teleport_town.getTownName()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". Type the command again to teleport.");
+					  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".teletime", Double.valueOf(p.getPlayerTime()));
+					  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".teleplayer", String.valueOf(teleport_town.getTownName()));
+				            	} else {
+							        p.sendMessage("Teleporting to "+ChatColor.GREEN+teleport_town.getTownName()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". You do not have enough in the bank for that.");
+				            	}
+			            	}
+		            	}
 		            } else {
 		            	boolean is_in_vehicle = false;
 		            	Entity vehicle = null;
@@ -1595,7 +1690,7 @@ public String convertToItemName(String val) {
 				        		  //this.plugin.gainMoneyExp(p,"Support",0,100);
 				        	  }
 				        	  p.sendMessage("Teleported to "+ChatColor.GREEN+target.getName()+ChatColor.WHITE+" for $"+ChatColor.YELLOW+df.format(finalcost)+ChatColor.WHITE+". New Account balance: $"+df.format(mymoney-finalcost));
-				        	  target.sendMessage(ChatColor.GREEN+p.getName().toLowerCase()+ChatColor.WHITE+" teleported to your location.");
+				        	  target.sendMessage(ChatColor.GREEN+p.getName()+ChatColor.WHITE+" teleported to your location.");
 				        	  if (is_in_vehicle) {
 				        		  vehicle.eject();
 				        		  p.eject();
@@ -1619,7 +1714,7 @@ public String convertToItemName(String val) {
 				        		  }
 				        	  }
 			            	} else {
-					          p.sendMessage("You need $"+ChatColor.YELLOW+df.format(finalcost)+" in the bank to teleport to "+ChatColor.GREEN+target.getName().toLowerCase()+ChatColor.WHITE+"!");
+					          p.sendMessage("You need $"+ChatColor.YELLOW+df.format(finalcost)+" in the bank to teleport to "+ChatColor.GREEN+target.getName()+ChatColor.WHITE+"!");
 			            	}
 		            	} else {
 		            		//Setup another player.
@@ -1654,7 +1749,47 @@ public String convertToItemName(String val) {
 	    		  //Teleport.
 		            Player target = p.getServer().getPlayer(args[1]);
 		            if (target == null) {
-		              p.sendMessage(this.prefix + " " + this.offlinePlayer);
+		            	//It could be a town name. Check
+		            	TownManager t = MCTownsPlugin.getPlugin().getTownManager();
+            			Bukkit.getLogger().info("Town Manager started:"+ t.toString());
+		            	Town teleport_town = null;
+		            	Collection<Town> towns = t.getTownsCollection();
+		            	for (Town towny : towns) {
+		            		if (towny!=null) {
+			            		if (towny.getTownName().equalsIgnoreCase(args[1])) {
+			            			teleport_town = towny;
+			            			break;
+			            		} else {
+			            			Bukkit.getLogger().info("This was town "+towny.getTownName());
+			            		}
+		            		}
+		            	}
+		            	if (teleport_town == null) {
+		            		p.sendMessage(this.prefix + " " + this.offlinePlayer);
+		            	} else {
+		            		//We can attempt to teleport to this town's spawn point. Find out the point and how much it costs.
+		            		Location spawn_point = teleport_town.getSpawn(Bukkit.getServer());
+			            	//Determine distance of player to town..
+			            	double otherx = spawn_point.getX();
+			            	double othery = spawn_point.getY();
+			            	double otherz = spawn_point.getZ();
+			            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase().toLowerCase() + ".money");
+			            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
+			            	//Bukkit.getLogger().info("finalcost1:"+finalcost);
+			            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
+			            	//Bukkit.getLogger().info("finalcost2:"+finalcost);
+			            	finalcost += finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
+			            	//Bukkit.getLogger().info("finalcost3:"+finalcost);
+			            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
+			            	if (mymoney>=finalcost) {
+			            		//Allow teleport to occur.
+						        p.sendMessage("Teleporting to "+ChatColor.GREEN+teleport_town.getTownName()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". Type the command again to teleport.");
+				  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".teletime", Double.valueOf(p.getPlayerTime()));
+				  	        	this.plugin.getAccountsConfig().set(p.getName().toLowerCase().toLowerCase() + ".teleplayer", String.valueOf(teleport_town.getTownName().toLowerCase()));
+			            	} else {
+						        p.sendMessage("Teleporting to "+ChatColor.GREEN+teleport_town.getTownName()+ChatColor.WHITE+" costs $"+ChatColor.YELLOW+df.format(finalcost)+". You do not have enough in the bank for that.");
+			            	}
+		            	}
 		            } else {
 		            	//Determine distance of player to other player.
 		            	double otherx = target.getLocation().getX();

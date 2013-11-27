@@ -23,6 +23,7 @@ import java.text.*;
 
 import me.kaZep.Commands.JobsDataInfo;
 import me.kaZep.Commands.commandBankEconomy;
+import net.jmhertlein.mctowns.MCTowns;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
@@ -222,6 +223,10 @@ public class Main extends JavaPlugin
     getServer().getPluginManager().registerEvents(this.pl, this);
     
     cleaned=false;
+    
+    if (Bukkit.getPluginManager().isPluginEnabled("MCTowns")) {
+    	Bukkit.getLogger().info("MCTowns loaded.");
+    }
     
     PluginDescriptionFile pdf = getDescription();
     System.out.println("[" + getDescription().getName() + "] Status: Activated (mb: kaZep)");

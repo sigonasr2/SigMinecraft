@@ -3039,7 +3039,7 @@ implements Listener
 		
 		if (e.getEntity() instanceof Zombie) {
 			Zombie z = (Zombie)e.getEntity();
-			if (z.isBaby() && z.getCustomName()!=null) {
+			if (z.isBaby() && z.getCustomName()!=null && !z.getCustomName().contains("Ninja")) {
 				//Can't have weird special baby zombies.
 				z.setBaby(false);
 			}
