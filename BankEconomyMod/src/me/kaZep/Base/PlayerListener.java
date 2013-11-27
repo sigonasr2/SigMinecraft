@@ -179,6 +179,7 @@ import org.bukkit.util.Vector;
 import org.bukkit.potion.Potion;
 
 import com.google.common.base.Objects;
+import com.modcrafting.diablodrops.DiabloDrops;
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -1551,12 +1552,15 @@ implements Listener
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".spleefwins", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".spleeflosses", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job1", String.valueOf("None"));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job1_30", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job1lv", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job1exp", Double.valueOf(0.0d));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job2", String.valueOf("None"));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job2_30", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job2lv", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job2exp", Double.valueOf(0.0d));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job3", String.valueOf("None"));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job3_30", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job3lv", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.job3exp", Double.valueOf(0.0d));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".jobs.ultimate", String.valueOf("None"));
@@ -1609,6 +1613,12 @@ implements Listener
 			p.sendMessage("----------------------------");
 			p.sendMessage(ChatColor.YELLOW+"Current Money Balance: $ "+df.format(Main.economy.bankBalance(p.getName().toLowerCase()).balance)+", Bank Balance: $"+df.format(this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase()+".money")));
 			//Update account information for the stat point update.
+			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".jobs.job1_30")) {
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1_30", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job2_30", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job3_30", Integer.valueOf(0));
+				//this.plugin.saveAccountsConfig();
+			}
 			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".bonus.witherskeleton")) {
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".bonus.witherskeleton", Integer.valueOf(0));
 				//this.plugin.saveAccountsConfig();
@@ -3685,9 +3695,9 @@ implements Listener
 		}
 		if (this.plugin.hasJobBuff("Digger", p, Job.JOB5)) {
 			//Applies to dirt, sand, and gravel blocks. A small chance that a nearby block drops an artifact piece (clay with enchantment to glow)
-			if (e.getBlock().getType()==Material.DIRT ||
+			if ((e.getBlock().getType()==Material.DIRT ||
 					e.getBlock().getType()==Material.SAND ||
-					e.getBlock().getType()==Material.GRAVEL && Math.random()<=0.0025 /*0.25% chance*/) {
+					e.getBlock().getType()==Material.GRAVEL) && Math.random()<=0.0025 /*0.25% chance*/) {
 				ItemStack artifact = new ItemStack(Material.CLAY_BALL);
 				ItemMeta meta = artifact.getItemMeta();
 				List<String> lore = new ArrayList<String>();
@@ -4448,16 +4458,42 @@ implements Listener
 		//****************************// Job Boofs poof here.
 		if (result.getResult().getType()==Material.CLAY_BALL) {
 			//Check to see if there is an artifact in the crafting grid.
-			boolean artifact=false;
+			boolean artifact=false, ender_eye=false;
 			for (int i=0;i<result.getMatrix().length;i++) {
-				if (result.getMatrix()[i].getType()==Material.CLAY_BALL) {
-					//See if it's an artifact.
-					if (result.getMatrix()[i].hasItemMeta() && result.getMatrix()[i].getItemMeta().hasLore()) {
-						if (result.getMatrix()[i].getItemMeta().getLore().contains("This clump of material seems to")) {
-							
+				if (result.getMatrix()[i]!=null) {
+					if (result.getMatrix()[i].getType()==Material.CLAY_BALL) {
+						//See if it's an artifact.
+						if (result.getMatrix()[i].hasItemMeta() && result.getMatrix()[i].getItemMeta().hasLore()) {
+							for (int j=0;j<result.getMatrix()[i].getItemMeta().getLore().size();j++) {
+								if (result.getMatrix()[i].getItemMeta().getLore().get(j).contains("This clump of material seems to")) {
+									Bukkit.getLogger().info("Found the lore line.");
+									artifact=true;
+								}
+							}
 						}
 					}
+					if (result.getMatrix()[i].getType()==Material.EYE_OF_ENDER) {
+						Bukkit.getLogger().info("Found the eye of ender.");
+						ender_eye=true;
+					} //DERP
 				}
+			}
+			if (artifact && ender_eye) {
+				ItemStack artifact_result = new ItemStack(Material.CLAY_BALL);
+				ItemMeta meta = artifact_result.getItemMeta();
+				List<String> lore = new ArrayList<String>();
+				lore.add("This clump of material seems to");
+				lore.add("be part of something ancient.");
+				lore.add("");
+				lore.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+"This piece has a chance to be restored");
+				lore.add(ChatColor.LIGHT_PURPLE+""+ChatColor.ITALIC+"to its true potential.");
+				meta.setLore(lore);
+				artifact_result.setItemMeta(meta);
+				artifact_result.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+				result.setResult(artifact_result);
+			} else {
+				result.setResult(new ItemStack(Material.AIR));
+				return; //Don't allow it to continue.
 			}
 		}
 		//****************************//Job Non-Boofs go below.
@@ -13333,19 +13369,6 @@ implements Listener
 		//******************************//All Job Buff related items go in here.
 		if (e.getAction()==Action.LEFT_CLICK_BLOCK || e.getAction()==Action.RIGHT_CLICK_AIR) {
 			if (this.plugin.hasJobBuff("Builder", p, Job.JOB10)) {
-				if (this.plugin.hasJobBuff("Builder", p, Job.JOB30B)) {
-					p.removePotionEffect(PotionEffectType.JUMP);
-					p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,200,9));
-				}
-				if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && !p.getAllowFlight()) {
-					p.setAllowFlight(true);
-					p.sendMessage(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"Flight enabled...");
-					this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
-				} else {
-					if (this.plugin.hasJobBuff("Builder", p, Job.JOB40)) {
-						this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
-					}
-				}
 				//See if they are holding a line tool.
 				if (p.getItemInHand().getType()==Material.getMaterial(142)) {
 					//Check to see if this is the first block they clicked.
@@ -13362,6 +13385,19 @@ implements Listener
 						pd.SetClickedBlock(checkblock.getLocation());
 					} else {
 						if (pd.GetClickedBlock().distance(checkblock.getLocation())<=500) {//Make sure the range is small enough.
+							if (this.plugin.hasJobBuff("Builder", p, Job.JOB30B)) {
+								p.removePotionEffect(PotionEffectType.JUMP);
+								p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,200,9));
+							}
+							if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && !p.getAllowFlight()) {
+								p.setAllowFlight(true);
+								p.sendMessage(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"Flight enabled...");
+								this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
+							} else {
+								if (this.plugin.hasJobBuff("Builder", p, Job.JOB40)) {
+									this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
+								}
+							}
 							//Compare the blocks and see if they are the same.
 							boolean successful=true;
 							int expbefore = (int)this.plugin.getPlayerCurrentJobExp(p, "Builder");
@@ -13494,19 +13530,6 @@ implements Listener
 				}
 			}
 			if (e.getAction()==Action.LEFT_CLICK_BLOCK && this.plugin.hasJobBuff("Builder", p, Job.JOB5)) {
-				if (this.plugin.hasJobBuff("Builder", p, Job.JOB30B)) {
-					p.removePotionEffect(PotionEffectType.JUMP);
-					p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,200,9));
-				}
-				if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && !p.getAllowFlight()) {
-					p.setAllowFlight(true);
-					p.sendMessage(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"Flight enabled...");
-					this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
-				} else {
-					if (this.plugin.hasJobBuff("Builder", p, Job.JOB40)) {
-						this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
-					}
-				}
 				//See if they are holding a line tool.
 				if (p.getItemInHand().getType()==Material.getMaterial(141)) {
 					//Check to see if this is the first block they clicked.
@@ -13516,6 +13539,19 @@ implements Listener
 						pd.SetClickedBlock(e.getClickedBlock().getLocation());
 					} else {
 						if (pd.GetClickedBlock().distance(e.getClickedBlock().getLocation())<=500) {//Make sure the range is small enough.
+							if (this.plugin.hasJobBuff("Builder", p, Job.JOB30B)) {
+								p.removePotionEffect(PotionEffectType.JUMP);
+								p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,200,9));
+							}
+							if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && !p.getAllowFlight()) {
+								p.setAllowFlight(true);
+								p.sendMessage(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"Flight enabled...");
+								this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
+							} else {
+								if (this.plugin.hasJobBuff("Builder", p, Job.JOB40)) {
+									this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
+								}
+							}
 							int expbefore = (int)this.plugin.getPlayerCurrentJobExp(p, "Builder");
 							//Compare the blocks and see if they are the same.
 							boolean successful=true;

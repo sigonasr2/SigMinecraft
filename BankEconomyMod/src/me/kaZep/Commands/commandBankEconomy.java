@@ -45,6 +45,8 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import sig.ItemSets.DiabloDropsHook;
+
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -569,6 +571,9 @@ public String convertToItemName(String val) {
   					  p.sendMessage("Thanksgiving event enabled.");
   				  }
   				  this.plugin.saveConfig();
+  			  }
+  			  if (args[0].equalsIgnoreCase("diablodrops")) {
+  				  p.getWorld().dropItemNaturally(p.getLocation(), DiabloDropsHook.getRandomItem());
   			  }
   			  if (args[0].equalsIgnoreCase("loot")) {
   				p.getWorld().dropItemNaturally(p.getLocation(), this.plugin.generate_LootChest());  			  }

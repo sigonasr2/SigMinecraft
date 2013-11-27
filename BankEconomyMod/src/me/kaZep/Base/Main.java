@@ -575,6 +575,11 @@ public class Main extends JavaPlugin
     item_cube.setIngredient('c', Material.EMERALD_BLOCK);
     Bukkit.addRecipe(item_cube);
     
+    ShapelessRecipe artifact_clay = new ShapelessRecipe(new ItemStack(Material.CLAY_BALL));
+    artifact_clay.addIngredient(Material.CLAY_BALL);
+    artifact_clay.addIngredient(Material.EYE_OF_ENDER);
+    Bukkit.addRecipe(artifact_clay);
+    
 
     ItemSetList = new ItemSetList();
     ItemSetList.Init();
