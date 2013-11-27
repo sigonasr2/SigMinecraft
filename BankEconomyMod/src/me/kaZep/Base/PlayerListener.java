@@ -6977,7 +6977,7 @@ implements Listener
 
 	@EventHandler
 	public void onPlayerPickup(PlayerPickupItemEvent e) {
-		if (this.plugin.getAccountsConfig().getBoolean(e.getPlayer().getName()+".settings.notify1")) {
+		if (this.plugin.getAccountsConfig().getBoolean(e.getPlayer().getName().toLowerCase()+".settings.notify1")) {
 			Player p = e.getPlayer();
 			String temp = e.getItem().getItemStack().getType().name().replace("_", " ");
 			char[] mod = temp.toCharArray();
