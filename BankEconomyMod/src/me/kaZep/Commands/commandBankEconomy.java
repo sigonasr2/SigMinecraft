@@ -1579,8 +1579,11 @@ public String convertToItemName(String val) {
 			            	double otherz = target.getLocation().getZ();
 			            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase().toLowerCase() + ".money");
 			            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
+			            	//Bukkit.getLogger().info("finalcost1:"+finalcost);
 			            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
+			            	//Bukkit.getLogger().info("finalcost2:"+finalcost);
 			            	finalcost += finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
+			            	//Bukkit.getLogger().info("finalcost3:"+finalcost);
 			            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
 			            	if (mymoney>=finalcost) {
 			            		//Allow teleport to occur.
@@ -1626,8 +1629,11 @@ public String convertToItemName(String val) {
 			            	double otherz = target.getLocation().getZ();
 			            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase().toLowerCase() + ".money");
 			            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
+			            	Bukkit.getLogger().info("finalcost1:"+finalcost);
 			            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
+			            	Bukkit.getLogger().info("finalcost2:"+finalcost);
 			            	finalcost += finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
+			            	Bukkit.getLogger().info("finalcost3:"+finalcost);
 			            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
 			            	if (mymoney>=finalcost) {
 			            		//Allow teleport to occur.
@@ -1656,7 +1662,11 @@ public String convertToItemName(String val) {
 		            	double otherz = target.getLocation().getZ();
 		            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase().toLowerCase() + ".money");
 		            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
+		            	//Bukkit.getLogger().info("finalcost1:"+finalcost);
 		            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
+		            	//Bukkit.getLogger().info("finalcost2:"+finalcost);
+		            	finalcost += finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
+		            	//Bukkit.getLogger().info("finalcost3:"+finalcost);
 		            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
 		            	if (mymoney>=finalcost) {
 		            		//Allow teleport to occur.
