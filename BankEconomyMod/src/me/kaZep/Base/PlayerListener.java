@@ -2431,6 +2431,13 @@ implements Listener
 					double levelsmult=1.0;
 					if (totallvs>20*levelsmult) {
 						if (totallvs<40*levelsmult) {
+							//Can't have baby zombies at this level.
+							if (e.getEntity().getType()==EntityType.ZOMBIE) {
+								Zombie z = (Zombie)e.getEntity();
+								if (z.isBaby()) {
+									z.setBaby(false);
+								}
+							}
 							//Sometimes wear leather armor. Only for Skeletons and Zombies.
 							if (e.getEntity().getType()==EntityType.SKELETON || e.getEntity().getType()==EntityType.ZOMBIE) {
 								LivingEntity l = (LivingEntity) e.getEntity();
@@ -2449,6 +2456,13 @@ implements Listener
 							}
 						} else
 							if (totallvs<60*levelsmult) {
+								//Can't have baby zombies at this level.
+								if (e.getEntity().getType()==EntityType.ZOMBIE) {
+									Zombie z = (Zombie)e.getEntity();
+									if (z.isBaby()) {
+										z.setBaby(false);
+									}
+								}
 								//Wear leather armor a bit more often. Sometimes a chain piece here or there. Include a Wooden sword usually.
 								if (e.getEntity().getType()==EntityType.SKELETON || e.getEntity().getType()==EntityType.ZOMBIE) {
 									LivingEntity l = (LivingEntity) e.getEntity();
@@ -3022,6 +3036,15 @@ implements Listener
 				}
 			}
 		}
+		
+		if (e.getEntity() instanceof Zombie) {
+			Zombie z = (Zombie)e.getEntity();
+			if (z.isBaby() && z.getCustomName()!=null) {
+				//Can't have weird special baby zombies.
+				z.setBaby(false);
+			}
+		}
+		
 		if (e.getEntity().getType()==EntityType.EXPERIENCE_ORB) {
 			Bukkit.getWorld("world").spawnEntity(e.getEntity().getLocation(),e.getEntity().getType());
 		}
@@ -6046,17 +6069,19 @@ implements Listener
 				|| e.getEntity().getType()==EntityType.PIG || e.getEntity().getType()==EntityType.COW || e.getEntity().getType()==EntityType.OCELOT || e.getEntity().getType()==EntityType.WOLF
 				|| e.getEntity().getType()==EntityType.MUSHROOM_COW) {
 			LivingEntity f = e.getEntity();
-			if (f.getType()==EntityType.ZOMBIE || 
-					f.getType()==EntityType.SKELETON || 
-					f.getType()==EntityType.PIG_ZOMBIE || 
-					f.getType()==EntityType.SPIDER || 
-					f.getType()==EntityType.CREEPER || 
-					f.getType()==EntityType.ENDERMAN) {
-				
-				
+			if (f instanceof Monster) {
 				if (this.plugin.getConfig().getBoolean("thanksgiving-enabled") && Math.random()<=0.01) {
 					// 0.5% chance of loot chest dropping
 				    f.getWorld().dropItemNaturally(f.getLocation(), this.plugin.generate_LootChest());
+				}
+				if (f instanceof Zombie) {
+					Zombie z = (Zombie)f;
+					if (z.isBaby()) {
+						//Randomly drop a loot chest sometimes. (4.5% of the time.)
+						if (Math.random() <= 0.045) {
+							z.getWorld().dropItemNaturally(z.getLocation(), this.plugin.generate_LootChest());
+						}
+					}
 				}
 				//if (Math.random()<=0.005) {
 				/*
@@ -9887,6 +9912,17 @@ implements Listener
 						store.setItemMeta(meta);
 						p.sendMessage("Your "+meta.getDisplayName()+ChatColor.RESET+" has been repaired!");
 					}
+					if (storename.toLowerCase().contains("null")) {
+						store.setType(Material.DIAMOND_LEGGINGS);
+						ItemMeta meta = store.getItemMeta();
+						meta.setDisplayName(meta.getDisplayName().replace(ChatColor.DARK_GRAY+"[BROKEN] ",""));
+						List<String> lore = store.getItemMeta().getLore();
+						lore.remove(repairline);
+						lore.remove(repairline-1);
+						meta.setLore(lore);
+						store.setItemMeta(meta);
+						p.sendMessage("Your "+meta.getDisplayName()+ChatColor.RESET+" has been repaired!");
+					}
 					if (storename.contains("Diamond Helmet")) {
 						store.setType(Material.DIAMOND_HELMET);
 						ItemMeta meta = store.getItemMeta();
@@ -12224,10 +12260,11 @@ implements Listener
 				list[i].playSound(list[i].getLocation(), Sound.NOTE_PLING, 8, 0.7f);
 			}
 		}
+		/*Makes no sense as to why this is here.
 		if (!this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".revived")) {
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".revived", Boolean.valueOf(true));
 			//this.plugin.saveAccountsConfig();
-		}
+		}*/
 		if (this.plugin.getConfig().getBoolean("spleefinsession") && (p.getName().toLowerCase().compareTo(this.plugin.getConfig().getString("spleefrequestaplayer"))==0 || p.getName().compareTo(this.plugin.getConfig().getString("spleefrequestbplayer"))==0)) {
 			//This player was in spleef. End the spleef session as if this player lost.
 			//We lose. Other player wins.
@@ -12506,19 +12543,19 @@ implements Listener
 				}
 			}
 			if (!plugin.PlayerinJob(p, "Explorer") || (plugin.PlayerinJob(p, "Explorer") && plugin.getJobLv("Explorer", p)<20)) {
-				double balance = Main.economy.getBalance(p.getName().toLowerCase());
+				double balance = Main.economy.getBalance(p.getName());
 				double lose = plugin.getConfig().getDouble("losemoney.LoseAmount");
-				double loseAmount = Main.economy.getBalance(p.getName().toLowerCase()) / 100.0D * lose;
+				double loseAmount = Main.economy.getBalance(p.getName()) / 100.0D * lose;
 				String message = "You lost $%amount because you died.";
 				DecimalFormat df = new DecimalFormat("#0.00");
 				loseAmount = Double.parseDouble(df.format(loseAmount));
 				if (Main.economy.has(p.getName().toLowerCase(), loseAmount)) {
 					plugin.getLogger().info("Player " + p.getName() + "'s getting withdrawed with " + loseAmount + "$");
-					Main.economy.withdrawPlayer(p.getName().toLowerCase(), loseAmount);
+					Main.economy.withdrawPlayer(p.getName(), loseAmount);
 					message = message.replaceAll("%amount", String.valueOf(loseAmount));
 				} else {
 					plugin.getLogger().info("Player " + p.getName() + "'s getting withdrawed with " + balance + "$");
-					Main.economy.withdrawPlayer(p.getName().toLowerCase(), balance);
+					Main.economy.withdrawPlayer(p.getName(), balance);
 					message = message.replaceAll("%amount", String.valueOf(balance));
 				}
 				p.sendMessage(message);

@@ -75,9 +75,9 @@ public class commandBankEconomy
   String notEnoughMoney = "˜aYou do not own that amount of money.";
   String succesfullDeposited = "˜aYou have deposited˜b";
   String succesfullWithdraw = "˜aYou have withdrawn˜b";
-  String cmdTransferToPlayer1 = "˜aYou have transfered˜b";
+  String cmdTransferToPlayer1 = "˜aYou have transferred˜b";
   String cmdTransferToPlayer2 = "˜ato˜b";
-  String cmdTransferToTarget1 = "˜ahas transfered to you˜b";
+  String cmdTransferToTarget1 = "˜ahas transferred to you˜b";
   String cmdTransferSameNick = "˜aYou can't transfer money to yourself.";
   String cmdEditAvaibleActions = "˜aAvaible actions: status, balance";
   String cmdEditDisabledToPlayer1 = "˜aYou have disabled";
@@ -1580,6 +1580,7 @@ public String convertToItemName(String val) {
 			            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase().toLowerCase() + ".money");
 			            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
 			            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
+			            	finalcost = finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
 			            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
 			            	if (mymoney>=finalcost) {
 			            		//Allow teleport to occur.
@@ -1626,6 +1627,7 @@ public String convertToItemName(String val) {
 			            	double mymoney = this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase().toLowerCase() + ".money");
 			            	double finalcost = Math.abs(p.getLocation().getX()-otherx)+Math.abs(p.getLocation().getY()-othery)+Math.abs(p.getLocation().getZ()-otherz);
 			            	finalcost *= this.plugin.getConfig().getDouble("teleport-cost-rate");
+			            	finalcost = finalcost * 15 * ((p.getMaxHealth()-p.getHealth())/p.getMaxHealth());
 			            	//finalcost += mymoney*this.plugin.getConfig().getDouble("teleport-cost-tax");
 			            	if (mymoney>=finalcost) {
 			            		//Allow teleport to occur.
@@ -1719,10 +1721,11 @@ public String convertToItemName(String val) {
     		  if (this.plugin.getConfig().contains("jobs."+job+"_members")) {
     			  p.sendMessage("Players in the "+job_color+job+" job:");
     			  String[] players = this.plugin.getConfig().getString("jobs."+job+"_members").split(", ");
-    			  int lowest = 40;
+    			  int lowest = 999999;
     			  List<String> sorted_players = new ArrayList<String>();
     			  for (int i=0;i<players.length;i++) {
     				  sorted_players.add(players[i]); //Add everyone to the list.
+    				  Bukkit.getLogger().info("Add player "+players[i]);
     			  }
     			  //Sort them.
     			  List<String> sorted_list_players = new ArrayList<String>();
@@ -1740,7 +1743,10 @@ public String convertToItemName(String val) {
 	    				  sorted_list_players.add(sorted_players.get(lowest_slot));
 	    				  sorted_players.remove(lowest_slot);
 	    				  lowest_slot=-1;
-	    				  lowest=40;
+	    				  lowest=999999;
+    				  } else {
+    	        		  p.sendMessage(ChatColor.GOLD+"Sorry, something bad happened! Please report this to an administrator. (EC1)");
+    					  break; //Something bad happened.
     				  }
     			  }
     			  if (sorted_list_players.size()>0) {
@@ -1752,7 +1758,7 @@ public String convertToItemName(String val) {
     				  p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"- No one in this job yet. -");
     			  }
     		  } else {
-        		  p.sendMessage(ChatColor.GOLD+"Sorry, something bad happened! Please report this to an administrator.");
+        		  p.sendMessage(ChatColor.GOLD+"Sorry, something bad happened! Please report this to an administrator. (EC0)");
     		  }
     	  } else {
     		  p.sendMessage(ChatColor.RED+"Sorry, that is not a valid job!");
