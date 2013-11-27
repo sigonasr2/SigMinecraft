@@ -4842,7 +4842,7 @@ public void payDay(int time)
 		}
 		return false;
     }
-    
+
     public boolean is_PocketWorkbench(ItemStack workbench) {
 		if (workbench.hasItemMeta() && workbench.getItemMeta().hasLore()) {
 			//Check to see if the Lore contains anything.
