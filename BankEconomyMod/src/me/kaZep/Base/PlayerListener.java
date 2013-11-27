@@ -9961,6 +9961,27 @@ implements Listener
 		if (p.hasPermission("group.administrators")) {
 			p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.DARK_PURPLE+"");
 		}
+		
+		//*****************************// Job buffs here
+		if (event.getSlotType()==SlotType.RESULT && (event.getInventory().getType()==InventoryType.CRAFTING || event.getInventory().getType()==InventoryType.PLAYER || event.getInventory().getType()==InventoryType.WORKBENCH)) {
+			//Check if level 5 digger.
+			if (this.plugin.hasJobBuff("Digger", p, Job.JOB5) && event.getCurrentItem().getType()==Material.CLAY_BALL) {
+				//This could potentially be an artifact. Check the lore.
+				ItemStack result = event.getCurrentItem();
+				if (result.hasItemMeta() && result.getItemMeta().hasLore()) {
+					if (result.getItemMeta().getLore().contains("This clump of material seems to")) {
+						//This is an artifact. There is a 7.5% chance of it turning into an equipment.
+						if (Math.random()<=0.075) {
+							event.setCurrentItem(stack)
+						}
+					}
+				}
+			}
+		}
+		
+		
+		//****************************//End job buffs.
+		
 		if (event.getCursor()!=null || event.getCurrentItem()!=null) {
 			if (event.getCursor().getType()==Material.SULPHUR) {
 				//This is a broken Halloween item...Maybe. Let's find out.

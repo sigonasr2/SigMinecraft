@@ -5020,6 +5020,7 @@ public void payDay(int time)
   		  return 0;
   	  }
     }
+    
     public void setLv30Choice(Player p, String arg1, String arg2) {
     	if (getJobLv(arg1, p)>=30) {
 	    	if (arg2.equals("1") || arg2.equals("2")) {
@@ -5043,6 +5044,33 @@ public void payDay(int time)
     	notifyBuffMessages(p, 20);
     }
 
+    public ItemStack convertArtifact(ItemStack artifact) {
+    	//Converts an artifact into a really good piece of equipment. Decide the equipment style.
+    	int style = (int)(Math.random()*3);
+    	boolean diamond=false;
+    	if (Math.random()<=0.35) {
+    		diamond=true; //35% chance of the item being diamond. Otherwise it's iron.
+    	}
+    	if (Math.random()<=0.95) {
+	    	switch (style) {
+		    	case 0: {
+		    		//Adds 1 Level 8 enchantment and a Level 4 sub-enchant.
+		    		
+		    	}break;
+		    	case 1: {
+		    		//Adds many lower-level enchantments altogether. (Between Levels 2-4)
+		    		
+		    	}break;
+		    	case 2: {
+		    		//Only two focused bonus enchants. One if very highly specced, the other is average.
+		    		
+		    	}break;
+	    	}
+    	} else {
+    		//This is an actual Artifact piece. Has extremely strong stats with very high durability.
+    		
+    	}
+    }
     
     private static Method getMethod(Class<?> cl, String method)
     {
