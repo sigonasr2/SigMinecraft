@@ -6947,6 +6947,9 @@ implements Listener
 			if (e.getCause()==DamageCause.ENTITY_EXPLOSION || e.getCause()==DamageCause.BLOCK_EXPLOSION) {
 				e.setDamage(e.getDamage()*2);
 			}
+			if (e.getCause()==DamageCause.WITHER) {
+				e.setDamage(e.getDamage()*Math.pow(0.5, this.plugin.getWitherlessRoseCount(p)));
+			}
 			Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 				@Override
 				public void run() {

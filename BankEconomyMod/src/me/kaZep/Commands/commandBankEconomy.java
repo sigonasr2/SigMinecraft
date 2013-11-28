@@ -24,6 +24,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.SkullType;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Skull;
 import org.bukkit.command.Command;
@@ -1700,7 +1701,10 @@ public String convertToItemName(String val) {
 		            		is_in_vehicle=true;
 		            		vehicle = p.getVehicle();
 		            	}
-		            	if (target.getName().equalsIgnoreCase(this.plugin.getAccountsConfig().getString(p.getName().toLowerCase() + ".teleplayer"))) {
+		            	if (this.plugin.hasDistortionOrb(target)) {
+		            		p.getWorld().playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 0.9f, 1);
+		            		p.sendMessage(ChatColor.YELLOW + "A strange force prevents you from teleporting!");
+		            	} else if (target.getName().equalsIgnoreCase(this.plugin.getAccountsConfig().getString(p.getName().toLowerCase() + ".teleplayer"))) {
 			            	//Determine distance of player to other player.
 			            	double otherx = target.getLocation().getX();
 			            	double othery = target.getLocation().getY();

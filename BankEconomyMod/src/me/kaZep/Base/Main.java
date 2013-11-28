@@ -328,7 +328,7 @@ public class Main extends JavaPlugin
     nether_star.setIngredient('d', Material.DIAMOND);
     Bukkit.addRecipe(nether_star);
     
-  //Add Recipe for water source crafting.
+    //Add Recipe for water source crafting.
     ItemStack water = new ItemStack(Material.WATER, 8);
     ItemMeta water_name = water.getItemMeta();
    
@@ -350,6 +350,56 @@ public class Main extends JavaPlugin
     nether_water.setIngredient('b', Material.NETHER_STAR);
 
     Bukkit.addRecipe(nether_water);
+    
+    //Add Recipe for orb of distortion
+    ItemStack orb = new ItemStack(Material.SLIME_BALL, 1);
+    ItemMeta orb_name = orb.getItemMeta();
+   
+    List<String> orblore = new ArrayList<String>();
+    orblore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+    orblore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"This orb distorts space-time");
+    orblore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"around it, preventing anyone");
+    orblore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"from teleporting to its carrier.");
+    orb_name.setLore(orblore);
+    orb_name.setDisplayName(ChatColor.AQUA+"Orb of Distortion");
+
+    orb.setItemMeta(orb_name);
+    orb.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+
+    ShapedRecipe distortion_orb = new ShapedRecipe(orb);
+    
+    distortion_orb.shape("aaa", "aba", "aaa");
+    distortion_orb.setIngredient('a', Material.ENDER_PEARL);
+    distortion_orb.setIngredient('b', Material.ENDER_STONE);
+
+    Bukkit.addRecipe(distortion_orb);
+    
+    //Add Recipe for rose of distortion
+    ItemStack rose = new ItemStack(Material.RED_ROSE, 1);
+    ItemMeta rose_name = rose.getItemMeta();
+   
+    List<String> roselore = new ArrayList<String>();
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"This flower is infused with");
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"overwhelming magical power,");
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"causing it to never wilt.");
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"The holder of this flower");
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"will also be resistant to");
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"any "+ChatColor.RESET+"WITHER"+ChatColor.GRAY+""+ChatColor.ITALIC+" effects.");
+    rose_name.setLore(roselore);
+    rose_name.setDisplayName(ChatColor.AQUA+"Unwilting Flower");
+
+    rose.setItemMeta(rose_name);
+    rose.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+
+    ShapedRecipe witherless_rose = new ShapedRecipe(rose);
+    
+    witherless_rose.shape(" a ", "aba", " a ");
+    witherless_rose.setIngredient('a', Material.NETHER_STAR);
+    witherless_rose.setIngredient('b', Material.RED_ROSE);
+
+    Bukkit.addRecipe(witherless_rose);
     
   //Add Recipe for pocket crafting table
     ItemStack table = new ItemStack(Material.WORKBENCH);
@@ -4866,6 +4916,42 @@ public void payDay(int time)
   	  }
     }
 
+    public boolean hasDistortionOrb(Player p) {
+    	for (int m=0;m<p.getInventory().getContents().length;m++) {
+			if (p.getInventory().getContents()[m]!=null && p.getInventory().getContents()[m].getType()==Material.SLIME_BALL) { 
+				// See if lore matches distortion orb
+				if (p.getInventory().getContents()[m].getItemMeta().getLore()!=null) {
+					List<String> data = p.getInventory().getContents()[m].getItemMeta().getLore();
+					
+					for (int i=0;i<data.size();i++) {
+						if (data.get(i).contains("This orb distorts space-time")) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+    	return false;
+    }
+    
+    public int getWitherlessRoseCount(Player p) {
+    	int count = 0;
+    	for (int m=0;m<p.getInventory().getContents().length;m++) {
+			if (p.getInventory().getContents()[m]!=null && p.getInventory().getContents()[m].getType()==Material.RED_ROSE) { 
+				// See if lore matches distortion orb
+				if (p.getInventory().getContents()[m].getItemMeta().getLore()!=null) {
+					List<String> data = p.getInventory().getContents()[m].getItemMeta().getLore();
+					
+					for (int i=0;i<data.size();i++) {
+						if (data.get(i).contains("This flower is infused with")) {
+							count += p.getInventory().getContents()[m].getAmount();
+						}
+					}
+				}
+			}
+		}
+    	return count;
+    }
     
     private static Method getMethod(Class<?> cl, String method)
     {
