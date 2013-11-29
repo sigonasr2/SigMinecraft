@@ -25,6 +25,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.SkullType;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Skull;
 import org.bukkit.command.Command;
@@ -603,7 +604,8 @@ public String convertToItemName(String val) {
   				  }
   			  }
   			  if (args[0].equalsIgnoreCase("loot")) {
-  				p.getWorld().dropItemNaturally(p.getLocation(), this.plugin.generate_LootChest());  			  }
+  				p.getWorld().dropItemNaturally(p.getLocation(), this.plugin.generate_LootChest());  			  
+  			  }
   			  if (args[0].equalsIgnoreCase("thanksgiving")) {
   				  if (this.plugin.getConfig().getBoolean("thanksgiving-enabled")) {
   					  this.plugin.getConfig().set("thanksgiving-enabled", Boolean.valueOf(false));
@@ -632,6 +634,9 @@ public String convertToItemName(String val) {
   			  }
             } else
             if (cmd.getName().toLowerCase().equalsIgnoreCase("event") && args.length==2 && p.hasPermission("maintenance-mode-admin")) {
+			  if (args[0].equalsIgnoreCase("loot")) {
+	  				p.getWorld().dropItemNaturally(p.getLocation(), this.plugin.generate_LootChest(Integer.valueOf(args[1])));  			  
+  			  }
   			  if (args[0].equalsIgnoreCase("head")) {
   				  ItemStack m = new ItemStack(Material.SKULL_ITEM, 64, (short)SkullType.PLAYER.ordinal());
       				SkullMeta skullMeta = (SkullMeta) m.getItemMeta();
@@ -1766,7 +1771,10 @@ public String convertToItemName(String val) {
 		            		is_in_vehicle=true;
 		            		vehicle = p.getVehicle();
 		            	}
-		            	if (target.getName() == this.plugin.getAccountsConfig().getString(p.getName().toLowerCase() + ".teleplayer")) {
+		            	if (this.plugin.hasDistortionOrb(target)) {
+		            		p.getWorld().playSound(p.getLocation(), Sound.ENDERMAN_TELEPORT, 0.9f, 1);
+		            		p.sendMessage(ChatColor.YELLOW + "A strange force prevents you from teleporting!");
+		            	} else if (target.getName().equalsIgnoreCase(this.plugin.getAccountsConfig().getString(p.getName().toLowerCase() + ".teleplayer"))) {
 			            	//Determine distance of player to other player.
 			            	double otherx = target.getLocation().getX();
 			            	double othery = target.getLocation().getY();

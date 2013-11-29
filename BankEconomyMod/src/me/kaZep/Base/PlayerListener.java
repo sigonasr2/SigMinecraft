@@ -21,6 +21,7 @@ import net.milkbowl.vault.economy.EconomyResponse;
 
 
 
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -178,6 +179,8 @@ import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.bukkit.potion.Potion;
 
+import sig.ItemSets.DiabloDropsHook;
+
 import com.google.common.base.Objects;
 import com.modcrafting.diablodrops.DiabloDrops;
 import com.sk89q.worldedit.CuboidClipboard;
@@ -321,7 +324,7 @@ implements Listener
 		if (this.plugin.PlayerinJob(p, "Enchanter") && this.plugin.getJobLv("Enchanter", p)>=5) {
 			e.setAmount(e.getAmount()*2);
 		}
-		if (this.plugin.getAccountsConfig().getBoolean("halloween-enabled")) {
+		if (this.plugin.getAccountsConfig().getBoolean("halloween-enabled") || this.plugin.getConfig().getBoolean("thanksgiving-enabled")) {
 			e.setAmount(e.getAmount()*2);
 		}
 		if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify3")) {
@@ -4502,10 +4505,27 @@ implements Listener
 		if (result.getResult().getType()==Material.MELON_BLOCK) {
 			result.setResult(new ItemStack(Material.AIR));
 		}
+
+		if (result.getResult().getType()==Material.WOOL && result.getResult().getAmount() == 1) {
+			//Make sure the crafting matrix only contains three string.
+			int stringcount=0;
+			for (int i=0;i<result.getMatrix().length;i++) {
+				if (result.getMatrix()[i]!=null && result.getMatrix()[i].getType()==Material.STRING) {
+					stringcount++;
+				}
+			}
+			if (stringcount!=4) {
+				result.setResult(new ItemStack(Material.AIR));
+				return;
+			}
+		}
 		
 		// Increase stairs recipe efficiency
 		if (result.getResult().getType()==Material.WOOD_STAIRS) {
 			result.setResult(new ItemStack(Material.WOOD_STAIRS, 8));
+		}
+		if (result.getResult().getType()==Material.COBBLESTONE_STAIRS) {
+			result.setResult(new ItemStack(Material.COBBLESTONE_STAIRS, 8));
 		}
 		if (result.getResult().getType()==Material.BIRCH_WOOD_STAIRS) {
 			result.setResult(new ItemStack(Material.BIRCH_WOOD_STAIRS, 8));
@@ -5736,6 +5756,8 @@ implements Listener
     	// 2 = mythic item
     	// 3 = plentiful items
     	// 4 = multiple items
+    	// 5 = chaos items (diablodrops items)
+    	// 999 = Survivor's kit
 		switch (tier) {
 			case 1: {
 				loc.getWorld().dropItemNaturally(loc, getGoodie(0));
@@ -5745,13 +5767,13 @@ implements Listener
 			}break;
 			case 3: {
 				if (Math.random() < 0.1) {
-					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.LOG, (int)(Math.random() * 64) + 1));
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.NETHER_BRICK, (int)(Math.random() * 64) + 1));
 				} else 
 				if (Math.random() < 0.1) {
 					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.RAW_FISH, (int)(Math.random() * 64) + 1));
 				} else 
 				if (Math.random() < 0.1) {
-					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.BOOKSHELF, (int)(Math.random() * 64) + 1));
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.HAY_BLOCK, (int)(Math.random() * 64) + 1));
 				} else 
 				if (Math.random() < 0.1) {
 					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.CLAY, (int)(Math.random() * 64) + 1));
@@ -5760,35 +5782,56 @@ implements Listener
 					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.EXP_BOTTLE, (int)(Math.random() * 64) + 1));
 				} else 
 				if (Math.random() < 0.1) {
-					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.OBSIDIAN, (int)(Math.random() * 64) + 1));
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.NOTE_BLOCK, (int)(Math.random() * 64) + 1));
 				} else 
 				if (Math.random() < 0.1) {
 					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.MOSSY_COBBLESTONE, (int)(Math.random() * 64) + 1));
 				} else 
 				if (Math.random() < 0.1) {
-					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.HAY_BLOCK, (int)(Math.random() * 64) + 1));
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.BOOKSHELF, (int)(Math.random() * 64) + 1));
 				} else 
 				if (Math.random() < 0.1) {
 					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.QUARTZ_BLOCK, (int)(Math.random() * 64) + 1));
 				} else 
 				if (Math.random() < 0.1) {
-					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.NETHER_BRICK, (int)(Math.random() * 64) + 1));
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.OBSIDIAN, (int)(Math.random() * 64) + 1));
+				} else
+				if (Math.random() < 0.1) {
+					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.REDSTONE_LAMP_OFF, (int)(Math.random() * 64) + 1));
 				} else {
+					// Damn you got unlucky, better try next time
 					loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.WOOL, (int)(Math.random() * 64) + 1));
 				}
 			}break;
 			case 4: {
-				// Drop at least one stack, and five rolls for a 20% chance at an extra stack.
+				// Drop at least two stacks, and four rolls for a 20% chance at an extra stack.
 				loc.getWorld().dropItemNaturally(loc, getGoodie(0));
-				for (int i = 0; i < 5; i++) {
+				loc.getWorld().dropItemNaturally(loc, getGoodie(0));
+				for (int i = 0; i < 4; i++) {
+					// Averages one extra drop. Can be up to 4. 
 					if (Math.random() < 0.2) {
 						loc.getWorld().dropItemNaturally(loc, getGoodie(0));
 					}
-
 				}
 			}break;
 			case 5: {
+				loc.getWorld().dropItemNaturally(loc, DiabloDropsHook.getRandomItem());
+				for (int i = 0; i < 10 && Math.random() < 0.2; i++) {
+					// 20% for one extra, 4% for two extra, 0.8% for three extra, etc. 
+					loc.getWorld().dropItemNaturally(loc, DiabloDropsHook.getRandomItem());
+				}
+			}break;
+			case 6: {
 				// OMG NOT CODED YET WTF THIS SHOULDN'T HAPPEN
+			}break;
+			case 999: {
+				// Not yet obtainable
+				loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.WORKBENCH));
+				loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.FURNACE));
+				loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.WOOD, 16));
+				loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.COBBLESTONE, 16));
+				loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.TORCH, 16));
+				loc.getWorld().dropItemNaturally(loc, new ItemStack(Material.BREAD, 16));
 			}break;
 		}
 	}
@@ -5799,7 +5842,7 @@ implements Listener
 
 	public ItemStack getGoodie(int rar /*1=Mythical 0=Normal -1=Only an equipment*/) {
 		ItemStack item = null;
-		if (Math.random()<0.33 || rar==-1) {
+		if (Math.random()<0.33 || rar==-1 || rar==1) {
 			//Add a weapon/armor piece.
 			int rand = (int)(Math.random()*5);
 			String type = "";
@@ -6716,7 +6759,7 @@ implements Listener
 					}
 				}
 			}
-			if (this.plugin.getAccountsConfig().getBoolean("halloween-enabled")) {
+			if (this.plugin.getAccountsConfig().getBoolean("halloween-enabled") || this.plugin.getConfig().getBoolean("thanksgiving-enabled")) {
 				e.setDroppedExp(e.getDroppedExp()*2);
 			}
 			if (f.getKiller()!=null && f.getKiller().getType()==EntityType.PLAYER) {
@@ -6971,9 +7014,23 @@ implements Listener
 	@EventHandler
 	public void onFishCatch(PlayerFishEvent e) {
 		if (e.getState()==State.CAUGHT_FISH) {
-			if (this.plugin.getConfig().getBoolean("thanksgiving-enabled") && Math.random() < 0.10) {
-				// 5% chance of fishing up a loot chest
-				e.getPlayer().getWorld().dropItemNaturally(e.getPlayer().getLocation(), this.plugin.generate_LootChest());
+			if (this.plugin.getConfig().getBoolean("thanksgiving-enabled")) {
+				if (Math.random() < 0.50) {
+					// 50% chance of fishing up a chicken plus feathers
+					e.setExpToDrop(e.getExpToDrop() * 2);
+					e.getPlayer().getWorld().dropItemNaturally(e.getPlayer().getLocation(), new ItemStack(Material.RAW_CHICKEN));
+					e.getPlayer().getWorld().dropItemNaturally(e.getPlayer().getLocation(), new ItemStack(Material.FEATHER, 1 + (int)(Math.random() * 4)));
+				}
+				for (int c = 0; c < 5 && Math.random() < 0.20; c++) {
+					// 20% chance each of catching additional fish
+					e.setExpToDrop(e.getExpToDrop() + (int)(Math.random() * 6) + 1);
+					e.getPlayer().getWorld().dropItemNaturally(e.getPlayer().getLocation(), new ItemStack(Material.RAW_FISH));
+				}
+				if (Math.random() < 0.10) {
+					// 10% chance of fishing up a loot chest
+					e.setExpToDrop(e.getExpToDrop() + (int)(Math.random() * 6) + 1);
+					e.getPlayer().getWorld().dropItemNaturally(e.getPlayer().getLocation(), this.plugin.generate_LootChest());
+				}
 			}
 			Player p = e.getPlayer();
 			if (this.plugin.PlayerinJob(p, "Fisherman")) {
@@ -7397,6 +7454,9 @@ implements Listener
 			final Player p = (Player)e.getEntity();
 			if (e.getCause()==DamageCause.ENTITY_EXPLOSION || e.getCause()==DamageCause.BLOCK_EXPLOSION) {
 				e.setDamage(e.getDamage()*2);
+			}
+			if (e.getCause()==DamageCause.WITHER) {
+				e.setDamage(e.getDamage()*Math.pow(0.5, this.plugin.getWitherlessRoseCount(p)));
 			}
 			Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 				@Override
@@ -11422,7 +11482,7 @@ implements Listener
 			Location loc = e.getEntity().getLocation(); 
 			ItemStack item = null;
 			
-			switch ((int)(Math.random()*112)) {
+			switch ((int)(Math.random()*111.01)) {
 				case 0:{
 					item = new ItemStack(Material.WOOD_HOE);
 				}break;
@@ -11640,7 +11700,7 @@ implements Listener
 					item = new ItemStack(Material.BROWN_MUSHROOM);
 				}break;
 				case 92:{
-					item = new ItemStack(Material.SNOW_BALL);
+					item = new ItemStack(Material.SNOW_BALL, 1 + (int)(Math.random() * 16));
 				}break;
 				case 93:{
 					item = new ItemStack(Material.FENCE);
@@ -11808,7 +11868,7 @@ implements Listener
 							item = new ItemStack(Material.DIAMOND);
 						}break;
 						case 3:{
-							item = new ItemStack(Material.GOLD_INGOT);
+							item = new ItemStack(Material.GOLD_INGOT, 1 + (int)(Math.random() * 2));
 						}break;
 						case 4:{
 							item = new ItemStack(Material.GOLDEN_APPLE);
@@ -11867,7 +11927,7 @@ implements Listener
 								case 1:
 								case 2:
 								case 3:{
-									item = new ItemStack(Material.SKULL_ITEM);
+									item = new ItemStack(Material.SKULL_ITEM, 1 + (int)(Math.random() * 6));
 									item.setData(new MaterialData(Material.SKULL_ITEM, (byte) 1));
 								}break;
 								case 4:{
@@ -11885,13 +11945,13 @@ implements Listener
 					}
 				}break;
 				case 107:{
-					item = new ItemStack(Material.COOKIE, 8);
+					item = new ItemStack(Material.COOKIE, 1 + (int)(Math.random() * 8));
 				}break;
 				case 108:{
-					item = new ItemStack(Material.SEEDS, 42);
+					item = new ItemStack(Material.SEEDS, 1 + (int)(Math.random() * 64));
 				}break;
 				case 109:{
-					item = new ItemStack(Material.PAINTING, 16);
+					item = new ItemStack(Material.PAINTING, 1 + (int)(Math.random() * 32));
 				}break;
 				case 110:{
 					item = getGoodie(0);
@@ -12359,7 +12419,7 @@ implements Listener
 			p.closeInventory();
 		}
 		for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
-			if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName().toLowerCase())==0) {
+			if (this.plugin.SPEED_CONTROL.get(i).p.getName().toLowerCase().compareTo(p.getName().toLowerCase())==0) {
 				p.removePotionEffect(PotionEffectType.SPEED);
 				//If they have a "speed" potion, give it back.
 				p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((this.plugin.SPEED_CONTROL.get(i).potion_time-Main.SERVER_TICK_TIME)*2), this.plugin.SPEED_CONTROL.get(i).potion_spdlv, true));

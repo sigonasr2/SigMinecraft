@@ -332,7 +332,7 @@ public class Main extends JavaPlugin
     nether_star.setIngredient('d', Material.DIAMOND);
     Bukkit.addRecipe(nether_star);
     
-  //Add Recipe for water source crafting.
+    //Add Recipe for water source crafting.
     ItemStack water = new ItemStack(Material.WATER, 8);
     ItemMeta water_name = water.getItemMeta();
    
@@ -354,6 +354,56 @@ public class Main extends JavaPlugin
     nether_water.setIngredient('b', Material.NETHER_STAR);
 
     Bukkit.addRecipe(nether_water);
+    
+    //Add Recipe for orb of distortion
+    ItemStack orb = new ItemStack(Material.SLIME_BALL, 1);
+    ItemMeta orb_name = orb.getItemMeta();
+   
+    List<String> orblore = new ArrayList<String>();
+    orblore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+    orblore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"This orb distorts space-time");
+    orblore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"around it, preventing anyone");
+    orblore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"from teleporting to its carrier.");
+    orb_name.setLore(orblore);
+    orb_name.setDisplayName(ChatColor.AQUA+"Orb of Distortion");
+
+    orb.setItemMeta(orb_name);
+    orb.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+
+    ShapedRecipe distortion_orb = new ShapedRecipe(orb);
+    
+    distortion_orb.shape("aaa", "aba", "aaa");
+    distortion_orb.setIngredient('a', Material.ENDER_PEARL);
+    distortion_orb.setIngredient('b', Material.ENDER_STONE);
+
+    Bukkit.addRecipe(distortion_orb);
+    
+    //Add Recipe for rose of distortion
+    ItemStack rose = new ItemStack(Material.RED_ROSE, 1);
+    ItemMeta rose_name = rose.getItemMeta();
+   
+    List<String> roselore = new ArrayList<String>();
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"This flower is infused with");
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"overwhelming magical power,");
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"causing it to never wilt.");
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"The holder of this flower");
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"will also be resistant to");
+    roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"any "+ChatColor.RESET+"WITHER"+ChatColor.GRAY+""+ChatColor.ITALIC+" effects.");
+    rose_name.setLore(roselore);
+    rose_name.setDisplayName(ChatColor.AQUA+"Unwilting Flower");
+
+    rose.setItemMeta(rose_name);
+    rose.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+
+    ShapedRecipe witherless_rose = new ShapedRecipe(rose);
+    
+    witherless_rose.shape(" a ", "aba", " a ");
+    witherless_rose.setIngredient('a', Material.NETHER_STAR);
+    witherless_rose.setIngredient('b', Material.RED_ROSE);
+
+    Bukkit.addRecipe(witherless_rose);
     
   //Add Recipe for pocket crafting table
     ItemStack table = new ItemStack(Material.WORKBENCH);
@@ -2707,6 +2757,23 @@ public void checkJukeboxes() {
     	LOGGING_UPDATE_COUNTS=0;
           for (int i=0;i<SPEED_CONTROL.size();i++) {
         	  SPEED_CONTROL.get(i).updatePlayerSpd();
+        	  try
+        	  {
+        	      String filename= "PlayerBuffData.txt";
+        	      FileWriter fw = new FileWriter(filename,true); //the true will append the new data
+        	      fw.write("["+SERVER_TICK_TIME+"]"+"PlayerBuffData for "+SPEED_CONTROL.get(i).p.getName()+": "+SPEED_CONTROL.get(i).toString()+"\n");//appends the string to the file
+        	      if (i+1==SPEED_CONTROL.size()) {
+        	    	  fw.write("========\n");
+        	      }
+        	      fw.close();
+        	  }
+        	  catch(IOException ioe)
+        	  {
+        	      System.err.println("IOException: " + ioe.getMessage());
+        	  }
+          }
+          if (SPEED_CONTROL.size()!=Bukkit.getOnlinePlayers().length) {
+        	  Bukkit.getLogger().warning("["+SERVER_TICK_TIME+"]SPEED_CONTROL and ONLINE PLAYERS list length don't match! ("+SPEED_CONTROL.size()+"/"+Bukkit.getOnlinePlayers().length+")");
           }
           LOGGING_UPDATE_COUNTS++; //1
           for (int i=0;i<explorers.size();i++) {
@@ -3805,7 +3872,7 @@ public void payDay(int time)
 	public void gainMoneyExp(Player p,String job,double amount,double exp) {
 		String[] jobs = getJobs(p);
 		int slot=-1;
-		if (getConfig().getBoolean("halloween-enabled")) {
+		if (getConfig().getBoolean("halloween-enabled") || getConfig().getBoolean("thanksgiving-enabled")) {
 			amount*=2;
 			exp*=2;
 		}
@@ -3896,7 +3963,7 @@ public void payDay(int time)
 	public void gainMoney(Player p,String job,double amount) {
 		String[] jobs = getJobs(p);
 		int slot=-1;
-		if (getConfig().getBoolean("halloween-enabled")) {
+		if (getConfig().getBoolean("halloween-enabled") || getConfig().getBoolean("thanksgiving-enabled")) {
 			amount*=2;
 		}
 		//Add to how much we've earned so far.
@@ -4888,6 +4955,9 @@ public void payDay(int time)
 				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"You can feel a variety of")) {
 					return 4; // Multiloot
 				}
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"A torrential flow of dark")) {
+					return 5; // Chaos loot
+				}
 			}
 			
 			
@@ -4939,9 +5009,23 @@ public void payDay(int time)
 		    chest_name.setLore(chestlore);
 
 		    chest.setItemMeta(chest_name);
-	    } else if (rand < 0.1 || tier == 4) {
-	    	// Generate a double chest
-	    	chest_name.setDisplayName(ChatColor.YELLOW+"Closed Chest");
+	    } else if (rand < 0.04 || tier == 5) {
+	    	// Generate a chaos chest
+	    	chest_name.setDisplayName(ChatColor.RED+"Chaos Chest");
+		 	   
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A torrential flow of dark");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"energy causes the chest to");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"shake uncontrollably! You");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"have absolutely zero idea");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"what may be inside.");
+		    chest_name.setLore(chestlore);
+
+		    chest.setItemMeta(chest_name);
+	    } else if (rand < 0.12 || tier == 4) {
+	    	// Generate a loaded chest
+	    	chest_name.setDisplayName(ChatColor.YELLOW+"Loaded Chest");
 		 	   
 		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
 		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
@@ -5019,6 +5103,42 @@ public void payDay(int time)
   	  } else {
   		  return 0;
   	  }
+    }
+    public boolean hasDistortionOrb(Player p) {
+    	for (int m=0;m<p.getInventory().getContents().length;m++) {
+			if (p.getInventory().getContents()[m]!=null && p.getInventory().getContents()[m].getType()==Material.SLIME_BALL) { 
+				// See if lore matches distortion orb
+				if (p.getInventory().getContents()[m].getItemMeta().getLore()!=null) {
+					List<String> data = p.getInventory().getContents()[m].getItemMeta().getLore();
+					
+					for (int i=0;i<data.size();i++) {
+						if (data.get(i).contains("This orb distorts space-time")) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+    	return false;
+    }
+    
+    public int getWitherlessRoseCount(Player p) {
+    	int count = 0;
+    	for (int m=0;m<p.getInventory().getContents().length;m++) {
+			if (p.getInventory().getContents()[m]!=null && p.getInventory().getContents()[m].getType()==Material.RED_ROSE) { 
+				// See if lore matches distortion orb
+				if (p.getInventory().getContents()[m].getItemMeta().getLore()!=null) {
+					List<String> data = p.getInventory().getContents()[m].getItemMeta().getLore();
+					
+					for (int i=0;i<data.size();i++) {
+						if (data.get(i).contains("This flower is infused with")) {
+							count += p.getInventory().getContents()[m].getAmount();
+						}
+					}
+				}
+			}
+		}
+    	return count;
     }
     
     public void setLv30Choice(Player p, String arg1, String arg2) {

@@ -30,6 +30,16 @@ public class PlayerBuffData {
 	double money_gained=0;
 	long last_money_report_time=0;
 	public Main plugin;
+	
+	public String toString() {
+		//A method that outputs this class as a string.
+		return "PlayerBuffData@{p = "+((p!=null)?p.toString():"null")+", base_spdlv = "+base_spdlv+", base_armorlv = "+base_armorlv+", armorbufflist = "+
+		((armorbufflist!=null)?armorbufflist.toString():"null")+", base_hplv = "+base_hplv+", hpbufflist = "+((hpbufflist!=null)?hpbufflist.toString():"null")+", helmet_durability = "+
+		helmet_durability+", chestplate_durability = "+chestplate_durability+", leggings_durability = "+leggings_durability+"," +
+				" boots_durability = "+boots_durability+", potion_spdlv = "+potion_spdlv+", potion_time = "+potion_time+", hpbuff_time = "+
+				hpbuff_time+", extra_hp = "+extra_hp+", money_gained = "+money_gained+", last_money_report_time = "+last_money_report_time+"," +
+				"plugin = "+((plugin!=null)?plugin.toString():"null")+"}";
+	}
 
 	public String healthbar(double curHP,double maxHP) {
 		  //笆�笆�
