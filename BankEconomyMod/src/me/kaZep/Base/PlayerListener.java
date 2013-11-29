@@ -12303,7 +12303,7 @@ implements Listener
 			p.closeInventory();
 		}
 		for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
-			if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName().toLowerCase())==0) {
+			if (this.plugin.SPEED_CONTROL.get(i).p.getName().toLowerCase().compareTo(p.getName().toLowerCase())==0) {
 				p.removePotionEffect(PotionEffectType.SPEED);
 				//If they have a "speed" potion, give it back.
 				p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((this.plugin.SPEED_CONTROL.get(i).potion_time-Main.SERVER_TICK_TIME)*2), this.plugin.SPEED_CONTROL.get(i).potion_spdlv, true));
