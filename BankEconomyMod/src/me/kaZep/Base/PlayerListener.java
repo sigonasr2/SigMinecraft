@@ -4101,13 +4101,25 @@ implements Listener
 		}
 
 		if (result.getResult().getType()==Material.WOOL && result.getResult().getAmount() == 1) {
-			result.setResult(new ItemStack(Material.AIR));
-			return;
+			//Make sure the crafting matrix only contains three string.
+			int stringcount=0;
+			for (int i=0;i<result.getMatrix().length;i++) {
+				if (result.getMatrix()[i]!=null && result.getMatrix()[i].getType()==Material.STRING) {
+					stringcount++;
+				}
+			}
+			if (stringcount!=4) {
+				result.setResult(new ItemStack(Material.AIR));
+				return;
+			}
 		}
 
 		// Increase stairs recipe efficiency
 		if (result.getResult().getType()==Material.WOOD_STAIRS) {
 			result.setResult(new ItemStack(Material.WOOD_STAIRS, 8));
+		}
+		if (result.getResult().getType()==Material.COBBLESTONE_STAIRS) {
+			result.setResult(new ItemStack(Material.COBBLESTONE_STAIRS, 8));
 		}
 		if (result.getResult().getType()==Material.BIRCH_WOOD_STAIRS) {
 			result.setResult(new ItemStack(Material.BIRCH_WOOD_STAIRS, 8));
