@@ -1609,7 +1609,7 @@ public String convertToItemName(String val) {
 	        		  teleportloc = p.getWorld().getSpawnLocation();
 	        	  }
 	        	  teleportloc.setX(deathX);
-	        	  teleportloc.setY(deathY);
+	        	  teleportloc.setY(deathY+1);
 	        	  teleportloc.setZ(deathZ);
 	        	  teleportloc.setWorld(Bukkit.getWorld(deathWorld));
 	        	  //p.sendMessage("Got 6.");

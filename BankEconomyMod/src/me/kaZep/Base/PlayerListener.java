@@ -1411,6 +1411,8 @@ implements Listener
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
 		Team tempteam;
+		//p.sendMessage("Roman numeral version of 64 is "+this.plugin.toRomanNumeral(64)+" and 193 is "+this.plugin.toRomanNumeral(193));
+		//p.sendMessage("Numeric version of XXVII and DLXIX are "+this.plugin.toNumber("XXVII")+" and "+this.plugin.toNumber("DLXIX"));
 		if (this.plugin.getConfig().getBoolean("halloween-enabled")) {
 			Bukkit.getWorld("world").setDifficulty(Difficulty.EASY);
 		} else {
@@ -1738,6 +1740,7 @@ implements Listener
 				this.plugin.getConfig().set("spleefinsession", Boolean.valueOf(false));
 			}
 		}
+		this.plugin.notifyBuffMessages(p);
 		boolean found=false;
 		for (int i=0;i<this.plugin.playerdata_list.size();i++) {
 			if (this.plugin.playerdata_list.get(i).data.getName().compareToIgnoreCase(p.getName().toLowerCase())==0) {
@@ -3522,6 +3525,29 @@ implements Listener
 			}
 		}
 	}
+	
+	public void getDiggerCredit(Player p, Block b) {
+		if (this.plugin.getPlayerData(p).GoodInteract()) {
+			if (b.getType()==Material.DIRT) {
+				this.plugin.gainMoneyExp(p,"Miner",0.01,1);
+			}
+			if (b.getType()==Material.GRASS) {
+				this.plugin.gainMoneyExp(p,"Miner",0.01,2);
+			}
+			if (b.getType()==Material.SAND) {
+				this.plugin.gainMoneyExp(p,"Miner",0.02,2);
+			}
+			if (b.getType()==Material.GRAVEL) {
+				this.plugin.gainMoneyExp(p,"Miner",0.04,5);
+			}
+			if (b.getType()==Material.SOUL_SAND) {
+				this.plugin.gainMoneyExp(p,"Miner",0.08,8);
+			}
+			if (b.getType()==Material.CLAY) {
+				this.plugin.gainMoneyExp(p,"Miner",0.10,10);
+			}
+		}
+	}
 
 
 	@EventHandler
@@ -3698,9 +3724,16 @@ implements Listener
 		}
 		if (this.plugin.hasJobBuff("Digger", p, Job.JOB5)) {
 			//Applies to dirt, sand, and gravel blocks. A small chance that a nearby block drops an artifact piece (clay with enchantment to glow)
+			double findrate = 0.0025; /*0.25% chance*/
+			if (this.plugin.hasJobBuff("Digger", p, Job.JOB20)) {
+				findrate=0.003125; /*0.31% chance*/
+			}
 			if ((e.getBlock().getType()==Material.DIRT ||
+					e.getBlock().getType()==Material.SOUL_SAND ||
+					e.getBlock().getType()==Material.CLAY ||
+					e.getBlock().getType()==Material.GRASS ||
 					e.getBlock().getType()==Material.SAND ||
-					e.getBlock().getType()==Material.GRAVEL) && Math.random()<=0.0025 /*0.25% chance*/) {
+					e.getBlock().getType()==Material.GRAVEL) && Math.random()<=findrate) {
 				ItemStack artifact = new ItemStack(Material.CLAY_BALL);
 				ItemMeta meta = artifact.getItemMeta();
 				List<String> lore = new ArrayList<String>();
@@ -3713,6 +3746,99 @@ implements Listener
 				artifact.setItemMeta(meta);
 				e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), artifact);
 			}
+		}
+		if (p.getItemInHand().getType()==Material.WOOD_SPADE && this.plugin.hasJobBuff("Digger", p, Job.JOB20)) {
+			if (this.plugin.getPlayerData(p).GoodInteract()) {
+				if (e.getBlock().getType()==Material.DIRT) {
+					this.plugin.gainMoneyExp(p,"Digger",0.005,1);
+				}
+				if (e.getBlock().getType()==Material.GRASS) {
+					this.plugin.gainMoneyExp(p,"Digger",0.005,2);
+				}
+				if (e.getBlock().getType()==Material.SAND) {
+					this.plugin.gainMoneyExp(p,"Digger",0.01,2);
+				}
+				if (e.getBlock().getType()==Material.GRAVEL) {
+					this.plugin.gainMoneyExp(p,"Digger",0.02,5);
+				}
+				if (e.getBlock().getType()==Material.SOUL_SAND) {
+					this.plugin.gainMoneyExp(p,"Digger",0.04,8);
+				}
+				if (e.getBlock().getType()==Material.CLAY) {
+					this.plugin.gainMoneyExp(p,"Digger",0.05,10);
+				}
+			}
+			if (e.getBlock().getType()==Material.SAND ||
+					e.getBlock().getType()==Material.GRAVEL) {
+				double findrate = 0.0025; /*0.25% chance*/
+				if (this.plugin.hasJobBuff("Digger", p, Job.JOB20)) {
+					findrate=0.003125; /*0.31% chance*/
+				}
+				//Check above blocks and destroy them if possible.
+				//If it's gravel, drop flint sometimes instead. Check if there is silk touch and fortune too to modify the result.
+				int y = 1;
+				while ((e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation().add(0,y,0)).getType()==Material.SAND ||
+						e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation().add(0,y,0)).getType()==Material.GRAVEL) &&
+						e.getBlock().getLocation().getBlockY()+y<=256) {
+					if (e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation().add(0,y,0)).getType()==Material.SAND) {
+						e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(0,y,0), new ItemStack(Material.SAND));
+					} else {
+						//This is gravel.
+						if (p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)>0) {
+							//Multiply chance of getting flint instead of gravel.
+							if (Math.random()<=0.25*p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)) {
+								e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(0,y,0), new ItemStack(Material.FLINT));
+							} else {
+								e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(0,y,0), new ItemStack(Material.GRAVEL));
+							}
+						} else
+						if (p.getItemInHand().getEnchantmentLevel(Enchantment.SILK_TOUCH)>0) {
+							//Always drop gravel.
+							e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(0,y,0), new ItemStack(Material.GRAVEL));
+						} else {
+							//Drop flint sometimes.
+							if (Math.random()<=0.10) {
+								e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(0,y,0), new ItemStack(Material.FLINT));
+							} else {
+								e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(0,y,0), new ItemStack(Material.GRAVEL));
+							}
+						}
+					}
+					getDiggerCredit(p, e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation().add(0,y,0)));
+					e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation().add(0,y,0)).setType(Material.AIR);
+					if (Math.random()<=findrate) {
+						ItemStack artifact = new ItemStack(Material.CLAY_BALL);
+						ItemMeta meta = artifact.getItemMeta();
+						List<String> lore = new ArrayList<String>();
+						lore.add("This clump of material seems to");
+						lore.add("be part of something ancient.");
+						lore.add("");
+						lore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"Combine this piece with Eyes of Ender");
+						lore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"to perhaps restore its true potential.");
+						meta.setLore(lore);
+						artifact.setItemMeta(meta);
+						e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), artifact);
+					}
+					y++;
+				}
+			}
+		}
+		if (p.getItemInHand().getType()==Material.WOOD_SPADE && this.plugin.hasJobBuff("Digger", p, Job.JOB30B)) {
+			boolean is_battleShovel=false;
+			if (p.getItemInHand().hasItemMeta() && p.getItemInHand().getItemMeta().hasLore()) {
+				for (int i=0;i<p.getItemInHand().getItemMeta().getLore().size();i++) {
+					if (p.getItemInHand().getItemMeta().getLore().get(i).contains(ChatColor.GOLD+"Whenever this shovel destroys")) {
+						is_battleShovel=true;
+					}
+				}
+			}
+			if (is_battleShovel) {
+				//Bukkit.getLogger().info("Facing vector: "+p.getLocation().getDirection().toString());
+				this.plugin.ARROW_SHOOTERS.add(new ArrowShooter(p.getLocation().getDirection(), e.getBlock().getLocation().add(0.5,0.5,-0.5), 80, 4, p, 4.0f, 8f));
+			}
+		}
+		if (p.getItemInHand().getType().name().toLowerCase().contains("spade") && this.plugin.hasJobBuff("Digger", p, Job.JOB30A)) {
+			p.getItemInHand().setDurability((short)0);
 		}
 		//*******************************//Job Buffs end here!
 
@@ -3932,6 +4058,9 @@ implements Listener
 			if (this.plugin.PlayerinJob(p, "Builder")) {
 				this.plugin.playerdata_list.get(myData).BadInteract(e.getBlock().getType());
 			}
+			if (this.plugin.PlayerinJob(p, "Digger")) {
+				getDiggerCredit(p, e.getBlock());
+			}
 			if (this.plugin.PlayerinJob(p, "Woodcutter")) {
 				if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
 					if (e.getBlock().getType()==Material.LOG) {
@@ -3992,28 +4121,6 @@ implements Listener
 																			if (e.getBlock().getType()==Material.EMERALD_ORE && !has_silktouch) {
 																				this.plugin.gainMoneyExp(p,"Miner",0.7625,160);
 																			}
-				}
-			}
-			if (this.plugin.PlayerinJob(p, "Digger")) {
-				if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
-					if (e.getBlock().getType()==Material.DIRT) {
-						this.plugin.gainMoneyExp(p,"Digger",0.005,1);
-					}
-					if (e.getBlock().getType()==Material.GRASS) {
-						this.plugin.gainMoneyExp(p,"Digger",0.005,2);
-					}
-					if (e.getBlock().getType()==Material.SAND) {
-						this.plugin.gainMoneyExp(p,"Digger",0.01,2);
-					}
-					if (e.getBlock().getType()==Material.GRAVEL) {
-						this.plugin.gainMoneyExp(p,"Digger",0.02,5);
-					}
-					if (e.getBlock().getType()==Material.SOUL_SAND) {
-						this.plugin.gainMoneyExp(p,"Digger",0.04,8);
-					}
-					if (e.getBlock().getType()==Material.CLAY) {
-						this.plugin.gainMoneyExp(p,"Digger",0.05,10);
-					}
 				}
 			}
 			//p.sendMessage("You broke the "+e.getBlock().getType()+", Data: "+e.getBlock().getData());
@@ -4499,7 +4606,61 @@ implements Listener
 				return; //Don't allow it to continue.
 			}
 		}
+
+		boolean is_battleShovel=false;
+		if (result.getResult().getType()==Material.WOOD_SPADE) {
+			//See if we're trying to make the battle shovel.
+			if (result.getResult().hasItemMeta() && result.getResult().getItemMeta().hasLore()) {
+				for (int i=0;i<result.getResult().getItemMeta().getLore().size();i++) {
+					if (result.getResult().getItemMeta().getLore().get(i).contains(ChatColor.GOLD+"Whenever this shovel destroys")) {
+						is_battleShovel=true;
+						break;
+					}
+				}
+			}
+		}
+		boolean allowed=false;
+		if (is_battleShovel) {
+			for (int i=0;i<e.getInventory().getViewers().size();i++) {
+				if (this.plugin.hasJobBuff("Digger", e.getInventory().getViewers().get(i).getName(), Job.JOB30B)) {
+					allowed=true;
+				}
+			}
+			if (!allowed) {
+				result.setResult(new ItemStack(Material.AIR));
+				return;
+			}
+		}
+		
 		//****************************//Job Non-Boofs go below.
+		
+
+		ItemStack armor1 = null;
+		for (int i=0;i<result.getMatrix().length;i++) {
+			//Disable crafting if two pieces of the same armor are in the slots.
+			if (armor1 != null && result.getMatrix()[i]!=null) {
+				if (result.getMatrix()[i].getType().name().toLowerCase().contains("helmet") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("chestplate") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("leggings") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("boots")) {
+					if (armor1.getType()==result.getMatrix()[i].getType()) {
+						//Two pieces with the same type. Disable merge crafting.
+						result.setResult(new ItemStack(Material.AIR));
+						return;
+					} else {
+						//Although at this point it really doesn't matter, since we had two or more armor pieces inside.
+						break;
+					}
+				}
+			} else
+			if (armor1 == null && result.getMatrix()[i]!=null && 
+				(result.getMatrix()[i].getType().name().toLowerCase().contains("helmet") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("chestplate") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("leggings") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("boots"))) {
+				armor1 = result.getMatrix()[i];
+			}
+		}
 
 		// Disable melon crafting recipe
 		if (result.getResult().getType()==Material.MELON_BLOCK) {
@@ -5668,86 +5829,26 @@ implements Listener
 	@EventHandler
 	public void onItemChange(PlayerItemHeldEvent e) {
 		Player p = e.getPlayer();
-		if (this.plugin.PlayerinJob(p, "Miner") && this.plugin.getJobLv("Miner", p)>=20) {
-			if (p.getInventory().getContents()[e.getNewSlot()]!=null && 
-					(p.getInventory().getContents()[e.getNewSlot()].getType()==Material.WOOD_PICKAXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.IRON_PICKAXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.GOLD_PICKAXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.DIAMOND_PICKAXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.STONE_PICKAXE)) {
+		
+		//**************************//Job Buffs begin here.
+		if (p.getInventory().getContents()[e.getNewSlot()]!=null) {
+			if (p.getInventory().getContents()[e.getNewSlot()].getType().name().toLowerCase().contains("pickaxe") && this.plugin.hasJobBuff("Miner", p, Job.JOB10)) {
 				ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
-				if (!currentitem.containsEnchantment(Enchantment.getByName("DIG_SPEED"))) {
-					currentitem.addEnchantment(Enchantment.getByName("DIG_SPEED"), 2);
-				} else {
-					//if (currentitem.getEnchantmentLevel())
+				if (currentitem.getEnchantmentLevel(Enchantment.getByName("DIG_SPEED"))<3) {
+					currentitem.addUnsafeEnchantment(Enchantment.getByName("DIG_SPEED"), 3);
 				}
 			}
-		} else
-			if (this.plugin.PlayerinJob(p, "Miner") && this.plugin.getJobLv("Miner", p)>=5) {
-				if (p.getInventory().getContents()[e.getNewSlot()]!=null && 
-						(p.getInventory().getContents()[e.getNewSlot()].getType()==Material.WOOD_PICKAXE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.IRON_PICKAXE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.GOLD_PICKAXE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.DIAMOND_PICKAXE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.STONE_PICKAXE)) {
-					ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
-					if (!currentitem.containsEnchantment(Enchantment.getByName("DIG_SPEED"))) {
-						currentitem.addEnchantment(Enchantment.getByName("DIG_SPEED"), 1);
-					}
-				}
-			}
-		if (this.plugin.PlayerinJob(p, "Digger") && this.plugin.getJobLv("Digger", p)>=5) {
-			if (p.getInventory().getContents()[e.getNewSlot()]!=null && 
-					(p.getInventory().getContents()[e.getNewSlot()].getType()==Material.WOOD_SPADE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.IRON_SPADE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.GOLD_SPADE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.DIAMOND_SPADE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.STONE_SPADE)) {
+			if (p.getInventory().getContents()[e.getNewSlot()].getType().name().toLowerCase().contains("spade") && this.plugin.hasJobBuff("Digger", p, Job.JOB10)) {
 				ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
-				if (!currentitem.containsEnchantment(Enchantment.getByName("DIG_SPEED"))) {
-					currentitem.addEnchantment(Enchantment.getByName("DIG_SPEED"), 1);
+				if (currentitem.getEnchantmentLevel(Enchantment.getByName("DURABILITY"))<5) {
+					currentitem.addUnsafeEnchantment(Enchantment.getByName("DURABILITY"), 5);
 				}
-			}
-		} else
-			if (this.plugin.PlayerinJob(p, "Digger") && this.plugin.getJobLv("Digger", p)>=20) {
-				if (p.getInventory().getContents()[e.getNewSlot()]!=null && 
-						(p.getInventory().getContents()[e.getNewSlot()].getType()==Material.WOOD_SPADE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.IRON_SPADE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.GOLD_SPADE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.DIAMOND_SPADE ||
-						p.getInventory().getContents()[e.getNewSlot()].getType()==Material.STONE_SPADE)) {
-					ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
-					if (!currentitem.containsEnchantment(Enchantment.getByName("DIG_SPEED"))) {
-						currentitem.addEnchantment(Enchantment.getByName("DIG_SPEED"), 2);
-					}
-				}
-			}
-		if (this.plugin.PlayerinJob(p, "Hunter") && this.plugin.getJobLv("Hunter", p)>=20) {
-			if (p.getInventory().getContents()[e.getNewSlot()]!=null && 
-					(p.getInventory().getContents()[e.getNewSlot()].getType()==Material.WOOD_SWORD ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.IRON_SWORD ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.GOLD_SWORD ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.DIAMOND_SWORD ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.STONE_SWORD)) {
-				ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
-				if (!currentitem.containsEnchantment(Enchantment.getByName("FIRE_ASPECT"))) { 
-					currentitem.addEnchantment(Enchantment.getByName("FIRE_ASPECT"), 2);
+				if (currentitem.getEnchantmentLevel(Enchantment.getByName("DIG_SPEED"))<4) {
+					currentitem.addUnsafeEnchantment(Enchantment.getByName("DIG_SPEED"), 4);
 				}
 			}
 		}
-		if (this.plugin.PlayerinJob(p, "Woodcutter") && this.plugin.getJobLv("Woodcutter", p)>=10) {
-			if (p.getInventory().getContents()[e.getNewSlot()]!=null && 
-					(p.getInventory().getContents()[e.getNewSlot()].getType()==Material.WOOD_AXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.IRON_AXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.GOLD_AXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.DIAMOND_AXE ||
-					p.getInventory().getContents()[e.getNewSlot()].getType()==Material.STONE_AXE)) {
-				ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
-				if (!currentitem.containsEnchantment(Enchantment.getByName("DIG_SPEED"))) {
-					currentitem.addEnchantment(Enchantment.getByName("DIG_SPEED"), 1);
-				}
-			}
-		}
+		//**************************//Job Buffs end here.
 	}
 	
     public void open_LootChest(int tier, Location loc) {
@@ -8761,7 +8862,7 @@ implements Listener
 							}
 						}
 					}
-					if (this.plugin.PlayerinJob((Player)e.getDamager(), "Hunter") && this.plugin.getJobLv("Hunter", (Player)e.getDamager())>=5) {
+					if (this.plugin.hasJobBuff("Hunter", (Player)e.getDamager(), Job.JOB5)) {
 						//Deal 2 extra damage.
 						e.setDamage(e.getDamage()+4);
 					}
@@ -8935,7 +9036,7 @@ implements Listener
 								}
 							}
 						}
-						if (this.plugin.PlayerinJob((Player)((Projectile)e.getDamager()).getShooter(), "Hunter") && this.plugin.getJobLv("Hunter", (Player)((Projectile)e.getDamager()).getShooter())>=5) {
+						if (this.plugin.hasJobBuff("Hunter", (Player)((Projectile)e.getDamager()).getShooter(), Job.JOB5)) {
 							//Deal 2 extra damage.
 							e.setDamage(e.getDamage()+4);
 						}
@@ -10023,16 +10124,23 @@ implements Listener
 		}
 		
 		//*****************************// Job buffs here
-		if (event.getSlotType()==SlotType.RESULT && (event.getInventory().getType()==InventoryType.CRAFTING || event.getInventory().getType()==InventoryType.PLAYER || event.getInventory().getType()==InventoryType.WORKBENCH)) {
+		if (event.getSlotType()==SlotType.RESULT && (event.getClick()==ClickType.LEFT || event.getClick()==ClickType.RIGHT) && (event.getInventory().getType()==InventoryType.CRAFTING || event.getInventory().getType()==InventoryType.PLAYER || event.getInventory().getType()==InventoryType.WORKBENCH)) {
 			//Check if level 5 digger.
 			if (this.plugin.hasJobBuff("Digger", p, Job.JOB5) && event.getCurrentItem().getType()==Material.CLAY_BALL) {
 				//This could potentially be an artifact. Check the lore.
-				ItemStack result = event.getCurrentItem();
+				ItemStack result = event.getInventory().getItem(event.getSlot());
 				if (result.hasItemMeta() && result.getItemMeta().hasLore()) {
 					if (result.getItemMeta().getLore().contains("This clump of material seems to")) {
 						//This is an artifact. There is a 7.5% chance of it turning into an equipment.
-						if (Math.random()<=0.075) {
-							event.setCurrentItem(stack)
+						double identifychance = 0.075;
+						if (this.plugin.hasJobBuff("Digger", p, Job.JOB40)) {
+							identifychance = 1.0;
+						}
+						if (Math.random()<=identifychance) {
+							p.sendMessage(ChatColor.LIGHT_PURPLE+"You feel a magical presence convert before you.");
+							event.setCurrentItem(this.plugin.convertArtifact(result.clone()));
+						} else {
+							p.sendMessage(ChatColor.DARK_GRAY+"The air remains unstirred.");
 						}
 					}
 				}
@@ -11454,6 +11562,7 @@ implements Listener
 	@EventHandler
 	public void onShootArrow(ProjectileHitEvent e) {
 		LivingEntity l = e.getEntity().getShooter();
+		//Bukkit.getLogger().info("Arrow vector is: "+e.getEntity().getVelocity().toString());
 		if (l!=null && l.getType()==EntityType.SKELETON && l.getCustomName()!=null) {
 			if ((l.getCustomName().compareTo(ChatColor.YELLOW+"Sniper")==0)) {
 				boolean found=false;
@@ -14290,7 +14399,7 @@ implements Listener
 		}
 	}
 
-	public String convertToItemName(String val) {
+	public static String convertToItemName(String val) {
 		val=val.replace('_', ' ');
 		char[] mod = val.toCharArray();
 		boolean first=false;

@@ -335,7 +335,9 @@ public class Main extends JavaPlugin
     //Add Recipe for water source crafting.
     ItemStack water = new ItemStack(Material.WATER, 8);
     ItemMeta water_name = water.getItemMeta();
-   
+    
+
+    
     List<String> waterlore = new ArrayList<String>();
     waterlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"Infused with the power of a");
     waterlore.add(ChatColor.AQUA+"Nether Star"+ChatColor.GRAY+""+ChatColor.ITALIC+", this water can");
@@ -354,6 +356,26 @@ public class Main extends JavaPlugin
     nether_water.setIngredient('b', Material.NETHER_STAR);
 
     Bukkit.addRecipe(nether_water);
+    
+    
+    
+    //Add Battle Shovel recipe.
+    ItemStack shovel = new ItemStack(Material.WOOD_SPADE);
+    ItemMeta shovel_meta = shovel.getItemMeta();
+    List<String> shovel_meta_lore = new ArrayList<String>();
+    shovel_meta_lore.add(ChatColor.GOLD+"Whenever this shovel destroys");
+    shovel_meta_lore.add(ChatColor.GOLD+"a block, it releases 20 arrows");
+    shovel_meta_lore.add(ChatColor.GOLD+"that fire in the destructing");
+    shovel_meta_lore.add(ChatColor.GOLD+"player's facing direction.");
+    shovel_meta.setLore(shovel_meta_lore);
+    shovel_meta.setDisplayName(ChatColor.RED+"Battle Shovel");
+    shovel.setItemMeta(shovel_meta);
+    shovel.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+    ShapedRecipe battle_shovel = new ShapedRecipe(shovel);
+    battle_shovel.shape("-a-","-b-","-b-");
+    battle_shovel.setIngredient('a', Material.LAPIS_BLOCK);
+    battle_shovel.setIngredient('b', Material.STICK);
+    Bukkit.addRecipe(battle_shovel);
     
     //Add Recipe for orb of distortion
     ItemStack orb = new ItemStack(Material.SLIME_BALL, 1);
@@ -781,8 +803,8 @@ public class Main extends JavaPlugin
     		"Shovels gain Unbreaking V and Efficiency IV.", 
     		"Destroying the bottom row of Sand or Gravel with a Wooden Shovel will destroy the whole stack instantly. Artifact discovery rate increased by 25%.",
     		"Shovels you use will not break.",
-    		"Diggers can craft a Battle Shovel (Use a Lapis block with sticks to build it). Any blocks you destroy with it will shoot 10 arrows rapidly from the destroyed block's position in the direction you are facing.",
-    		"Artifacts will be able to be identified immediately with no identify tomes.");
+    		"Diggers can craft a Battle Shovel (Use a Lapis block with sticks to build it). Any blocks you destroy with it will shoot 20 arrows rapidly from the destroyed block's position in the direction you are facing.",
+    		"Artifacts will have a 100% identify rate.");
     
     /*
     Farmer_job.setJobName("Farmer");
@@ -864,7 +886,7 @@ public class Main extends JavaPlugin
     Hunter_job.setBuffData("Damage dealt increased by 4.",
     		"Sneaking gives you invisibility. Anything targeting you loses aggro.", 
     		"Swords inflict Poison II on mobs. Movement speed increased by 20%.", 
-    		"Each time you get hit, the next hit has a 10% stacking chance of blocking for 10 seconds.",
+    		"Each time you get hit, the next hit has a 10% increased stacking chance of blocking for 10 seconds. Hitting an enemy removes this buff.",
     		"Attacks deal an additional 10 armor penetration damage.",
     		"Damage dealt increased by 4, damage taken decreased by 30%, at night you are invisible. Health increased by 20.");
 
@@ -1210,8 +1232,8 @@ public void runTick() {
 			for (int i=0;i<ARROW_SHOOTERS.size();i++) {
 				ArrowShooter shooter = ARROW_SHOOTERS.get(i);
 				shooter.timer--;
-				if ( ( shooter.timer % shooter.frequency )==0) {
-					Arrow arrow = Bukkit.getWorld("world").spawnArrow(shooter.loc, shooter.spd, 0.6f, 12f);
+				if ((shooter.timer % shooter.frequency )==0) {
+					Arrow arrow = Bukkit.getWorld("world").spawnArrow(shooter.loc, shooter.dir, shooter.spd, shooter.spread);
 					//arrow.setShooter(shooter.shooter);
 					List<Entity> arrows = Bukkit.getWorld("world").getEntities();
 					for (int j=0;j<arrows.size();j++) {
@@ -1825,279 +1847,11 @@ public void runTick() {
 								 }
 							  }
 						  }
-						  int heightmodifier=0;
-						  if (Bukkit.getWorld("world").getHighestBlockYAt(nearby.get(i).getLocation())>=96) {
-							  heightmodifier=126;
-						  } else {
-							  heightmodifier=63;
-						  }
-						  if (nearby.get(i).getType()==EntityType.CREEPER) {
-							  LivingEntity l = (LivingEntity)nearby.get(i);
-							  if (l.getCustomName()==null && l.getTicksLived()<6400 && !l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-								  if (l.getLocation().getY()<=40 && Math.random()<=0.08+((heightmodifier-l.getLocation().getY())*0.01d)) {
-									  if (Math.random()<=0.35) {
-										  l.setCustomName(ChatColor.YELLOW+"Explosive Creeper");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()*1.25d,1));
-									  } else
-									  if (Math.random()<=0.15) {
-										  l.setCustomName(ChatColor.GOLD+"Explosive Creeper II");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()*1.75d,2));
-									  } else
-									  if (Math.random()<=0.35) {
-										  l.setCustomName(ChatColor.YELLOW+"Destructive Creeper");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()*1.25d,3));
-									  } else {
-										  l.setCustomName(ChatColor.GOLD+"Destructive Creeper II");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()*1.75d,4));
-									  }
-									  if (l!=null && l.isValid()) {
-										  l.setHealth(Warning(l.getMaxHealth(),20));
-									  }
-								  }
-								  l.setTicksLived(6400);
-							  }
-						  } else
-						  if (nearby.get(i).getType()==EntityType.SPIDER) {
-							  LivingEntity l = (LivingEntity)nearby.get(i);
-							  if (l.getCustomName()==null && l.getTicksLived()<6400 && !l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-								  if (Math.random()<=0.08+((heightmodifier-l.getLocation().getY())*0.01d)) {
-									  if (Math.random()<=0.35) {
-										  l.setCustomName(ChatColor.YELLOW+"Venomous Spider");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth(),5));
-									  } else
-									  if (Math.random()<=0.15) {
-										  l.setCustomName(ChatColor.GOLD+"Venomous Spider II");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()*1.5,6));
-									  } else
-									  if (Math.random()<=0.35) {
-										  l.setCustomName(ChatColor.YELLOW+"Snaring Spider");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()*1.5,7));
-									  } else {
-										  l.setCustomName(ChatColor.GOLD+"Snaring Spider II");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()*2,8));
-									  }
-									  if (l!=null && l.isValid()) {
-										  l.setHealth(Warning(l.getMaxHealth(),21));
-									  }
-								  }
-								  l.setTicksLived(6400);
-							  }
-						  } else
-						  if (nearby.get(i).getType()==EntityType.SKELETON) {
-							  LivingEntity l = (LivingEntity)nearby.get(i);
-							  if (l.getCustomName()==null && l.getTicksLived()<6400 && !l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-								  if (Math.random()<=0.10+((heightmodifier-l.getLocation().getY())*0.01d)) {
-									  if (Math.random()<=0.85) {
-										  l.setCustomName(ChatColor.YELLOW+"Sniper");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()/2,9));
-									  } else {
-										  l.setCustomName(ChatColor.GOLD+"Sniper II");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()/4,10));
-									  }
-									  if (l!=null && l.isValid()) {
-										  l.setHealth(Warning(l.getMaxHealth(),11));
-									  }
-								  }
-								  l.setTicksLived(6400);
-							  }
-						  } else
-						  if (nearby.get(i).getType()==EntityType.ZOMBIE) {
-							  LivingEntity l = (LivingEntity)nearby.get(i);
-							  if (l.getCustomName()==null && l.getTicksLived()<6400 && !l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-								  if (l.getLocation().getY()<=35 && Math.random()<=0.15) {
-									  if (Math.random()<=0.85) {
-										  l.setCustomName(ChatColor.YELLOW+"Charge Zombie");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  l.setMaxHealth(Warning(l.getMaxHealth()+5,12));
-									  } else {
-										  l.setCustomName(ChatColor.GOLD+"Charge Zombie II");
-										  l.setCustomNameVisible(false);
-										  //l.setCustomNameVisible(true);
-										  Warning(l,13);
-										  if (l!=null && l.isValid()) {
-											  l.setMaxHealth(l.getMaxHealth()+20);
-										  }
-									  }
-									  Warning(l,23);
-									  if (l!=null && l.isValid()) {
-										  l.setMaxHealth(l.getMaxHealth());
-									  }
-								  } else {
-									  if (Math.random()<=0.10+((heightmodifier-l.getLocation().getY())*0.01d)) {
-										  if (Math.random()<=0.25) {
-											  l.setCustomName(ChatColor.GRAY+"Zombie Ninja");
-											  l.setCustomNameVisible(false);
-											  l.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0, true));
-											  l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 2, true));
-											  //l.setCustomNameVisible(true);
-											  //A Zombie Ninja will not wear armor to stay hidden. But may carry a sword.
-											  l.getEquipment().setChestplate(new ItemStack(Material.AIR));
-											  l.getEquipment().setBoots(new ItemStack(Material.AIR));
-											  l.getEquipment().setLeggings(new ItemStack(Material.AIR));
-											  l.getEquipment().setHelmet(new ItemStack(Material.AIR));
-											  Zombie g = (Zombie)l;
-											  g.setBaby(true);
-											  Warning(l,14);
-											  if (l!=null && l.isValid()) {
-												  l.setMaxHealth(l.getMaxHealth()*0.65d);
-												  Warning(l,15);
-												  if (l!=null && l.isValid()) {
-													  l.setHealth(l.getMaxHealth());
-												  }
-											  }
-										  }
-									  }
-								  }
-								  l.setTicksLived(6400);
-							  } else {
-								  if (l.getCustomName()!=null && (l.getCustomName().compareTo(ChatColor.YELLOW+"Charge Zombie")==0 || l.getCustomName().compareTo(ChatColor.GOLD+"Charge Zombie II")==0 || l.getCustomName().compareTo(ChatColor.DARK_PURPLE+"Charge Zombie III")==0)) {
-									  //Destroy blocks around it.
-									  /*Block b = l.getLocation().getBlock();
-									  if (b.getType()==Material.WATER || b.getType()==Material.STATIONARY_WATER ||
-											  b.getType()==Material.LAVA || b.getType()==Material.STATIONARY_LAVA) {
-										Vector knockback = l.getVelocity().multiply(8f);
-										l.setVelocity(knockback);*/
-									  boolean doit=true;
-									  if (l.getKiller()!=null && l.getKiller().getLocation().getY()>l.getLocation().getY()) {
-										  doit=false;
-									  }
-									  if (l.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-										  l.removePotionEffect(PotionEffectType.INVISIBILITY);
-									  }
-									  if (doit) {
-										  //Bukkit.getPlayer("sigonasr2").sendMessage("Charge Zombie!");
-										  if (l.getCustomName().compareTo(ChatColor.DARK_PURPLE+"Charge Zombie III")==0 && !l.isDead()) {
-											  /*//OLD CHARGE ZOMBIE BEHAVIOR. Charge Zombie II now does this weak block destruction.
-											  for (int k=-1;k<2;k++) {
-												  for (int j=-1;j<2;j++) {
-													  Location checkloc = l.getLocation().add(k,1,j);
-													  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,2,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,0,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-												  }
-											  }*/
-											  for (int k=-2;k<3;k++) {
-												  for (int j=-2;j<3;j++) {
-													  Location checkloc = l.getLocation().add(k,1,j);
-													  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,2,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,0,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,-1,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-												  }
-											  }
-										  } else {
-											  if (l.getCustomName().compareTo(ChatColor.GOLD+"Charge Zombie II")==0 && !l.isDead() && l.getKiller()!=null) {
-											  /*
-											  for (int k=-1;k<2;k++) {
-												  for (int j=-1;j<2;j++) {
-													  Location checkloc = l.getLocation().add(k,1,j);
-													  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,2,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-													  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-													  checkloc = l.getLocation().add(k,0,j);
-													  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-														  bl.breakNaturally();
-													  }
-												  }
-											  }*/ //Charge Zombie II's now only break blocks when YOU get hit by them.
-											  //OLD CHARGE ZOMBIE II BEHAVIOR.
-												  for (int k=-2;k<3;k++) {
-													  for (int j=-2;j<3;j++) {
-														  Location checkloc = l.getLocation().add(k,1,j);
-														  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND) {
-															  bl.breakNaturally();
-														  }
-														  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-														  checkloc = l.getLocation().add(k,2,j);
-														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND) {
-															  bl.breakNaturally();
-														  }
-														  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-														  checkloc = l.getLocation().add(k,0,j);
-														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND) {
-															  bl.breakNaturally();
-														  }
-													  }
-												  }
-											  } else 
-											if (l.getCustomName().compareTo(ChatColor.YELLOW+"Charge Zombie")==0 && !l.isDead() && l.getKiller()!=null) {
-												  for (int k=-1;k<2;k++) {
-													  for (int j=-1;j<2;j++) {
-														  Location checkloc = l.getLocation().add(k,1,j);
-														  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-															  bl.breakNaturally();
-														  }
-														  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-														  checkloc = l.getLocation().add(k,2,j);
-														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-															  bl.breakNaturally();
-														  }
-														  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-														  checkloc = l.getLocation().add(k,0,j);
-														  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER) {
-															  bl.breakNaturally();
-														  }
-													  }
-												  }
-											  }
-										  }
-									  }
+						  if (nearby.get(i) instanceof Monster) {
+							  Monster m = (Monster)nearby.get(i);
+							  if (m.getTarget() instanceof Player) {
+								  if (hasJobBuff("Hunter",(Player)(m.getTarget()),Job.JOB10) && ((Player)(m.getTarget())).hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+									  m.setTarget(null);
 								  }
 							  }
 						  }
@@ -3993,6 +3747,11 @@ public void payDay(int time)
 		return ChatColor.WHITE;
 	}
 	
+	/**
+	 * Returns the job slot of the job in the GLOBAL JOB LIST. NOT for players!
+	 * @param job The job name to find the slot of.
+	 * @return The slot in the array ValidJobs[].
+	 */
 	public int getJobSlot(String job) {
 		for (int i=0;i<ValidJobs.length;i++) {
 			if (job.equalsIgnoreCase(ValidJobs[i])) {
@@ -4268,6 +4027,13 @@ public void payDay(int time)
 		return item;
 	}
 	
+	/**
+	 * DEPRECATED. Use hasJobBuff() to determine if a player has a buff.
+	 * @param job The job name.
+	 * @param p The name of the player we are checking.
+	 * @return The level of the player in a specific job.
+	 */
+	@Deprecated
 	public int getJobLv(String job, String p) {
 		p=p.toLowerCase();
 		if (PlayerinJob(p,job)) {
@@ -4376,6 +4142,13 @@ public void payDay(int time)
 		  return playerdata_list.get(getPlayerDataSlot(p));
 	}
 	
+	/**
+	 * DEPRECATED. Use hasJobBuff() to determine if a player has a buff.
+	 * @param job The job name.
+	 * @param p The player we are checking.
+	 * @return The level of the player in a specific job.
+	 */
+	@Deprecated
 	public int getJobLv(String job, Player p) {
 		if (PlayerinJob(p,job)) {
 			int slot=-1;
@@ -4744,6 +4517,40 @@ public void payDay(int time)
 				return 0;
 			}
 		}
+	}
+
+	/**
+	 * Gets the job number slot that the job holds.
+	 * @param job The job string to look for. CASE-SENSITIVE.
+	 * @param p The name of the player to search for.
+	 * @return The slot number (1-3) of the job. -1 if the job could not be found.
+	 */
+	public int getPlayerJobSlot(String job, String p) {
+		if (PlayerinJob(p, job)) {
+			p=p.toLowerCase();
+			if (getAccountsConfig().getString(p+".jobs.job1").equalsIgnoreCase(job)) {
+				return 1;
+			}
+			if (getAccountsConfig().getString(p+".jobs.job2").equalsIgnoreCase(job)) {
+				return 2;
+			}
+			if (getAccountsConfig().getString(p+".jobs.job3").equalsIgnoreCase(job)) {
+				return 3;
+			}
+			return -1;
+		} else {
+			return -1;
+		}
+	}
+
+	/**
+	 * Gets the job number slot that the job holds.
+	 * @param job The job string to look for. CASE-SENSITIVE.
+	 * @param p The name of the player to search for.
+	 * @return The slot number (1-3) of the job. -1 if the job could not be found.
+	 */
+	public int getPlayerJobSlot(String job, Player p) {
+		return getPlayerJobSlot(job, p.getName());
 	}
 	
 	public double getJobExp(String job,int lv) {
@@ -5144,9 +4951,9 @@ public void payDay(int time)
     public void setLv30Choice(Player p, String arg1, String arg2) {
     	if (getJobLv(arg1, p)>=30) {
 	    	if (arg2.equals("1") || arg2.equals("2")) {
-	    		if (getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(getJobSlot(arg1)+1)+"_30")==0) {
+	    		if (getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job"+(getPlayerJobSlot(arg1, p))+"_30")==0) {
 		    		//We are making a valid choice.
-	    			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(getJobSlot(arg1)+1)+"_30",Integer.valueOf(arg2));
+	    			getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job"+(getPlayerJobSlot(arg1, p))+"_30",Integer.valueOf(arg2));
 	    			//saveAccountsConfig() //Commented out;
 	        		p.sendMessage(ChatColor.GREEN+"You have set your Lv30 Buff choice for your "+arg1+" job to the "+((Integer.valueOf(arg2)==1)?"first":"second")+" version.");
 	    		} else {
@@ -5163,6 +4970,152 @@ public void payDay(int time)
     public void notifyBuffMessages(Player p) {
     	notifyBuffMessages(p, 20);
     }
+    
+    /**
+     * 
+     * @param numb The number to convert to Roman Numerals.
+     * @return A String version of the number converted in Roman Numeral Format.
+     */
+    public String toRomanNumeral(int numb) {
+    	String[] ones = {"I","II","III","IV","V","VI","VII","VIII","IX"};
+    	String[] tens = {"X","XX","XXX","XL","L","LX","LXX","LXXX","XC"};
+    	String[] hundreds = {"C","CC","CCC","CD","D","DC","DCC","DCCC","CM"};
+    	String RomanNumeral = "";
+    	if (numb>999) {
+    		//The number is too big for our converter.
+    		return String.valueOf(numb);
+    	} else {
+    		String numb_reader = String.valueOf(numb);
+    		//Bukkit.getLogger().info("Number is "+numb_reader+". Length is "+numb_reader.length());
+			int offset = 3-numb_reader.length();
+    		for (int i=0;i<numb_reader.length();i++) {
+    			switch (offset+i) {
+    				case 0:{
+    		    		//Bukkit.getLogger().info("Hundreds, Read number: "+numb_reader.charAt(i)+", Add "+hundreds[(int)(numb_reader.charAt(i)-'0')-1]);
+    					RomanNumeral+=hundreds[(int)(numb_reader.charAt(i)-'0')-1];
+    				}break;
+    				case 1:{
+    		    		if (Integer.valueOf(numb_reader.charAt(i))!=0) {
+	    		    		//Bukkit.getLogger().info("Tens, Read number: "+numb_reader.charAt(i)+", Add "+tens[(int)(numb_reader.charAt(i)-'0')-1]);
+	    					RomanNumeral+=tens[(int)(numb_reader.charAt(i)-'0')-1];
+    		    		}
+    				}break;
+    				case 2:{
+    		    		//Bukkit.getLogger().info("Ones, Read number: "+numb_reader.charAt(i)+", Add "+ones[(int)(numb_reader.charAt(i)-'0')-1]);
+    		    		if (Integer.valueOf(numb_reader.charAt(i))!=0) {
+    		    			RomanNumeral+=ones[(int)(numb_reader.charAt(i)-'0')-1];
+    		    		}
+    				}break;
+    			}
+    		}
+    		return RomanNumeral;
+    	}
+    }
+    
+    /**
+     * 
+     * @param roman_numeral The string in roman numeral form.
+     * @return The integer version of the roman numeral given.
+     */
+    public int toNumber(String roman_numeral) {
+    	String[] ones = {"I","II","III","IV","V","VI","VII","VIII","IX"};
+    	String[] tens = {"X","XX","XXX","XL","L","LX","LXX","LXXX","XC"};
+    	String[] hundreds = {"C","CC","CCC","CD","D","DC","DCC","DCCC","CM"};
+    	int finalval = 0;
+    	for (int i=0;i<3;i++) {
+    		switch (i) {
+	    		case 0:{
+	    			//We have to find a matching hundreds value and replace it.
+	    			for (int j=0;j<hundreds.length;j++) {
+	    				if (roman_numeral.contains(hundreds[hundreds.length-j-1])) {
+	    					roman_numeral = roman_numeral.replaceFirst(hundreds[hundreds.length-j-1], "");
+	    					//Bukkit.getLogger().info("Found "+hundreds[hundreds.length-j-1]+", converting to "+(100*(hundreds.length-j))+". New String is "+roman_numeral);
+	    					finalval+=100*(hundreds.length-j);
+	    					break; //There is only one hundreds place.
+	    				}
+	    			}
+	    		}break;
+	    		case 1:{
+	    			//We have to find a matching tens value and replace it.
+	    			for (int j=0;j<tens.length;j++) {
+	    				if (roman_numeral.contains(tens[tens.length-j-1])) {
+	    					roman_numeral = roman_numeral.replaceFirst(tens[tens.length-j-1], "");
+	    					//Bukkit.getLogger().info("Found "+tens[tens.length-j-1]+", converting to "+(10*(tens.length-j))+". New String is "+roman_numeral);
+	    					finalval+=10*(tens.length-j);
+	    					break; //There is only one tens place.
+	    				}
+	    			}
+	    		}break;
+	    		case 2:{
+	    			//We have to find a matching ones value and replace it.
+	    			for (int j=0;j<ones.length;j++) {
+	    				if (roman_numeral.contains(ones[ones.length-j-1])) {
+	    					roman_numeral = roman_numeral.replaceFirst(ones[ones.length-j-1], "");
+	    					//Bukkit.getLogger().info("Found "+ones[ones.length-j-1]+", converting to "+((ones.length-j))+". New String is "+roman_numeral);
+	    					finalval+=ones.length-j;
+	    					break; //There is only one ones place.
+	    				}
+	    			}
+	    		}break;
+    		}
+    	}
+    	if (!roman_numeral.equalsIgnoreCase("")) {
+    		Bukkit.getLogger().severe("Number could not be resolved completely from roman numeral. \""+roman_numeral+"\" remaining.");
+    	}
+    	return finalval;
+    }
+    
+    /**
+     * 
+     * @param item The item to sort Enchantments on.
+     * @return The item with all enchantments sorted out.
+     */
+    public ItemStack sortEnchantments(ItemStack item) {
+    	//Sorts the enchantments so they are in the intended order.
+    	//(All Enchantments with Roman numerals are first.)
+    	//(All bonus enchantments are sorted via their ID.)
+    	//(Extra effects and descriptions are below.)
+    	if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
+    		List<String> LoreData = item.getItemMeta().getLore();
+    		ItemMeta meta = item.getItemMeta();
+    		List<String> newLoreData = new ArrayList<String>();
+    		//First find all 'extra' special enchantments.
+    		for (int i=0;i<LoreData.size();i++) {
+    			if (LoreData.get(i).contains(ChatColor.GRAY+"Sturdy ")) {
+    				newLoreData.add(LoreData.get(i));
+    				LoreData.remove(i);
+    			}
+    		}
+    		//Now find all bonus enchantments.
+    		for (int i=0;i<LoreData.size();i++) {
+    			if (LoreData.get(i).contains(ChatColor.YELLOW+"+") &&
+    					LoreData.get(i).contains(" ") &&
+    					(LoreData.get(i).contains(ChatColor.BLUE+"Damage Reduction") ||
+    							LoreData.get(i).contains(ChatColor.BLUE+"Health") ||
+    							LoreData.get(i).contains(ChatColor.BLUE+"Armor Penetration") ||
+    							LoreData.get(i).contains(ChatColor.BLUE+"Critical Chance") ||
+    							LoreData.get(i).contains(ChatColor.BLUE+"Life Steal") ||
+    							LoreData.get(i).contains(ChatColor.BLUE+"Attack Speed") ||
+    							LoreData.get(i).contains(ChatColor.BLUE+"Damage") ||
+    							LoreData.get(i).contains(ChatColor.BLUE+"Durability") ||
+    							LoreData.get(i).contains(ChatColor.BLUE+"Block Chance") ||
+    							LoreData.get(i).contains(ChatColor.BLUE+"Speed Boost Chance"))) {
+    				newLoreData.add(LoreData.get(i));
+    				LoreData.remove(i);
+    			}
+    		}
+    		//Now everything else.
+    		for (int i=0;i<LoreData.size();i++) {
+				newLoreData.add(LoreData.get(i));
+				LoreData.remove(i);
+    		}
+    		meta.setLore(newLoreData);
+    		item.setItemMeta(meta);
+    		return item;
+    	} else {
+    		return item;
+    	}
+    }
 
     public ItemStack convertArtifact(ItemStack artifact) {
     	//Converts an artifact into a really good piece of equipment. Decide the equipment style.
@@ -5171,24 +5124,410 @@ public void payDay(int time)
     	if (Math.random()<=0.35) {
     		diamond=true; //35% chance of the item being diamond. Otherwise it's iron.
     	}
+    	int[] enchantment_id_list = {0,1,2,3,4,5,6,7,16,17,18,19,20,21,32,33,34,35,48,49,50,51};
     	if (Math.random()<=0.95) {
 	    	switch (style) {
 		    	case 0: {
 		    		//Adds 1 Level 8 enchantment and a Level 4 sub-enchant.
-		    		
-		    	}break;
+		    		String itemname = "";
+		    		if (!diamond) {
+		    			itemname+="Iron";
+		    		} else {
+		    			itemname+="Diamond";
+		    		}
+		    		double random_choose = Math.random()*9.0d;
+		    		//Bukkit.getLogger().info("Random choose is "+random_choose);
+		    		switch ((int)random_choose) {
+		    			case 0: {
+		    				itemname+=" Chestplate";
+		    			}break;
+		    			case 1: {
+		    				itemname+=" Helmet";
+		    			}break;
+		    			case 2: {
+		    				itemname+=" Leggings";
+		    			}break;
+		    			case 3: {
+		    				itemname+=" Boots";
+		    			}break;
+		    			case 4: {
+		    				itemname+=" Pickaxe";
+		    			}break;
+		    			case 5: {
+		    				itemname+=" Axe";
+		    			}break;
+		    			case 6: {
+		    				itemname+=" Spade";
+		    			}break;
+		    			case 7: {
+		    				itemname+=" Sword";
+		    			}break;
+		    			case 8: {
+		    				itemname="Bow";
+		    			}break;
+		    		}
+		    		//Choose a random enchanment.
+		    		int randomenchant = (int)(Math.random()*enchantment_id_list.length);
+		    		ItemStack legendary = new ItemStack(Material.getMaterial(itemname.toUpperCase().replace(" ", "_")));
+		    		legendary.addUnsafeEnchantment(Enchantment.getById(enchantment_id_list[randomenchant]), 8);
+		    		ItemMeta meta = legendary.getItemMeta();
+		    		meta.setDisplayName(ChatColor.BOLD+"Treasured "+PlayerListener.convertToItemName(Enchantment.getById(enchantment_id_list[randomenchant]).getName()) + " " + itemname);
+		    		legendary.setItemMeta(meta);
+		    		legendary.addUnsafeEnchantment(Enchantment.getById(enchantment_id_list[randomenchant = (int)(Math.random()*enchantment_id_list.length)]), 4);
+		    		return legendary;
+		    	}
 		    	case 1: {
 		    		//Adds many lower-level enchantments altogether. (Between Levels 2-4)
-		    		
-		    	}break;
+		    		String itemname = "";
+		    		if (!diamond) {
+		    			itemname+="Iron";
+		    		} else {
+		    			itemname+="Diamond";
+		    		}
+		    		double random_choose = Math.random()*9.0d;
+		    		//Bukkit.getLogger().info("Random choose is "+random_choose);
+		    		switch ((int)random_choose) {
+		    			case 0: {
+		    				itemname+=" Chestplate";
+		    			}break;
+		    			case 1: {
+		    				itemname+=" Helmet";
+		    			}break;
+		    			case 2: {
+		    				itemname+=" Leggings";
+		    			}break;
+		    			case 3: {
+		    				itemname+=" Boots";
+		    			}break;
+		    			case 4: {
+		    				itemname+=" Pickaxe";
+		    			}break;
+		    			case 5: {
+		    				itemname+=" Axe";
+		    			}break;
+		    			case 6: {
+		    				itemname+=" Spade";
+		    			}break;
+		    			case 7: {
+		    				itemname+=" Sword";
+		    			}break;
+		    			case 8: {
+		    				itemname="Bow";
+		    			}break;
+		    		}
+		    		//Choose a random enchanment.
+		    		int randomenchant = (int)(Math.random()*enchantment_id_list.length);
+		    		int enchantcount=0;
+		    		ItemStack legendary = new ItemStack(Material.getMaterial(itemname.toUpperCase().replace(" ", "_")));
+		    		while (enchantcount<enchantment_id_list.length/2+((int)(Math.random()*(enchantment_id_list.length/2)))) {
+		    			if (legendary.getEnchantmentLevel(Enchantment.getById(enchantment_id_list[randomenchant]))==0) {
+		    				legendary.addUnsafeEnchantment(Enchantment.getById(enchantment_id_list[randomenchant]), (int)(Math.random()*4)+1);
+		    				enchantcount++;
+		    			}
+	    				randomenchant = (int)(Math.random()*enchantment_id_list.length);
+		    		}
+		    		ItemMeta meta = legendary.getItemMeta();
+		    		meta.setDisplayName(ChatColor.BOLD+"Powered "+PlayerListener.convertToItemName(Enchantment.getById(enchantment_id_list[randomenchant]).getName()) + " " + itemname);
+		    		legendary.setItemMeta(meta);
+		    		return legendary;
+		    	}
 		    	case 2: {
 		    		//Only two focused bonus enchants. One if very highly specced, the other is average.
-		    		
-		    	}break;
+		    		//Adds many lower-level enchantments altogether. (Between Levels 2-4)
+		    		String itemname = "";
+		    		if (!diamond) {
+		    			itemname+="Iron";
+		    		} else {
+		    			itemname+="Diamond";
+		    		}
+		    		int type=1;
+		    		double random_choose = Math.random()*9.0d;
+		    		//Bukkit.getLogger().info("Random choose is "+random_choose);
+		    		switch ((int)random_choose) {
+		    			case 0: {
+		    				itemname+=" Chestplate";
+		    				type=2;
+		    			}break;
+		    			case 1: {
+		    				itemname+=" Helmet";
+		    				type=2;
+		    			}break;
+		    			case 2: {
+		    				itemname+=" Leggings";
+		    				type=2;
+		    			}break;
+		    			case 3: {
+		    				itemname+=" Boots";
+		    				type=2;
+		    			}break;
+		    			case 4: {
+		    				itemname+=" Pickaxe";
+		    				type=1;
+		    			}break;
+		    			case 5: {
+		    				itemname+=" Axe";
+		    				type=1;
+		    			}break;
+		    			case 6: {
+		    				itemname+=" Spade";
+		    				type=1;
+		    			}break;
+		    			case 7: {
+		    				itemname+=" Sword";
+		    				type=1;
+		    			}break;
+		    			case 8: {
+		    				itemname="Bow";
+		    				type=1;
+		    			}break;
+		    		}
+		    		//Choose a random enchanment.
+		    		int randomenchant = (int)(Math.random()*enchantment_id_list.length);
+		    		int enchantcount=0;
+		    		ItemStack legendary = new ItemStack(Material.getMaterial(itemname.toUpperCase().replace(" ", "_")));
+		    		//Get two random bonus enchantments.
+		    		List<String> lore = new ArrayList<String>();
+		    		if (type==2) {
+			    		int bonus_enchant1 = (int)(Math.random()*6); //0-5.
+			    		int bonus_enchant2 = (int)(Math.random()*6); //0-5.
+			    		while (bonus_enchant2==bonus_enchant1) {
+			    			bonus_enchant2 = (int)(Math.random()*6);
+			    		}
+			    		switch (bonus_enchant1) {
+			    			case 0: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*32)+16+1)+" "+ChatColor.BLUE+"Health");
+			    			}break;
+			    			case 1: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+20+1)+"% "+ChatColor.BLUE+"Damage Reduction");
+			    			}break;
+			    			case 2: {
+			    				lore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*200)+100+1)*10)+"% "+ChatColor.BLUE+"Durability");
+			    			}break;
+			    			case 3: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+10+1)+"% "+ChatColor.BLUE+"Block Chance");
+			    			}break;
+			    			case 4: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*35)+20+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
+			    			}break;
+			    			case 5: {
+			    				lore.add(ChatColor.GRAY+"Sturdy "+toRomanNumeral((int)(Math.random()*9)+2));
+			    			}break;
+			    		}
+			    		switch (bonus_enchant2) {
+		    				case 0: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*16)+8+1)+" "+ChatColor.BLUE+"Health");
+			    			}break;
+			    			case 1: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*15)+10+1)+"% "+ChatColor.BLUE+"Damage Reduction");
+			    			}break;
+			    			case 2: {
+			    				lore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*100)+50+1)*10)+"% "+ChatColor.BLUE+"Durability");
+			    			}break;
+			    			case 3: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*15)+5+1)+"% "+ChatColor.BLUE+"Block Chance");
+			    			}break;
+			    			case 4: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*16)+10+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
+			    			}break;
+			    			case 5: {
+			    				lore.add(ChatColor.GRAY+"Sturdy "+toRomanNumeral((int)(Math.random()*4)+1));
+			    			}break;
+			    		}
+		    		} else {
+			    		int bonus_enchant1 = (int)(Math.random()*5); //0-4.
+			    		int bonus_enchant2 = (int)(Math.random()*5); //0-4.
+			    		while (bonus_enchant2==bonus_enchant1) {
+			    			bonus_enchant2 = (int)(Math.random()*5);
+			    		}
+			    		switch (bonus_enchant1) {
+			    			case 0: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+20+1)+"% "+ChatColor.BLUE+"Critical Chance");
+			    			}break;
+			    			case 1: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+4+1)+" "+ChatColor.BLUE+"Armor Penetration");
+			    			}break;
+			    			case 2: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+20+1)+"% "+ChatColor.BLUE+"Life Steal");
+			    			}break;
+			    			case 3: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*90)+60+1)+"% "+ChatColor.BLUE+"Attack Speed");
+			    			}break;
+			    			case 4: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*15)+10+1)+" "+ChatColor.BLUE+"Damage");
+			    			}break;
+			    		}
+			    		switch (bonus_enchant2) {
+		    			case 0: {
+		    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*15)+10+1)+"% "+ChatColor.BLUE+"Critical Chance");
+		    			}break;
+		    			case 1: {
+		    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+2+1)+" "+ChatColor.BLUE+"Armor Penetration");
+		    			}break;
+		    			case 2: {
+		    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*15)+10+1)+"% "+ChatColor.BLUE+"Life Steal");
+		    			}break;
+		    			case 3: {
+		    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*45)+30+1)+"% "+ChatColor.BLUE+"Attack Speed");
+		    			}break;
+		    			case 4: {
+		    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*7)+5+1)+" "+ChatColor.BLUE+"Damage");
+		    			}break;
+			    		}
+		    		}
+		    		ItemMeta meta = legendary.getItemMeta();
+		    		meta.setLore(lore);
+		    		meta.setDisplayName(ChatColor.BOLD+"Spiritual"+" " + itemname);
+		    		legendary.setItemMeta(meta);
+		    		sortEnchantments(legendary);
+		    		return legendary;
+		    	}
+		    	default: {
+		    		return new ItemStack(Material.AIR); //Something bad happened. So we just return nothing / a null item.
+		    	}
 	    	}
     	} else {
     		//This is an actual Artifact piece. Has extremely strong stats with very high durability.
+    		String itemname = "";
+    		if (!diamond) {
+    			itemname+="Iron";
+    		} else {
+    			itemname+="Diamond";
+    		}
+    		int type=1;
+    		double random_choose = Math.random()*9.0d;
+    		//Bukkit.getLogger().info("Random choose is "+random_choose);
+    		switch ((int)random_choose) {
+				case 0: {
+					itemname+=" Chestplate";
+					type=2;
+				}break;
+				case 1: {
+					itemname+=" Helmet";
+					type=2;
+				}break;
+				case 2: {
+					itemname+=" Leggings";
+					type=2;
+				}break;
+				case 3: {
+					itemname+=" Boots";
+					type=2;
+				}break;
+				case 4: {
+					itemname+=" Pickaxe";
+					type=1;
+				}break;
+				case 5: {
+					itemname+=" Axe";
+					type=1;
+				}break;
+				case 6: {
+					itemname+=" Spade";
+					type=1;
+				}break;
+				case 7: {
+					itemname+=" Sword";
+					type=1;
+				}
+				case 8: {
+					itemname="Bow";
+					type=1;
+				}break;
+    		}
+    		//Choose a random enchanment.
+    		int randomenchant = (int)(Math.random()*enchantment_id_list.length);
+    		int enchantcount=0;
     		
+    		List<String> lore = new ArrayList<String>();
+    		if (type==2) {
+	    		int bonus_enchant1 = (int)(Math.random()*6); //0-5.
+	    		int enchant_count = 0;
+	    		boolean[] done = {false, false, false, false, false, false};
+	    		while (enchant_count<3) {
+		    		switch (bonus_enchant1) {
+		    			case 0: {
+		    				if (!done[bonus_enchant1]) {
+		    					lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*32)+16+1)+" "+ChatColor.BLUE+"Health");
+		    					enchant_count++;
+		    				}
+		    			}break;
+		    			case 1: {
+		    				if (!done[bonus_enchant1]) {
+		    					lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+20+1)+"% "+ChatColor.BLUE+"Damage Reduction");
+		    					enchant_count++;
+		    				}
+		    			}break;
+		    			case 2: {
+		    				if (!done[bonus_enchant1]) {
+		    					lore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*200)+100+1)*10)+"% "+ChatColor.BLUE+"Durability");
+		    					enchant_count++;
+		    				}
+		    			}break;
+		    			case 3: {
+		    				if (!done[bonus_enchant1]) {
+		    					lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+10+1)+"% "+ChatColor.BLUE+"Block Chance");
+		    					enchant_count++;
+		    				}
+		    			}break;
+		    			case 4: {
+		    				if (!done[bonus_enchant1]) {
+		    					lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*35)+20+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
+		    					enchant_count++;
+		    				}
+		    			}break;
+		    			case 5: {
+		    				if (!done[bonus_enchant1]) {
+		    					lore.add(ChatColor.GRAY+"Sturdy "+toRomanNumeral((int)(Math.random()*9)+2));
+		    				}
+		    			}break;
+		    		}
+					done[bonus_enchant1]=true;
+					bonus_enchant1 = (int)(Math.random()*6);
+	    		}
+    		} else {
+	    		int bonus_enchant1 = (int)(Math.random()*5); //0-4.
+	    		int enchant_count = 0;
+	    		boolean[] done = {false, false, false, false, false};
+	    		while (enchant_count<3) {
+    				if (!done[bonus_enchant1]) {
+			    		switch (bonus_enchant1) {
+			    			case 0: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+20+1)+"% "+ChatColor.BLUE+"Critical Chance");
+			    			}break;
+			    			case 1: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+4+1)+" "+ChatColor.BLUE+"Armor Penetration");
+			    			}break;
+			    			case 2: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+20+1)+"% "+ChatColor.BLUE+"Life Steal");
+			    			}break;
+			    			case 3: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*90)+60+1)+"% "+ChatColor.BLUE+"Attack Speed");
+			    			}break;
+			    			case 4: {
+			    				lore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*15)+10+1)+" "+ChatColor.BLUE+"Damage");
+			    			}break;
+			    		}
+    					enchant_count++;
+    					done[bonus_enchant1]=true;
+    				}
+					bonus_enchant1 = (int)(Math.random()*5);
+	    		}
+    		}
+    		
+    		ItemStack legendary = new ItemStack(Material.getMaterial(itemname.toUpperCase().replace(" ", "_")));
+    		while (enchantcount<enchantment_id_list.length/4+((int)(Math.random()*(enchantment_id_list.length/1.5d)))) {
+    			if (legendary.getEnchantmentLevel(Enchantment.getById(enchantment_id_list[randomenchant]))==0) {
+    				legendary.addUnsafeEnchantment(Enchantment.getById(enchantment_id_list[randomenchant]), (int)(Math.random()*10)+5);
+    				enchantcount++;
+    			}
+				randomenchant = (int)(Math.random()*enchantment_id_list.length);
+    		}
+    		ItemMeta meta = legendary.getItemMeta();
+    		meta.setLore(lore);
+    		meta.setDisplayName(ChatColor.BOLD+""+ChatColor.AQUA+"Ancient "+PlayerListener.convertToItemName(Enchantment.getById(enchantment_id_list[randomenchant]).getName()) + " " + itemname);
+    		legendary.setItemMeta(meta);
+    		sortEnchantments(legendary);
+    		return legendary;
     	}
     }
     
