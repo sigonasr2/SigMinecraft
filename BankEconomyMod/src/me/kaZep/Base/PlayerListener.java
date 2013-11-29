@@ -11354,7 +11354,7 @@ implements Listener
 			Location loc = e.getEntity().getLocation(); 
 			ItemStack item = null;
 			
-			switch ((int)(Math.random()*112)) {
+			switch ((int)(Math.random()*111.01)) {
 				case 0:{
 					item = new ItemStack(Material.WOOD_HOE);
 				}break;

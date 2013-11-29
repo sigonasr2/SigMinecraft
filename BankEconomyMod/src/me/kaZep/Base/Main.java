@@ -2698,6 +2698,23 @@ public void checkJukeboxes() {
     	LOGGING_UPDATE_COUNTS=0;
           for (int i=0;i<SPEED_CONTROL.size();i++) {
         	  SPEED_CONTROL.get(i).updatePlayerSpd();
+        	  try
+        	  {
+        	      String filename= "PlayerBuffData.txt";
+        	      FileWriter fw = new FileWriter(filename,true); //the true will append the new data
+        	      fw.write("["+SERVER_TICK_TIME+"]"+"PlayerBuffData for "+SPEED_CONTROL.get(i).p.getName()+": "+SPEED_CONTROL.get(i).toString()+"\n");//appends the string to the file
+        	      if (i+1==SPEED_CONTROL.size()) {
+        	    	  fw.write("========\n");
+        	      }
+        	      fw.close();
+        	  }
+        	  catch(IOException ioe)
+        	  {
+        	      System.err.println("IOException: " + ioe.getMessage());
+        	  }
+          }
+          if (SPEED_CONTROL.size()!=Bukkit.getOnlinePlayers().length) {
+        	  Bukkit.getLogger().warning("["+SERVER_TICK_TIME+"]SPEED_CONTROL and ONLINE PLAYERS list length don't match! ("+SPEED_CONTROL.size()+"/"+Bukkit.getOnlinePlayers().length+")");
           }
           LOGGING_UPDATE_COUNTS++; //1
           for (int i=0;i<explorers.size();i++) {
