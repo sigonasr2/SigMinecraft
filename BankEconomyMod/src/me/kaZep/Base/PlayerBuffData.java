@@ -8,6 +8,8 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
 
+import me.kaZep.Commands.JobsDataInfo.Job;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -29,6 +31,7 @@ public class PlayerBuffData {
 	double extra_hp=0;
 	double money_gained=0;
 	long last_money_report_time=0;
+	long last_sneak_time=0;
 	public Main plugin;
 	
 	public String toString() {
@@ -156,6 +159,9 @@ public class PlayerBuffData {
 		if (!p.isDead()) { //Don't even try to set things if we're dead.
 			base_hplv=20;
 			base_hplv+=hpbufflist.size()*10;
+			if (this.plugin.hasJobBuff("Hunter", p, Job.JOB40)) {
+				base_hplv+=20;
+			}
 			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat8")>0) {
 				base_hplv+=this.plugin.getStatBonus(7, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat8")/2);
 			}

@@ -10,16 +10,20 @@ public class PlayerData {
 	Material lastblocktype=null;
 	long lastinteracttime=0;
 	long lastminetime=0;
+	long lastsneaktime=0;
 	int minestreak=0;
+	int blockstack=0; //The amount of times you've gotten hit (The amount of "blocking" stacks you now have)
+	int fishingrodfails=0; //The amount of times in a row you've failed to catch fish.
+	long fishingroduse=0; //The last time you threw the fishing rod in the water.
 	Location clickedblock1=null; //Stores the location of a clicked block.
 	Player data=null;
 	long lastflighttime=0;
 	public PlayerData(Player p) {
 		this.data=p;
 		this.lastblocktype=Material.DIRT;
-		lastinteracttime=Main.SERVER_TICK_TIME;
-		lastminetime=Main.SERVER_TICK_TIME;
-		lastflighttime=Main.SERVER_TICK_TIME;
+		lastinteracttime=
+				lastminetime=
+				lastflighttime=Main.SERVER_TICK_TIME;
 		minestreak=0;
 	}
 	public boolean CheckMineStreak() {

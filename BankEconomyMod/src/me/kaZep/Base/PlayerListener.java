@@ -97,6 +97,8 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
@@ -1326,13 +1328,42 @@ implements Listener
 	}
 
 	@EventHandler
+	public void onEnemyTarget(EntityTargetLivingEntityEvent e) {
+		if (e.getTarget() instanceof Player) {
+			Player p = (Player)e.getTarget();
+			if (Main.SERVER_TICK_TIME-this.plugin.getPlayerData(((Player)(e.getTarget()))).lastsneaktime<=60) {
+				//Disallow it, since they are sneaking.
+				e.setCancelled(true);
+			}
+		}
+	}
+	
+	@EventHandler
 	public void onPlayerSneak(PlayerToggleSneakEvent e) {
 		if (e.isSneaking()) {
-			if (this.plugin.PlayerinJob(e.getPlayer(),"Hunter") && this.plugin.getJobLv("Hunter", e.getPlayer())>=10) {
+			if (this.plugin.hasJobBuff("Hunter", e.getPlayer(), Job.JOB10)) {
 				e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 9999999, 0, true));
+				if (Main.SERVER_TICK_TIME-this.plugin.getPlayerData(e.getPlayer()).lastsneaktime>60) {
+					this.plugin.getPlayerData(e.getPlayer()).lastsneaktime=Main.SERVER_TICK_TIME;
+					Player p = e.getPlayer();
+					  List<Entity> nearby = p.getNearbyEntities(20, 12, 20);
+					  //List<Entity> nearby2 = p.getNearbyEntities(10, 6, 10);
+					  for (int i=0;i<nearby.size();i++) {
+						  //EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
+						  if (nearby.get(i) instanceof Monster) {
+							  Monster m = (Monster)nearby.get(i);
+							  if (m.getTarget() instanceof Player) {
+								  if (this.plugin.hasJobBuff("Hunter",(Player)(m.getTarget()),Job.JOB10) && ((Player)(m.getTarget())).hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+									  //Respawn the mob.
+									  m.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,60,6));
+								  }
+							  }
+						  }
+					  }
+				}
 			}
 		} else {
-			if (this.plugin.PlayerinJob(e.getPlayer(),"Hunter") && this.plugin.getJobLv("Hunter", e.getPlayer())>=10) {
+			if (this.plugin.hasJobBuff("Hunter", e.getPlayer(), Job.JOB10)) {
 				if (e.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
 					try {
 						Collection<PotionEffect> effects = e.getPlayer().getActivePotionEffects();
@@ -1499,9 +1530,9 @@ implements Listener
 		p.updateInventory();
 		if (this.plugin.PlayerinJob(p, "Explorer") && this.plugin.getJobLv("Explorer", p)>=5) {
 			//p.sendMessage("Explorer speed buff set.");
-			newplayer.setBaseSpd(1);
+			newplayer.setBaseSpd(newplayer.base_spdlv+1);
 		}
-		if (this.plugin.PlayerinJob(p, "Hunter") && this.plugin.getJobLv("Hunter", p)>=20) {
+		if (this.plugin.hasJobBuff("Hunter", p, Job.JOB20)) {
 			//p.sendMessage("Explorer speed buff set.");
 			newplayer.setBaseSpd(newplayer.base_spdlv+1);
 		}
@@ -7136,7 +7167,7 @@ implements Listener
 			Player p = e.getPlayer();
 			if (this.plugin.PlayerinJob(p, "Fisherman")) {
 				this.plugin.gainMoneyExp(p,"Fisherman",0.175,3);
-				if (this.plugin.getJobLv("Fisherman", p)>=5) {
+				if (this.plugin.hasJobBuff("Fisherman", p, Job.JOB5)) {
 					//Half chance to set the durability back by one.
 					if (p.getItemInHand().getType()==Material.FISHING_ROD) {
 						if (p.getItemInHand().getDurability()>0) {
@@ -7146,7 +7177,7 @@ implements Listener
 						}
 					}
 				}
-				if (this.plugin.getJobLv("Fisherman", p)>=20) {
+				if (this.plugin.hasJobBuff("Fisherman", p, Job.JOB20)) {
 					e.setExpToDrop(e.getExpToDrop()*2);
 					int i=4;
 					while (i>0) {
@@ -7553,6 +7584,9 @@ implements Listener
 		final EntityDamageEvent f = e;
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			final Player p = (Player)e.getEntity();
+			if (this.plugin.hasJobBuff("Hunter", p, Job.JOB40)) {
+				e.setDamage(e.getDamage()*0.70d);
+			}
 			if (e.getCause()==DamageCause.ENTITY_EXPLOSION || e.getCause()==DamageCause.BLOCK_EXPLOSION) {
 				e.setDamage(e.getDamage()*2);
 			}
@@ -8014,6 +8048,9 @@ implements Listener
 	  }*/
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			final Player p = (Player)e.getEntity();
+			if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f && this.plugin.hasJobBuff("Hunter", p, Job.JOB30A)) {
+				this.plugin.getPlayerData(p).blockstack+=1;
+			}
 			List<Entity> nearby = p.getNearbyEntities(10, 10, 10);
 			for (int i=0;i<nearby.size();i++) {
 				if (nearby.get(i).getType()==EntityType.PLAYER && this.plugin.PlayerinJob((Player)nearby.get(i), "Support") && this.plugin.getJobLv("Support", (Player)nearby.get(i))>=20) {
@@ -8089,6 +8126,9 @@ implements Listener
 			List<Integer>blocks = new ArrayList<Integer>(); //Corresponds to helmet, chestplate, leggings, and boots.
 			//Found the slot. Check armor values.
 			double block_chance=0,speed_boost_chance=0;
+			if (this.plugin.hasJobBuff("Hunter", p, Job.JOB30A)) {
+				block_chance+=(double)10*this.plugin.getPlayerData(p).blockstack;
+			}
 			if (p.getEquipment().getBoots()!=null) {
 				ItemStack item = p.getEquipment().getBoots();
 				if (this.plugin.isBroken(item)) {
@@ -8451,20 +8491,22 @@ implements Listener
 			if (Math.random()<=block_chance/100.0d) {
 				e.setDamage(0);
 				//Choose a random set to mark off.
-				int armor = blocks.get((int)(Math.random()*blocks.size()));
-				switch (armor) {
-				case 0:{
-					p.getInventory().getHelmet().setDurability((short)(p.getInventory().getHelmet().getDurability()+1));
-				}break;
-				case 1:{
-					p.getInventory().getChestplate().setDurability((short)(p.getInventory().getChestplate().getDurability()+1));
-				}break;
-				case 2:{
-					p.getInventory().getLeggings().setDurability((short)(p.getInventory().getLeggings().getDurability()+1));
-				}break;
-				case 3:{
-					p.getInventory().getBoots().setDurability((short)(p.getInventory().getBoots().getDurability()+1));
-				}break;
+				if (blocks.size()>0) {
+					int armor = blocks.get((int)(Math.random()*blocks.size()));
+					switch (armor) {
+					case 0:{
+						p.getInventory().getHelmet().setDurability((short)(p.getInventory().getHelmet().getDurability()+1));
+					}break;
+					case 1:{
+						p.getInventory().getChestplate().setDurability((short)(p.getInventory().getChestplate().getDurability()+1));
+					}break;
+					case 2:{
+						p.getInventory().getLeggings().setDurability((short)(p.getInventory().getLeggings().getDurability()+1));
+					}break;
+					case 3:{
+						p.getInventory().getBoots().setDurability((short)(p.getInventory().getBoots().getDurability()+1));
+					}break;
+					}
 				}
 				e.setCancelled(true);
 			}
@@ -8784,6 +8826,40 @@ implements Listener
 						}
 					}
 					final Player p = (Player) e.getDamager();
+					if (e.getEntity() instanceof Monster) {
+						Monster m = (Monster)e.getEntity();
+						/*if (m.hasPotionEffect(PotionEffectType.SLOW) && Main.SERVER_TICK_TIME-this.plugin.getPlayerData(p).lastsneaktime<=60) {
+							m.removePotionEffect(PotionEffectType.SLOW);
+						}*/
+						try {
+							Iterator<PotionEffect> effects = m.getActivePotionEffects().iterator();
+							//Figure out potion effects when player joins.
+							while (effects.hasNext()) {
+								PotionEffect nexteffect = effects.next();
+								//Bukkit.getLogger().info("Effect Type is "+nexteffect.getType().getName()+", amplifier is "+nexteffect.getAmplifier()+", duration is "+nexteffect.getDuration());
+								if (nexteffect.getType().getName().compareTo(PotionEffectType.SLOW.getName())==0 && nexteffect.getAmplifier()==6 && nexteffect.getDuration()<=60) {
+									m.removePotionEffect(PotionEffectType.SLOW);
+									//Bukkit.getLogger().info("Removed slow.");
+									//p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 200, nexteffect.getAmplifier()+1, true));
+									break;
+								}
+								/*if (nexteffect.getType().getName().compareTo(PotionEffectType.JUMP.getName())==0) {
+									p.removePotionEffect(PotionEffectType.JUMP);
+									p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 360000, nexteffect.getAmplifier()+2, true));
+								}*/
+								effects.remove();
+							}
+						} catch (ConcurrentModificationException ex_e) {
+							Bukkit.getLogger().warning("Potion Effect Collection not accessible while trying to remove slow debuff.");
+						}
+					}
+					if (this.plugin.hasJobBuff("Hunter", p, Job.JOB20) && p.getItemInHand().getType().name().toLowerCase().contains("sword")) {
+						if (e.getEntity() instanceof Monster) {
+							Monster m = (Monster)e.getEntity();
+							m.addPotionEffect(new PotionEffect(PotionEffectType.POISON,120,1));
+						}
+					}
+					this.plugin.getPlayerData(p).lastsneaktime=0;
 					if (p.getItemInHand().hasItemMeta() && p.getItemInHand().getItemMeta().getDisplayName()!=null && p.getItemInHand().getItemMeta().getDisplayName().contains(ChatColor.DARK_GRAY+"[BROKEN]")) {
 						e.setDamage(0);
 						e.setCancelled(true);
@@ -8792,6 +8868,9 @@ implements Listener
 					//p.sendMessage("No Damage Ticks: "+f.getNoDamageTicks());
 					ItemStack item = p.getItemInHand();
 					double critical_chance=0,armor_pen=0,life_steal=0,attack_speed=0,dmg=0,armor_pen_dmg=0;
+					if (this.plugin.hasJobBuff("Hunter", p, Job.JOB30B)) {
+						armor_pen+=10;
+					}
 					if (item.getType()!=Material.BOW && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) { //Make sure this isn't a ranged weapon.
 						for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 							if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Critical Chance")) {
@@ -8862,8 +8941,12 @@ implements Listener
 							}
 						}
 					}
+					if (this.plugin.hasJobBuff("Hunter", (Player)e.getDamager(), Job.JOB40)) {
+						//Deal 4 extra damage.
+						e.setDamage(e.getDamage()+4);
+					}
 					if (this.plugin.hasJobBuff("Hunter", (Player)e.getDamager(), Job.JOB5)) {
-						//Deal 2 extra damage.
+						//Deal 4 extra damage.
 						e.setDamage(e.getDamage()+4);
 					}
 					if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat7")>0) {
@@ -8898,7 +8981,7 @@ implements Listener
 							//This means piercing would do extra damage. Just subtract throughdmg.
 							if (f.getHealth()-throughdmg>0) {
 								f.setHealth(f.getHealth()-throughdmg);
-								armor_pen_dmg=throughdmg;
+								//armor_pen_dmg=throughdmg;
 								if (f!=null) {
 									if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 										if (f.getCustomName()!=null) {
@@ -8941,9 +9024,13 @@ implements Listener
 				} else {
 					if (((Projectile)e.getDamager()).getShooter()!=null && ((Projectile)e.getDamager()).getShooter().getType()==EntityType.PLAYER) {
 						final Player p = (Player)((Projectile)e.getDamager()).getShooter();
+						this.plugin.getPlayerData(p).lastsneaktime=0;
 						p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 						ItemStack item = p.getItemInHand();
 						double critical_chance=0,armor_pen=0,life_steal=0,attack_speed=0,dmg=0,armor_pen_dmg=0;
+						if (this.plugin.hasJobBuff("Hunter", p, Job.JOB30B)) {
+							armor_pen+=10;
+						}
 						if (item.getType()==Material.BOW && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) { //Make sure we are using a ranged weapon.
 							for (int i=0;i<item.getItemMeta().getLore().size();i++) {
 								if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Critical Chance")) {
@@ -9036,8 +9123,12 @@ implements Listener
 								}
 							}
 						}
+						if (this.plugin.hasJobBuff("Hunter", (Player)((Projectile)e.getDamager()).getShooter(), Job.JOB40)) {
+							//Deal 4 extra damage.
+							e.setDamage(e.getDamage()+4);
+						}
 						if (this.plugin.hasJobBuff("Hunter", (Player)((Projectile)e.getDamager()).getShooter(), Job.JOB5)) {
-							//Deal 2 extra damage.
+							//Deal 4 extra damage.
 							e.setDamage(e.getDamage()+4);
 						}
 						if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat7")>0) {
@@ -9068,7 +9159,7 @@ implements Listener
 								//This means piercing would do extra damage. Just subtract throughdmg.
 								if (f.getHealth()-throughdmg>0) {
 									f.setHealth(f.getHealth()-throughdmg);
-									armor_pen_dmg=throughdmg;
+									////armor_pen_dmg=throughdmg;
 									if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 										if (f.getCustomName()!=null) {
 											//p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+" Dealt "+(Math.round(throughdmg)*10)/10+" damage to "+convertToItemName(f.getCustomName())+".");

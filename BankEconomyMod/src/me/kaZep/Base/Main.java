@@ -885,7 +885,7 @@ public class Main extends JavaPlugin
     Hunter_job.addData("WITHER", 550.00, 7800, 1);
     Hunter_job.setBuffData("Damage dealt increased by 4.",
     		"Sneaking gives you invisibility. Anything targeting you loses aggro.", 
-    		"Swords inflict Poison II on mobs. Movement speed increased by 20%.", 
+    		"Swords inflict Poison II on mobs for 6 seconds. Movement speed increased by 20%.", 
     		"Each time you get hit, the next hit has a 10% increased stacking chance of blocking for 10 seconds. Hitting an enemy removes this buff.",
     		"Attacks deal an additional 10 armor penetration damage.",
     		"Damage dealt increased by 4, damage taken decreased by 30%, at night you are invisible. Health increased by 20.");
@@ -1847,14 +1847,6 @@ public void runTick() {
 								 }
 							  }
 						  }
-						  if (nearby.get(i) instanceof Monster) {
-							  Monster m = (Monster)nearby.get(i);
-							  if (m.getTarget() instanceof Player) {
-								  if (hasJobBuff("Hunter",(Player)(m.getTarget()),Job.JOB10) && ((Player)(m.getTarget())).hasPotionEffect(PotionEffectType.INVISIBILITY)) {
-									  m.setTarget(null);
-								  }
-							  }
-						  }
 					  }
 				  }
 			  }
@@ -2570,6 +2562,14 @@ public void checkJukeboxes() {
           LOGGING_UPDATE_COUNTS++; //2
     		Player[] list = Bukkit.getOnlinePlayers();
     		for (int i=0;i<list.length;i++) {
+    			if (hasJobBuff("Hunter", list[i],Job.JOB40)) {
+    				if (Bukkit.getWorld("world").getTime()>13000) {
+    					list[i].addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,199,1));
+    				}
+    			}
+        		if (hasJobBuff("Hunter", list[i], Job.JOB30A)) {
+        			getPlayerData(list[i]).blockstack=0;
+        		}
     			if (list[i].getAllowFlight() && hasJobBuff("Builder", list[i], Job.JOB40) && SERVER_TICK_TIME-getPlayerData(list[i]).lastflighttime>=200) {
     				list[i].setAllowFlight(false);
     				list[i].sendMessage(ChatColor.DARK_RED+""+ChatColor.ITALIC+"Flight disabled...");
