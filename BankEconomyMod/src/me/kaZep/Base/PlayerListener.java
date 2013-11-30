@@ -5192,6 +5192,42 @@ implements Listener
 			if (result.getResult().getType()==Material.DIAMOND_SWORD) {
 				crafteditem=true;
 			}
+			if (this.plugin.hasJobBuff("Weaponsmith", p, Job.JOB40) && crafteditem) {
+				ItemStack[] crafteditems = result.getMatrix();
+				if (e.getClick()==ClickType.SHIFT_RIGHT || e.getClick()==ClickType.SHIFT_LEFT) {
+					int lowestamt=9999;
+					for (int i=0;i<crafteditems.length;i++) {
+						if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+							if (crafteditems[i].getAmount()<lowestamt) {
+								lowestamt=crafteditems[i].getAmount();
+							}
+						}
+					}
+					for (int i=0;i<crafteditems.length;i++) {
+						if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+							for (int j=0;j<lowestamt;j++) {
+								if (Math.random()<=0.5) {
+									//p.sendMessage("Restored an item.");
+									ItemStack replenishitem = crafteditems[i].clone();
+									replenishitem.setAmount(1);
+									p.getInventory().addItem(replenishitem);
+								}
+							}
+						}
+					}
+				} else {
+					for (int i=0;i<crafteditems.length;i++) {
+						if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+							if (Math.random()<=0.5) {
+								//p.sendMessage("Restored an item.");
+								ItemStack replenishitem = crafteditems[i].clone();
+								replenishitem.setAmount(1);
+								p.getInventory().addItem(replenishitem);
+							}
+						}
+					}
+				}
+			} else
 			if (this.plugin.hasJobBuff("Weaponsmith", p, Job.JOB20) && crafteditem) {
 				ItemStack[] crafteditems = result.getMatrix();
 				if (e.getClick()==ClickType.SHIFT_RIGHT || e.getClick()==ClickType.SHIFT_LEFT) {
@@ -5267,7 +5303,17 @@ implements Listener
 			if (this.plugin.hasJobBuff("Weaponsmith", p, Job.JOB10) && crafteditem) {
 				//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
 				if (e.getClick()!=ClickType.SHIFT_RIGHT && e.getClick()!=ClickType.SHIFT_LEFT) {
-					ItemStack resulting = EnchantItem(result.getResult(),5,p);
+					ItemStack resulting = result.getResult();
+					if (hasJobBuff("Weaponsmith", p.getName(), Job.JOB40)) {
+						resulting = EnchantItem(resulting,25,(Player)p);
+						int finalstack=1;
+						while (Math.random()<=0.3) {
+							finalstack++;
+						}
+						resulting.setAmount(finalstack);
+					} else {
+						resulting = EnchantItem(result.getResult(),5,p);
+					}
 					if (hasJobBuff("Weaponsmith", p.getName(), Job.JOB30A)) {
 						ItemMeta meta = resulting.getItemMeta();
 						List<String> lore = new ArrayList<String>();
@@ -5921,8 +5967,8 @@ implements Listener
 					if (p.getGameMode()!=GameMode.CREATIVE) {
     					p.setAllowFlight(false);
 						p.setFlying(false);
+						p.sendMessage(ChatColor.DARK_RED+""+ChatColor.ITALIC+"Flight disabled...");
     				}
-    				p.sendMessage(ChatColor.DARK_RED+""+ChatColor.ITALIC+"Flight disabled...");
 				}
 			}
 		}
@@ -11493,10 +11539,23 @@ implements Listener
 								newItemsCount += post.getAmount();
 								//Do any enchants we need to do here.
 								ItemStack clone = post.clone();
+								if (hasJobBuff("Weaponsmith", player.getName(), Job.JOB40) && validItem_Weaponsmith(post)) {
+									ItemStack resulting = clone;
+									resulting = EnchantItem(clone,25,(Player)player);
+									int finalstack=1;
+									while (Math.random()<=0.3) {
+										finalstack++;
+									}
+									resulting.setAmount(finalstack);
+									player.getInventory().setItem(i, resulting);
+								}
 								if (PlayerinJob((Player)player,"Weaponsmith")) {
 									if (getJobLv("Weaponsmith", player.getName())>=10 && validItem_Weaponsmith(post)) {
 										//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-										ItemStack resulting = EnchantItem(clone,5,(Player)player);
+										ItemStack resulting = clone;
+										if (!hasJobBuff("Weaponsmith", player.getName(), Job.JOB40)) {
+											resulting = EnchantItem(clone,5,(Player)player);
+										}
 										if (hasJobBuff("Weaponsmith", player.getName(), Job.JOB30A)) {
 											ItemMeta meta = resulting.getItemMeta();
 											List<String> lore = new ArrayList<String>();

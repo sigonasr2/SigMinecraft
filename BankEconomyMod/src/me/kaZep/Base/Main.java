@@ -3827,7 +3827,7 @@ public void payDay(int time)
 		//DERP
 		if (item.getType()==Material.BOW) {enchant_data=ENCHANTMENT_DATA.bow;} else
 		if (item.getType()==Material.IRON_SWORD) {enchant_data=ENCHANTMENT_DATA.iron_sword;} else
-		if (item.getType()==Material.GOLD_SWORD) {enchant_data=ENCHANTMENT_DATA.gold_sword;} else
+		if (item.getType()==Material.GOLD_SWORD) {enchant_data=ENCHANTMENT_DATA.golden_sword;} else
 		if (item.getType()==Material.DIAMOND_SWORD) {enchant_data=ENCHANTMENT_DATA.diamond_sword;} else
 		if (item.getType()==Material.STONE_SPADE) {enchant_data=ENCHANTMENT_DATA.stone_shovel;} else
 		if (item.getType()==Material.STONE_PICKAXE) {enchant_data=ENCHANTMENT_DATA.stone_pickaxe;} else
@@ -3901,19 +3901,17 @@ public void payDay(int time)
 					}
 					//see if we should try for a second/third/fourth enchantment.
 					boolean keepgoing=false;
-					if (lv==5) {
-						if (enchantments==1 && Math.random()<=0.07) {
-							keepgoing=true;
-						} else
-						if (enchantments==2 && Math.random()<=0.045) {
-							keepgoing=true;
-						} else
-						if (enchantments==3 && Math.random()<=0.03) {
-							keepgoing=true;
-						}
-						if (!keepgoing) {
-							break;
-						}
+					if (enchantments==1 && Math.random()<=0.07*((double)lv)) {
+						keepgoing=true;
+					} else
+					if (enchantments==2 && Math.random()<=0.045*((double)lv)) {
+						keepgoing=true;
+					} else
+					if (enchantments==3 && Math.random()<=0.03*((double)lv)) {
+						keepgoing=true;
+					}
+					if (!keepgoing) {
+						break;
 					}
 				}
 			}
