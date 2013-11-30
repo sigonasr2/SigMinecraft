@@ -34,6 +34,7 @@ import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Effect;
 import org.bukkit.FireworkEffect;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -919,7 +920,7 @@ public class Main extends JavaPlugin
     		"Weapons crafted gain a free level 5 enchantment.", 
     		"Crafting Weaponsmith items have a 25% chance of preserving materials used.",
     		"All weaponsmith items crafted gain +X Damage bonus enchantments. (Increases by weaponsmithing level)",
-    		"All weaponsmith items have your name engraved on your weapons, and your soul implanted in them...",
+    		"All weaponsmith items crafted gain +2% Lifesteal bonus enchantments. (Increases by 2% every weaponsmithing level after 30.)",
     		"Weapons crafted gain free level 25 enchantments. Materials used in crafting have a 50% chance of being preserved. Weapons crafted have a 30% chance of stacking (duplicated), and 30% chance for every extra addition to the weapon stack.");
 
     Blacksmith_job.setJobName("Blacksmith");
@@ -2571,7 +2572,17 @@ public void checkJukeboxes() {
         			getPlayerData(list[i]).blockstack=0;
         		}
     			if (list[i].getAllowFlight() && hasJobBuff("Builder", list[i], Job.JOB40) && SERVER_TICK_TIME-getPlayerData(list[i]).lastflighttime>=200) {
-    				list[i].setAllowFlight(false);
+    				if (list[i].getGameMode()!=GameMode.CREATIVE) {
+    					list[i].setAllowFlight(false);
+						list[i].setFlying(false);
+    				}
+    				list[i].sendMessage(ChatColor.DARK_RED+""+ChatColor.ITALIC+"Flight disabled...");
+    			}
+    			if (list[i].getAllowFlight() && hasJobBuff("Fisherman", list[i], Job.JOB40) && !list[i].isOnGround() && SERVER_TICK_TIME-getPlayerData(list[i]).lastflighttime>=100) {
+    				if (list[i].getGameMode()!=GameMode.CREATIVE) {
+    					list[i].setAllowFlight(false);
+						list[i].setFlying(false);
+    				}
     				list[i].sendMessage(ChatColor.DARK_RED+""+ChatColor.ITALIC+"Flight disabled...");
     			}
     			if (Math.random()<0.5) {
@@ -5648,7 +5659,7 @@ public void payDay(int time)
 		      }
 		  	},total_tick_delay+=tick_delay);
     	}
-    	if ((getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job1lv")>=40 || getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job2lv")>=40 || getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job3lv")>=40) && !getAccountsConfig().getBoolean(p.getName().toLowerCase()+".jobs.ultimate")) {
+    	if ((getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job1lv")>=40 || getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job2lv")>=40 || getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job3lv")>=40) && !getAccountsConfig().getBoolean(p.getName().toLowerCase()+".jobs.ultimatesealed")) {
 	    	Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
 			      @Override
 			      public void run() {

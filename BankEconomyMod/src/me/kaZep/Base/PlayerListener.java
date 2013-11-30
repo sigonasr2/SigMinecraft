@@ -28,6 +28,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.DyeColor;
 import org.bukkit.Effect;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -54,6 +55,7 @@ import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Fish;
 import org.bukkit.entity.Golem;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.HumanEntity;
@@ -145,6 +147,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
@@ -3597,7 +3600,9 @@ implements Listener
 
 		//*******************************//Job Buffs Begin here!
 		if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && p.getAllowFlight()) {
-			p.setAllowFlight(false);
+			if (p.getGameMode()!=GameMode.CREATIVE) {
+				p.setAllowFlight(false);
+			}
 			p.sendMessage(ChatColor.DARK_RED+""+ChatColor.ITALIC+"Flight disabled...");
 		}
 		if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB20)) {
@@ -4673,7 +4678,15 @@ implements Listener
 				if (result.getMatrix()[i].getType().name().toLowerCase().contains("helmet") ||
 					result.getMatrix()[i].getType().name().toLowerCase().contains("chestplate") ||
 					result.getMatrix()[i].getType().name().toLowerCase().contains("leggings") ||
-					result.getMatrix()[i].getType().name().toLowerCase().contains("boots")) {
+					result.getMatrix()[i].getType().name().toLowerCase().contains("boots") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("pickaxe") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("bow") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("sword") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("spade") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("axe") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("hoe") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("fishing_rod") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("shears")) {
 					if (armor1.getType()==result.getMatrix()[i].getType()) {
 						//Two pieces with the same type. Disable merge crafting.
 						result.setResult(new ItemStack(Material.AIR));
@@ -5155,7 +5168,6 @@ implements Listener
 				restoreItems(e.getInventory(), e.getClick(), p, 0.75);
 			}
 		}
-		//***********************************//End job buff stuff
 		
 		if (this.plugin.PlayerinJob(p,"Weaponsmith")) {
 			boolean crafteditem=false;
@@ -5180,7 +5192,7 @@ implements Listener
 			if (result.getResult().getType()==Material.DIAMOND_SWORD) {
 				crafteditem=true;
 			}
-			if (this.plugin.getJobLv("Weaponsmith", p)>=20 && crafteditem) {
+			if (this.plugin.hasJobBuff("Weaponsmith", p, Job.JOB20) && crafteditem) {
 				ItemStack[] crafteditems = result.getMatrix();
 				if (e.getClick()==ClickType.SHIFT_RIGHT || e.getClick()==ClickType.SHIFT_LEFT) {
 					int lowestamt=9999;
@@ -5216,7 +5228,7 @@ implements Listener
 					}
 				}
 			} else
-				if (this.plugin.getJobLv("Weaponsmith", p)>=5 && crafteditem) {
+				if (this.plugin.hasJobBuff("Weaponsmith", p, Job.JOB5) && crafteditem) {
 					ItemStack[] crafteditems = result.getMatrix();
 					if (e.getClick()==ClickType.SHIFT_RIGHT || e.getClick()==ClickType.SHIFT_LEFT) {
 						int lowestamt=9999;
@@ -5252,14 +5264,36 @@ implements Listener
 						}
 					}
 				}
-			if (this.plugin.getJobLv("Weaponsmith", p)>=10 && crafteditem) {
+			if (this.plugin.hasJobBuff("Weaponsmith", p, Job.JOB10) && crafteditem) {
 				//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
 				if (e.getClick()!=ClickType.SHIFT_RIGHT && e.getClick()!=ClickType.SHIFT_LEFT) {
 					ItemStack resulting = EnchantItem(result.getResult(),5,p);
+					if (hasJobBuff("Weaponsmith", p.getName(), Job.JOB30A)) {
+						ItemMeta meta = resulting.getItemMeta();
+						List<String> lore = new ArrayList<String>();
+						if (meta.hasLore()) {
+							lore = meta.getLore();
+						}
+						lore.add(ChatColor.YELLOW+"+"+(getJobLv("Weaponsmith", p.getName())-29)+" "+ChatColor.BLUE+"Damage");
+						meta.setLore(lore);
+						resulting.setItemMeta(meta);
+					}
+					if (hasJobBuff("Weaponsmith", p.getName(), Job.JOB30B)) {
+						ItemMeta meta = resulting.getItemMeta();
+						List<String> lore = new ArrayList<String>();
+						if (meta.hasLore()) {
+							lore = meta.getLore();
+						}
+						lore.add(ChatColor.YELLOW+"+"+((getJobLv("Weaponsmith", p.getName())-29)*2)+"% "+ChatColor.BLUE+"Lifesteal");
+						meta.setLore(lore);
+						resulting.setItemMeta(meta);
+					}
 					result.setResult(resulting);
 				}
 			}
 		}
+		//***********************************//End job buff stuff
+		
 		if (this.plugin.PlayerinJob(p,"Blacksmith")) {
 			boolean crafteditem=false;
 			/*
@@ -5876,6 +5910,19 @@ implements Listener
 				}
 				if (currentitem.getEnchantmentLevel(Enchantment.getByName("DIG_SPEED"))<4) {
 					currentitem.addUnsafeEnchantment(Enchantment.getByName("DIG_SPEED"), 4);
+				}
+			}
+			if (p.getInventory().getContents()[e.getNewSlot()].getType()==Material.FISHING_ROD && this.plugin.hasJobBuff("Fisherman", p, Job.JOB40) && !p.getAllowFlight() && p.isOnGround()) {
+				p.setAllowFlight(true);
+				p.sendMessage(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"Flight enabled...");
+				this.plugin.getPlayerData(p).lastflighttime=Main.SERVER_TICK_TIME;
+			} else {
+				if (p.getAllowFlight()) {
+					if (p.getGameMode()!=GameMode.CREATIVE) {
+    					p.setAllowFlight(false);
+						p.setFlying(false);
+    				}
+    				p.sendMessage(ChatColor.DARK_RED+""+ChatColor.ITALIC+"Flight disabled...");
 				}
 			}
 		}
@@ -7145,6 +7192,40 @@ implements Listener
 
 	@EventHandler
 	public void onFishCatch(PlayerFishEvent e) {
+		Player p = e.getPlayer();
+		if (e.getState()==State.FISHING) {
+			PlayerData pd = this.plugin.getPlayerData(p);
+			if (Main.SERVER_TICK_TIME-pd.fishingroduse<40+pd.fishingrodfails*10) { /*We're lenient at first, but make it worse if we keep doing it fast.*/
+				pd.fishingrodfails++;
+				if (pd.fishingrodfails>4) {
+					if (p.getItemInHand().getType()==Material.FISHING_ROD) {
+						p.getItemInHand().setDurability((short)(p.getItemInHand().getDurability()+10+pd.fishingrodfails));
+					}
+				}
+			}
+			pd.fishingroduse = Main.SERVER_TICK_TIME; 
+			if (this.plugin.hasJobBuff("Fisherman", p, Job.JOB30A)) {
+				//Bukkit.getLogger().info("Fishing chance is "+e.getHook().getBiteChance()+".");
+				e.getHook().setBiteChance(e.getHook().getBiteChance()+(e.getHook().getBiteChance()*0.3));
+				//Bukkit.getLogger().info("Increasing fishing chance to "+e.getHook().getBiteChance()+".");
+			}
+			if (this.plugin.hasJobBuff("Fisherman", p, Job.JOB30B)) {
+				//Bukkit.getLogger().info("Fishing chance is "+e.getHook().getBiteChance()+".");
+				e.getHook().setBiteChance(pd.fishingrodcatchrate+(pd.fishingrodcatchrate*0.05));
+				//Bukkit.getLogger().info("Increasing fishing chance to "+e.getHook().getBiteChance()+".");
+			}
+			if (this.plugin.hasJobBuff("Fisherman", p, Job.JOB40)) {
+				if (p.getItemInHand().getType()==Material.FISHING_ROD) {
+					p.getItemInHand().setDurability((short)0);
+				}
+				e.getHook().setBiteChance(e.getHook().getBiteChance()+(e.getHook().getBiteChance()*0.5));
+			}
+		}
+		if (e.getState()==State.FAILED_ATTEMPT) {
+			PlayerData pd = this.plugin.getPlayerData(p);
+			//Bukkit.getLogger().info("Fishing chance is reset.");
+			pd.fishingrodcatchrate=0.002;
+		}
 		if (e.getState()==State.CAUGHT_FISH) {
 			if (this.plugin.getConfig().getBoolean("thanksgiving-enabled")) {
 				if (Math.random() < 0.50) {
@@ -7164,7 +7245,22 @@ implements Listener
 					e.getPlayer().getWorld().dropItemNaturally(e.getPlayer().getLocation(), this.plugin.generate_LootChest());
 				}
 			}
-			Player p = e.getPlayer();
+			if (this.plugin.hasJobBuff("Fisherman", p, Job.JOB30A)) {
+				e.setExpToDrop(e.getExpToDrop()*2);
+				p.getWorld().dropItemNaturally(p.getLocation(), new ItemStack(Material.RAW_FISH));
+				this.plugin.gainMoneyExp(p,"Fisherman",0.175,3);
+				this.plugin.gainMoneyExp(p,"Fisherman",0.175,3);
+				if (p.getItemInHand().getType()==Material.FISHING_ROD) {
+					if (p.getItemInHand().getDurability()>0) {
+						if (Math.random()>=0.25) {
+							p.getItemInHand().setDurability((short)(p.getItemInHand().getDurability()-1));
+						}
+					}
+				}
+			}
+			if (this.plugin.hasJobBuff("Fisherman", p, Job.JOB30B)) {
+				this.plugin.getPlayerData(p).fishingrodcatchrate+=this.plugin.getPlayerData(p).fishingrodcatchrate*0.05;
+			}
 			if (this.plugin.PlayerinJob(p, "Fisherman")) {
 				this.plugin.gainMoneyExp(p,"Fisherman",0.175,3);
 				if (this.plugin.hasJobBuff("Fisherman", p, Job.JOB5)) {
@@ -7195,7 +7291,7 @@ implements Listener
 						i--;
 					}
 				} else
-					if (this.plugin.getJobLv("Fisherman", p)>=10) {
+					if (this.plugin.hasJobBuff("Fisherman", p, Job.JOB10)) {
 						e.setExpToDrop(e.getExpToDrop()*2);
 						if (Math.random()<=0.25) {
 							p.getWorld().dropItemNaturally(p.getLocation(), new ItemStack(Material.RAW_FISH));
@@ -7816,7 +7912,10 @@ implements Listener
 		if (e.getEntity() instanceof Player) {
 			Player p = (Player)e.getEntity();
 			if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && p.getAllowFlight()) {
-				p.setAllowFlight(false);
+				if (p.getGameMode()!=GameMode.CREATIVE) {
+					p.setAllowFlight(false);
+					p.setFlying(false);
+				}
 				p.sendMessage(ChatColor.DARK_RED+""+ChatColor.ITALIC+"Flight disabled...");
 			}
 		}
@@ -7824,6 +7923,23 @@ implements Listener
 
 		if (e.getEntity() instanceof LivingEntity) {
 			final LivingEntity l = (LivingEntity)e.getEntity();
+			if (e.getDamager().getType()==EntityType.FISHING_HOOK) {
+				//See if any nearby players are casting lines.
+				List<Entity> nearbyents = l.getNearbyEntities(20, 20, 20);
+				List<Player> nearbyplayers = new ArrayList<Player>();
+				for (int i=0;i<nearbyents.size();i++) {
+					if (nearbyents.get(i) instanceof Player) {
+						nearbyplayers.add((Player)(nearbyents.get(i)));
+					}
+				}
+				for (int j=0;j<nearbyplayers.size();j++) {
+					if (nearbyplayers.get(j).getItemInHand().getType()==Material.FISHING_ROD && this.plugin.hasJobBuff("Fisherman", nearbyplayers.get(j), Job.JOB40)) {
+						nearbyplayers.get(j).getItemInHand().setDurability((short)0);
+						e.setDamage(e.getDamage()+10);
+						break;
+					}
+				}
+			}
 			if (l instanceof Player) {
 				e.setDamage(e.getDamage()*1.45d);
 				if (e.getDamager() instanceof Wither) {
@@ -8191,7 +8307,7 @@ implements Listener
 
 							//Bukkit.getLogger().info("Made it through 2.1.6.");
 						}
-						int heal = item.getDurability()-this.plugin.SPEED_CONTROL.get(slot).boots_durability;
+						int heal = item.getDurability()-this.plugin.SPEED_CONTROL.get(slot).boots_durability+1;
 						//p.sendMessage("Heal is "+heal+" ("+item.getDurability()+"-"+this.plugin.SPEED_CONTROL.get(slot).boots_durability+")");
 						if (Math.random()<=0.75 && heal>0) {
 							heal--;
@@ -8276,7 +8392,7 @@ implements Listener
 							}	
 						}
 						boolean allow=false;
-						int heal = item.getDurability()-this.plugin.SPEED_CONTROL.get(slot).chestplate_durability;
+						int heal = item.getDurability()-this.plugin.SPEED_CONTROL.get(slot).chestplate_durability+1;
 						if (Math.random()<=0.75 && heal>0) {
 							heal--;
 							item.setDurability((short)(item.getDurability()-1));
@@ -8352,7 +8468,7 @@ implements Listener
 								}
 							}
 						}
-						int heal = item.getDurability()-this.plugin.SPEED_CONTROL.get(slot).leggings_durability;
+						int heal = item.getDurability()-this.plugin.SPEED_CONTROL.get(slot).leggings_durability+1;
 						if (Math.random()<=0.75 && heal>0) {
 							heal--;
 							item.setDurability((short)(item.getDurability()-1));
@@ -8428,7 +8544,7 @@ implements Listener
 								}
 							}
 						}
-						int heal = item.getDurability()-this.plugin.SPEED_CONTROL.get(slot).helmet_durability;
+						int heal = item.getDurability()-this.plugin.SPEED_CONTROL.get(slot).helmet_durability+1;
 						if (Math.random()<=0.75 && heal>0) {
 							heal--;
 							item.setDurability((short)(item.getDurability()-1));
@@ -10237,8 +10353,6 @@ implements Listener
 				}
 			}
 		}
-		
-		
 		//****************************//End job buffs.
 		
 		if (event.getCursor()!=null || event.getCurrentItem()!=null) {
@@ -11275,6 +11389,15 @@ implements Listener
 	public int getJobLv(String job, String p) {
 		return this.plugin.getJobLv(job, p);
 	}
+	
+
+	public boolean hasJobBuff(String job, String p, Job j) {
+		return this.plugin.hasJobBuff(job, p, j);
+	}
+	
+	public boolean hasJobBuff(String job, Player p, Job j) {
+		return this.plugin.hasJobBuff(job, p, j);
+	}
 
 	public boolean validItem_Weaponsmith(ItemStack i) {
 		if (i.getType()==Material.ARROW ||
@@ -11369,24 +11492,42 @@ implements Listener
 									compareItem.getItemMeta().equals(post.getItemMeta()) && compareItem.getEnchantments().equals(post.getEnchantments())) {
 								newItemsCount += post.getAmount();
 								//Do any enchants we need to do here.
+								ItemStack clone = post.clone();
 								if (PlayerinJob((Player)player,"Weaponsmith")) {
 									if (getJobLv("Weaponsmith", player.getName())>=10 && validItem_Weaponsmith(post)) {
 										//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-										ItemStack clone = post.clone();
 										ItemStack resulting = EnchantItem(clone,5,(Player)player);
+										if (hasJobBuff("Weaponsmith", player.getName(), Job.JOB30A)) {
+											ItemMeta meta = resulting.getItemMeta();
+											List<String> lore = new ArrayList<String>();
+											if (meta.hasLore()) {
+												lore = meta.getLore();
+											}
+											lore.add(ChatColor.YELLOW+"+"+(getJobLv("Weaponsmith", player.getName())-29)+" "+ChatColor.BLUE+"Damage");
+											meta.setLore(lore);
+											resulting.setItemMeta(meta);
+										}
+										if (hasJobBuff("Weaponsmith", player.getName(), Job.JOB30B)) {
+											ItemMeta meta = resulting.getItemMeta();
+											List<String> lore = new ArrayList<String>();
+											if (meta.hasLore()) {
+												lore = meta.getLore();
+											}
+											lore.add(ChatColor.YELLOW+"+"+((getJobLv("Weaponsmith", player.getName())-29)*2)+"% "+ChatColor.BLUE+"Lifesteal");
+											meta.setLore(lore);
+											resulting.setItemMeta(meta);
+										}
 										player.getInventory().setItem(i, resulting);
 									}
 								}	
 								if (PlayerinJob((Player)player,"Blacksmith")) {
 									if (getJobLv("Blacksmith", player.getName())>=10 && validItem_Blacksmith(post)) {
 										//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-										ItemStack clone = post.clone();
 										ItemStack resulting = EnchantItem(clone,10,(Player)player);
 										player.getInventory().setItem(i, resulting);
 									} else
 										if (getJobLv("Blacksmith", player.getName())>=5 && validItem_Blacksmith(post)) {
 											//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-											ItemStack clone = post.clone();
 											ItemStack resulting = EnchantItem(clone,5,(Player)player);
 											player.getInventory().setItem(i, resulting);
 										}
@@ -12209,6 +12350,14 @@ implements Listener
 		//Bukkit.broadcastMessage("Explosion occurs.");
 	}
 
+	@EventHandler
+  	public void onPlayerMove(PlayerMoveEvent e) {
+		if (e.getPlayer().isOnGround() && this.plugin.hasJobBuff("Fisherman", e.getPlayer(), Job.JOB40) && e.getPlayer().getItemInHand().getType()==Material.FISHING_ROD && !e.getPlayer().getAllowFlight()) {
+			this.plugin.getPlayerData(e.getPlayer()).haslanded=true;
+			e.getPlayer().setAllowFlight(true);
+			e.getPlayer().sendMessage(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"Flight enabled...");
+		}
+	}
 	/*
   @SuppressWarnings("deprecation")
 @EventHandler

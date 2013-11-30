@@ -12,9 +12,11 @@ public class PlayerData {
 	long lastminetime=0;
 	long lastsneaktime=0;
 	int minestreak=0;
+	boolean haslanded=true;
 	int blockstack=0; //The amount of times you've gotten hit (The amount of "blocking" stacks you now have)
 	int fishingrodfails=0; //The amount of times in a row you've failed to catch fish.
-	long fishingroduse=0; //The last time you threw the fishing rod in the water.
+	long fishingroduse=Main.SERVER_TICK_TIME; //The last time you threw the fishing rod in the water.
+	double fishingrodcatchrate = 0.002; //The current chance of catching a fish.
 	Location clickedblock1=null; //Stores the location of a clicked block.
 	Player data=null;
 	long lastflighttime=0;

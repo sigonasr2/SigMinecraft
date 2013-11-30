@@ -606,16 +606,6 @@ public String convertToItemName(String val) {
   			  if (args[0].equalsIgnoreCase("loot")) {
   				p.getWorld().dropItemNaturally(p.getLocation(), this.plugin.generate_LootChest());  			  
   			  }
-  			  if (args[0].equalsIgnoreCase("thanksgiving")) {
-  				  if (this.plugin.getConfig().getBoolean("thanksgiving-enabled")) {
-  					  this.plugin.getConfig().set("thanksgiving-enabled", Boolean.valueOf(false));
-  					  p.sendMessage("Thanksgiving event disabled.");
-  				  } else {
-  					  this.plugin.getConfig().set("thanksgiving-enabled", Boolean.valueOf(true));
-  					  p.sendMessage("Thanksgiving event enabled.");
-  				  }
-  				  this.plugin.saveConfig();
-  			  }
   			  if (args[0].equalsIgnoreCase("loot")) {
 					ItemStack chest = new ItemStack(Material.CHEST);
 				    ItemMeta chest_name = chest.getItemMeta();
