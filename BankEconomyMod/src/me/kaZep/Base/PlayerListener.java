@@ -34,6 +34,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BrewingStand;
@@ -194,6 +195,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.schematic.SchematicFormat;
+import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 
 import me.kaZep.Base.BrewingStandData;
 import me.kaZep.Base.FurnaceData;
@@ -4626,6 +4628,37 @@ implements Listener
 		CraftingInventory result = e.getInventory();
 		
 		//****************************// Job Boofs poof here.
+		
+		if (result.getResult().getType()==Material.WOOD){ 
+			boolean allow_wood=false;
+			Player p = null;
+			for (int i=0;i<e.getInventory().getViewers().size();i++) {
+				if (this.plugin.hasJobBuff("Woodcutter", e.getInventory().getViewers().get(i).getName(), Job.JOB10) || this.plugin.hasJobBuff("Woodcutter", e.getInventory().getViewers().get(i).getName(), Job.JOB40)) {
+					allow_wood=true;
+					p=(Player)e.getInventory().getViewers().get(i);
+				}
+			}
+			if (!allow_wood) {
+				result.setResult(new ItemStack(Material.AIR));
+				return;
+			} else {
+				if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB40)) {
+					ItemStack newstack = result.getResult();
+					newstack.setAmount(20);
+					result.setResult(newstack);
+				} else
+				if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB30B)) {
+					ItemStack newstack = result.getResult();
+					newstack.setAmount(10);
+					result.setResult(newstack);
+				} else
+				if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB10)) {
+					ItemStack newstack = result.getResult();
+					newstack.setAmount(6);
+					result.setResult(newstack);
+				}
+			}
+		}
 		if (result.getResult().getType()==Material.CLAY_BALL) {
 			//Check to see if there is an artifact in the crafting grid.
 			boolean artifact=false, ender_eye=false;
@@ -13843,6 +13876,104 @@ implements Listener
 		int actHand = (int)Main.economy.getBalance(p.getName());
 		
 		//******************************//All Job Buff related items go in here.
+		if (e.getAction()==Action.LEFT_CLICK_BLOCK && this.plugin.hasJobBuff("Woodcutter", p, Job.JOB5)) {
+			if (e.getClickedBlock().getType()==Material.LEAVES) {
+				if ((e.getClickedBlock().getData()<4 || e.getClickedBlock().getData()>7) && e.getClickedBlock().getData()%4==0) {
+					//This is Oak Leaves that were NOT placed by a player.
+					//Bukkit.getLogger().info("A Valid oak leaf! Apple!");
+					if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB20)) {
+						if (Math.random()<=0.02) {
+							p.getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), new ItemStack(Material.APPLE));
+						}
+					}
+				}
+				e.getClickedBlock().setType(Material.AIR);
+				p.playSound(e.getClickedBlock().getLocation(), Sound.DIG_GRASS, 1, 1);
+				p.getWorld().playEffect(e.getClickedBlock().getLocation(), Effect.STEP_SOUND, Material.LEAVES.getId());
+				//Randomly drop a sapling based on type.
+				if (e.getClickedBlock().getData()%4==3) {
+					//This is a jungle leaf.
+					if (Math.random()<=0.025) {
+						e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), new ItemStack(Material.SAPLING,1,(short)(e.getClickedBlock().getData()%4)));
+					}
+				} else {
+					if (Math.random()<=0.05) {
+						e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation(), new ItemStack(Material.SAPLING,1,(short)(e.getClickedBlock().getData()%4)));
+					}
+				}
+			}
+		}
+		if (e.getAction()==Action.RIGHT_CLICK_BLOCK && p.getItemInHand().getType()==Material.SAPLING && (e.getClickedBlock().getType()==Material.GRASS || e.getClickedBlock().getType()==Material.DIRT) && this.plugin.hasJobBuff("Woodcutter", p, Job.JOB30B)) {
+			//Instantly grow the tree!
+			//Check out the data value of the sapling.
+			Byte data = p.getItemInHand().getData().getData();
+			//Bukkit.getLogger().info("Data value for this sapling: "+data.toString());
+			int tries=0;
+            BukkitWorld BWf = new BukkitWorld(p.getWorld());
+            EditSession es = new EditSession(BWf, 1000); //STart a new editing session to create trees.
+			switch (data) {
+				case (byte)0: {
+					//This is a normal sapling. see if we're in a swamp biome.
+					//Bukkit.getLogger().info("This is a normal sapling!");
+					if (e.getClickedBlock().getWorld().getBiome(e.getClickedBlock().getLocation().getBlockX(), e.getClickedBlock().getLocation().getBlockZ())==Biome.SWAMPLAND) {
+						if (Math.random()<=0.90) {
+							while (tries<100) {
+								//e.getClickedBlock().getWorld().generateTree(e.getClickedBlock().getLocation().add(0,1,0), TreeType.SWAMP);
+								BWf.generateTree(TreeType.SWAMP, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+								tries++;
+							}
+						} else {
+							while (tries<100) {
+								BWf.generateTree(TreeType.TREE, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+								tries++;
+							}
+						}
+					} else {
+						if (Math.random()<=0.90) {
+							while (tries<100) {
+								BWf.generateTree(TreeType.TREE, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+								tries++;
+							}
+						} else {
+							while (tries<100) {
+								BWf.generateTree(TreeType.BIG_TREE, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+								tries++;
+							}
+						}
+					}
+				}break;
+				case (byte)1: {
+					while (tries<100) {
+						/*
+						e.getClickedBlock().getWorld().generateTree(e.getClickedBlock().getLocation().add(0,1,0), TreeType.REDWOOD);
+						e.getClickedBlock().getWorld().generateTree(e.getClickedBlock().getLocation().add(0,1,0), com.sk89q.worldedit.blocks.tr);*/
+						BWf.generateTree(TreeType.PINE, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+						BWf.generateTree(TreeType.REDWOOD, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+						BWf.generateTree(TreeType.TALL_REDWOOD, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+						tries++;
+					}
+				}break;
+				case (byte)2: {
+					while (tries<100) {
+						BWf.generateTree(TreeType.BIRCH, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+						tries++;
+					}
+				}break;
+				case (byte)3: {
+					if (Math.random()<=0.90) {
+						while (tries<100) {
+							BWf.generateTree(TreeType.SHORT_JUNGLE, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+							tries++;
+						}
+					} else {
+						while (tries<100) {
+							BWf.generateTree(TreeType.JUNGLE, es, new com.sk89q.worldedit.Vector(e.getClickedBlock().getLocation().add(0,1,0).getX(),e.getClickedBlock().getLocation().add(0,1,0).getY(),e.getClickedBlock().getLocation().add(0,1,0).getZ()));
+							tries++;
+						}
+					}
+				}break;
+			}
+		}
 		if (e.getAction()==Action.LEFT_CLICK_BLOCK || e.getAction()==Action.RIGHT_CLICK_AIR) {
 			if (this.plugin.hasJobBuff("Builder", p, Job.JOB10)) {
 				//See if they are holding a line tool.
@@ -14141,9 +14272,9 @@ implements Listener
 		}
 
 		if ((e.getAction()==Action.RIGHT_CLICK_AIR || (e.getAction()==Action.RIGHT_CLICK_BLOCK && p.isSneaking())) && p.getItemInHand().hasItemMeta() && p.getItemInHand().getItemMeta().hasLore()) {
-			if (isFood(p.getItemInHand().getType())) {
+			/*if (isFood(p.getItemInHand().getType())) {
 				
-			}
+			}*/
 		}
 		
 		//******************************//End Job related buffs.
