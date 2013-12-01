@@ -908,6 +908,29 @@ implements Listener
 				e.setResult(result);
 			}
 		}
+		if (this.plugin.hasJobBuff("Cook", owner, Job.JOB10)) {
+			if (e.getResult().getType()==Material.COOKED_FISH ||
+					e.getResult().getType()==Material.BAKED_POTATO ||
+					e.getResult().getType()==Material.COOKED_CHICKEN ||
+					e.getResult().getType()==Material.GRILLED_PORK ||
+					e.getResult().getType()==Material.COOKED_BEEF) {
+				List<String> lore = new ArrayList<String>();
+				if (e.getResult().getItemMeta().hasLore()) {
+					lore = e.getResult().getItemMeta().getLore();
+				} else {
+					lore.add("This food item was fabulously");
+					lore.add("created by cook "+ChatColor.YELLOW+owner+",");
+					lore.add("restoring more hunger and");
+					lore.add("saturation than normal, and");
+					lore.add("healing 1 Heart of health.");
+				}
+				ItemMeta meta = e.getResult().getItemMeta();
+				meta.setLore(lore);
+				ItemStack newstack = e.getResult();
+				newstack.setItemMeta(meta);
+				e.setResult(newstack);
+			}
+		}
 		//*************************//Not Job Buffies below.
 		
 		if (this.plugin.PlayerinJob(owner, "Digger")) {
@@ -948,11 +971,12 @@ implements Listener
 				this.plugin.gainMoneyExp(owner,"Cook",0.20,80);
 				crafteditem=true;
 			}
+			/*
 			if (this.plugin.getJobLv("Cook", owner)>=20 && crafteditem) {
 				ItemStack result = e.getResult();
 				result.setAmount(result.getAmount()+1);
 				e.setResult(result);
-			}
+			}*/
 		}
 	}
 
@@ -4667,6 +4691,85 @@ implements Listener
 				return;
 			}
 		}
+
+		//Find out if there is only 1 item in the crafting matrix. It also have to be an armor/tool.
+		boolean check=false;
+		int count=0;
+		for (int i=0;i<result.getMatrix().length;i++) {
+			if (result.getMatrix()[i]!=null) {
+				//Bukkit.getLogger().info("Checking item "+result.getMatrix()[i].getType().name());
+				if (result.getMatrix()[i].getType().name().toLowerCase().contains("helmet") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("chestplate") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("leggings") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("boots") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("pickaxe") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("spade") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("axe") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("hoe")) {
+					check=true;
+					count++;
+				}
+			}
+		}
+		if (check && count==1) {
+			//Bukkit.getLogger().info("Found only 1 piece inside.");
+			for (int i=0;i<e.getInventory().getViewers().size();i++) {
+				if (this.plugin.hasJobBuff("Blacksmith", e.getInventory().getViewers().get(i).getName(), Job.JOB30B)) {
+					allowed=true;
+				}
+			}
+			if (!allowed) {
+				//Bukkit.getLogger().info("Not allowed!");
+				result.setResult(new ItemStack(Material.AIR));
+				return;
+			} else {
+				//Bukkit.getLogger().info("Allowed.");
+				ItemStack myitem = null;
+
+				for (int i=0;i<result.getMatrix().length;i++) {
+					if (result.getMatrix()[i]!=null && result.getMatrix()[i].getType()!=Material.AIR) {
+						myitem=result.getMatrix()[i];
+						Bukkit.getLogger().info("set item: "+i);
+						break;
+					}
+				}
+				
+				boolean weak=false;
+				
+				//Check if it's a weak piece.
+				if (myitem.hasItemMeta() && myitem.getItemMeta().hasLore()) {
+					if (myitem.getItemMeta().getLore().contains(ChatColor.RED+"-400% Durability")) {
+						weak=true;
+						Bukkit.getLogger().info("It's a weak piece");
+					}
+				}
+				
+				ItemStack offering = null;
+				int itemcount=0;
+				
+				String myname = myitem.getType().name().toLowerCase();
+				
+				if (myname.contains("helmet")) {itemcount=5; if (myname.contains("chainmail")) {itemcount=3;} if (!weak) {itemcount*=9;}}
+				if (myname.contains("chestplate")) {itemcount=8; if (myname.contains("chainmail")) {itemcount=5;} if (!weak) {itemcount*=9;}}
+				if (myname.contains("leggings")) {itemcount=7; if (myname.contains("chainmail")) {itemcount=4;} if (!weak) {itemcount*=9;}}
+				if (myname.contains("boots")) {itemcount=4; if (myname.contains("chainmail")) {itemcount=2;} if (!weak) {itemcount*=9;}}
+				if (myname.contains("pickaxe")) {itemcount=3;}
+				if (myname.contains("spade")) {itemcount=1;}
+				if (myname.contains("axe")) {itemcount=3;}
+				if (myname.contains("hoe")) {itemcount=2;}
+				//Bukkit.getLogger().info("Offering itemcount is "+itemcount);
+				
+				//We now have myitem. Check type.
+				if (myname.contains("diamond")) {offering = new ItemStack(Material.DIAMOND,(int)(itemcount*0.07)+1);}
+				if (myname.contains("iron")) {offering = new ItemStack(Material.IRON_INGOT,(int)(itemcount*0.07)+1);}
+				if (myname.contains("wood")) {offering = new ItemStack(Material.WOOD,(int)(itemcount*0.07)+1);}
+				if (myname.contains("gold")) {offering = new ItemStack(Material.GOLD_INGOT,(int)(itemcount*0.07)+1);}
+				if (myname.contains("chainmail")) {offering = new ItemStack(Material.IRON_INGOT,(int)(itemcount*0.07)+1);}
+				if (myname.contains("stone")) {offering = new ItemStack(Material.COBBLESTONE,(int)(itemcount*0.07)+1);}
+				//Bukkit.getLogger().info("Offering is "+offering.toString());
+				result.setResult(offering);
+			}
+		}
 		
 		//****************************//Job Non-Boofs go below.
 		
@@ -4907,204 +5010,6 @@ implements Listener
 						result.setResult(newarmor);
 					}
 				}
-		//It could be with iron, gold, or diamond blocks. Try them out.
-		/*
-	  boolean iron=false,gold=false,diamond=false;
-	  boolean helmet=false,chestplate=false,leggings=false,boots=false;
-	  ItemStack[] craftwith = result.getMatrix();
-	  if (craftwith[0].getType()==Material.IRON_BLOCK &&
-			  craftwith[1].getType()==Material.IRON_BLOCK &&
-			  craftwith[2].getType()==Material.IRON_BLOCK &&
-			  craftwith[3].getType()==Material.IRON_BLOCK &&
-			  craftwith[4].getType()==Material.AIR &&
-			  craftwith[5].getType()==Material.IRON_BLOCK &&
-			  craftwith[6].getType()==Material.IRON_BLOCK &&
-			  craftwith[7].getType()==Material.AIR &&
-			  craftwith[8].getType()==Material.IRON_BLOCK) {
-		  ItemStack newarmor = new ItemStack(Material.IRON_LEGGINGS);
-		  result.setResult(newarmor);
-	  } else
-	  if (craftwith[0].getType()==Material.IRON_BLOCK &&
-			  craftwith[1].getType()==Material.AIR &&
-			  craftwith[2].getType()==Material.IRON_BLOCK &&
-			  craftwith[3].getType()==Material.IRON_BLOCK &&
-			  craftwith[4].getType()==Material.IRON_BLOCK &&
-			  craftwith[5].getType()==Material.IRON_BLOCK &&
-			  craftwith[6].getType()==Material.IRON_BLOCK &&
-			  craftwith[7].getType()==Material.IRON_BLOCK &&
-			  craftwith[8].getType()==Material.IRON_BLOCK) {
-		  ItemStack newarmor = new ItemStack(Material.IRON_CHESTPLATE);
-		  result.setResult(newarmor);
-	  } else
-		  if ((craftwith[0].getType()==Material.IRON_BLOCK &&
-		  craftwith[1].getType()==Material.IRON_BLOCK &&
-		  craftwith[2].getType()==Material.IRON_BLOCK &&
-		  craftwith[3].getType()==Material.IRON_BLOCK &&
-		  craftwith[4].getType()==Material.AIR &&
-		  craftwith[5].getType()==Material.IRON_BLOCK &&
-		  craftwith[6].getType()==Material.AIR &&
-		  craftwith[7].getType()==Material.AIR &&
-		  craftwith[8].getType()==Material.AIR) || (craftwith[3].getType()==Material.IRON_BLOCK &&
-			  craftwith[4].getType()==Material.IRON_BLOCK &&
-			  craftwith[5].getType()==Material.IRON_BLOCK &&
-			  craftwith[6].getType()==Material.IRON_BLOCK &&
-			  craftwith[7].getType()==Material.AIR &&
-			  craftwith[8].getType()==Material.IRON_BLOCK &&
-			  craftwith[0].getType()==Material.AIR &&
-			  craftwith[1].getType()==Material.AIR &&
-			  craftwith[2].getType()==Material.AIR)) {
-	  ItemStack newarmor = new ItemStack(Material.IRON_HELMET);
-	  result.setResult(newarmor);
-	  } else
-		  if ((craftwith[0].getType()==Material.IRON_BLOCK &&
-		  craftwith[1].getType()==Material.AIR &&
-		  craftwith[2].getType()==Material.IRON_BLOCK &&
-		  craftwith[3].getType()==Material.IRON_BLOCK &&
-		  craftwith[4].getType()==Material.AIR &&
-		  craftwith[5].getType()==Material.IRON_BLOCK &&
-		  craftwith[6].getType()==Material.AIR &&
-		  craftwith[7].getType()==Material.AIR &&
-		  craftwith[8].getType()==Material.AIR) || (craftwith[3].getType()==Material.IRON_BLOCK &&
-			  craftwith[4].getType()==Material.AIR &&
-			  craftwith[5].getType()==Material.IRON_BLOCK &&
-			  craftwith[6].getType()==Material.IRON_BLOCK &&
-			  craftwith[7].getType()==Material.AIR &&
-			  craftwith[8].getType()==Material.IRON_BLOCK &&
-			  craftwith[0].getType()==Material.AIR &&
-			  craftwith[1].getType()==Material.AIR &&
-			  craftwith[2].getType()==Material.AIR)) {
-	  ItemStack newarmor = new ItemStack(Material.IRON_BOOTS);
-	  result.setResult(newarmor);
-	  }
-	  if (craftwith[0].getType()==Material.GOLD_BLOCK &&
-			  craftwith[1].getType()==Material.GOLD_BLOCK &&
-			  craftwith[2].getType()==Material.GOLD_BLOCK &&
-			  craftwith[3].getType()==Material.GOLD_BLOCK &&
-			  craftwith[4].getType()==Material.AIR &&
-			  craftwith[5].getType()==Material.GOLD_BLOCK &&
-			  craftwith[6].getType()==Material.GOLD_BLOCK &&
-			  craftwith[7].getType()==Material.AIR &&
-			  craftwith[8].getType()==Material.GOLD_BLOCK) {
-		  ItemStack newarmor = new ItemStack(Material.GOLD_LEGGINGS);
-		  result.setResult(newarmor);
-	  } else
-	  if (craftwith[0].getType()==Material.GOLD_BLOCK &&
-			  craftwith[1].getType()==Material.AIR &&
-			  craftwith[2].getType()==Material.GOLD_BLOCK &&
-			  craftwith[3].getType()==Material.GOLD_BLOCK &&
-			  craftwith[4].getType()==Material.GOLD_BLOCK &&
-			  craftwith[5].getType()==Material.GOLD_BLOCK &&
-			  craftwith[6].getType()==Material.GOLD_BLOCK &&
-			  craftwith[7].getType()==Material.GOLD_BLOCK &&
-			  craftwith[8].getType()==Material.GOLD_BLOCK) {
-		  ItemStack newarmor = new ItemStack(Material.GOLD_CHESTPLATE);
-		  result.setResult(newarmor);
-	  } else
-		  if ((craftwith[0].getType()==Material.GOLD_BLOCK &&
-		  craftwith[1].getType()==Material.GOLD_BLOCK &&
-		  craftwith[2].getType()==Material.GOLD_BLOCK &&
-		  craftwith[3].getType()==Material.GOLD_BLOCK &&
-		  craftwith[4].getType()==Material.AIR &&
-		  craftwith[5].getType()==Material.GOLD_BLOCK &&
-		  craftwith[6].getType()==Material.AIR &&
-		  craftwith[7].getType()==Material.AIR &&
-		  craftwith[8].getType()==Material.AIR) || (craftwith[3].getType()==Material.GOLD_BLOCK &&
-			  craftwith[4].getType()==Material.GOLD_BLOCK &&
-			  craftwith[5].getType()==Material.GOLD_BLOCK &&
-			  craftwith[6].getType()==Material.GOLD_BLOCK &&
-			  craftwith[7].getType()==Material.AIR &&
-			  craftwith[8].getType()==Material.GOLD_BLOCK &&
-			  craftwith[0].getType()==Material.AIR &&
-			  craftwith[1].getType()==Material.AIR &&
-			  craftwith[2].getType()==Material.AIR)) {
-	  ItemStack newarmor = new ItemStack(Material.GOLD_HELMET);
-	  result.setResult(newarmor);
-	  } else
-		  if ((craftwith[0].getType()==Material.GOLD_BLOCK &&
-		  craftwith[1].getType()==Material.AIR &&
-		  craftwith[2].getType()==Material.GOLD_BLOCK &&
-		  craftwith[3].getType()==Material.GOLD_BLOCK &&
-		  craftwith[4].getType()==Material.AIR &&
-		  craftwith[5].getType()==Material.GOLD_BLOCK &&
-		  craftwith[6].getType()==Material.AIR &&
-		  craftwith[7].getType()==Material.AIR &&
-		  craftwith[8].getType()==Material.AIR) || (craftwith[3].getType()==Material.GOLD_BLOCK &&
-			  craftwith[4].getType()==Material.AIR &&
-			  craftwith[5].getType()==Material.GOLD_BLOCK &&
-			  craftwith[6].getType()==Material.GOLD_BLOCK &&
-			  craftwith[7].getType()==Material.AIR &&
-			  craftwith[8].getType()==Material.GOLD_BLOCK &&
-			  craftwith[0].getType()==Material.AIR &&
-			  craftwith[1].getType()==Material.AIR &&
-			  craftwith[2].getType()==Material.AIR)) {
-	  ItemStack newarmor = new ItemStack(Material.GOLD_BOOTS);
-	  result.setResult(newarmor);
-	  }
-	  if (craftwith[0].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[1].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[2].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[3].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[4].getType()==Material.AIR &&
-			  craftwith[5].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[6].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[7].getType()==Material.AIR &&
-			  craftwith[8].getType()==Material.DIAMOND_BLOCK) {
-		  ItemStack newarmor = new ItemStack(Material.DIAMOND_LEGGINGS);
-		  result.setResult(newarmor);
-	  } else
-	  if (craftwith[0].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[1].getType()==Material.AIR &&
-			  craftwith[2].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[3].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[4].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[5].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[6].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[7].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[8].getType()==Material.DIAMOND_BLOCK) {
-		  ItemStack newarmor = new ItemStack(Material.DIAMOND_CHESTPLATE);
-		  result.setResult(newarmor);
-	  } else
-		  if ((craftwith[0].getType()==Material.DIAMOND_BLOCK &&
-		  craftwith[1].getType()==Material.DIAMOND_BLOCK &&
-		  craftwith[2].getType()==Material.DIAMOND_BLOCK &&
-		  craftwith[3].getType()==Material.DIAMOND_BLOCK &&
-		  craftwith[4].getType()==Material.AIR &&
-		  craftwith[5].getType()==Material.DIAMOND_BLOCK &&
-		  craftwith[6].getType()==Material.AIR &&
-		  craftwith[7].getType()==Material.AIR &&
-		  craftwith[8].getType()==Material.AIR) || (craftwith[3].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[4].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[5].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[6].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[7].getType()==Material.AIR &&
-			  craftwith[8].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[0].getType()==Material.AIR &&
-			  craftwith[1].getType()==Material.AIR &&
-			  craftwith[2].getType()==Material.AIR)) {
-	  ItemStack newarmor = new ItemStack(Material.DIAMOND_HELMET);
-	  result.setResult(newarmor);
-	  } else
-		  if ((craftwith[0].getType()==Material.DIAMOND_BLOCK &&
-		  craftwith[1].getType()==Material.AIR &&
-		  craftwith[2].getType()==Material.DIAMOND_BLOCK &&
-		  craftwith[3].getType()==Material.DIAMOND_BLOCK &&
-		  craftwith[4].getType()==Material.AIR &&
-		  craftwith[5].getType()==Material.DIAMOND_BLOCK &&
-		  craftwith[6].getType()==Material.AIR &&
-		  craftwith[7].getType()==Material.AIR &&
-		  craftwith[8].getType()==Material.AIR) || (craftwith[3].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[4].getType()==Material.AIR &&
-			  craftwith[5].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[6].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[7].getType()==Material.AIR &&
-			  craftwith[8].getType()==Material.DIAMOND_BLOCK &&
-			  craftwith[0].getType()==Material.AIR &&
-			  craftwith[1].getType()==Material.AIR &&
-			  craftwith[2].getType()==Material.AIR)) {
-	  ItemStack newarmor = new ItemStack(Material.DIAMOND_BOOTS);
-	  result.setResult(newarmor);
-	  }
-		 */
 	}
 	
 	private void restoreItems(CraftingInventory craft, ClickType click, Player p, double restore_chance) {
@@ -5149,6 +5054,7 @@ implements Listener
 		//This is something we just crafted.
 		//Bukkit.getPlayer("sigonasr2").sendMessage("Resulting item is "+result.getResult().getAmount()+" "+result.getResult().getType());
 		CraftingInventory result = e.getInventory();
+		if (result==null) {return;} //No point in checking here if the resulting inventory is blank.
 		//Bukkit.getPlayer("sigonasr2").sendMessage("Resulting item is "+result.getResult().getAmount()+" "+result.getResult().getType());
 		Player p = Bukkit.getPlayer(e.getWhoClicked().getName());
 		
@@ -5169,7 +5075,7 @@ implements Listener
 			}
 		}
 		
-		if (this.plugin.PlayerinJob(p,"Weaponsmith")) {
+		if (this.plugin.PlayerinJob(p,"Weaponsmith") || this.plugin.hasJobBuff("Weaponsmith", p, Job.JOB40)) {
 			boolean crafteditem=false;
 			if (result.getResult().getType()==Material.ARROW) {
 				crafteditem=true;
@@ -5338,9 +5244,7 @@ implements Listener
 				}
 			}
 		}
-		//***********************************//End job buff stuff
-		
-		if (this.plugin.PlayerinJob(p,"Blacksmith")) {
+		if (this.plugin.PlayerinJob(p,"Blacksmith") || this.plugin.hasJobBuff("Blacksmith", p, Job.JOB40)) {
 			boolean crafteditem=false;
 			/*
 		  if (result.getResult().getType()==Material.STONE_HOE) {
@@ -5511,34 +5415,57 @@ implements Listener
 				//this.plugin.gainMoneyExp(p,"Blacksmith",1.50*mult,175*mult);
 				crafteditem=true;
 			}
-			if (this.plugin.getJobLv("Blacksmith", p)>=5 && crafteditem) {
-				//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-				if (e.getClick()!=ClickType.SHIFT_RIGHT && e.getClick()!=ClickType.SHIFT_LEFT) {
-					ItemStack resulting = EnchantItem(result.getResult(),5,p);
-					result.setResult(resulting);
+			ItemStack resulting = result.getResult();
+			if (e.getClick()!=ClickType.SHIFT_RIGHT && e.getClick()!=ClickType.SHIFT_LEFT) {
+				if (this.plugin.hasJobBuff("Blacksmith", p, Job.JOB30A) && crafteditem) {
+					ItemMeta meta = resulting.getItemMeta();
+					List<String> lore = new ArrayList<String>();
+					if (meta.hasLore()) {
+						lore = meta.getLore();
+					}
+					lore.add(ChatColor.YELLOW+"+"+((getJobLv("Blacksmith", p.getName())-29)*2)+" "+ChatColor.BLUE+"Health");
+					meta.setLore(lore);
+					resulting.setItemMeta(meta);
 				}
-			}
-			if (this.plugin.getJobLv("Blacksmith", p)>=10 && crafteditem) {
-				//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-				if (e.getClick()!=ClickType.SHIFT_RIGHT && e.getClick()!=ClickType.SHIFT_LEFT) {
-					ItemStack resulting = EnchantItem(result.getResult(),10,p);
-					result.setResult(resulting);
+				if (this.plugin.hasJobBuff("Blacksmith", p, Job.JOB5) && crafteditem) {
+					//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
+					if (e.getClick()!=ClickType.SHIFT_RIGHT && e.getClick()!=ClickType.SHIFT_LEFT) {
+						resulting = EnchantItem(result.getResult(),5,p);
+						result.setResult(resulting);
+					}
 				}
-			}
-			if (this.plugin.getJobLv("Blacksmith", p)>=20 && crafteditem) {
-				ItemStack[] crafteditems = result.getMatrix();
-				if (e.getClick()==ClickType.SHIFT_RIGHT || e.getClick()==ClickType.SHIFT_LEFT) {
-					int lowestamt=9999;
-					for (int i=0;i<crafteditems.length;i++) {
-						if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
-							if (crafteditems[i].getAmount()<lowestamt) {
-								lowestamt=crafteditems[i].getAmount();
+				if (this.plugin.hasJobBuff("Blacksmith", p, Job.JOB10) && crafteditem) {
+					//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
+					if (e.getClick()!=ClickType.SHIFT_RIGHT && e.getClick()!=ClickType.SHIFT_LEFT) {
+						resulting = EnchantItem(result.getResult(),10,p);
+						result.setResult(resulting);
+					}
+				}
+				if (this.plugin.hasJobBuff("Blacksmith", p, Job.JOB20) && crafteditem) {
+					ItemStack[] crafteditems = result.getMatrix();
+					if (e.getClick()==ClickType.SHIFT_RIGHT || e.getClick()==ClickType.SHIFT_LEFT) {
+						int lowestamt=9999;
+						for (int i=0;i<crafteditems.length;i++) {
+							if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+								if (crafteditems[i].getAmount()<lowestamt) {
+									lowestamt=crafteditems[i].getAmount();
+								}
 							}
 						}
-					}
-					for (int i=0;i<crafteditems.length;i++) {
-						if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
-							for (int j=0;j<lowestamt;j++) {
+						for (int i=0;i<crafteditems.length;i++) {
+							if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
+								for (int j=0;j<lowestamt;j++) {
+									if (Math.random()<=0.30) {
+										ItemStack replenishitem = crafteditems[i].clone();
+										replenishitem.setAmount(1);
+										p.getInventory().addItem(replenishitem);
+									}
+								}
+							}
+						}
+					} else {
+						for (int i=0;i<crafteditems.length;i++) {
+							if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
 								if (Math.random()<=0.30) {
 									ItemStack replenishitem = crafteditems[i].clone();
 									replenishitem.setAmount(1);
@@ -5547,19 +5474,93 @@ implements Listener
 							}
 						}
 					}
-				} else {
-					for (int i=0;i<crafteditems.length;i++) {
-						if (crafteditems[i]!=null && crafteditems[i].getType()!=Material.AIR) {
-							if (Math.random()<=0.30) {
-								ItemStack replenishitem = crafteditems[i].clone();
-								replenishitem.setAmount(1);
-								p.getInventory().addItem(replenishitem);
-							}
-						}
+				}
+				if (this.plugin.hasJobBuff("Blacksmith", p, Job.JOB40) && crafteditem) {
+					if (Math.random()<=0.5) {
+						resulting = EnchantItem(result.getResult(), 30, p);
+					} else {
+						resulting = EnchantItem(result.getResult(), 20, p);
 					}
+					resulting.setAmount((int)(Math.random()*4)+2);
+					result.setResult(resulting);
 				}
 			}
 		}
+
+		if (hasJobBuff("Cook", p, Job.JOB10)) {
+			if (e.getClick()!=ClickType.SHIFT_RIGHT && e.getClick()!=ClickType.SHIFT_LEFT) {
+				ItemStack resulting = result.getResult();
+				List<String> lore = new ArrayList<String>();
+				if (resulting.getItemMeta().hasLore()) {
+					lore = resulting.getItemMeta().getLore();
+				} else {
+					lore.add("This food item was fabulously");
+					lore.add("created by cook "+ChatColor.YELLOW+p.getName()+",");
+					lore.add("restoring more hunger and");
+					lore.add("saturation than normal, and");
+					lore.add("healing 1 Heart of health.");
+				}
+				ItemMeta meta = resulting.getItemMeta();
+				meta.setLore(lore);
+				resulting.setItemMeta(meta);
+				result.setResult(resulting);
+			}
+		}	
+		
+		ItemStack item = result.getResult();
+		int amount=1;
+		if (this.plugin.PlayerinJob(p,"Digger")) {
+			if (e.getClick()!=ClickType.SHIFT_RIGHT && e.getClick()!=ClickType.SHIFT_LEFT) {
+				if (item.getType()==Material.SANDSTONE) {
+					this.plugin.gainMoneyExp(p,"Digger",0.02*amount,6*amount);
+				}
+				if (item.getType()==Material.BRICK) {
+					this.plugin.gainMoneyExp(p,"Digger",0.04*amount,8*amount);
+				}
+			}
+		}
+		if (this.plugin.PlayerinJob(p,"Cook")) {
+			if (e.getClick()!=ClickType.SHIFT_RIGHT && e.getClick()!=ClickType.SHIFT_LEFT) {
+				boolean crafteditem=false;
+				if (item.getType()==Material.BREAD) {
+					this.plugin.gainMoneyExp(p,"Cook",0.003125*amount,1.25*amount);
+					crafteditem=true;
+				}
+				if (item.getType()==Material.COOKIE) {
+					this.plugin.gainMoneyExp(p,"Cook",0.016875*amount,1.50*amount);
+					crafteditem=true;
+				}
+				if (item.getType()==Material.MUSHROOM_SOUP) {
+					this.plugin.gainMoneyExp(p,"Cook",0.009375*amount,3.75*amount);
+					crafteditem=true;
+				}
+				if (item.getType()==Material.PUMPKIN_PIE) {
+					this.plugin.gainMoneyExp(p,"Cook",0.0375*amount,15*amount);
+					crafteditem=true;
+				}
+				if (item.getType()==Material.GOLDEN_CARROT) {
+					this.plugin.gainMoneyExp(p,"Cook",0.0875*amount,35*amount);
+					crafteditem=true;
+				}
+				if (item.getType()==Material.CAKE) {
+					this.plugin.gainMoneyExp(p,"Cook",0.10625*amount,21.25*amount);
+					crafteditem=true;
+				}
+				if (item.getType()==Material.GOLDEN_APPLE) {
+					this.plugin.gainMoneyExp(p,"Cook",0.1125*amount,45*amount);
+					crafteditem=true;
+				}
+			}
+			/*
+			if (this.plugin.getJobLv("Cook", p)>=10 && crafteditem==true) {
+				//This is an ugly fix for the problem...But it works somehow.
+				//Player newp = Bukkit.getPlayer(p.getName().toLowerCase());
+				p.getInventory().addItem(new ItemStack(item.getType(),amount,item.getDurability(),item.getData().getData()));
+			}*/
+		}
+		//***********************************//End job buff stuff
+		
+		
 		/*
 	  //this.plugin.tempinventory = Bukkit.getPlayer(e.getWhoClicked().getName()).getInventory().getContents();
 	  CraftingInventory result = e.getInventory();
@@ -11078,6 +11079,43 @@ implements Listener
 				this.plugin.gainMoneyExp(p,"Digger",0.04*amount,8*amount);
 			}
 		}
+		if (this.plugin.PlayerinJob(p,"Cook")) {
+			boolean crafteditem=false;
+			if (item.getType()==Material.BREAD) {
+				this.plugin.gainMoneyExp(p,"Cook",0.003125*amount,1.25*amount);
+				crafteditem=true;
+			}
+			if (item.getType()==Material.COOKIE) {
+				this.plugin.gainMoneyExp(p,"Cook",0.016875*amount,1.50*amount);
+				crafteditem=true;
+			}
+			if (item.getType()==Material.MUSHROOM_SOUP) {
+				this.plugin.gainMoneyExp(p,"Cook",0.009375*amount,3.75*amount);
+				crafteditem=true;
+			}
+			if (item.getType()==Material.PUMPKIN_PIE) {
+				this.plugin.gainMoneyExp(p,"Cook",0.0375*amount,15*amount);
+				crafteditem=true;
+			}
+			if (item.getType()==Material.GOLDEN_CARROT) {
+				this.plugin.gainMoneyExp(p,"Cook",0.0875*amount,35*amount);
+				crafteditem=true;
+			}
+			if (item.getType()==Material.CAKE) {
+				this.plugin.gainMoneyExp(p,"Cook",0.10625*amount,21.25*amount);
+				crafteditem=true;
+			}
+			if (item.getType()==Material.GOLDEN_APPLE) {
+				this.plugin.gainMoneyExp(p,"Cook",0.1125*amount,45*amount);
+				crafteditem=true;
+			}
+			/*
+			if (this.plugin.getJobLv("Cook", p)>=10 && crafteditem==true) {
+				//This is an ugly fix for the problem...But it works somehow.
+				//Player newp = Bukkit.getPlayer(p.getName().toLowerCase());
+				p.getInventory().addItem(new ItemStack(item.getType(),amount,item.getDurability(),item.getData().getData()));
+			}*/
+		}
 		if (this.plugin.PlayerinJob(p,"Weaponsmith")) {
 			boolean crafteditem=false;
 			if (item.getType()==Material.ARROW) {
@@ -11298,98 +11336,6 @@ implements Listener
 				crafteditem=true;
 			}
 		}
-		/*if (e.getBlock().getType()==Material.PUMPKIN) {
-	  this.plugin.gainMoneyExp(p,"Farmer",0.00,1);
-  }
-  if (e.getBlock().getType()==Material.MELON_BLOCK) {
-	  this.plugin.gainMoneyExp(p,"Farmer",0.10,10);
-  }*/
-		if (this.plugin.PlayerinJob(p,"Farmer")) {
-			boolean crafteditem=false;
-			if (item.getType()==Material.MELON) {
-				this.plugin.gainMoneyExp(p,"Farmer",0.10,10);
-				crafteditem=true;
-			}
-			if (item.getType()==Material.PUMPKIN_SEEDS) {
-				this.plugin.gainMoneyExp(p,"Farmer",0.04,8);
-				crafteditem=true;
-			}
-		}
-		if (this.plugin.PlayerinJob(p,"Cook")) {
-			boolean crafteditem=false;
-			if (item.getType()==Material.BREAD) {
-				this.plugin.gainMoneyExp(p,"Cook",0.003125*amount,1.25*amount);
-				crafteditem=true;
-			}
-			if (item.getType()==Material.COOKIE) {
-				this.plugin.gainMoneyExp(p,"Cook",0.016875*amount,1.50*amount);
-				crafteditem=true;
-			}
-			if (item.getType()==Material.MUSHROOM_SOUP) {
-				this.plugin.gainMoneyExp(p,"Cook",0.009375*amount,3.75*amount);
-				crafteditem=true;
-			}
-			if (item.getType()==Material.PUMPKIN_PIE) {
-				this.plugin.gainMoneyExp(p,"Cook",0.0375*amount,15*amount);
-				crafteditem=true;
-			}
-			if (item.getType()==Material.GOLDEN_CARROT) {
-				this.plugin.gainMoneyExp(p,"Cook",0.0875*amount,35*amount);
-				crafteditem=true;
-			}
-			if (item.getType()==Material.CAKE) {
-				this.plugin.gainMoneyExp(p,"Cook",0.10625*amount,21.25*amount);
-				crafteditem=true;
-			}
-			if (item.getType()==Material.GOLDEN_APPLE) {
-				this.plugin.gainMoneyExp(p,"Cook",0.1125*amount,45*amount);
-				crafteditem=true;
-			}
-			if (this.plugin.getJobLv("Cook", p)>=10 && crafteditem==true) {
-				//This is an ugly fix for the problem...But it works somehow.
-				//Player newp = Bukkit.getPlayer(p.getName().toLowerCase());
-				p.getInventory().addItem(new ItemStack(item.getType(),amount,item.getDurability(),item.getData().getData()));
-			}
-		}
-		/*
-	  if (this.plugin.PlayerinJob(p,"Support")) {
-		  if (item.getType()==Material.BREAD) {
-			  this.plugin.gainMoneyExp(p,"Support",0.015*amount,2*amount);
-		  }
-		  if (item.getType()==Material.MUSHROOM_SOUP) {
-			  this.plugin.gainMoneyExp(p,"Support",0.015*amount,2*amount);
-		  }
-		  if (item.getType()==Material.COOKIE) {
-			  this.plugin.gainMoneyExp(p,"Support",0.015*amount,2*amount);
-		  }
-		  if (item.getType()==Material.GOLDEN_CARROT) {
-			  this.plugin.gainMoneyExp(p,"Support",0.015*amount,2*amount);
-		  }
-		  if (item.getType()==Material.GOLDEN_APPLE) {
-			  this.plugin.gainMoneyExp(p,"Support",0.015*amount,2*amount);
-		  }
-		  if (item.getType()==Material.PUMPKIN_PIE) {
-			  this.plugin.gainMoneyExp(p,"Support",0.015*amount,2*amount);
-		  }
-		  if (item.getType()==Material.CAKE) {
-			  this.plugin.gainMoneyExp(p,"Support",0.015*amount,2*amount);
-		  }
-		  if (item.getType()==Material.IRON_SWORD) {
-			  this.plugin.gainMoneyExp(p,"Support",0.015*amount,3*amount);
-		  }
-		  if (item.getType()==Material.IRON_CHESTPLATE || item.getType()==Material.IRON_HELMET || item.getType()==Material.IRON_BOOTS || item.getType()==Material.IRON_LEGGINGS) {
-			  this.plugin.gainMoneyExp(p,"Support",0.025*amount,5*amount);
-		  }
-		  if (item.getType()==Material.DIAMOND_SWORD) {
-			  this.plugin.gainMoneyExp(p,"Support",0.075*amount,8*amount);
-		  }
-		  if (item.getType()==Material.DIAMOND_CHESTPLATE || item.getType()==Material.DIAMOND_HELMET || item.getType()==Material.DIAMOND_BOOTS || item.getType()==Material.DIAMOND_LEGGINGS) {
-			  this.plugin.gainMoneyExp(p,"Support",0.20*amount,20*amount);
-		  }
-		  if (item.getType()==Material.CAKE) {
-			  this.plugin.gainMoneyExp(p,"Support",0.03*amount,2*amount);
-		  }
-	  }*/
 	}
 
 	private void handleCrafting(InventoryClickEvent event) {
@@ -11580,16 +11526,51 @@ implements Listener
 									}
 								}	
 								if (PlayerinJob((Player)player,"Blacksmith")) {
+									ItemStack resulting = clone;
+									if (hasJobBuff("Blacksmith", player.getName(), Job.JOB30A) && validItem_Blacksmith(post)) {
+										ItemMeta meta = resulting.getItemMeta();
+										List<String> lore = new ArrayList<String>();
+										if (meta.hasLore()) {
+											lore = meta.getLore();
+										}
+										lore.add(ChatColor.YELLOW+"+"+((getJobLv("Blacksmith", player.getName())-29)*2)+" "+ChatColor.BLUE+"Health");
+										meta.setLore(lore);
+										resulting.setItemMeta(meta);
+									}
 									if (getJobLv("Blacksmith", player.getName())>=10 && validItem_Blacksmith(post)) {
 										//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-										ItemStack resulting = EnchantItem(clone,10,(Player)player);
-										player.getInventory().setItem(i, resulting);
+										resulting = EnchantItem(clone,10,(Player)player);
 									} else
-										if (getJobLv("Blacksmith", player.getName())>=5 && validItem_Blacksmith(post)) {
-											//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
-											ItemStack resulting = EnchantItem(clone,5,(Player)player);
-											player.getInventory().setItem(i, resulting);
+									if (getJobLv("Blacksmith", player.getName())>=5 && validItem_Blacksmith(post)) {
+										//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
+										resulting = EnchantItem(clone,5,(Player)player);
+									}
+									if (hasJobBuff("Blacksmith", (Player)player, Job.JOB40) && validItem_Blacksmith(post)) {
+										if (Math.random()<=0.5) {
+											resulting = EnchantItem(clone, 30, (Player)player);
+										} else {
+											resulting = EnchantItem(clone, 20, (Player)player);
 										}
+										resulting.setAmount((int)(Math.random()*4)+2);
+									}
+									player.getInventory().setItem(i, resulting);
+								}
+								if (hasJobBuff("Cook", (Player)player, Job.JOB10)) {
+									ItemStack resulting = clone;
+									List<String> lore = new ArrayList<String>();
+									if (resulting.getItemMeta().hasLore()) {
+										lore = resulting.getItemMeta().getLore();
+									} else {
+										lore.add("This food item was fabulously");
+										lore.add("created by cook "+ChatColor.YELLOW+player.getName()+",");
+										lore.add("restoring more hunger and");
+										lore.add("saturation than normal, and");
+										lore.add("healing 1 Heart of health.");
+									}
+									ItemMeta meta = resulting.getItemMeta();
+									meta.setLore(lore);
+									resulting.setItemMeta(meta);
+									player.getInventory().setItem(i, resulting);
 								}
 							}
 							//Bukkit.getPlayer("sigonasr2").sendMessage("Item amounts differ. New count: "+newItemsCount);
@@ -13845,6 +13826,10 @@ implements Listener
 			}
 		}
 	}
+	
+	public boolean isFood(ItemStack i) {
+		
+	}
 
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e)
@@ -14154,6 +14139,13 @@ implements Listener
 				}
 			}
 		}
+
+		if ((e.getAction()==Action.RIGHT_CLICK_AIR || (e.getAction()==Action.RIGHT_CLICK_BLOCK && p.isSneaking())) && p.getItemInHand().hasItemMeta() && p.getItemInHand().getItemMeta().hasLore()) {
+			if (isFood(p.getItemInHand().getType())) {
+				
+			}
+		}
+		
 		//******************************//End Job related buffs.
 		
 		if (this.plugin.PlayerinJob(p, "Explorer")) {

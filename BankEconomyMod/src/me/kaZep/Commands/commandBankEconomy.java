@@ -624,6 +624,17 @@ public String convertToItemName(String val) {
   			  }
             } else
             if (cmd.getName().toLowerCase().equalsIgnoreCase("event") && args.length==2 && p.hasPermission("maintenance-mode-admin")) {
+  			  if (args[0].equalsIgnoreCase("job_max")) {
+  				  this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1", String.valueOf(args[1]));
+  				  this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1lv", Integer.valueOf(40));
+  				  this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.ultimate", String.valueOf(args[1]));
+  				  this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.ultimatesealed", Boolean.valueOf(true));
+  				  p.sendMessage("Set job slot 1 to "+args[1]+" @ Lv40, set ultimate and sealed it as well.");
+  			  }
+  			  if (args[0].equalsIgnoreCase("job_30")) {
+  				  this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1_30", Integer.valueOf(args[1]));
+  				  p.sendMessage("Set job slot 1 LV30 buff to Type "+args[1]);
+  			  }
 			  if (args[0].equalsIgnoreCase("loot")) {
 	  				p.getWorld().dropItemNaturally(p.getLocation(), this.plugin.generate_LootChest(Integer.valueOf(args[1])));  			  
   			  }

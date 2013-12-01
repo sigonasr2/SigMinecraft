@@ -653,6 +653,104 @@ public class Main extends JavaPlugin
     artifact_clay.addIngredient(Material.EYE_OF_ENDER);
     Bukkit.addRecipe(artifact_clay);
     
+    //Add deconversion recipes.
+    ShapelessRecipe DeConv_diamond_chestplate = new ShapelessRecipe(new ItemStack(Material.DIAMOND));
+    DeConv_diamond_chestplate.addIngredient(Material.DIAMOND_CHESTPLATE);
+    ShapelessRecipe DeConv_iron_chestplate = new ShapelessRecipe(new ItemStack(Material.IRON_INGOT));
+    DeConv_iron_chestplate.addIngredient(Material.IRON_CHESTPLATE);
+    ShapelessRecipe DeConv_gold_chestplate = new ShapelessRecipe(new ItemStack(Material.GOLD_INGOT));
+    DeConv_gold_chestplate.addIngredient(Material.GOLD_CHESTPLATE);
+    ShapelessRecipe DeConv_chainmail_chestplate = new ShapelessRecipe(new ItemStack(Material.IRON_INGOT));
+    DeConv_chainmail_chestplate.addIngredient(Material.CHAINMAIL_CHESTPLATE);
+    ShapelessRecipe DeConv_diamond_helmet = new ShapelessRecipe(new ItemStack(Material.DIAMOND));
+    DeConv_diamond_helmet.addIngredient(Material.DIAMOND_HELMET);
+    ShapelessRecipe DeConv_iron_helmet = new ShapelessRecipe(new ItemStack(Material.IRON_INGOT));
+    DeConv_iron_helmet.addIngredient(Material.IRON_HELMET);
+    ShapelessRecipe DeConv_gold_helmet = new ShapelessRecipe(new ItemStack(Material.GOLD_INGOT));
+    DeConv_gold_helmet.addIngredient(Material.GOLD_HELMET);
+    ShapelessRecipe DeConv_chainmail_helmet = new ShapelessRecipe(new ItemStack(Material.IRON_INGOT));
+    DeConv_chainmail_helmet.addIngredient(Material.CHAINMAIL_HELMET);
+    ShapelessRecipe DeConv_diamond_leggings = new ShapelessRecipe(new ItemStack(Material.DIAMOND));
+    DeConv_diamond_leggings.addIngredient(Material.DIAMOND_LEGGINGS);
+    ShapelessRecipe DeConv_iron_leggings = new ShapelessRecipe(new ItemStack(Material.IRON_INGOT));
+    DeConv_iron_leggings.addIngredient(Material.IRON_LEGGINGS);
+    ShapelessRecipe DeConv_gold_leggings = new ShapelessRecipe(new ItemStack(Material.GOLD_INGOT));
+    DeConv_gold_leggings.addIngredient(Material.GOLD_LEGGINGS);
+    ShapelessRecipe DeConv_chainmail_leggings = new ShapelessRecipe(new ItemStack(Material.IRON_INGOT));
+    DeConv_chainmail_leggings.addIngredient(Material.CHAINMAIL_LEGGINGS);
+    ShapelessRecipe DeConv_diamond_boots = new ShapelessRecipe(new ItemStack(Material.DIAMOND));
+    DeConv_diamond_boots.addIngredient(Material.DIAMOND_BOOTS);
+    ShapelessRecipe DeConv_iron_boots = new ShapelessRecipe(new ItemStack(Material.IRON_INGOT));
+    DeConv_iron_boots.addIngredient(Material.IRON_BOOTS);
+    ShapelessRecipe DeConv_gold_boots = new ShapelessRecipe(new ItemStack(Material.GOLD_INGOT));
+    DeConv_gold_boots.addIngredient(Material.GOLD_BOOTS);
+    ShapelessRecipe DeConv_chainmail_boots = new ShapelessRecipe(new ItemStack(Material.IRON_INGOT));
+    DeConv_chainmail_boots.addIngredient(Material.CHAINMAIL_BOOTS);
+    ShapelessRecipe DeConv_diamond_pickaxe = new ShapelessRecipe(new ItemStack(Material.DIAMOND));
+    DeConv_diamond_pickaxe.addIngredient(Material.DIAMOND_PICKAXE);
+    ShapelessRecipe DeConv_iron_pickaxe = new ShapelessRecipe(new ItemStack(Material.IRON_INGOT));
+    DeConv_iron_pickaxe.addIngredient(Material.IRON_PICKAXE);
+    ShapelessRecipe DeConv_gold_pickaxe = new ShapelessRecipe(new ItemStack(Material.GOLD_INGOT));
+    DeConv_gold_pickaxe.addIngredient(Material.GOLD_PICKAXE);
+    ShapelessRecipe DeConv_stone_pickaxe = new ShapelessRecipe(new ItemStack(Material.COBBLESTONE));
+    DeConv_stone_pickaxe.addIngredient(Material.STONE_PICKAXE);
+    ShapelessRecipe DeConv_diamond_spade = new ShapelessRecipe(new ItemStack(Material.DIAMOND));
+    DeConv_diamond_spade.addIngredient(Material.DIAMOND_SPADE);
+    ShapelessRecipe DeConv_iron_spade = new ShapelessRecipe(new ItemStack(Material.IRON_INGOT));
+    DeConv_iron_spade.addIngredient(Material.IRON_SPADE);
+    ShapelessRecipe DeConv_gold_spade = new ShapelessRecipe(new ItemStack(Material.GOLD_INGOT));
+    DeConv_gold_spade.addIngredient(Material.GOLD_SPADE);
+    ShapelessRecipe DeConv_stone_spade = new ShapelessRecipe(new ItemStack(Material.COBBLESTONE));
+    DeConv_stone_spade.addIngredient(Material.STONE_SPADE);
+    ShapelessRecipe DeConv_diamond_axe = new ShapelessRecipe(new ItemStack(Material.DIAMOND));
+    DeConv_diamond_axe.addIngredient(Material.DIAMOND_AXE);
+    ShapelessRecipe DeConv_iron_axe = new ShapelessRecipe(new ItemStack(Material.IRON_INGOT));
+    DeConv_iron_axe.addIngredient(Material.IRON_AXE);
+    ShapelessRecipe DeConv_gold_axe = new ShapelessRecipe(new ItemStack(Material.GOLD_INGOT));
+    DeConv_gold_axe.addIngredient(Material.GOLD_AXE);
+    ShapelessRecipe DeConv_stone_axe = new ShapelessRecipe(new ItemStack(Material.COBBLESTONE));
+    DeConv_stone_axe.addIngredient(Material.STONE_AXE);
+    ShapelessRecipe DeConv_diamond_hoe = new ShapelessRecipe(new ItemStack(Material.DIAMOND));
+    DeConv_diamond_hoe.addIngredient(Material.DIAMOND_HOE);
+    ShapelessRecipe DeConv_iron_hoe = new ShapelessRecipe(new ItemStack(Material.IRON_INGOT));
+    DeConv_iron_hoe.addIngredient(Material.IRON_HOE);
+    ShapelessRecipe DeConv_gold_hoe = new ShapelessRecipe(new ItemStack(Material.GOLD_INGOT));
+    DeConv_gold_hoe.addIngredient(Material.GOLD_HOE);
+    ShapelessRecipe DeConv_stone_hoe = new ShapelessRecipe(new ItemStack(Material.COBBLESTONE));
+    DeConv_stone_hoe.addIngredient(Material.STONE_HOE);
+    Bukkit.addRecipe(DeConv_diamond_chestplate);
+    Bukkit.addRecipe(DeConv_iron_chestplate);
+    Bukkit.addRecipe(DeConv_gold_chestplate);
+    Bukkit.addRecipe(DeConv_chainmail_chestplate);
+    Bukkit.addRecipe(DeConv_diamond_leggings);
+    Bukkit.addRecipe(DeConv_iron_leggings);
+    Bukkit.addRecipe(DeConv_gold_leggings);
+    Bukkit.addRecipe(DeConv_chainmail_leggings);
+    Bukkit.addRecipe(DeConv_diamond_helmet);
+    Bukkit.addRecipe(DeConv_iron_helmet);
+    Bukkit.addRecipe(DeConv_gold_helmet);
+    Bukkit.addRecipe(DeConv_chainmail_helmet);
+    Bukkit.addRecipe(DeConv_diamond_boots);
+    Bukkit.addRecipe(DeConv_iron_boots);
+    Bukkit.addRecipe(DeConv_gold_boots);
+    Bukkit.addRecipe(DeConv_chainmail_boots);
+    Bukkit.addRecipe(DeConv_diamond_axe);
+    Bukkit.addRecipe(DeConv_iron_axe);
+    Bukkit.addRecipe(DeConv_gold_axe);
+    Bukkit.addRecipe(DeConv_stone_axe);
+    Bukkit.addRecipe(DeConv_diamond_pickaxe);
+    Bukkit.addRecipe(DeConv_iron_pickaxe);
+    Bukkit.addRecipe(DeConv_gold_pickaxe);
+    Bukkit.addRecipe(DeConv_stone_pickaxe);
+    Bukkit.addRecipe(DeConv_diamond_hoe);
+    Bukkit.addRecipe(DeConv_iron_hoe);
+    Bukkit.addRecipe(DeConv_gold_hoe);
+    Bukkit.addRecipe(DeConv_stone_hoe);
+    Bukkit.addRecipe(DeConv_diamond_spade);
+    Bukkit.addRecipe(DeConv_iron_spade);
+    Bukkit.addRecipe(DeConv_gold_spade);
+    Bukkit.addRecipe(DeConv_stone_spade);
+    
 
     ItemSetList = new ItemSetList();
     ItemSetList.Init();
@@ -976,8 +1074,8 @@ public class Main extends JavaPlugin
     Blacksmith_job.setBuffData("All crafted items are buffed with a Lv5 enchantment.",
     		"All crafted items are buffed with a Lv10 enchantment.", 
     		"Crafting Blacksmith items have a 30% chance of preserving materials used.",
-    		"All blacksmith items crafted gain +4 Health bonus enchantments. (Increases by +4 per blacksmithing level after 30.)",
-    		"Blacksmiths gain the ability to craft armor they find back into ingots / materials, based on the remaining durability. (About 50% lossy)",
+    		"All blacksmith items crafted gain +2 Health bonus enchantments. (Increases by +2 per blacksmithing level after 30.)",
+    		"Blacksmiths gain the ability to craft armor they find back into ingots / materials, based on the remaining durability. (About 90% lossy)",
     		"All crafted Blacksmith items stack between 2 and 5 of the same item, effectively multiplying the amount you craft. Items are buffed with a Lv20 enchantment and have a 50% chance to be enchanted with a level 30 enchantment.");
 
     Cook_job.setJobName("Cook");
