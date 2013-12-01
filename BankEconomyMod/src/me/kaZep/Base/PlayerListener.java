@@ -4638,10 +4638,7 @@ implements Listener
 					p=(Player)e.getInventory().getViewers().get(i);
 				}
 			}
-			if (!allow_wood) {
-				result.setResult(new ItemStack(Material.AIR));
-				return;
-			} else {
+			if (allow_wood) {
 				if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB40)) {
 					ItemStack newstack = result.getResult();
 					newstack.setAmount(20);
@@ -10404,7 +10401,7 @@ implements Listener
 		}
 		
 		//*****************************// Job buffs here
-		Bukkit.getLogger().info("Click type is "+event.getClick().name());
+		//Bukkit.getLogger().info("Click type is "+event.getClick().name());
 		if (event.getSlotType()==SlotType.RESULT && (event.getInventory().getType()==InventoryType.CRAFTING || event.getInventory().getType()==InventoryType.PLAYER || event.getInventory().getType()==InventoryType.WORKBENCH)) {
 			//Check if level 5 digger.
 			if ((this.plugin.hasJobBuff("Digger", p, Job.JOB5) || this.plugin.hasJobBuff("Digger", p, Job.JOB40)) && event.getCurrentItem().getType()==Material.CLAY_BALL) {
