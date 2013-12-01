@@ -929,9 +929,32 @@ implements Listener
 				ItemMeta meta = e.getResult().getItemMeta();
 				meta.setLore(lore);
 				ItemStack newstack = e.getResult();
+				newstack.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
 				newstack.setItemMeta(meta);
 				e.setResult(newstack);
 			}
+		}
+		if (hasJobBuff("Cook", owner, Job.JOB40)) {
+			if (hasJobBuff("Cook", owner, Job.JOB30A)) {
+				e.setResult(modifyFoodItem(e.getResult(),1,0,true));
+			} else 
+			if (hasJobBuff("Cook", owner, Job.JOB30B)) {
+				e.setResult(modifyFoodItem(e.getResult(),0,3,true));
+			}
+			ItemStack oldamt = e.getResult();
+			oldamt.setAmount(oldamt.getAmount()+1);
+			e.setResult(oldamt);
+		}
+		else
+		if (hasJobBuff("Cook", owner, Job.JOB30A) || hasJobBuff("Cook", owner, Job.JOB30B)) {
+			if (hasJobBuff("Cook", owner, Job.JOB30A)) {
+				e.setResult(modifyFoodItem(e.getResult(),1));
+			} else {
+				e.setResult(modifyFoodItem(e.getResult(),0,3));
+			}
+		} else
+		if (hasJobBuff("Cook", owner, Job.JOB20)) {
+			e.setResult(modifyFoodItem(e.getResult()));
 		}
 		//*************************//Not Job Buffies below.
 		
@@ -4360,7 +4383,7 @@ implements Listener
 	}
 
 	@EventHandler
-	public void onPotionConsume(PlayerItemConsumeEvent e) {
+	public void onItemConsume(PlayerItemConsumeEvent e) {
 		final Player p = e.getPlayer();
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 			@Override
@@ -4368,6 +4391,107 @@ implements Listener
 				p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 			}
 		},5);
+		if (isFood(e.getItem()) && e.getItem().hasItemMeta() && e.getItem().getItemMeta().hasLore()) {
+			//We need to parse the lore for any additional effects to give.
+			List<String> itemlore = e.getItem().getItemMeta().getLore();
+			if (itemlore.contains("This food item was fabulously")) {
+				int hungerincrease=0;
+				float saturationincrease=0;
+				switch (e.getItem().getType()) {
+					case POTATO:{hungerincrease=1;}break;
+					case COOKIE:
+					case MELON:
+					case POISONOUS_POTATO:
+					case RAW_CHICKEN:
+					case SPIDER_EYE:
+					case RAW_FISH:{hungerincrease=2;}break;
+					case PORK:
+					case RAW_BEEF:{hungerincrease=3;}break;
+					case ROTTEN_FLESH:
+					case CARROT_ITEM:
+					case GOLDEN_APPLE:
+					case APPLE:{hungerincrease=4;}break;
+					case BREAD:
+					case COOKED_FISH:{hungerincrease=5;}break;
+					case MUSHROOM_SOUP:
+					case BAKED_POTATO:
+					case COOKED_CHICKEN:
+					case GOLDEN_CARROT:{hungerincrease=6;}break;
+					case PUMPKIN_PIE:
+					case COOKED_BEEF:
+					case GRILLED_PORK:{hungerincrease=8;}break;
+				}
+				switch (e.getItem().getType()) {
+					case COOKIE:
+					case RAW_FISH:{saturationincrease=0.4f;}break;
+					case POTATO:{saturationincrease=0.6f;}break;
+					case ROTTEN_FLESH:{saturationincrease=0.8f;}break;
+					case MELON:
+					case RAW_CHICKEN:
+					case POISONOUS_POTATO:{saturationincrease=1.2f;}break;
+					case PORK:
+					case RAW_BEEF:{saturationincrease=1.8f;}break;
+					case APPLE:{saturationincrease=2.4f;}break;
+					case SPIDER_EYE:{saturationincrease=3.2f;}break;
+					case CARROT:{saturationincrease=4.8f;}break;
+					case PUMPKIN_PIE:
+					case BREAD:{saturationincrease=6f;}break;
+					case BAKED_POTATO:
+					case COOKED_CHICKEN:
+					case MUSHROOM_SOUP:{saturationincrease=7.2f;}break;
+					case GOLDEN_APPLE:{saturationincrease=9.6f;}break;
+					case COOKED_BEEF:
+					case GRILLED_PORK:{saturationincrease=12.8f;}break;
+					case GOLDEN_CARROT:{saturationincrease=14.4f;}break;
+				}
+				p.setFoodLevel(p.getFoodLevel()+hungerincrease);
+				p.setSaturation(p.getSaturation()+saturationincrease);
+				if (p.getSaturation()>30f) {
+					p.setSaturation(30f);
+				}
+				if (p.getHealth()+2<p.getMaxHealth()) {
+					p.setHealth(p.getHealth()+2);
+				} else {
+					p.setHealth(p.getMaxHealth());
+				}
+			}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Night Vision (1:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,1200,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Night Vision (4:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,4800,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Night Vision (16:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,19200,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Regeneration I (1:00)")) {Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {@Override public void run() {p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,1200,0),true);}},5);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Regeneration II (1:00)")) {Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {@Override public void run() {p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,1200,1),true);}},5);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Regeneration I (4:00)")) {Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {@Override public void run() {p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,4800,0),true);}},5);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Regeneration III (4:00)")) {Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {@Override public void run() {p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,4800,2),true);}},5);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Regeneration II (16:00)")) {Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {@Override public void run() {p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,19200,1),true);}},5);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Strength I (1:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,1200,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Strength II (1:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,1200,1),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Strength I (4:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,4800,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Strength III (4:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,4800,2),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Strength II (16:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,19200,1),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Water Breathing (1:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,1200,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Water Breathing (4:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,4800,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Water Breathing (16:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.WATER_BREATHING,19200,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Fire Resistance (1:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,1200,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Fire Resistance (4:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,4800,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Fire Resistance (16:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,19200,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Haste I (1:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,1200,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Haste II (1:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,1200,1),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Haste I (4:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,4800,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Haste III (4:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,4800,2),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Haste II (16:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,19200,1),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Jump Boost I (1:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,1200,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Jump Boost II (1:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,1200,1),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Jump Boost I (4:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,4800,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Jump Boost III (4:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,4800,2),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Jump Boost II (16:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP,19200,1),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Speed I (1:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,1200,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Speed II (1:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,1200,1),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Speed I (4:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,4800,0),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Speed III (4:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,4800,2),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Speed II (16:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,19200,1),true);}
+			if (itemlore.contains(" "+ChatColor.GRAY+"Saturation (2:00)")) {p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION,2400,1),true);}
+			if (itemlore.contains(" "+ChatColor.BLUE+"Heals 6 HP "+Character.toString((char)0x2665)+Character.toString((char)0x2665)+Character.toString((char)0x2665))) {if (p.getHealth()+6<p.getMaxHealth()) {p.setHealth(p.getHealth()+6);} else {p.setHealth(p.getMaxHealth());}}
+		}
 		if (e.getItem().getType()==Material.MILK_BUCKET) {
 			for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
 				if (this.plugin.SPEED_CONTROL.get(i).p.getName().equalsIgnoreCase(p.getName().toLowerCase())) {
@@ -4622,38 +4746,123 @@ implements Listener
 			Bukkit.getLogger().warning("Entity Collection not accessible during splash potion effect.");
 		}
 	}
+	
+	/**
+	 * Adds in a special power-up, based on the type of item.
+	 * @param i The item to add a powerup to.
+	 * @return The powered food item.
+	 */
+	private ItemStack modifyFoodItem(ItemStack i) {
+		return modifyFoodItem(i, 0, 0, false);
+	}
+	
+	/**
+	 * Adds in a special power-up, based on the type of item.
+	 * @param i The item to add a powerup to.
+	 * @param power_increase The amount of levels to add onto this item.
+	 * @return The powered food item.
+	 */
+	private ItemStack modifyFoodItem(ItemStack i, int power_increase) {
+		return modifyFoodItem(i, power_increase, 0, false);
+	}
+	
+	/**
+	 * Adds in a special power-up, based on the type of item.
+	 * @param i The item to add a powerup to.
+	 * @param power_increase The amount of levels to add onto this item.
+	 * @param duration_increase The amount of time (in ticks) to add onto this item.
+	 * @return The powered food item.
+	 */
+	private ItemStack modifyFoodItem(ItemStack i, int power_increase, int duration_increase) {
+		return modifyFoodItem(i, power_increase, duration_increase, false);
+	}
+
+	/**
+	 * Adds in a special power-up, based on the type of item.
+	 * @param i The item to add a powerup to.
+	 * @param power_increase The amount of levels to add onto this item.
+	 * @param duration_increase The amount of time (in ticks) to add onto this item.
+	 * @param ult Whether or not to give the food the Ultimate-infused version.
+	 * @return The powered food item.
+	 */
+	private ItemStack modifyFoodItem(ItemStack i, int power_increase, int duration_increase, boolean ult) {
+		//Assumes the user is allowed to do this. Buffs a food item in a certain way.
+		i.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+		int power_level = power_increase + 1;
+		int duration_level = duration_increase + 1;
+		List<String> lore = null,altlore = null;
+		if (i.hasItemMeta() && i.getItemMeta().hasLore()) {
+			lore = i.getItemMeta().getLore();
+			altlore = i.getItemMeta().getLore();
+		} else {
+			lore = new ArrayList<String>();
+			lore = new ArrayList<String>();
+		}
+		lore.add("");
+		lore.add(ChatColor.AQUA+"Additional Effects:");
+		if (ult) {
+			lore.add(" "+ChatColor.BLUE+"Heals 6 HP "+Character.toString((char)0x2665)+Character.toString((char)0x2665)+Character.toString((char)0x2665));
+			lore.add(" "+ChatColor.GRAY+"Saturation (2:00)");
+			if (duration_level==4) {duration_level=16;} else {duration_level=4;}
+			power_level++;
+			altlore.add("");
+			altlore.add(ChatColor.AQUA+"Additional Effects:");
+			altlore.add(" "+ChatColor.BLUE+"Heals 6 HP "+Character.toString((char)0x2665)+Character.toString((char)0x2665)+Character.toString((char)0x2665));
+			altlore.add(" "+ChatColor.GRAY+"Saturation (2:00)");
+		}
+		String duration = "";
+		boolean no_effect=false;
+		switch (duration_level) {
+			case 1:{
+				duration = "1:00";
+			}break;
+			case 4:{
+				duration = "4:00";
+			}break;
+			case 16:{
+				duration = "16:00";
+			}break;
+		}
+		switch (i.getType()) {
+			case GOLDEN_CARROT:{lore.add(" "+ChatColor.GRAY+"Night Vision ("+duration+")");}break;
+			case GOLDEN_APPLE:{lore.add(" "+ChatColor.GRAY+"Regeneration "+this.plugin.toRomanNumeral(power_level)+" ("+duration+")");}break;
+			case COOKED_BEEF:
+			case GRILLED_PORK:{lore.add(" "+ChatColor.GRAY+"Strength "+this.plugin.toRomanNumeral(power_level)+" ("+duration+")");}break;
+			case COOKED_FISH:{lore.add(" "+ChatColor.GRAY+"Water Breathing ("+duration+")");}break;
+			case BREAD:{lore.add(" "+ChatColor.GRAY+"Fire Resistance ("+duration+")");}break;
+			case MUSHROOM_SOUP:{lore.add(" "+ChatColor.GRAY+"Haste "+this.plugin.toRomanNumeral(power_level)+" ("+duration+")");}break;
+			case COOKED_CHICKEN:{lore.add(" "+ChatColor.GRAY+"Jump Boost "+this.plugin.toRomanNumeral(power_level)+" ("+duration+")");}break;
+			case BAKED_POTATO:{lore.add(" "+ChatColor.GRAY+"Speed "+this.plugin.toRomanNumeral(power_level)+" ("+duration+")");}break;
+			default: {no_effect=true;}
+		}
+		if (no_effect) {
+			ItemMeta meta = i.getItemMeta();
+			meta.setLore(altlore);
+			i.setItemMeta(meta);
+			return i;
+		} else {
+			ItemMeta meta = i.getItemMeta();
+			meta.setLore(lore);
+			i.setItemMeta(meta);
+			return i;
+		}
+	}
 
 	@EventHandler
 	public void onItemPrepareCraft(PrepareItemCraftEvent e) {
 		CraftingInventory result = e.getInventory();
 		
 		//****************************// Job Boofs poof here.
-		
-		if (result.getResult().getType()==Material.WOOD){ 
-			boolean allow_wood=false;
-			Player p = null;
-			for (int i=0;i<e.getInventory().getViewers().size();i++) {
-				if (this.plugin.hasJobBuff("Woodcutter", e.getInventory().getViewers().get(i).getName(), Job.JOB10) || this.plugin.hasJobBuff("Woodcutter", e.getInventory().getViewers().get(i).getName(), Job.JOB40)) {
-					allow_wood=true;
-					p=(Player)e.getInventory().getViewers().get(i);
-				}
-			}
-			if (allow_wood) {
-				if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB40)) {
-					ItemStack newstack = result.getResult();
-					newstack.setAmount(20);
-					result.setResult(newstack);
-				} else
-				if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB30B)) {
-					ItemStack newstack = result.getResult();
-					newstack.setAmount(10);
-					result.setResult(newstack);
-				} else
-				if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB10)) {
-					ItemStack newstack = result.getResult();
-					newstack.setAmount(6);
-					result.setResult(newstack);
-				}
+
+		if (result.getResult().getType()==Material.WOOD) {
+			if (this.plugin.hasJobBuff("Woodcutter", e.getView().getPlayer().getName(), Job.JOB40)) {
+				result.setResult(new ItemStack(Material.WOOD,20,result.getResult().getData().getData()));
+			} else
+			if (this.plugin.hasJobBuff("Woodcutter", e.getView().getPlayer().getName(), Job.JOB30B)) {
+				result.setResult(new ItemStack(Material.WOOD,10,result.getResult().getData().getData()));
+			} else
+			if (this.plugin.hasJobBuff("Woodcutter", e.getView().getPlayer().getName(), Job.JOB10)) {
+				result.setResult(new ItemStack(Material.WOOD,6,result.getResult().getData().getData()));
 			}
 		}
 		if (result.getResult().getType()==Material.CLAY_BALL) {
@@ -4798,6 +5007,55 @@ implements Listener
 				if (myname.contains("stone")) {offering = new ItemStack(Material.COBBLESTONE,(int)(itemcount*0.07)+1);}
 				//Bukkit.getLogger().info("Offering is "+offering.toString());
 				result.setResult(offering);
+			}
+		}
+		
+		Player p = null;
+		for (int i=0;i<e.getInventory().getViewers().size();i++) {
+			if (this.plugin.hasJobBuff("Cook", e.getInventory().getViewers().get(i).getName(), Job.JOB10)) {
+				allowed=true;
+				p=(Player)e.getInventory().getViewers().get(i);
+			}
+		}
+		if (allowed) {
+			ItemStack resulting = new ItemStack(result.getResult().getType(),result.getResult().getAmount());
+			if (hasJobBuff("Cook", p, Job.JOB10)) {
+				resulting.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+				List<String> lore = new ArrayList<String>();
+				if (resulting.getItemMeta().hasLore()) {
+					lore = resulting.getItemMeta().getLore();
+				} else {
+					lore.add("This food item was fabulously");
+					lore.add("created by cook "+ChatColor.YELLOW+p.getName()+",");
+					lore.add("restoring more hunger and");
+					lore.add("saturation than normal, and");
+					lore.add("healing 1 Heart of health.");
+				}
+				ItemMeta meta = resulting.getItemMeta();
+				meta.setLore(lore);
+				resulting.setItemMeta(meta);
+				result.setResult(resulting);
+			}
+			if (hasJobBuff("Cook", p, Job.JOB40)) {
+				if (hasJobBuff("Cook", p, Job.JOB30A)) {
+					result.setResult(modifyFoodItem(result.getResult(),1,0,true));
+				} else 
+				if (hasJobBuff("Cook", p, Job.JOB30B)) {
+					result.setResult(modifyFoodItem(result.getResult(),0,3,true));
+				}
+				ItemStack final_result = result.getResult();
+				final_result.setAmount(final_result.getAmount()*2);
+				result.setResult(final_result);
+			} else
+			if (hasJobBuff("Cook", p, Job.JOB30A) || hasJobBuff("Cook", p, Job.JOB30B)) {
+				if (hasJobBuff("Cook", p, Job.JOB30A)) {
+					result.setResult(modifyFoodItem(result.getResult(),1));
+				} else {
+					result.setResult(modifyFoodItem(result.getResult(),0,3));
+				}
+			} else
+			if (hasJobBuff("Cook", p, Job.JOB20)) {
+				result.setResult(modifyFoodItem(result.getResult()));
 			}
 		}
 		
@@ -5517,9 +5775,11 @@ implements Listener
 			}
 		}
 
+		/*
+		ItemStack resulting = new ItemStack(result.getResult().getType(),result.getResult().getAmount());
 		if (hasJobBuff("Cook", p, Job.JOB10)) {
 			if (e.getClick()!=ClickType.SHIFT_RIGHT && e.getClick()!=ClickType.SHIFT_LEFT) {
-				ItemStack resulting = result.getResult();
+				resulting.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
 				List<String> lore = new ArrayList<String>();
 				if (resulting.getItemMeta().hasLore()) {
 					lore = resulting.getItemMeta().getLore();
@@ -5536,6 +5796,9 @@ implements Listener
 				result.setResult(resulting);
 			}
 		}	
+		if (hasJobBuff("Cook", p, Job.JOB20)) {
+			result.setResult(modifyFoodItem(result.getResult()));
+		}*/
 		
 		ItemStack item = result.getResult();
 		int amount=1;
@@ -5579,6 +5842,13 @@ implements Listener
 				if (item.getType()==Material.GOLDEN_APPLE) {
 					this.plugin.gainMoneyExp(p,"Cook",0.1125*amount,45*amount);
 					crafteditem=true;
+				}
+			}
+			if (this.plugin.hasJobBuff("Cook", p, Job.JOB40)) {
+				if (e.getClick()!=ClickType.SHIFT_LEFT && e.getClick()!=ClickType.SHIFT_RIGHT) {
+					ItemStack replenishitem = item.clone();
+					replenishitem.setAmount(1);
+					p.getInventory().addItem(replenishitem);
 				}
 			}
 			/*
@@ -11549,7 +11819,7 @@ implements Listener
 										player.getInventory().setItem(i, resulting);
 									}
 								}	
-								if (PlayerinJob((Player)player,"Blacksmith")) {
+								if (PlayerinJob((Player)player,"Blacksmith") || hasJobBuff("Blacksmith", (Player)player, Job.JOB40)) {
 									ItemStack resulting = clone;
 									if (hasJobBuff("Blacksmith", player.getName(), Job.JOB30A) && validItem_Blacksmith(post)) {
 										ItemMeta meta = resulting.getItemMeta();
@@ -11561,11 +11831,11 @@ implements Listener
 										meta.setLore(lore);
 										resulting.setItemMeta(meta);
 									}
-									if (getJobLv("Blacksmith", player.getName())>=10 && validItem_Blacksmith(post)) {
+									if (hasJobBuff("Blacksmith", player.getName(), Job.JOB10) && validItem_Blacksmith(post)) {
 										//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
 										resulting = EnchantItem(clone,10,(Player)player);
 									} else
-									if (getJobLv("Blacksmith", player.getName())>=5 && validItem_Blacksmith(post)) {
+									if (hasJobBuff("Blacksmith", player.getName(), Job.JOB5) && validItem_Blacksmith(post)) {
 										//Bukkit.getPlayer("sigonasr2").sendMessage("Valid item. Going to attempt to enchant.");
 										resulting = EnchantItem(clone,5,(Player)player);
 									}
@@ -11577,23 +11847,6 @@ implements Listener
 										}
 										resulting.setAmount((int)(Math.random()*4)+2);
 									}
-									player.getInventory().setItem(i, resulting);
-								}
-								if (hasJobBuff("Cook", (Player)player, Job.JOB10)) {
-									ItemStack resulting = clone;
-									List<String> lore = new ArrayList<String>();
-									if (resulting.getItemMeta().hasLore()) {
-										lore = resulting.getItemMeta().getLore();
-									} else {
-										lore.add("This food item was fabulously");
-										lore.add("created by cook "+ChatColor.YELLOW+player.getName()+",");
-										lore.add("restoring more hunger and");
-										lore.add("saturation than normal, and");
-										lore.add("healing 1 Heart of health.");
-									}
-									ItemMeta meta = resulting.getItemMeta();
-									meta.setLore(lore);
-									resulting.setItemMeta(meta);
 									player.getInventory().setItem(i, resulting);
 								}
 							}
@@ -13852,7 +14105,33 @@ implements Listener
 	}
 	
 	public boolean isFood(ItemStack i) {
-		
+		if (i.getType()==Material.RAW_FISH ||
+				i.getType()==Material.ROTTEN_FLESH ||
+				i.getType()==Material.COOKIE ||
+				i.getType()==Material.CAKE ||
+				i.getType()==Material.POTATO ||
+				i.getType()==Material.MELON ||
+				i.getType()==Material.POISONOUS_POTATO ||
+				i.getType()==Material.RAW_CHICKEN ||
+				i.getType()==Material.RAW_BEEF ||
+				i.getType()==Material.PORK ||
+				i.getType()==Material.APPLE ||
+				i.getType()==Material.PUMPKIN_PIE ||
+				i.getType()==Material.CARROT_ITEM ||
+				i.getType()==Material.COOKED_FISH ||
+				i.getType()==Material.BREAD ||
+				i.getType()==Material.MUSHROOM_SOUP ||
+				i.getType()==Material.COOKED_CHICKEN ||
+				i.getType()==Material.BAKED_POTATO ||
+				i.getType()==Material.SPIDER_EYE ||
+				i.getType()==Material.COOKED_BEEF ||
+				i.getType()==Material.GRILLED_PORK ||
+				i.getType()==Material.GOLDEN_APPLE ||
+				i.getType()==Material.GOLDEN_CARROT) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	@EventHandler
@@ -14263,9 +14542,14 @@ implements Listener
 		}
 
 		if ((e.getAction()==Action.RIGHT_CLICK_AIR || (e.getAction()==Action.RIGHT_CLICK_BLOCK && p.isSneaking())) && p.getItemInHand().hasItemMeta() && p.getItemInHand().getItemMeta().hasLore()) {
-			/*if (isFood(p.getItemInHand().getType())) {
-				
-			}*/
+			if (isFood(p.getItemInHand()) && p.getItemInHand().hasItemMeta() && p.getItemInHand().getItemMeta().hasLore()) {
+				//This is a special food. Even if we are full, take action.
+				if (p.getFoodLevel()>=20 && Main.SERVER_TICK_TIME-this.plugin.getPlayerData(p).lasteattime>100) {
+					p.setFoodLevel(19);
+					p.playSound(p.getLocation(), Sound.EAT, 1.0f, 1.0f);
+					this.plugin.getPlayerData(p).lasteattime=Main.SERVER_TICK_TIME;
+				}
+			}
 		}
 		
 		//******************************//End Job related buffs.

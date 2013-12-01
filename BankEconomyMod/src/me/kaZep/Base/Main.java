@@ -1096,11 +1096,11 @@ public class Main extends JavaPlugin
     Cook_job.addData("GRILLED PORK", 0.12, 48, 1);
     Cook_job.addData("COOKED BEEF", 0.20, 80, 1);
     Cook_job.setBuffData("Double the amount of cooking time with one fuel item in the furnace.",
-    		"Results of crafting food is double the normal amount.", 
-    		"Results of cooking food is double the normal amount.", 
+    		"Food that is cooked/crafted gives double the amount of hunger restoration and heals 1 Heart of Health (2HP) when eaten.", 
+    		"Food that is cooked/crafted gain magical buffs that apply when someone eats them. These last for 60 seconds.", 
     		"Increases buff strength of all food items by 1.",
     		"Increases bonus effect duration of all food items by x4.",
-    		"Cooking and crafting food gives 4x the normal amount. Cooking and crafting food gives exp orbs and has a chance of giving Golden Apples and Golden Carrots sometimes. (15% per crafted/cooked item.)");
+    		"Food that is cooked/crafted gain a 'Saturation' magical buff that lasts for 2 minutes and heals 3 hearts (6HP) for the player that eats it. All food magical buffs' durations will be increased an additional 3 minutes long and the strength of those buffs increase by 1. Food results that are cooked/crafted will be doubled.");
 
     Brewer_job.setJobName("Brewer");
     Brewer_job.setJobDescription("A brewer's job is to create potions for others and themselves in order to change the outcome of situations.");

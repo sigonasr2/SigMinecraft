@@ -13,6 +13,7 @@ public class PlayerData {
 	long lastsneaktime=0;
 	int minestreak=0;
 	boolean haslanded=true;
+	long lasteattime=Main.SERVER_TICK_TIME;
 	int blockstack=0; //The amount of times you've gotten hit (The amount of "blocking" stacks you now have)
 	int fishingstreak=0;
 	int fishingrodfails=0; //The amount of times in a row you've failed to catch fish.
