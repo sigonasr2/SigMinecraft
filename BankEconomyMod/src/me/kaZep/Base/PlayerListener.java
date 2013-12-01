@@ -5929,44 +5929,19 @@ implements Listener
 	  Player p = e.getPlayer();
 	  Bukkit.getPlayer("sigonasr2").sendMessage("Extacting "+e.getItemAmount()+" "+e.getItemType());
   }*/
+
 	@EventHandler
-	public void onLeafDecay(LeavesDecayEvent e) {
-		Player[] list = Bukkit.getOnlinePlayers();
-		for (int i=0;i<list.length;i++) {
-			double distance=Math.abs(list[i].getLocation().getX()-e.getBlock().getX())+Math.abs(list[i].getLocation().getY()-e.getBlock().getY())+Math.abs(list[i].getLocation().getZ()-e.getBlock().getZ());
-			if (distance<50) {
-				if (this.plugin.PlayerinJob(list[i], "Woodcutter") && this.plugin.getJobLv("Woodcutter", list[i])>=20) {
-					//Increase sapling drops by 64%.
-					if (e.getBlock().getData()!=3) {
-						//This is not a jungle leaf block.
-						if (Math.random()*100<=25) {
-							//Produce a sapling.
-							Bukkit.getWorld("world").dropItem(e.getBlock().getLocation(), new ItemStack(Material.SAPLING,1,e.getBlock().getData()));
-							//list[i].sendMessage("You got an extra spawned sapling.");
-						}
-					} else {
-						if (Math.random()*100<=12.5) {
-							//Produce a sapling.
-							Bukkit.getWorld("world").dropItem(e.getBlock().getLocation(), new ItemStack(Material.SAPLING,1,e.getBlock().getData()));
-						}
+	public void onLeavesDecay(LeavesDecayEvent e) {
+		if (e.getBlock().getData()==0/*Has to be oak.*/) {
+			//We will check for nearby players.
+			for (int i=0;i<Bukkit.getOnlinePlayers().length;i++) {
+				Player p = Bukkit.getOnlinePlayers()[i];
+				if (this.plugin.hasJobBuff("Woodcutter", p, Job.JOB20) && p.getLocation().distanceSquared(e.getBlock().getLocation())<=900) {
+					//There is a chance to drop an apple!
+					if (Math.random()<=0.02) { //Reduced from 1/200 to 1/50 chance.
+						p.getWorld().dropItemNaturally(e.getBlock().getLocation(), new ItemStack(Material.APPLE));
 					}
-				} else
-					if (this.plugin.PlayerinJob(list[i], "Woodcutter") && this.plugin.getJobLv("Woodcutter", list[i])>=5) {
-						//Increase sapling drops by 40%.
-						if (e.getBlock().getData()!=3) {
-							//This is not a jungle leaf block.
-							if (Math.random()*100<=12) {
-								//Produce a sapling.
-								Bukkit.getWorld("world").dropItem(e.getBlock().getLocation(), new ItemStack(Material.SAPLING,1,e.getBlock().getData()));
-								//list[i].sendMessage("You got an extra spawned sapling.");
-							}
-						} else {
-							if (Math.random()*100<=6) {
-								//Produce a sapling.
-								Bukkit.getWorld("world").dropItem(e.getBlock().getLocation(), new ItemStack(Material.SAPLING,1,e.getBlock().getData()));
-							}
-						}
-					}
+				}
 			}
 		}
 	}
@@ -5981,6 +5956,15 @@ implements Listener
 				ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
 				if (currentitem.getEnchantmentLevel(Enchantment.getByName("DIG_SPEED"))<3) {
 					currentitem.addUnsafeEnchantment(Enchantment.getByName("DIG_SPEED"), 3);
+				}
+			}
+			if (p.getInventory().getContents()[e.getNewSlot()].getType().name().toLowerCase().contains("pickaxe") && this.plugin.hasJobBuff("Miner", p, Job.JOB20)) {
+				ItemStack currentitem = p.getInventory().getContents()[e.getNewSlot()];
+				if (currentitem.getEnchantmentLevel(Enchantment.getByName("DIG_SPEED"))<6) {
+					currentitem.addUnsafeEnchantment(Enchantment.getByName("DIG_SPEED"), 6);
+				}
+				if (currentitem.getEnchantmentLevel(Enchantment.getByName("DURABILITY"))<4) {
+					currentitem.addUnsafeEnchantment(Enchantment.getByName("DURABILITY"), 4);
 				}
 			}
 			if (p.getInventory().getContents()[e.getNewSlot()].getType().name().toLowerCase().contains("spade") && this.plugin.hasJobBuff("Digger", p, Job.JOB10)) {
@@ -7305,6 +7289,10 @@ implements Listener
 			PlayerData pd = this.plugin.getPlayerData(p);
 			//Bukkit.getLogger().info("Fishing chance is reset.");
 			pd.fishingrodcatchrate=0.002;
+			pd.fishingstreak=0;
+			if (this.plugin.hasJobBuff("Fisherman", p, Job.JOB30B)) {
+				p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Fishing streak reset...");
+			}
 		}
 		if (e.getState()==State.CAUGHT_FISH) {
 			if (this.plugin.getConfig().getBoolean("thanksgiving-enabled")) {
@@ -7339,7 +7327,12 @@ implements Listener
 				}
 			}
 			if (this.plugin.hasJobBuff("Fisherman", p, Job.JOB30B)) {
+				this.plugin.getPlayerData(p).fishingstreak++;
 				this.plugin.getPlayerData(p).fishingrodcatchrate+=this.plugin.getPlayerData(p).fishingrodcatchrate*0.05;
+				DecimalFormat df = new DecimalFormat("#0.00");
+				if (this.plugin.getPlayerData(p).fishingstreak%5==0) {
+					p.sendMessage(ChatColor.GREEN+""+this.plugin.getPlayerData(p).fishingstreak+" in a row! "+ChatColor.GRAY+""+ChatColor.ITALIC+"Current Fish Catch Rate: "+((this.plugin.getPlayerData(p).fishingrodcatchrate/0.002))+"%");
+				}
 			}
 			if (this.plugin.PlayerinJob(p, "Fisherman")) {
 				this.plugin.gainMoneyExp(p,"Fisherman",0.175,3);
