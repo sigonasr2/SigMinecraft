@@ -12,6 +12,8 @@ public class PlayerData {
 	long lastminetime=0;
 	long lastsneaktime=0;
 	int minestreak=0;
+	long furytime=0;
+	int furyamt=0;
 	boolean haslanded=true;
 	long lasteattime=Main.SERVER_TICK_TIME;
 	int blockstack=0; //The amount of times you've gotten hit (The amount of "blocking" stacks you now have)

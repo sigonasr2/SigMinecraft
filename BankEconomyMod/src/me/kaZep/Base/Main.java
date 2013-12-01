@@ -126,6 +126,7 @@ public class Main extends JavaPlugin
   public String last_bank_withdraw_user="";
   public long last_boss_dungeon_time=0;
   public long last_player_death_time=0;
+  public long last_sight_check_time=0;
   public long check_nether_time=0;
   public long check_lights_time=0;
   public long check_spleef_game=0;
@@ -175,6 +176,7 @@ public class Main extends JavaPlugin
   public List<PersistentExplorerList> explorers = null;
   public List<ArrowShooter> ARROW_SHOOTERS = null;
   public List<TempWeb> TEMP_WEBS = null;
+  public List<TempBlock> TEMP_BLOCKS = null;
   public List<PlayerData> playerdata_list = null;
   public List<InvisibilityData> ninjavisible_list = null;
   public List<ReviveInventory> revive_inventory_list = null;
@@ -293,6 +295,7 @@ public class Main extends JavaPlugin
     LOGGING_LOGS = new ArrayList<String>();
     ARROW_SHOOTERS = new ArrayList<ArrowShooter>();
     TEMP_WEBS = new ArrayList<TempWeb>();
+    TEMP_BLOCKS = new ArrayList<TempBlock>();
     playerdata_list = new ArrayList<PlayerData>();
     ninjavisible_list = new ArrayList<InvisibilityData>();
     revive_inventory_list = new ArrayList<ReviveInventory>();
@@ -1118,12 +1121,12 @@ public class Main extends JavaPlugin
     Brewer_job.addData("BLAZE POWDER", 0.05, 6, 0);
     Brewer_job.addData("MAGMA CREAM", 0.075, 8, 0);
     Brewer_job.addData("GHAST TEAR", 0.30, 20, 0);
-    Brewer_job.setBuffData("Decrease brewing wait time by half.",
-    		"Potions obtained are doubled. (Stacks of two)", 
-    		"Potions created by you have double the duration.", 
-    		"Gain the ability to brew Night Vision and Invisibility potions.",
-    		"Potions created by you stack to 8.",
-    		"Potions created by you last for 30 minutes. Potions automatically stack up together in your inventory when grabbed. Splash potions provide full power regardless of how far from the splash the affected entities are. Potions obtained are quadrupled. Brewing wait time decreased by 4x the normal time.");
+    Brewer_job.setBuffData("Gain access to the Teleport potion. Water Bottle + Lapis Lazuli. Throwing it will teleport you to the thrown location.",
+    		"Potions can stack up to 2 at a time. Gain access to the Eye of Wonder potion. Teleport potion + Eye of Ender. Drinking it will reveal mobs' nametags nearby. Throwing it will turn stone into glass temporarily, revealing nearby ores within.", 
+    		"Potions you throw have double the duration. Gain access to the Potion of Fury (Gives you attack speed. Strength Potion + Blaze Rod) and Potion of Resistance (Heal Potion + Obsidian) Potions.", 
+    		"Gain the ability to create Strength potions with Strength IV buffs. Heal potions created by you heal 4x their normal amount.",
+    		"Potions can stack up to 8 at a time. Gain the ability to brew Night Vision and Invisibility potions.",
+    		"Potions created by you last for 30 minutes. Potions can stack up to 64 at a time. Brewing wait time decreased by 4x the normal time.");
 
     Enchanter_job.setJobName("Enchanter");
     Enchanter_job.setJobDescription("An enchanter's job is to enchant items in order to make them more powerful and useful for everyday tasks.");
@@ -1344,6 +1347,18 @@ public void runTick() {
 				}
 				if (shooter.timer<=0) {
 					ARROW_SHOOTERS.remove(i);
+					i--;
+				}
+			}
+			for (int i=0;i<TEMP_BLOCKS.size();i++) {
+				TempBlock block = TEMP_BLOCKS.get(i);
+				block.timer--;
+				if (block.timer<=0) {
+					//Attempt to destroy the block in the world.
+					if (block.loc.getBlock().getType()==Material.GLASS || block.loc.getBlock().getType()==Material.JACK_O_LANTERN) {
+						block.loc.getBlock().setType(Material.STONE);
+					}
+					TEMP_BLOCKS.remove(i);
 					i--;
 				}
 			}
@@ -1941,7 +1956,7 @@ public void runTick() {
 										 lineofsight_check.add(l.getUniqueId());
 									 }
 							  } else {
-								 if (!lineofsight_check.contains(l.getUniqueId())) {
+								 if (!lineofsight_check.contains(l.getUniqueId()) && Main.SERVER_TICK_TIME-last_sight_check_time>200) {
 									 l.setCustomNameVisible(false);
 								 }
 							  }
@@ -2663,7 +2678,7 @@ public void checkJukeboxes() {
     		for (int i=0;i<list.length;i++) {
     			if (hasJobBuff("Hunter", list[i],Job.JOB40)) {
     				if (Bukkit.getWorld("world").getTime()>13000) {
-    					list[i].addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,199,1));
+    					list[i].addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,200,1,true));
     				}
     			}
         		if (hasJobBuff("Hunter", list[i], Job.JOB30A)) {
@@ -3321,7 +3336,7 @@ public void updateTime() {
 	  					  if (PlayerinJob(brewingstandlist.get(i).owner, "Brewer") && getJobLv("Brewer", brewingstandlist.get(i).owner)>=5) {
 		  					  brewingstandlist.get(i).set_newTime(true);
 		  					  //Bukkit.getPlayer("sigonasr2").sendMessage("Old Brewing time: "+brewingstandlist.get(i).getBrewingTime());
-		  					  brewingstandlist.get(i).setBrewingTime(brewingstandlist.get(i).getBrewingTime()/2);
+		  					  //brewingstandlist.get(i).setBrewingTime(brewingstandlist.get(i).getBrewingTime()/2);
 		  					  //Bukkit.getPlayer("sigonasr2").sendMessage("New Brewing time: "+brewingstandlist.get(i).getBrewingTime());
 	  					  }
 	  				  }
