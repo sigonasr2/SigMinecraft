@@ -10404,9 +10404,10 @@ implements Listener
 		}
 		
 		//*****************************// Job buffs here
-		if (event.getSlotType()==SlotType.RESULT && (event.getClick()==ClickType.LEFT || event.getClick()==ClickType.RIGHT) && (event.getInventory().getType()==InventoryType.CRAFTING || event.getInventory().getType()==InventoryType.PLAYER || event.getInventory().getType()==InventoryType.WORKBENCH)) {
+		Bukkit.getLogger().info("Click type is "+event.getClick().name());
+		if (event.getSlotType()==SlotType.RESULT && (event.getInventory().getType()==InventoryType.CRAFTING || event.getInventory().getType()==InventoryType.PLAYER || event.getInventory().getType()==InventoryType.WORKBENCH)) {
 			//Check if level 5 digger.
-			if (this.plugin.hasJobBuff("Digger", p, Job.JOB5) && event.getCurrentItem().getType()==Material.CLAY_BALL) {
+			if ((this.plugin.hasJobBuff("Digger", p, Job.JOB5) || this.plugin.hasJobBuff("Digger", p, Job.JOB40)) && event.getCurrentItem().getType()==Material.CLAY_BALL) {
 				//This could potentially be an artifact. Check the lore.
 				ItemStack result = event.getInventory().getItem(event.getSlot());
 				if (result.hasItemMeta() && result.getItemMeta().hasLore()) {
