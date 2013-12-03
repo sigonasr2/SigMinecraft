@@ -202,6 +202,9 @@ import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 
+import de.kumpelblase2.remoteentities.CreateEntityContext;
+import de.kumpelblase2.remoteentities.api.RemoteEntityType;
+
 import me.kaZep.Base.BrewingStandData;
 import me.kaZep.Base.FurnaceData;
 import me.kaZep.Base.PlayerBuffData;
@@ -2578,7 +2581,9 @@ implements Listener
 					double levelsmult=1.0;
 					
 					double COUNTER_SLIME_SPAWN_RATE = 0.01,
-							VIRAL_SPIDER_SPAWN_RATE = 0.2;
+							VIRAL_SPIDER_SPAWN_RATE = 0.01,
+							SILENCER_SPAWN_RATE = 0.01,
+							HOUND_CALLER_SPAWN_RATE = 0.2;
 					
 					if (totallvs>80*levelsmult) {
 						//Try to spawn a counter slime.
@@ -2597,10 +2602,47 @@ implements Listener
 							LivingEntity l = (LivingEntity)entity;
 							l.setCustomName(ChatColor.RED+"Viral Spider");
 							l.setCustomNameVisible(true);
-							Bukkit.getLogger().info("Viral Spider spawned at "+l.getLocation().toString());
+							//Bukkit.getLogger().info("Viral Spider spawned at "+l.getLocation().toString());
 							l.setMaxHealth(85);
 							l.setHealth(85);
 							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
+						}
+						//Try to spawn a Silencer.
+						if (Math.random()<=SILENCER_SPAWN_RATE) {
+							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.SKELETON);
+							LivingEntity l = (LivingEntity)entity;
+							l.setCustomName(ChatColor.RED+"Silencer");
+							l.setCustomNameVisible(true);
+							//Bukkit.getLogger().info("Silencer spawned at "+l.getLocation().toString());
+							l.setMaxHealth(45);
+							l.setHealth(45);
+							ItemStack helm = new ItemStack(Material.DIAMOND_HELMET);
+							helm.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 32);
+							l.getEquipment().setHelmet(helm);
+							l.getEquipment().setHelmetDropChance(0.002f);
+							l.getEquipment().setItemInHand(new ItemStack(Material.BOW));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
+						}
+						//Try to spawn a Hound Caller.
+						if (Math.random()<=HOUND_CALLER_SPAWN_RATE) {
+							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.WOLF);
+							LivingEntity l = (LivingEntity)entity;
+							l.setCustomName(ChatColor.RED+"Hound Caller");
+							l.setCustomNameVisible(true);
+							//Bukkit.getLogger().info("Hound Caller spawned at "+l.getLocation().toString());
+							l.setMaxHealth(65);
+							l.setHealth(65);
+							Wolf w = (Wolf)l;
+							//helm.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 32);
+							//l.getEquipment().setHelmet(helm);
+							//l.getEquipment().setHelmetDropChance(0.002f);
+							//l.getEquipment().setItemInHand(new ItemStack(Material.BOW));
+							//w.setAngry(true);
+							w.setAdult();
+							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 999999, 3));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 2));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 0));
 						}
 					}
 					
@@ -8759,6 +8801,10 @@ implements Listener
 		//**********************************//Player buffs begin
 		if (e.getDamager() instanceof Player) {
 			Player p = (Player)e.getDamager();
+			if (p.hasPotionEffect(PotionEffectType.BLINDNESS)) {
+				e.setCancelled(true);
+				return;
+			}
 			if (p.getItemInHand().getType().name().toLowerCase().contains("axe") && !p.getItemInHand().getType().name().toLowerCase().contains("pickaxe") && this.plugin.hasJobBuff("Woodcutter", p, Job.JOB30A)) {
 				p.getItemInHand().setDurability((short)0);
 			}
@@ -8786,6 +8832,27 @@ implements Listener
 
 		if (e.getEntity() instanceof LivingEntity) {
 			final LivingEntity l = (LivingEntity)e.getEntity();
+			if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Wolf Minion")) {
+				e.setDamage(e.getDamage()*1.5);
+			}
+			if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Hound Caller")) {
+				e.setDamage(e.getDamage()*2.5);
+				if (Math.random()<=0.33) {
+					l.getLocation().getWorld().playSound(l.getLocation(), Sound.WOLF_HOWL, 0.2f, 0.9f);
+					Entity entity = l.getWorld().spawnEntity(l.getLocation().add(Math.random(),0,Math.random()), EntityType.WOLF);
+					LivingEntity l2 = (LivingEntity)entity;
+					Creature c = (Creature)l2;
+					l.setCustomName(ChatColor.RED+"Wolf Minion");
+					l.setCustomNameVisible(true);
+					if (e.getDamager() instanceof LivingEntity) {
+						c.setTarget((LivingEntity)e.getDamager());
+					}
+					Wolf w = (Wolf)l2;
+					w.setAngry(true);
+					w.setBaby();
+					//l.setLastDamageCause(new EntityDamageEvent(p, DamageCause.ENTITY_ATTACK, 0.01));
+				}
+			}
 			if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Viral Spider")) {
 				if (e.getDamager() instanceof LivingEntity) {
 					LivingEntity l2 = (LivingEntity)e.getDamager();
@@ -9111,6 +9178,35 @@ implements Listener
 	  }*/
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			final Player p = (Player)e.getEntity();
+			if (e.getDamager() instanceof Wolf) {
+				LivingEntity l = (LivingEntity)e.getDamager();
+				if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Hound Caller")) {
+					//e.setDamage(e.getDamage()*2.5);
+					if (Math.random()<=0.2) {
+						l.getLocation().getWorld().playSound(l.getLocation(), Sound.WOLF_HOWL, 0.2f, 0.9f);
+						Entity entity = l.getWorld().spawnEntity(l.getLocation().add(Math.random(),0,Math.random()), EntityType.WOLF);
+						LivingEntity l2 = (LivingEntity)entity;
+						Creature c = (Creature)l2;
+						l.setCustomName(ChatColor.RED+"Wolf Minion");
+						l.setCustomNameVisible(true);
+						if (e.getDamager() instanceof LivingEntity) {
+							c.setTarget((LivingEntity)e.getDamager());
+						}
+						Wolf w = (Wolf)l2;
+						w.setAngry(true);
+						w.setBaby();
+						//l.setLastDamageCause(new EntityDamageEvent(p, DamageCause.ENTITY_ATTACK, 0.01));
+					}
+				}
+			}
+			if (e.getDamager() instanceof Projectile) {
+				if (((Projectile)e.getDamager()).getShooter() instanceof LivingEntity) {
+					LivingEntity l = ((Projectile)e.getDamager()).getShooter();
+					if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Silencer")) {
+						p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 90, 64));
+					}
+				}
+			}
 			if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f && this.plugin.hasJobBuff("Hunter", p, Job.JOB30A)) {
 				this.plugin.getPlayerData(p).blockstack+=1;
 			}
@@ -10072,17 +10168,19 @@ implements Listener
 							}
 						}
 					}
-					if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
+					if (e.getCause()!=DamageCause.CUSTOM && f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 						final double armor_dmg = armor_pen_dmg;
 						Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 							@Override
 							public void run() {
 								DecimalFormat df = new DecimalFormat("#0.0");
 								DecimalFormat df2 = new DecimalFormat("#0");
-								if (f.getCustomName()!=null) {
-									p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+f.getCustomName()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
-								} else {
-									p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+ChatColor.WHITE+f.getType()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
+								if (enemy_starthp-f.getHealth()+armor_dmg>0.1) {
+									if (f.getCustomName()!=null) {
+										p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+f.getCustomName()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
+									} else {
+										p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+ChatColor.WHITE+f.getType()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
+									}
 								}
 							}
 						},1);
@@ -10251,7 +10349,7 @@ implements Listener
 								}
 							}
 						}
-						if (f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
+						if (e.getCause()!=DamageCause.CUSTOM && f.getNoDamageTicks()<f.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify4")) {
 							final double armor_dmg = armor_pen_dmg;
 							Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 								@Override
@@ -10259,9 +10357,11 @@ implements Listener
 									DecimalFormat df = new DecimalFormat("#0.0");
 									DecimalFormat df2 = new DecimalFormat("#0");
 									if (f.getCustomName()!=null) {
-										p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+f.getCustomName()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
-									} else {
-										p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+ChatColor.WHITE+f.getType()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
+										if (enemy_starthp-f.getHealth()+armor_dmg>0.1) {
+											p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+f.getCustomName()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
+										} else {
+											p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+ChatColor.WHITE+f.getType()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
+										}
 									}
 								}
 							},1);
@@ -15712,6 +15812,11 @@ implements Listener
 		boolean stats = this.plugin.getAccountsConfig().getBoolean(p.getName() + ".status");
 		double actMon = this.plugin.getAccountsConfig().getDouble(p.getName() + ".money");
 		int actHand = (int)Main.economy.getBalance(p.getName());
+		
+		if (p.hasPotionEffect(PotionEffectType.BLINDNESS)) {
+			e.setCancelled(true);
+			return;
+		}
 		
 		//******************************//All Job Buff related items go in here.
 		if (e.getAction()==Action.LEFT_CLICK_BLOCK && this.plugin.hasJobBuff("Woodcutter", p, Job.JOB5)) {

@@ -52,6 +52,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.FileConfigurationOptions;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -64,6 +65,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Wither;
+import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -90,6 +92,8 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import sig.ItemSets.ColorSet;
 import sig.ItemSets.ItemSet;
@@ -1960,6 +1964,49 @@ public void runTick() {
 									 l.setCustomNameVisible(false);
 								 }
 							  }
+						  }
+					  }
+				  }
+			  }
+			  if (Main.SERVER_TICK_TIME%60==0) {
+				  if (p.getWorld().getName().compareTo("world")==0) {
+					  List<Entity> nearby = p.getNearbyEntities(30, 30, 30);
+					  Location nearestwolf = null;
+					  int minions=0;
+					  for (int i=0;i<nearby.size();i++) {
+						  if (nearby.get(i).getType()==EntityType.WOLF) {
+							  minions++;
+							  if (nearestwolf==null || nearby.get(i).getLocation().distanceSquared(p.getLocation())<nearestwolf.distanceSquared(p.getLocation())) {
+								  nearestwolf = nearby.get(i).getLocation();
+							  }
+							  Creature l = (Creature)nearby.get(i);
+							  if (Math.random()<=0.4 && l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.RED+"Hound Caller")) {
+								  Wolf w = (Wolf)nearby.get(i);
+								  if (w.getOwner()==null) {
+									  if (!w.isAngry()) {
+										  w.damage(0,p);
+										  w.setHealth(w.getMaxHealth());
+										  w.setAngry(true);
+									  }
+									  l.setTarget(p);
+									  l.setLastDamage(0.01);
+									  l.setLastDamageCause(new EntityDamageEvent(p, DamageCause.CUSTOM, 0.01));
+								  }
+							  }
+						  }
+					  }
+					  if (minions<5 && nearestwolf!=null) {
+						  if (Math.random()<=0.05) {
+							  Entity entity = p.getWorld().spawnEntity(nearestwolf, EntityType.WOLF);
+								LivingEntity l = (LivingEntity)entity;
+								Creature c = (Creature)l;
+								l.setCustomName(ChatColor.RED+"Wolf Minion");
+								l.setCustomNameVisible(true);
+								c.setTarget(p);
+								Wolf w = (Wolf)l;
+								w.setBaby();
+								l.setLastDamageCause(new EntityDamageEvent(p, DamageCause.CUSTOM, 0.01));
+								l.getLocation().getWorld().playSound(l.getLocation(), Sound.WOLF_HOWL, 0.2f, 0.9f);
 						  }
 					  }
 				  }
