@@ -13,6 +13,7 @@ public class PlayerData {
 	long lastsneaktime=0;
 	int minestreak=0;
 	long furytime=0;
+	long invulntime=0;
 	int furyamt=0;
 	boolean haslanded=true;
 	long lasteattime=Main.SERVER_TICK_TIME;

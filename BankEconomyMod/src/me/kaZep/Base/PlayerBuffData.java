@@ -243,12 +243,13 @@ public class PlayerBuffData {
 				//Figure out potion effects when player joins.
 				while (effects.hasNext()) {
 					PotionEffect nexteffect = effects.next();
+					/*
 					if (nexteffect.getType().getName().compareTo(PotionEffectType.INCREASE_DAMAGE.getName())==0) {
 						if (nexteffect.getAmplifier()>0) {
 							p.removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
 							p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,nexteffect.getDuration()*4,0));
 						}
-					}
+					}*/
 					if (nexteffect.getType().getName().compareTo(PotionEffectType.SPEED.getName())==0) {
 						if (nexteffect.getDuration()<47479999) {
 							//This is not a buff we applied via our plugin.

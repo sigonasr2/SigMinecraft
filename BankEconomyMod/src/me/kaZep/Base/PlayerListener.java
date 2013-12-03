@@ -74,6 +74,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Skeleton.SkeletonType;
+import org.bukkit.entity.Slime;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.Wolf;
@@ -227,6 +228,9 @@ implements Listener
 	}
 
 	enum Cube { SMALL, LARGE, ENDER }
+	enum SpecialMob { COUNTER_SLIME, VIRAL_SPIDER, SILENCER,
+		HOUND_CALLER, FISH_CALLER, EXPLOSIVE_BOMBER, SUICIDAL_CREEPER,
+		CHILLING_GOLEM, POWERSURGE_ZOMBIE, LIGHTNING_MAGE }
 
 	public boolean naturalBlock(Material mat) {
 		List<Material> natural_mats = new ArrayList<Material>();
@@ -406,14 +410,39 @@ implements Listener
 			if (e.getContents().getIngredient().getType()==Material.GHAST_TEAR) {
 				this.plugin.gainMoneyExp(owner,"Brewer",0.30*mult,20*mult);
 			}
-			if (this.plugin.getJobLv("Brewer", owner)>=10) {
+			if (this.plugin.hasJobBuff("Brewer", owner, Job.JOB30A)) {
 				ItemStack[] items = e.getContents().getContents();
 				for (int i=0;i<items.length;i++) {
 					if (items[i]!=null) {
-						if (items[i].getType()==Material.POTION) {
-							if (items[i].getAmount()<2) {
-								//items[i].setAmount(2);
-							}
+						if (e.getContents().getIngredient().getType()==Material.BLAZE_POWDER ||
+								items[i].getDurability()==8201 ||
+								items[i].getDurability()==8233 ||
+								items[i].getDurability()==8265 ||
+								items[i].getDurability()==16393 ||
+								items[i].getDurability()==16425 ||
+								items[i].getDurability()==16457) {
+							ItemMeta meta = items[i].getItemMeta();
+							List<String> lore = new ArrayList<String>();
+							lore.add(ChatColor.GOLD+"");
+							lore.add(ChatColor.GOLD+"Custom Effects:");
+							lore.add(ChatColor.GOLD+"Applies "+ChatColor.GRAY+"Strength IV"+ChatColor.GOLD+".");
+							meta.setLore(lore);
+							items[i].setItemMeta(meta);
+						}
+						if (e.getContents().getIngredient().getType()==Material.SPECKLED_MELON ||
+								items[i].getDurability()==8197 ||
+								items[i].getDurability()==8229 ||
+								items[i].getDurability()==8261 ||
+								items[i].getDurability()==16389 ||
+								items[i].getDurability()==16421 ||
+								items[i].getDurability()==16453) {
+							ItemMeta meta = items[i].getItemMeta();
+							List<String> lore = new ArrayList<String>();
+							lore.add(ChatColor.GOLD+"");
+							lore.add(ChatColor.GOLD+"Custom Effects:");
+							lore.add(ChatColor.GOLD+"Heals 4x more Health.");
+							meta.setLore(lore);
+							items[i].setItemMeta(meta);
 						}
 					}
 				}
@@ -2485,7 +2514,7 @@ implements Listener
 				if (nearbylist.get(k).getType()==EntityType.PLAYER) {
 					//This is a player.
 					Player g = (Player)nearbylist.get(k);
-					maxgroup+=plugin.getJobTotalLvs(g)/20;
+					maxgroup+=plugin.getJobTotalLvs(g)/10;
 					totallvs+=plugin.getJobTotalLvs(g);
 					////Bukkit.getLogger().info("Mob maxgroup increased to "+maxgroup+" down here.");
 				}
@@ -2547,6 +2576,36 @@ implements Listener
 					}
 
 					double levelsmult=1.0;
+					
+					double COUNTER_SLIME_SPAWN_RATE = 0.01,
+							VIRAL_SPIDER_SPAWN_RATE = 0.2;
+					
+					if (totallvs>80*levelsmult) {
+						//Try to spawn a counter slime.
+						if (Math.random()<=COUNTER_SLIME_SPAWN_RATE) {
+							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.SLIME);
+							Slime s = (Slime)entity;
+							//Bukkit.getLogger().info("Counter Slime spawned at "+s.getLocation().toString());
+							s.setSize((int)(Math.random()*3)+2);
+							LivingEntity l = (LivingEntity)entity;
+							l.setCustomName(ChatColor.RED+"Counter Slime");
+							l.setCustomNameVisible(true);
+						}
+						//Try to spawn a Viral Spider.
+						if (Math.random()<=VIRAL_SPIDER_SPAWN_RATE) {
+							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.SPIDER);
+							LivingEntity l = (LivingEntity)entity;
+							l.setCustomName(ChatColor.RED+"Viral Spider");
+							l.setCustomNameVisible(true);
+							Bukkit.getLogger().info("Viral Spider spawned at "+l.getLocation().toString());
+							l.setMaxHealth(85);
+							l.setHealth(85);
+							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
+						}
+					}
+					
+					
+					
 					if (totallvs>20*levelsmult) {
 						if (totallvs<40*levelsmult) {
 							//Can't have baby zombies at this level.
@@ -4506,60 +4565,163 @@ implements Listener
 			}
 		} else
 			if (e.getItem().getType()==Material.POTION) {
+				if (e.getItem().getDurability()!=0) {
+					Potion pot = Potion.fromItemStack(e.getItem());
+					//Bukkit.getLogger().info("Potion type is "+pot.getType()+", Level is "+pot.getLevel());
+					PotionEffectType typeset = null;
+					if (pot.getType()!=null) {
+						switch (pot.getType()) {
+							case FIRE_RESISTANCE: {
+								typeset = PotionEffectType.FIRE_RESISTANCE;
+							}break;
+							case SPEED: {
+								typeset = PotionEffectType.SPEED;
+							}break;
+							case POISON: {
+								typeset = PotionEffectType.POISON;
+							}break;
+							case NIGHT_VISION: {
+								typeset = PotionEffectType.NIGHT_VISION;
+							}break;
+							case REGEN: {
+								typeset = PotionEffectType.REGENERATION;
+							}break;
+							case WEAKNESS: {
+								typeset = PotionEffectType.WEAKNESS;
+							}break;
+							case STRENGTH: {
+								typeset = PotionEffectType.INCREASE_DAMAGE;
+							}break;
+							case SLOWNESS: {
+								typeset = PotionEffectType.SLOW;
+							}break;
+							case INVISIBILITY: {
+								typeset = PotionEffectType.INVISIBILITY;
+							}break;
+						}
+					}
+					/*
+					if (e.getItem().getItemMeta().hasLore() &&
+						e.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"30 Minute Duration")) {
+							if (typeset!=null) {
+								//Apply a 30 minute buff on it.
+								p.addPotionEffect(new PotionEffect(typeset, 36000, pot.getLevel()-1),true);
+							}
+						}*/
+				}
 				//p.sendMessage("This is the data: "+e.getItem().getData());
-				if (e.getItem().getDurability()==8233 && e.getItem().getItemMeta().hasLore() &&
+				if (e.getItem().getDurability()==11 && e.getItem().getItemMeta().hasLore() &&
 						e.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (1:30)")) {
-					e.setItem(new ItemStack(Material.POTION));
 					int duration = 1800;
 					if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20)) {
-						duration*=2;
+						//duration*=2;
 					}
 					p.sendMessage(ChatColor.YELLOW+"Increased Attack speed by 50% for "+((duration==1800)?"1:30":"3:00")+".");
 					this.plugin.getPlayerData(p).furytime=Main.SERVER_TICK_TIME+duration;
 					this.plugin.getPlayerData(p).furyamt=50;
 				}
-				if (e.getItem().getDurability()==8265 && e.getItem().getItemMeta().hasLore() &&
+				if (e.getItem().getDurability()==15 && e.getItem().getItemMeta().hasLore() &&
 						e.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+150% Attack Speed (0:45)")) {
-					e.setItem(new ItemStack(Material.POTION));
 					int duration = 900;
 					if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20)) {
-						duration*=2;
+						//duration*=2;
 					}
-					p.sendMessage(ChatColor.YELLOW+"Increased Attack speed by 50% for "+((duration==900)?"0:45":"1:30")+".");
+					p.sendMessage(ChatColor.YELLOW+"Increased Attack speed by 150% for "+((duration==900)?"0:45":"1:30")+".");
 					this.plugin.getPlayerData(p).furytime=Main.SERVER_TICK_TIME+duration;
 					this.plugin.getPlayerData(p).furyamt=150;
 				}
-				if (e.getItem().getDurability()==8193 && e.getItem().getItemMeta().hasLore() &&
+				if (e.getItem().getDurability()==23 && e.getItem().getItemMeta().hasLore() &&
+						e.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (3:15)")) {
+					int duration = 3900;
+					if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20)) {
+						//duration*=2;
+					}
+					p.sendMessage(ChatColor.YELLOW+"Increased Attack speed by 50% for "+((duration==3900)?"3:15":"6:30")+".");
+					this.plugin.getPlayerData(p).furytime=Main.SERVER_TICK_TIME+duration;
+					this.plugin.getPlayerData(p).furyamt=50;
+				}
+				if (e.getItem().getDurability()==27 && e.getItem().getItemMeta().hasLore() &&
 						e.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+20% Damage Resistance (2:00)")) {
-					e.setItem(new ItemStack(Material.POTION));
 					int duration = 2400;
 					if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20)) {
-						duration*=2;
+						//duration*=2;
 					}
 					p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,duration,0),true);
 				}
-				if (e.getItem().getDurability()==8225 && e.getItem().getItemMeta().hasLore() &&
-						e.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+40% Damage Resistance (1:00)")) {
-					e.setItem(new ItemStack(Material.POTION));
+				if (e.getItem().getDurability()==31 && e.getItem().getItemMeta().hasLore() &&
+						e.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+40% Damage Resistance (1:20)")) {
 					int duration = 1200;
 					if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20)) {
-						duration*=2;
+						//duration*=2;
 					}
 					p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,duration,1),true);
 				}
-				if (e.getItem().getDurability()==8257 && e.getItem().getItemMeta().hasLore() &&
-						e.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+20% Damage Resistance (4:50)")) {
-					e.setItem(new ItemStack(Material.POTION));
-					int duration = 5800;
+				if (e.getItem().getDurability()==39 && e.getItem().getItemMeta().hasLore() &&
+						e.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+20% Damage Resistance (3:50)")) {
+					int duration = 4600;
 					if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20)) {
-						duration*=2;
+						//duration*=2;
 					}
 					p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,duration,0),true);
 				}
-				if (e.getItem().getDurability()==8204 && e.getItem().getItemMeta().hasLore() &&
+				if (e.getItem().getDurability()==39 && e.getItem().getItemMeta().hasLore() &&
+						e.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"sources. (1:20)")) {
+					int duration = 1600;
+					if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20)) {
+						//duration*=2;
+					}
+					//p.addPotionEffect(new PotionEffect(PotionEffectType.DA,duration,0),true);
+					p.sendMessage(ChatColor.YELLOW+"Gained Invulnerability buff for "+((duration==1600)?"1:20":"2:40")+".");
+					this.plugin.getPlayerData(p).invulntime=Main.SERVER_TICK_TIME+duration;
+				}
+				if (e.getItem().getItemMeta().hasLore() &&
+						e.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"Applies "+ChatColor.GRAY+"Strength IV"+ChatColor.GOLD+".")) {
+					int duration = 1600;
+					switch (e.getItem().getDurability()) {
+						case 8201:{duration=3600;}break;
+						case 8233:{duration=1800;}break;
+						case 8265:{duration=9600;}break;
+					}
+					
+					if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20)) {
+						//duration*=2;
+					}
+					p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,duration,3),true);
+					//p.sendMessage(ChatColor.YELLOW+"Gained Invulnerability buff for "+((duration==1600)?"1:20":"2:40")+".");
+					//this.plugin.getPlayerData(p).invulntime=Main.SERVER_TICK_TIME+duration;
+				}
+				if (e.getItem().getItemMeta().hasLore() &&
+						e.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"Heals 4x more Health.")) {
+					int duration = 1600;
+					switch (e.getItem().getDurability()) {
+						case 8201:{duration=3600;}break;
+						case 8233:{duration=1800;}break;
+						case 8265:{duration=9600;}break;
+					}
+					
+					if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20)) {
+						//duration*=2;
+					}
+					//p.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,duration,3),true);
+					if (e.getItem().getDurability()==8197 ||
+							e.getItem().getDurability()==8261) {
+						if (p.getHealth()+16>=p.getMaxHealth()) {
+							p.setHealth(p.getMaxHealth());
+						} else {
+							p.setHealth(p.getHealth()+16);
+						}
+					} else {
+						if (p.getHealth()+32>=p.getMaxHealth()) {
+							p.setHealth(p.getMaxHealth());
+						} else {
+							p.setHealth(p.getHealth()+32);
+						}
+					}
+					//p.sendMessage(ChatColor.YELLOW+"Gained Invulnerability buff for "+((duration==1600)?"1:20":"2:40")+".");
+					//this.plugin.getPlayerData(p).invulntime=Main.SERVER_TICK_TIME+duration;
+				}
+				if (e.getItem().getDurability()==7 && e.getItem().getItemMeta().hasLore() &&
 						e.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"Drink to reveal nearby mob tags.")) {
-					//Remove the harming effect.
-					e.setItem(new ItemStack(Material.POTION));
 					//Now go ahead and reveal all nearby nametags.
 					List<Entity> nearby = p.getNearbyEntities(30, 20, 30);
 					for (int i=0;i<nearby.size();i++) {
@@ -4577,39 +4739,38 @@ implements Listener
 					} else {
 						this.plugin.last_sight_check_time = Main.SERVER_TICK_TIME;
 					}
-					return;
-				}
-				Potion pot = Potion.fromDamage(e.getItem().getData().getData());
-				if (pot.getType()==PotionType.SPEED) {
-					//p.sendMessage("This is a speed "+pot.getLevel()+" potion.");
-					for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
-						if (this.plugin.SPEED_CONTROL.get(i).p.getName().compareTo(p.getName().toLowerCase())==0) {
-							this.plugin.SPEED_CONTROL.get(i).potion_spdlv=pot.getLevel();
-							if (pot.hasExtendedDuration()) {
-								this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+4800;
-							} else {
-								if (pot.getLevel()==1) {
-									this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+2400;
-								} else {
-									this.plugin.SPEED_CONTROL.get(i).potion_time=Main.SERVER_TICK_TIME+1200;
-								}
-							}
-							this.plugin.SPEED_CONTROL.get(i).updatePlayerSpd();
-							break;
-						}
-					}
-				}
-
-				if (pot.getType()==PotionType.INSTANT_HEAL) {
-					if (!p.isDead()) {
-						if (p.getHealth()+24>p.getMaxHealth()) {
-							p.setHealth(p.getMaxHealth());
-						} else {
-							p.setHealth(p.getHealth()+24);
-						}
-					}
 				}
 			}
+	}
+	
+	/**
+	 * Converts a number of ticks to a timestamp.
+	 * @param ticks The number of game ticks to convert.
+	 * @return A string containing the timestamp in format: (XX:XX:XX).
+	 *  If it's just seconds, it returns X seconds.
+	 */
+	private String convertTime(int ticks) {
+		boolean hours=false,minutes=false,secs=false;
+		Bukkit.getLogger().info("Convert "+ticks+" ticks.");
+		if (ticks>0) {
+			secs=true;
+		}
+		if (ticks>=1200) {
+			minutes=true;
+		}
+		if (ticks>=72000) {
+			hours=true;
+		}
+		if (hours) {
+			return ((ticks/72000)%24)+":"+((((ticks/1200)%60)<10)?"0"+((ticks/1200)%60):((ticks/1200)%60))+":"+((((ticks/20)%60)<10)?"0"+((ticks/20)%60):((ticks/20)%60));
+		}
+		if (minutes) {
+			return ((ticks/1200)%60)+":"+((((ticks/20)%60)<10)?"0"+((ticks/20)%60):((ticks/20)%60));
+		}
+		if (secs) {
+			return ""+((ticks/20)%60)+" seconds";
+		}
+		return "";
 	}
 
 	@EventHandler
@@ -4617,71 +4778,208 @@ implements Listener
 		ThrownPotion pot = e.getEntity();
 		LivingEntity theshooter = pot.getShooter();
 		if (pot.getItem().getItemMeta().hasLore() &&
-				pot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (1:15)")) {
-			int duration = 1500;
+				pot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (1:20)")) {
+			int duration = 1600;
 			if (theshooter instanceof Player) {
 				Player pshooter = (Player)theshooter;
 				if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB20)) {
 					duration*=2;
 				}
+				if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB40)) {
+					duration=36000;
+				}
 			}
 			Collection<LivingEntity> splashed = e.getAffectedEntities();
 			for (LivingEntity l : splashed) {
+				duration = (int)(e.getIntensity(l)*duration);
 				if (l instanceof Player) {
 					Player p = (Player)l;
 					if (theshooter instanceof Player) {
-						p.sendMessage(ChatColor.YELLOW+"Gained +50% Attack Speed buff for "+((duration==1500)?"1:15":"2:30")+" from "+(Player)theshooter+".");
+						p.sendMessage(ChatColor.YELLOW+"Gained +50% Attack Speed buff for "+(convertTime(duration))+" from "+((Player)theshooter).getName()+".");
 					}
 					this.plugin.getPlayerData(p).furytime=Main.SERVER_TICK_TIME+duration;
 					this.plugin.getPlayerData(p).furyamt=50;
 				}
 			}
-			pot.setItem(new ItemStack(Material.POTION));
 		} else
 		if (pot.getItem().getItemMeta().hasLore() &&
-				pot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (3:00)")) {
-			int duration = 3600;
+				pot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (2:30)")) {
+			int duration = 3000;
 			if (theshooter instanceof Player) {
 				Player pshooter = (Player)theshooter;
 				if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB20)) {
 					duration*=2;
 				}
+				if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB40)) {
+					duration=36000;
+				}
 			}
 			Collection<LivingEntity> splashed = e.getAffectedEntities();
 			for (LivingEntity l : splashed) {
+				duration = (int)(e.getIntensity(l)*duration);
 				if (l instanceof Player) {
 					Player p = (Player)l;
 					if (theshooter instanceof Player) {
-						p.sendMessage(ChatColor.YELLOW+"Gained +50% Attack Speed buff for "+((duration==3600)?"3":"6")+":00 from "+(Player)theshooter+".");
+						p.sendMessage(ChatColor.YELLOW+"Gained +50% Attack Speed buff for "+(convertTime(duration))+" from "+((Player)theshooter).getName()+".");
 					}
 					this.plugin.getPlayerData(p).furytime=Main.SERVER_TICK_TIME+duration;
 					this.plugin.getPlayerData(p).furyamt=50;
 				}
 			}
-			pot.setItem(new ItemStack(Material.POTION));
 		} else
 		if (pot.getItem().getItemMeta().hasLore() &&
-				pot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+40% Damage Resistance (0:45)")) {
-			int duration = 900;
+				pot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+150% Attack Speed (0:30)")) {
+			int duration = 600;
 			if (theshooter instanceof Player) {
 				Player pshooter = (Player)theshooter;
 				if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB20)) {
 					duration*=2;
 				}
+				if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB40)) {
+					duration=36000;
+				}
 			}
 			Collection<LivingEntity> splashed = e.getAffectedEntities();
 			for (LivingEntity l : splashed) {
+				duration = (int)(e.getIntensity(l)*duration);
 				if (l instanceof Player) {
 					Player p = (Player)l;
 					if (theshooter instanceof Player) {
-						p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,duration,1),true);
-						//p.sendMessage(ChatColor.YELLOW+"Gained +50% Attack Speed buff for "+((duration==900)?"0:45":"1:30")+" from "+(Player)theshooter+".");
+						p.sendMessage(ChatColor.YELLOW+"Gained +150% Attack Speed buff for "+(convertTime(duration))+" from "+((Player)theshooter).getName()+".");
 					}
+					this.plugin.getPlayerData(p).furytime=Main.SERVER_TICK_TIME+duration;
+					this.plugin.getPlayerData(p).furyamt=150;
 				}
 			}
-			pot.setItem(new ItemStack(Material.POTION));
+		} else
+		if (pot.getItem().getItemMeta().hasLore() &&
+				pot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+20% Damage Resistance (1:45)")) {
+			int duration = 2100;
+			if (theshooter instanceof Player) {
+				Player pshooter = (Player)theshooter;
+				if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB20)) {
+					duration*=2;
+				}
+				if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB40)) {
+					duration=36000;
+				}
+			}
+			Collection<LivingEntity> splashed = e.getAffectedEntities();
+			for (LivingEntity l : splashed) {
+				duration = (int)(e.getIntensity(l)*duration);
+				if (l instanceof Player) {
+					Player p = (Player)l;
+					p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, 0),true);
+				}
+			}
+		} else
+		if (pot.getItem().getItemMeta().hasLore() &&
+				pot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+40% Damage Resistance (1:00)")) {
+			int duration = 1200;
+			if (theshooter instanceof Player) {
+				Player pshooter = (Player)theshooter;
+				if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB20)) {
+					duration*=2;
+				}
+				if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB40)) {
+					duration=36000;
+				}
+			}
+			Collection<LivingEntity> splashed = e.getAffectedEntities();
+			for (LivingEntity l : splashed) {
+				duration = (int)(e.getIntensity(l)*duration);
+				if (l instanceof Player) {
+					Player p = (Player)l;
+					p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, 1),true);
+				}
+			}
+		} else
+		if (pot.getItem().getItemMeta().hasLore() &&
+				pot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+20% Damage Resistance (2:45)")) {
+			int duration = 3300;
+			if (theshooter instanceof Player) {
+				Player pshooter = (Player)theshooter;
+				if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB20)) {
+					duration*=2;
+				}
+				if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB40)) {
+					duration=36000;
+				}
+			}
+			Collection<LivingEntity> splashed = e.getAffectedEntities();
+			for (LivingEntity l : splashed) {
+				duration = (int)(e.getIntensity(l)*duration);
+				if (l instanceof Player) {
+					Player p = (Player)l;
+					p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, 0),true);
+				}
+			}
+		} else
+			if (pot.getItem().getItemMeta().hasLore() &&
+					pot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"Heals 4x more Health.")) {
+				int duration = 3300;
+				if (theshooter instanceof Player) {
+					Player pshooter = (Player)theshooter;
+					if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB20)) {
+						duration*=2;
+					}
+					if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB40)) {
+						duration=36000;
+					}
+				}
+				Collection<LivingEntity> splashed = e.getAffectedEntities();
+				for (LivingEntity l : splashed) {
+					duration = (int)(e.getIntensity(l)*duration);
+					if (l instanceof Player) {
+						Player p = (Player)l;
+						//p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, duration, 0),true);
+						if (pot.getItem().getDurability()==8197 || pot.getItem().getDurability()==8261 ||
+								 pot.getItem().getDurability()==16389 || pot.getItem().getDurability()==16453) {
+							//This is a weak heal.
+							if (p.getHealth()+((int)(16*e.getIntensity(l)))>=p.getMaxHealth()) {
+								p.setHealth(p.getMaxHealth());
+							} else {
+								p.setHealth(p.getHealth()+((int)(16*e.getIntensity(l))));
+							}
+						} else {
+							//Strong heals all day here.
+							if (p.getHealth()+((int)(32*e.getIntensity(l)))>=p.getMaxHealth()) {
+								p.setHealth(p.getMaxHealth());
+							} else {
+								p.setHealth(p.getHealth()+((int)(32*e.getIntensity(l))));
+							}
+						}
+					}
+				}
+			} else
+		if (pot.getItem().getItemMeta().hasLore() &&
+				pot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"sources. (0:55)")) {
+			int duration = 1100;
+			if (theshooter instanceof Player) {
+				Player pshooter = (Player)theshooter;
+				if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB20)) {
+					//duration*=2;
+				}
+			}
+			Collection<LivingEntity> splashed = e.getAffectedEntities();
+			for (LivingEntity l : splashed) {
+				duration = (int)(e.getIntensity(l)*duration);
+				if (l instanceof Player) {
+					Player p = (Player)l;
+					//p.addPotionEffect(new PotionEffect(PotionEffectType., duration, 0),true);
+					if (theshooter instanceof Player) {
+						p.sendMessage(ChatColor.YELLOW+"Gained Invulnerability buff for "+(convertTime(duration))+" from "+((Player)theshooter).getName()+".");
+					}
+					this.plugin.getPlayerData(p).invulntime = Main.SERVER_TICK_TIME + duration;
+				}
+			}
 		} else
 		if (theshooter instanceof Player) {
+			boolean strengthbuff = false;
+			if (pot.getItem().getItemMeta().hasLore() &&
+					pot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"Applies "+ChatColor.GRAY+"Strength IV"+ChatColor.GOLD+".")) {
+				strengthbuff=true;
+			}
 			Player pshooter = (Player)theshooter;
 			if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB20)) {
 				Collection<PotionEffect> poteffects = pot.getEffects();
@@ -4694,11 +4992,43 @@ implements Listener
 					//Now we just have to double the duration of all types for the affected players.
 					if (l instanceof Player) {
 						final Player p = (Player)l;
+						final boolean strength = strengthbuff;
 						Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 							@Override
 							public void run() {
 								for (int i=0;i<activeeffects.size();i++) {
-									p.addPotionEffect(new PotionEffect(activeeffects.get(i).getType(), activeeffects.get(i).getDuration()*2, activeeffects.get(i).getAmplifier()),true);
+									if (activeeffects.get(i).getType()==PotionEffectType.INCREASE_DAMAGE && strength) {
+										p.addPotionEffect(new PotionEffect(activeeffects.get(i).getType(), activeeffects.get(i).getDuration()*2, 3),true);
+									} else {
+										p.addPotionEffect(new PotionEffect(activeeffects.get(i).getType(), activeeffects.get(i).getDuration()*2, activeeffects.get(i).getAmplifier()),true);
+									}
+								}
+							}
+						},5);
+					}
+				}
+			}
+			if (this.plugin.hasJobBuff("Brewer", pshooter, Job.JOB40)) {
+				Collection<PotionEffect> poteffects = pot.getEffects();
+				final List<PotionEffect> activeeffects = new ArrayList<PotionEffect>();
+				for (PotionEffect p : poteffects) {
+					activeeffects.add(p);
+				}
+				Collection<LivingEntity> splashed = e.getAffectedEntities();
+				for (LivingEntity l : splashed) {
+					//Now we just have to double the duration of all types for the affected players.
+					if (l instanceof Player) {
+						final Player p = (Player)l;
+						final boolean strength = strengthbuff;
+						Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+							@Override
+							public void run() {
+								for (int i=0;i<activeeffects.size();i++) {
+									if (activeeffects.get(i).getType()==PotionEffectType.INCREASE_DAMAGE && strength) {
+										p.addPotionEffect(new PotionEffect(activeeffects.get(i).getType(), 36000, 3),true);
+									} else {
+										p.addPotionEffect(new PotionEffect(activeeffects.get(i).getType(), 36000, activeeffects.get(i).getAmplifier()),true);
+									}
 								}
 							}
 						},5);
@@ -7266,6 +7596,38 @@ implements Listener
 					// 0.5% chance of loot chest dropping
 				    f.getWorld().dropItemNaturally(f.getLocation(), this.plugin.generate_LootChest());
 				}
+				if (f.getCustomName()!=null && f.getCustomName().contains(ChatColor.RED+"Viral Spider")) {
+					List<Entity> nearents = f.getNearbyEntities(20, 20, 20);
+					for (int i=0;i<nearents.size();i++) {
+						if (nearents.get(i) instanceof Player) {
+							Player p = (Player)(nearents.get(i));
+							if (p.hasPotionEffect(PotionEffectType.POISON)) {
+								int poisonlevel=0;
+								Collection<PotionEffect> pots = p.getActivePotionEffects();
+								for (PotionEffect effect : pots) {
+									if (effect.getType().getName().equalsIgnoreCase("poison")) {
+										poisonlevel = effect.getAmplifier();
+										break;
+									}
+								}
+								if (poisonlevel>0) {
+									if (p.getHealth()-(poisonlevel/1.5d)>0) {
+										p.setHealth(p.getHealth()-(poisonlevel/1.5d));
+									} else {
+										p.setHealth(0);
+									}
+									DecimalFormat df = new DecimalFormat("#0.0");
+									DecimalFormat df2 = new DecimalFormat("#0");
+									double dmg = poisonlevel/1.5d;
+									if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
+										p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(dmg)+" damage from "+ChatColor.WHITE+"POISON EXPUNGE"+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((dmg)/p.getMaxHealth())*100)+"%)");
+									}
+									p.playSound(p.getLocation(), Sound.ZOMBIE_WOODBREAK, 1.0f, 0.8f);
+								}
+							}
+						}
+					}
+				}
 				if (f instanceof Zombie) {
 					Zombie z = (Zombie)f;
 					if (z.isBaby()) {
@@ -8168,6 +8530,10 @@ implements Listener
 		final EntityDamageEvent f = e;
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			final Player p = (Player)e.getEntity();
+			if (this.plugin.getPlayerData(p).invulntime!=0) {
+				//Bukkit.getLogger().info("Invuln time");
+				e.setDamage(0);
+			}
 			if (this.plugin.hasJobBuff("Hunter", p, Job.JOB40)) {
 				e.setDamage(e.getDamage()*0.70d);
 			}
@@ -8396,6 +8762,15 @@ implements Listener
 			if (p.getItemInHand().getType().name().toLowerCase().contains("axe") && !p.getItemInHand().getType().name().toLowerCase().contains("pickaxe") && this.plugin.hasJobBuff("Woodcutter", p, Job.JOB30A)) {
 				p.getItemInHand().setDurability((short)0);
 			}
+			Collection<PotionEffect> effects = p.getActivePotionEffects();
+			for (PotionEffect pe : effects) {
+				if (pe.getType()==PotionEffectType.INCREASE_DAMAGE) {
+					//We have to first lower damage to what it should be without the amplification.
+					e.setDamage(e.getDamage()/(pe.getAmplifier()*1.3));
+					//Now apply only 30% increase per level.
+					e.setDamage(e.getDamage()+(e.getDamage()*(pe.getAmplifier()*0.3)));
+				}
+			}
 		}
 		if (e.getEntity() instanceof Player) {
 			Player p = (Player)e.getEntity();
@@ -8411,6 +8786,90 @@ implements Listener
 
 		if (e.getEntity() instanceof LivingEntity) {
 			final LivingEntity l = (LivingEntity)e.getEntity();
+			if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Viral Spider")) {
+				if (e.getDamager() instanceof LivingEntity) {
+					LivingEntity l2 = (LivingEntity)e.getDamager();
+					int poisonlevel=-1;
+					Collection<PotionEffect> effects = l2.getActivePotionEffects();
+					for (PotionEffect pot : effects) {
+						if (pot.getType().getName().equalsIgnoreCase("poison")) {
+							poisonlevel = pot.getAmplifier();
+							//Bukkit.getLogger().info("Poison level is "+poisonlevel);
+							break;
+						}
+					}
+					poisonlevel+=2;
+					l2.addPotionEffect(new PotionEffect(PotionEffectType.POISON, poisonlevel*20+60, poisonlevel),true);
+				}
+				if (e.getDamager() instanceof Projectile) {
+					Projectile proj = (Projectile)e.getDamager();
+					if (proj.getShooter() instanceof LivingEntity) {
+						LivingEntity l2 = (LivingEntity)proj.getShooter();
+						int poisonlevel=-1;
+						Collection<PotionEffect> effects = l2.getActivePotionEffects();
+						for (PotionEffect pot : effects) {
+							if (pot.getType()==PotionEffectType.POISON) {
+								poisonlevel = pot.getAmplifier();
+								break;
+							}
+						}
+						poisonlevel+=2;
+						l2.addPotionEffect(new PotionEffect(PotionEffectType.POISON, poisonlevel*20+60, poisonlevel),true);
+					}
+				}
+			}
+			if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Counter Slime")) {
+				if (e.getDamager() instanceof LivingEntity) {
+					LivingEntity l2 = (LivingEntity)e.getDamager();
+					double dmg = this.plugin.DMGCALC.getDamage(l2.getEquipment().getHelmet(), l2.getEquipment().getChestplate(), l2.getEquipment().getLeggings(), l2.getEquipment().getBoots(), e.getDamage()*2, e.getCause(), false);
+					if (l2.getHealth()-dmg>0) {
+						l2.setHealth(l2.getHealth()-dmg);
+						if (l2 instanceof Player) {
+							Player p = (Player)l2;
+							p.playSound(p.getLocation(), Sound.HURT_FLESH, 0.5f, 1.0f);
+							DecimalFormat df = new DecimalFormat("#0.0");
+							DecimalFormat df2 = new DecimalFormat("#0");
+							if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
+								p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(dmg)+" damage from "+ChatColor.RED+"COUNTER SLIME"+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((dmg)/p.getMaxHealth())*100)+"%)");
+							}
+						}
+					} else {
+						if (l2 instanceof Player) {
+							Player p = (Player)l2;
+							p.setLastDamage(dmg);
+							p.setLastDamageCause(new EntityDamageEvent(l, e.getCause().ENTITY_ATTACK, dmg));
+						}
+						l2.setHealth(0);
+						
+					}
+				}
+				if (e.getDamager() instanceof Projectile) {
+					Projectile proj = (Projectile)e.getDamager();
+					if (proj.getShooter() instanceof LivingEntity) {
+						LivingEntity l2 = (LivingEntity)proj.getShooter();
+						double dmg = this.plugin.DMGCALC.getDamage(l2.getEquipment().getHelmet(), l2.getEquipment().getChestplate(), l2.getEquipment().getLeggings(), l2.getEquipment().getBoots(), e.getDamage()*2, e.getCause(), false);
+						if (l2.getHealth()-dmg>0) {
+							l2.setHealth(l2.getHealth()-dmg);
+							if (l2 instanceof Player) {
+								Player p = (Player)l2;
+								p.playSound(p.getLocation(), Sound.HURT, 0.5f, 1.0f);
+								DecimalFormat df = new DecimalFormat("#0.0");
+								DecimalFormat df2 = new DecimalFormat("#0");
+								if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
+									p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(dmg)+" damage from "+ChatColor.RED+"COUNTER SLIME"+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((dmg)/p.getMaxHealth())*100)+"%)");
+								}
+							}
+						} else {
+							if (l2 instanceof Player) {
+								Player p = (Player)l2;
+								p.setLastDamage(dmg);
+								p.setLastDamageCause(new EntityDamageEvent(l, e.getCause().ENTITY_ATTACK, dmg));
+							}
+							l2.setHealth(0);
+						}
+					}
+				}
+			}
 			if (e.getDamager().getType()==EntityType.FISHING_HOOK) {
 				//See if any nearby players are casting lines.
 				List<Entity> nearbyents = l.getNearbyEntities(20, 20, 20);
@@ -9506,6 +9965,9 @@ implements Listener
 							}
 						}
 					}
+					if (this.plugin.getPlayerData(p).furytime!=0) {
+						attack_speed+=this.plugin.getPlayerData(p).furyamt;
+					}
 					if (critical_chance>0) {
 						if (Math.random()<=critical_chance/100.0d) {
 							e.setDamage(e.getDamage()*2);
@@ -9665,6 +10127,9 @@ implements Listener
 									dmg+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
 								}
 							}
+						}
+						if (this.plugin.getPlayerData(p).furytime!=0) {
+							attack_speed+=this.plugin.getPlayerData(p).furyamt;
 						}
 						if (critical_chance>0) {
 							if (Math.random()<=critical_chance/100.0d) {
@@ -10829,12 +11294,85 @@ implements Listener
 			if (event.getCursor()!=null && ((event.getCursor().getType()==Material.INK_SACK && event.getCursor().getData().getData()==4) ||
 					event.getCursor().getType()==Material.EYE_OF_ENDER ||
 					event.getCursor().getType()==Material.SULPHUR ||
+					event.getCursor().getType()==Material.REDSTONE ||
+					event.getCursor().getType()==Material.GLOWSTONE_DUST ||
 					event.getCursor().getType()==Material.BLAZE_ROD ||
-					event.getCursor().getType()==Material.OBSIDIAN)) {
+					event.getCursor().getType()==Material.OBSIDIAN ||
+					event.getCursor().getType()==Material.WATER)) {
 					event.setResult(Result.ALLOW);
-					event.getInventory().setItem(3, event.getCursor());
-					event.setCursor(new ItemStack(Material.AIR));
+					//p.updateInventory();
+					//Subtract 1 from cursor.
+					//If the item matches or it's blank.
+					if (event.getInventory().getItem(3)!=null) {
+						if (event.getClick()==ClickType.LEFT) {
+							if (event.getInventory().getItem(3).getType()==event.getCursor().getType() || event.getInventory().getItem(3).getType()==Material.AIR) {
+								int amt = event.getInventory().getItem(3).getAmount();
+								if (amt+event.getCursor().getAmount()>event.getInventory().getItem(3).getMaxStackSize()) {
+									//We have to split it, and put some back on the cursor.
+									int leftover = amt+event.getCursor().getAmount()-event.getInventory().getItem(3).getMaxStackSize();
+									ItemStack newamt = event.getInventory().getItem(3).clone();
+									ItemStack newamt2 = event.getInventory().getItem(3).clone(); newamt2.setAmount(event.getInventory().getItem(3).getMaxStackSize());
+									newamt.setAmount(leftover);
+									event.getInventory().setItem(3, newamt2);
+									event.setCursor(newamt);
+								} else {
+									//Just transfer it all.
+									event.getInventory().setItem(3, event.getCursor());
+									event.setCursor(new ItemStack(Material.AIR));
+								}
+							} else {
+								//Swap them.
+								ItemStack swap = event.getInventory().getItem(3).clone();
+								event.getInventory().setItem(3, event.getCursor());
+								event.setCursor(swap);
+							}
+						} else 
+						if (event.getClick()==ClickType.RIGHT) {
+							if (event.getInventory().getItem(3).getType()==event.getCursor().getType() || event.getInventory().getItem(3).getType()==Material.AIR) {
+								int amt = event.getInventory().getItem(3).getAmount();
+								if (amt+1>event.getInventory().getItem(3).getMaxStackSize()) {
+									//We have to split it, and put some back on the cursor.
+									int leftover = amt+1-event.getInventory().getItem(3).getMaxStackSize();
+									ItemStack newamt = event.getInventory().getItem(3).clone();
+									ItemStack newamt2 = event.getInventory().getItem(3).clone(); newamt2.setAmount(event.getInventory().getItem(3).getMaxStackSize());
+									newamt.setAmount(leftover);
+									event.getInventory().setItem(3, newamt2);
+									event.setCursor(newamt);
+								} else {
+									//Just transfer 1.
+									ItemStack curs = event.getCursor().clone();
+									ItemStack inven = event.getInventory().getItem(3).clone();
+									curs.setAmount(curs.getAmount()-1);
+									inven.setAmount(inven.getAmount()+1);
+									event.getInventory().setItem(3, inven);
+									event.setCursor(curs);
+								}
+							} else {
+								//Swap them.
+								ItemStack swap = event.getInventory().getItem(3).clone();
+								event.getInventory().setItem(3, event.getCursor());
+								event.setCursor(swap);
+							}
+						}
+					} else {
+						if (event.getClick()==ClickType.LEFT) {
+							event.getInventory().setItem(3, event.getCursor());
+							event.setCursor(new ItemStack(Material.AIR));
+						} else 
+						if (event.getClick()==ClickType.RIGHT) {
+							if (event.getCursor().getAmount()==1) {
+								event.getInventory().setItem(3, event.getCursor());
+								event.setCursor(new ItemStack(Material.AIR));
+							} else {
+								ItemStack curs = event.getCursor().clone(); curs.setAmount(curs.getAmount()-1);
+								ItemStack curs2 = event.getCursor().clone(); curs2.setAmount(1);
+								event.getInventory().setItem(3, curs2);
+								event.setCursor(curs);
+							}
+						}
+					}
 					p.updateInventory();
+					event.setCancelled(true);
 			}
 			if (event.getInventory().getItem(3)!=null) {
 				if ((event.getInventory().getItem(0)!=null && event.getInventory().getItem(0).getType()==Material.POTION)) {
@@ -10854,48 +11392,32 @@ implements Listener
 				//There is potentially a brew that will happen.
 				//Try to brew a Teleport Potion.
 				boolean brew=false;
+				short checkpot = 0; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"Teleports shooter to target"; //The string to look for to check for the potion.
 				if (pot1!=null && pot1.getDurability()==0) {brew=true;}
 				if (pot2!=null && pot2.getDurability()==0) {brew=true;}
 				if (pot3!=null && pot3.getDurability()==0) {brew=true;}
 				if (event.getInventory().getItem(3).getType()==Material.INK_SACK && brew) {
-					if (pot1!=null && pot1.getDurability()==0) {
-						pot1.setDurability((short)16453);
-						List<String> lore = new ArrayList<String>();
-						ItemMeta meta=pot1.getItemMeta();
-						meta.setDisplayName("Potion of Teleporting");
-						pot1.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-						lore.add("");
-						lore.add("Custom Effects: ");
-						lore.add(ChatColor.GOLD+"Teleports shooter to target");
-						lore.add(ChatColor.GOLD+"location.");
-						meta.setLore(lore);
-						pot1.setItemMeta(meta);
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)16391);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Potion of Teleporting");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"Teleports shooter to target");
+					lore.add(ChatColor.GOLD+"location.");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
 					}
-					if (pot2!=null && pot2.getDurability()==0) {
-						pot2.setDurability((short)16453);
-						List<String> lore = new ArrayList<String>();
-						ItemMeta meta=pot2.getItemMeta();
-						meta.setDisplayName("Potion of Teleporting");
-						pot2.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-						lore.add("");
-						lore.add("Custom Effects: ");
-						lore.add(ChatColor.GOLD+"Teleports shooter to target");
-						lore.add(ChatColor.GOLD+"location.");
-						meta.setLore(lore);
-						pot2.setItemMeta(meta);
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
 					}
-					if (pot3!=null && pot3.getDurability()==0) {
-						pot3.setDurability((short)16453);
-						List<String> lore = new ArrayList<String>();
-						ItemMeta meta=pot3.getItemMeta();
-						meta.setDisplayName("Potion of Teleporting");
-						pot3.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-						lore.add("");
-						lore.add("Custom Effects: ");
-						lore.add(ChatColor.GOLD+"Teleports shooter to target");
-						lore.add(ChatColor.GOLD+"location.");
-						meta.setLore(lore);
-						pot3.setItemMeta(meta);
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
 					}
 					if (event.getInventory().getItem(3).getAmount()==1) {
 						event.getInventory().setItem(3, new ItemStack(Material.AIR));
@@ -10905,6 +11427,8 @@ implements Listener
 						event.getInventory().setItem(3, newstack);
 					}
 					p.updateInventory();
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					return;
 				}
 				//Brewing stand get.
 				InventoryView brewing_stand = p.getOpenInventory();
@@ -10917,48 +11441,32 @@ implements Listener
 				//There is potentially a brew that will happen.
 				//Try to brew a Teleport Potion.
 				boolean brew=false;
-				if (pot1!=null && pot1.getDurability()==(short)16453 && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(ChatColor.GOLD+"Teleports shooter to target")) {brew=true;}
-				if (pot2!=null && pot2.getDurability()==(short)16453 && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(ChatColor.GOLD+"Teleports shooter to target")) {brew=true;}
-				if (pot3!=null && pot3.getDurability()==(short)16453 && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(ChatColor.GOLD+"Teleports shooter to target")) {brew=true;}
+				short checkpot = 16391; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"Teleports shooter to target"; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(checkstring)) {brew=true;}
 				if (event.getInventory().getItem(3).getType()==Material.EYE_OF_ENDER && brew) {
-					if (pot1!=null && pot1.getDurability()==(short)16453) {
-						pot1.setDurability((short)8204);
-						List<String> lore = new ArrayList<String>();
-						ItemMeta meta=pot1.getItemMeta();
-						meta.setDisplayName("Wondering Eyes Potion");
-						pot1.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-						lore.add("");
-						lore.add("Custom Effects: ");
-						lore.add(ChatColor.GOLD+"Drink to reveal nearby mob tags.");
-						lore.add(ChatColor.GOLD+"Splash to reveal stone areas.");
-						meta.setLore(lore);
-						pot1.setItemMeta(meta);
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)7);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Wondering Eye Potion");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"Drink to reveal nearby mob tags.");
+					lore.add(ChatColor.GOLD+"Splash to reveal stone areas.");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
 					}
-					if (pot2!=null && pot2.getDurability()==(short)16453) {
-						pot2.setDurability((short)8204);
-						List<String> lore = new ArrayList<String>();
-						ItemMeta meta=pot2.getItemMeta();
-						meta.setDisplayName("Wondering Eyes Potion");
-						pot2.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-						lore.add("");
-						lore.add("Custom Effects: ");
-						lore.add(ChatColor.GOLD+"Drink to reveal nearby mob tags.");
-						lore.add(ChatColor.GOLD+"Splash to reveal stone areas.");
-						meta.setLore(lore);
-						pot2.setItemMeta(meta);
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
 					}
-					if (pot3!=null && pot3.getDurability()==(short)16453) {
-						pot3.setDurability((short)8204);
-						List<String> lore = new ArrayList<String>();
-						ItemMeta meta=pot3.getItemMeta();
-						meta.setDisplayName("Wondering Eyes Potion");
-						pot3.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-						lore.add("");
-						lore.add("Custom Effects: ");
-						lore.add(ChatColor.GOLD+"Drink to reveal nearby mob tags.");
-						lore.add(ChatColor.GOLD+"Splash to reveal stone areas.");
-						meta.setLore(lore);
-						pot3.setItemMeta(meta);
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
 					}
 					if (event.getInventory().getItem(3).getAmount()==1) {
 						event.getInventory().setItem(3, new ItemStack(Material.AIR));
@@ -10967,526 +11475,691 @@ implements Listener
 						newstack.setAmount(newstack.getAmount()-1);
 						event.getInventory().setItem(3, newstack);
 					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
 					p.updateInventory();
+					return;
 				}
 			}
-				if (this.plugin.hasJobBuff("Brewer", p, Job.JOB10) &&
-						(pot1!=null ||
-						pot2!=null ||
-						pot3!=null)) {
-					//There is potentially a brew that will happen.
-					//Try to brew a Teleport Potion.
-					boolean brew=false;
-					if (pot1!=null && pot1.getDurability()==(short)8204 && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(ChatColor.GOLD+"Drink to reveal nearby mob tags.")) {brew=true;}
-					if (pot2!=null && pot2.getDurability()==(short)8204 && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(ChatColor.GOLD+"Drink to reveal nearby mob tags.")) {brew=true;}
-					if (pot3!=null && pot3.getDurability()==(short)8204 && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(ChatColor.GOLD+"Drink to reveal nearby mob tags.")) {brew=true;}
-					if (event.getInventory().getItem(3).getType()==Material.SULPHUR && brew) {
-						if (pot1!=null && pot1.getDurability()==(short)8204) {
-							pot1.setDurability((short)16396);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot1.getItemMeta();
-							meta.setDisplayName("Wondering Eyes Potion");
-							pot1.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"Drink to reveal nearby mob tags.");
-							lore.add(ChatColor.GOLD+"Splash to reveal stone areas.");
-							meta.setLore(lore);
-							pot1.setItemMeta(meta);
-						}
-						if (pot2!=null && pot2.getDurability()==(short)8204) {
-							pot2.setDurability((short)16396);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot2.getItemMeta();
-							meta.setDisplayName("Wondering Eyes Potion");
-							pot2.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"Drink to reveal nearby mob tags.");
-							lore.add(ChatColor.GOLD+"Splash to reveal stone areas.");
-							meta.setLore(lore);
-							pot2.setItemMeta(meta);
-						}
-						if (pot3!=null && pot3.getDurability()==(short)8204) {
-							pot3.setDurability((short)16396);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot3.getItemMeta();
-							meta.setDisplayName("Wondering Eyes Potion");
-							pot3.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"Drink to reveal nearby mob tags.");
-							lore.add(ChatColor.GOLD+"Splash to reveal stone areas.");
-							meta.setLore(lore);
-							pot3.setItemMeta(meta);
-						}
-						if (event.getInventory().getItem(3).getAmount()==1) {
-							event.getInventory().setItem(3, new ItemStack(Material.AIR));
-						} else {
-							ItemStack newstack = event.getInventory().getItem(3);
-							newstack.setAmount(newstack.getAmount()-1);
-							event.getInventory().setItem(3, newstack);
-						}
-						p.updateInventory();
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB10) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 7; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"Drink to reveal nearby mob tags."; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.SULPHUR && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)16395);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Splash Potion of Wondering Eye");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"Drink to reveal nearby mob tags.");
+					lore.add(ChatColor.GOLD+"Splash to reveal stone areas.");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
 					}
-				}
-				if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20) &&
-						(pot1!=null ||
-						pot2!=null ||
-						pot3!=null)) {
-					//There is potentially a brew that will happen.
-					//Try to brew a Teleport Potion.
-					boolean brew=false;
-					if (pot1!=null && pot1.getDurability()==(short)8201) {brew=true;}
-					if (pot2!=null && pot2.getDurability()==(short)8201) {brew=true;}
-					if (pot3!=null && pot3.getDurability()==(short)8201) {brew=true;}
-					if (event.getInventory().getItem(3).getType()==Material.BLAZE_ROD && brew) {
-						if (pot1!=null && pot1.getDurability()==(short)8201) {
-							pot1.setDurability((short)8233);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot1.getItemMeta();
-							meta.setDisplayName("Potion of Fury");
-							pot1.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+50% Attack Speed (1:30)");
-							meta.setLore(lore);
-							pot1.setItemMeta(meta);
-						}
-						if (pot2!=null && pot2.getDurability()==(short)8201) {
-							pot2.setDurability((short)8233);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot2.getItemMeta();
-							meta.setDisplayName("Potion of Fury");
-							pot2.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+50% Attack Speed (1:30)");
-							meta.setLore(lore);
-							pot2.setItemMeta(meta);
-						}
-						if (pot3!=null && pot3.getDurability()==(short)8201) {
-							pot3.setDurability((short)8233);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot3.getItemMeta();
-							meta.setDisplayName("Potion of Fury");
-							pot3.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+50% Attack Speed (1:30)");
-							meta.setLore(lore);
-							pot3.setItemMeta(meta);
-						}
-						if (event.getInventory().getItem(3).getAmount()==1) {
-							event.getInventory().setItem(3, new ItemStack(Material.AIR));
-						} else {
-							ItemStack newstack = event.getInventory().getItem(3);
-							newstack.setAmount(newstack.getAmount()-1);
-							event.getInventory().setItem(3, newstack);
-						}
-						p.updateInventory();
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
 					}
-				}
-				if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20) &&
-						(pot1!=null ||
-						pot2!=null ||
-						pot3!=null)) {
-					//There is potentially a brew that will happen.
-					//Try to brew a Teleport Potion.
-					boolean brew=false;
-					if (pot1!=null && pot1.getDurability()==(short)8233 && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (1:30)")) {brew=true;}
-					if (pot2!=null && pot2.getDurability()==(short)8233 && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (1:30)")) {brew=true;}
-					if (pot3!=null && pot3.getDurability()==(short)8233 && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (1:30)")) {brew=true;}
-					if (event.getInventory().getItem(3).getType()==Material.GLOWSTONE && brew) {
-						if (pot1!=null && pot1.getDurability()==(short)8233) {
-							pot1.setDurability((short)8265);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot1.getItemMeta();
-							meta.setDisplayName("Potion of Fury");
-							pot1.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+150% Attack Speed (0:45)");
-							meta.setLore(lore);
-							pot1.setItemMeta(meta);
-						}
-						if (pot2!=null && pot2.getDurability()==(short)8233) {
-							pot2.setDurability((short)8265);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot2.getItemMeta();
-							meta.setDisplayName("Potion of Fury");
-							pot2.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+150% Attack Speed (0:45)");
-							meta.setLore(lore);
-							pot2.setItemMeta(meta);
-						}
-						if (pot3!=null && pot3.getDurability()==(short)8233) {
-							pot3.setDurability((short)8265);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot3.getItemMeta();
-							meta.setDisplayName("Potion of Fury");
-							pot3.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+150% Attack Speed (0:45)");
-							meta.setLore(lore);
-							pot3.setItemMeta(meta);
-						}
-						if (event.getInventory().getItem(3).getAmount()==1) {
-							event.getInventory().setItem(3, new ItemStack(Material.AIR));
-						} else {
-							ItemStack newstack = event.getInventory().getItem(3);
-							newstack.setAmount(newstack.getAmount()-1);
-							event.getInventory().setItem(3, newstack);
-						}
-						p.updateInventory();
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
 					}
-				}
-				if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20) &&
-						(pot1!=null ||
-						pot2!=null ||
-						pot3!=null)) {
-					//There is potentially a brew that will happen.
-					//Try to brew a Teleport Potion.
-					boolean brew=false;
-					if (pot1!=null && pot1.getDurability()==(short)8233 && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (1:30)")) {brew=true;}
-					if (pot2!=null && pot2.getDurability()==(short)8233 && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (1:30)")) {brew=true;}
-					if (pot3!=null && pot3.getDurability()==(short)8233 && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (1:30)")) {brew=true;}
-					if (event.getInventory().getItem(3).getType()==Material.SULPHUR && brew) {
-						if (pot1!=null && pot1.getDurability()==(short)8233) {
-							pot1.setDurability((short)16393);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot1.getItemMeta();
-							meta.setDisplayName("Potion of Fury");
-							pot1.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+50% Attack Speed (1:15)");
-							meta.setLore(lore);
-							pot1.setItemMeta(meta);
-						}
-						if (pot2!=null && pot2.getDurability()==(short)8233) {
-							pot2.setDurability((short)16393);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot2.getItemMeta();
-							meta.setDisplayName("Potion of Fury");
-							pot2.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+50% Attack Speed (1:15)");
-							meta.setLore(lore);
-							pot2.setItemMeta(meta);
-						}
-						if (pot3!=null && pot3.getDurability()==(short)8233) {
-							pot3.setDurability((short)16393);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot3.getItemMeta();
-							meta.setDisplayName("Potion of Fury");
-							pot3.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+50% Attack Speed (1:15)");
-							meta.setLore(lore);
-							pot3.setItemMeta(meta);
-						}
-						if (event.getInventory().getItem(3).getAmount()==1) {
-							event.getInventory().setItem(3, new ItemStack(Material.AIR));
-						} else {
-							ItemStack newstack = event.getInventory().getItem(3);
-							newstack.setAmount(newstack.getAmount()-1);
-							event.getInventory().setItem(3, newstack);
-						}
-						p.updateInventory();
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
 					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
 				}
-				if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20) &&
-						(pot1!=null ||
-						pot2!=null ||
-						pot3!=null)) {
-					//There is potentially a brew that will happen.
-					//Try to brew a Teleport Potion.
-					boolean brew=false;
-					if (pot1!=null && pot1.getDurability()==(short)16393 && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (1:15)")) {brew=true;}
-					if (pot2!=null && pot2.getDurability()==(short)16393 && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (1:15)")) {brew=true;}
-					if (pot3!=null && pot3.getDurability()==(short)16393 && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (1:15)")) {brew=true;}
-					if (event.getInventory().getItem(3).getType()==Material.REDSTONE && brew) {
-						if (pot1!=null && pot1.getDurability()==(short)16393) {
-							pot1.setDurability((short)16457);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot1.getItemMeta();
-							meta.setDisplayName("Potion of Fury");
-							pot1.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+50% Attack Speed (3:00)");
-							meta.setLore(lore);
-							pot1.setItemMeta(meta);
-						}
-						if (pot2!=null && pot2.getDurability()==(short)16393) {
-							pot2.setDurability((short)16457);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot2.getItemMeta();
-							meta.setDisplayName("Potion of Fury");
-							pot2.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+50% Attack Speed (3:00)");
-							meta.setLore(lore);
-							pot2.setItemMeta(meta);
-						}
-						if (pot3!=null && pot3.getDurability()==(short)16393) {
-							pot3.setDurability((short)16457);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot3.getItemMeta();
-							meta.setDisplayName("Potion of Fury");
-							pot3.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+50% Attack Speed (3:00)");
-							meta.setLore(lore);
-							pot3.setItemMeta(meta);
-						}
-						if (event.getInventory().getItem(3).getAmount()==1) {
-							event.getInventory().setItem(3, new ItemStack(Material.AIR));
-						} else {
-							ItemStack newstack = event.getInventory().getItem(3);
-							newstack.setAmount(newstack.getAmount()-1);
-							event.getInventory().setItem(3, newstack);
-						}
-						p.updateInventory();
+			}
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB30B) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 8201; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"Drink to reveal nearby mob tags."; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.BLAZE_ROD && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)11);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Potion of Fury");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"+50% Attack Speed (1:30)");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
 					}
-				}
-
-				if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20) &&
-						(pot1!=null ||
-						pot2!=null ||
-						pot3!=null)) {
-					//There is potentially a brew that will happen.
-					//Try to brew a Teleport Potion.
-					boolean brew=false;
-					if (pot1!=null && pot1.getDurability()==(short)8197) {brew=true;}
-					if (pot2!=null && pot2.getDurability()==(short)8197) {brew=true;}
-					if (pot3!=null && pot3.getDurability()==(short)8197) {brew=true;}
-					if (event.getInventory().getItem(3).getType()==Material.OBSIDIAN && brew) {
-						if (pot1!=null && pot1.getDurability()==(short)8197) {
-							pot1.setDurability((short)8193);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot1.getItemMeta();
-							meta.setDisplayName("Potion of Resistance");
-							pot1.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+20% Damage Resistance (2:00)");
-							meta.setLore(lore);
-							pot1.setItemMeta(meta);
-						}
-						if (pot2!=null && pot2.getDurability()==(short)8197) {
-							pot2.setDurability((short)8193);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot2.getItemMeta();
-							meta.setDisplayName("Potion of Resistance");
-							pot2.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+20% Damage Resistance (2:00)");
-							meta.setLore(lore);
-							pot2.setItemMeta(meta);
-						}
-						if (pot3!=null && pot3.getDurability()==(short)8197) {
-							pot3.setDurability((short)8193);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot3.getItemMeta();
-							meta.setDisplayName("Potion of Resistance");
-							pot3.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+20% Damage Resistance (2:00)");
-							meta.setLore(lore);
-							pot3.setItemMeta(meta);
-						}
-						if (event.getInventory().getItem(3).getAmount()==1) {
-							event.getInventory().setItem(3, new ItemStack(Material.AIR));
-						} else {
-							ItemStack newstack = event.getInventory().getItem(3);
-							newstack.setAmount(newstack.getAmount()-1);
-							event.getInventory().setItem(3, newstack);
-						}
-						p.updateInventory();
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
 					}
-				}
-				if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20) &&
-						(pot1!=null ||
-						pot2!=null ||
-						pot3!=null)) {
-					//There is potentially a brew that will happen.
-					//Try to brew a Teleport Potion.
-					boolean brew=false;
-					if (pot1!=null && pot1.getDurability()==(short)8193 && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(ChatColor.GOLD+"+20% Damage Resistance (2:00)")) {brew=true;}
-					if (pot2!=null && pot2.getDurability()==(short)8193 && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(ChatColor.GOLD+"+20% Damage Resistance (2:00)")) {brew=true;}
-					if (pot3!=null && pot3.getDurability()==(short)8193 && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(ChatColor.GOLD+"+20% Damage Resistance (2:00)")) {brew=true;}
-					if (event.getInventory().getItem(3).getType()==Material.GLOWSTONE && brew) {
-						if (pot1!=null && pot1.getDurability()==(short)8193) {
-							pot1.setDurability((short)8225);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot1.getItemMeta();
-							meta.setDisplayName("Potion of Resistance");
-							pot1.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+40% Damage Resistance (1:00)");
-							meta.setLore(lore);
-							pot1.setItemMeta(meta);
-						}
-						if (pot2!=null && pot2.getDurability()==(short)8193) {
-							pot2.setDurability((short)8225);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot2.getItemMeta();
-							meta.setDisplayName("Potion of Resistance");
-							pot2.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+40% Damage Resistance (1:00)");
-							meta.setLore(lore);
-							pot2.setItemMeta(meta);
-						}
-						if (pot3!=null && pot3.getDurability()==(short)8193) {
-							pot3.setDurability((short)8225);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot3.getItemMeta();
-							meta.setDisplayName("Potion of Resistance");
-							pot3.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+40% Damage Resistance (1:00)");
-							meta.setLore(lore);
-							pot3.setItemMeta(meta);
-						}
-						if (event.getInventory().getItem(3).getAmount()==1) {
-							event.getInventory().setItem(3, new ItemStack(Material.AIR));
-						} else {
-							ItemStack newstack = event.getInventory().getItem(3);
-							newstack.setAmount(newstack.getAmount()-1);
-							event.getInventory().setItem(3, newstack);
-						}
-						p.updateInventory();
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
 					}
-				}
-				if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20) &&
-						(pot1!=null ||
-						pot2!=null ||
-						pot3!=null)) {
-					//There is potentially a brew that will happen.
-					//Try to brew a Teleport Potion.
-					boolean brew=false;
-					if (pot1!=null && pot1.getDurability()==(short)8225 && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(ChatColor.GOLD+"+40% Damage Resistance (1:00)")) {brew=true;}
-					if (pot2!=null && pot2.getDurability()==(short)8225 && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(ChatColor.GOLD+"+40% Damage Resistance (1:00)")) {brew=true;}
-					if (pot3!=null && pot3.getDurability()==(short)8225 && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(ChatColor.GOLD+"+40% Damage Resistance (1:00)")) {brew=true;}
-					if (event.getInventory().getItem(3).getType()==Material.SULPHUR && brew) {
-						if (pot1!=null && pot1.getDurability()==(short)8225) {
-							pot1.setDurability((short)16417);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot1.getItemMeta();
-							meta.setDisplayName("Potion of Resistance");
-							pot1.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+40% Damage Resistance (0:45)");
-							meta.setLore(lore);
-							pot1.setItemMeta(meta);
-						}
-						if (pot2!=null && pot2.getDurability()==(short)8225) {
-							pot2.setDurability((short)16417);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot2.getItemMeta();
-							meta.setDisplayName("Potion of Resistance");
-							pot2.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+40% Damage Resistance (0:45)");
-							meta.setLore(lore);
-							pot2.setItemMeta(meta);
-						}
-						if (pot3!=null && pot3.getDurability()==(short)8225) {
-							pot3.setDurability((short)16417);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot3.getItemMeta();
-							meta.setDisplayName("Potion of Resistance");
-							pot3.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+40% Damage Resistance (0:45)");
-							meta.setLore(lore);
-							pot3.setItemMeta(meta);
-						}
-						if (event.getInventory().getItem(3).getAmount()==1) {
-							event.getInventory().setItem(3, new ItemStack(Material.AIR));
-						} else {
-							ItemStack newstack = event.getInventory().getItem(3);
-							newstack.setAmount(newstack.getAmount()-1);
-							event.getInventory().setItem(3, newstack);
-						}
-						p.updateInventory();
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
 					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
 				}
-				if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20) &&
-						(pot1!=null ||
-						pot2!=null ||
-						pot3!=null)) {
-					//There is potentially a brew that will happen.
-					//Try to brew a Teleport Potion.
-					boolean brew=false;
-					if (pot1!=null && pot1.getDurability()==(short)8193 && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(ChatColor.GOLD+"+20% Damage Resistance (2:00)")) {brew=true;}
-					if (pot2!=null && pot2.getDurability()==(short)8193 && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(ChatColor.GOLD+"+20% Damage Resistance (2:00)")) {brew=true;}
-					if (pot3!=null && pot3.getDurability()==(short)8193 && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(ChatColor.GOLD+"+20% Damage Resistance (2:00)")) {brew=true;}
-					if (event.getInventory().getItem(3).getType()==Material.REDSTONE && brew) {
-						if (pot1!=null && pot1.getDurability()==(short)8193) {
-							pot1.setDurability((short)8257);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot1.getItemMeta();
-							meta.setDisplayName("Potion of Resistance");
-							pot1.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+20% Damage Resistance (4:50)");
-							meta.setLore(lore);
-							pot1.setItemMeta(meta);
-						}
-						if (pot2!=null && pot2.getDurability()==(short)8193) {
-							pot2.setDurability((short)8257);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot2.getItemMeta();
-							meta.setDisplayName("Potion of Resistance");
-							pot2.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+20% Damage Resistance (4:50)");
-							meta.setLore(lore);
-							pot2.setItemMeta(meta);
-						}
-						if (pot3!=null && pot3.getDurability()==(short)8193) {
-							pot3.setDurability((short)8257);
-							List<String> lore = new ArrayList<String>();
-							ItemMeta meta=pot3.getItemMeta();
-							meta.setDisplayName("Potion of Resistance");
-							pot3.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
-							lore.add("");
-							lore.add("Custom Effects: ");
-							lore.add(ChatColor.GOLD+"+20% Damage Resistance (4:50)");
-							meta.setLore(lore);
-							pot3.setItemMeta(meta);
-						}
-						if (event.getInventory().getItem(3).getAmount()==1) {
-							event.getInventory().setItem(3, new ItemStack(Material.AIR));
-						} else {
-							ItemStack newstack = event.getInventory().getItem(3);
-							newstack.setAmount(newstack.getAmount()-1);
-							event.getInventory().setItem(3, newstack);
-						}
-						p.updateInventory();
+			}
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB30B) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 11; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"+50% Attack Speed (1:30)"; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.SULPHUR && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)16399);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Splash Potion of Fury");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"+50% Attack Speed (1:20)");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
 					}
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
+					}
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
+					}
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
+					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
 				}
+			}
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB30B) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 11; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"+50% Attack Speed (1:30)"; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.GLOWSTONE_DUST && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)15);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Potion of Fury");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"+150% Attack Speed (0:45)");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
+					}
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
+					}
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
+					}
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
+					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
+				}
+			}
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB30B) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 11; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"+50% Attack Speed (1:30)"; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.REDSTONE && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)23);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Potion of Fury");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"+50% Attack Speed (3:15)");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
+					}
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
+					}
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
+					}
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
+					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
+				}
+			}
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB30B) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 23; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"+50% Attack Speed (3:15)"; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.SULPHUR && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)23);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Splash Potion of Fury");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"+50% Attack Speed (2:30)");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
+					}
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
+					}
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
+					}
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
+					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
+				}
+			}
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB30B) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 15; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"+150% Attack Speed (0:45)"; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.SULPHUR && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)16403);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Splash Potion of Fury");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"+150% Attack Speed (0:30)");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
+					}
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
+					}
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
+					}
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
+					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
+				}
+			}
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB30B) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 8197; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"+150% Attack Speed (0:45)"; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.OBSIDIAN && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)27);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Potion of Resistance");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"+20% Damage Resistance (2:00)");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
+					}
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
+					}
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
+					}
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
+					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
+				}
+			}
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB30B) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 27; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"+20% Damage Resistance (2:00)"; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.SULPHUR && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)16411);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Splash Potion of Resistance");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"+20% Damage Resistance (1:45)");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
+					}
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
+					}
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
+					}
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
+					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
+				}
+			}
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB30B) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 27; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"+20% Damage Resistance (2:00)"; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.GLOWSTONE_DUST && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)31);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Potion of Resistance");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"+40% Damage Resistance (1:20)");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
+					}
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
+					}
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
+					}
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
+					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
+				}
+			}
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB30B) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 31; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"+40% Damage Resistance (1:20)"; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.SULPHUR && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)16415);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Splash Potion of Resistance");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"+40% Damage Resistance (1:00)");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
+					}
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
+					}
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
+					}
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
+					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
+				}
+			}
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB30B) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 27; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"+20% Damage Resistance (2:00)"; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.REDSTONE && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)39);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Potion of Resistance");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"+20% Damage Resistance (3:50)");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
+					}
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
+					}
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
+					}
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
+					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
+				}
+			}
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB30B) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 39; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"+20% Damage Resistance (3:50)"; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot && pot2.getItemMeta().hasLore() && pot2.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot && pot3.getItemMeta().hasLore() && pot3.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.SULPHUR && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)16423);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Splash Potion of Resistance");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"+20% Damage Resistance (2:45)");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
+					}
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
+					}
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
+					}
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
+					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
+				}
+			}
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB40) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 0; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"+20% Damage Resistance (3:50)"; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.WATER && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)43);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Potion of Invulnerability");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"Protected from all damage");
+					lore.add(ChatColor.GOLD+"sources. (1:20)");
+					lore.add(ChatColor.DARK_GRAY+"Potion duration cannot be modified.");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
+					}
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
+					}
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
+					}
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
+					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
+				}
+			}
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB40) &&
+					(pot1!=null ||
+					pot2!=null ||
+					pot3!=null)) {
+				//There is potentially a brew that will happen.
+				//Try to brew a Teleport Potion.
+				boolean brew=false;
+				short checkpot = 43; //The number of the potion to check for conversion.
+				String checkstring = ChatColor.GOLD+"sources. (1:20)"; //The string to look for to check for the potion.
+				if (pot1!=null && pot1.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot2!=null && pot2.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (pot3!=null && pot3.getDurability()==(short)checkpot && pot1.getItemMeta().hasLore() && pot1.getItemMeta().getLore().contains(checkstring)) {brew=true;}
+				if (event.getInventory().getItem(3).getType()==Material.SULPHUR && brew) {
+					ItemStack pot = new ItemStack(Material.POTION);
+					pot.setDurability((short)16427);
+					List<String> lore = new ArrayList<String>();
+					ItemMeta meta=pot.getItemMeta();
+					meta.setDisplayName("Splash Potion of Invulnerability");
+					pot.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 1);
+					lore.add("");
+					lore.add("Custom Effects: ");
+					lore.add(ChatColor.GOLD+"Protected from all damage");
+					lore.add(ChatColor.GOLD+"sources. (0:55)");
+					lore.add(ChatColor.DARK_GRAY+"Potion duration cannot be modified.");
+					meta.setLore(lore);
+					pot.setItemMeta(meta);
+					if (pot1!=null && pot1.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot1.getAmount());event.getInventory().setItem(0, t);
+					}
+					if (pot2!=null && pot2.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot2.getAmount());event.getInventory().setItem(1, t);
+					}
+					if (pot3!=null && pot3.getDurability()==checkpot) {
+						ItemStack t = pot.clone();t.setAmount(pot3.getAmount());event.getInventory().setItem(2, t);
+					}
+					if (event.getInventory().getItem(3).getAmount()==1) {
+						event.getInventory().setItem(3, new ItemStack(Material.AIR));
+					} else {
+						ItemStack newstack = event.getInventory().getItem(3);
+						newstack.setAmount(newstack.getAmount()-1);
+						event.getInventory().setItem(3, newstack);
+					}
+					p.playSound(p.getLocation(), Sound.SUCCESSFUL_HIT, 0.6f, 1.0f);
+					p.updateInventory();
+					return;
+				}
+			}
 				//Brewing stand get.
 				InventoryView brewing_stand = p.getOpenInventory();
 				brewing_stand.setProperty(Property.BREW_TIME, 1);
@@ -11577,7 +12250,7 @@ implements Listener
 						p.sendMessage("Your "+meta.getDisplayName()+ChatColor.RESET+" has been repaired!");
 					}
 					if (storename.contains("Diamond Boots")) {
-						store.setType(Material.DIAMOND_CHESTPLATE);
+						store.setType(Material.DIAMOND_BOOTS);
 						ItemMeta meta = store.getItemMeta();
 						meta.setDisplayName(meta.getDisplayName().replace(ChatColor.DARK_GRAY+"[BROKEN] ",""));
 						List<String> lore = store.getItemMeta().getLore();
@@ -11613,21 +12286,75 @@ implements Listener
 			}
 		}
 		if ((event.getClick()==ClickType.LEFT || event.getClick()==ClickType.RIGHT)) {
-			if (event.getCursor()!=null && event.getCurrentItem()!=null && event.getCursor().getType().equals(event.getCurrentItem().getType()) && event.getCursor().getDurability()==event.getCurrentItem().getDurability() && event.getCursor().getType()==Material.POTION && event.getCurrentItem().getAmount()==1 && event.getCursor().getAmount()==1 && this.plugin.hasJobBuff("Brewer", p, Job.JOB10)) {
-				//Combine them together.
-				ItemStack i = event.getCurrentItem();
-				i.setAmount(2);
-				event.setCurrentItem(new ItemStack(Material.AIR));
-				event.setCursor(i);
-				p.updateInventory();
-			}
-			else
-			if (event.getCursor()!=null && event.getCurrentItem()!=null && event.getCursor().getType().equals(event.getCurrentItem().getType()) && event.getCursor().getType()==Material.POTION) {
-				//Literally swap them and cancel.
-				ItemStack temp = event.getCursor();
-				event.setCursor(event.getCurrentItem());
-				event.setCurrentItem(temp);
-				event.setCancelled(true);
+			if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20) || this.plugin.hasJobBuff("Brewer", p, Job.JOB40)) {
+				if (event.getCursor()!=null && event.getCurrentItem()!=null && event.getCursor().getDurability()==event.getCurrentItem().getDurability() && event.getCursor().getType().equals(event.getCurrentItem().getType()) && event.getCursor().getType()==Material.POTION) {
+					if (this.plugin.hasJobBuff("Brewer", p, Job.JOB40) && event.getCursor().getAmount()+event.getCurrentItem().getAmount()<=64/*Make sure their amounts check out.*/) {
+						ItemStack i = event.getCurrentItem();
+						i.setAmount(event.getCursor().getAmount()+event.getCurrentItem().getAmount());
+						event.setCurrentItem(new ItemStack(Material.AIR));
+						event.setCursor(i);
+						p.updateInventory();
+					} else
+					if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20) && event.getCursor().getAmount()+event.getCurrentItem().getAmount()<=this.plugin.getJobLv("Brewer", p)+4-20/*Make sure their amounts check out.*/) {
+						ItemStack i = event.getCurrentItem();
+						i.setAmount(event.getCursor().getAmount()+event.getCurrentItem().getAmount());
+						event.setCurrentItem(new ItemStack(Material.AIR));
+						event.setCursor(i);
+						p.updateInventory();
+					} else {
+						if (this.plugin.hasJobBuff("Brewer", p, Job.JOB40)) {
+							//At least put what we can together.
+							int leftover = event.getCursor().getAmount()+event.getCurrentItem().getAmount()-(64);
+							//Bukkit.getLogger().info((event.getCursor().getAmount()+event.getCurrentItem().getAmount())+" is too high. Exceeds "+(this.plugin.getJobLv("Brewer", p)+4-20)+". LEftover is "+leftover+".");
+							ItemStack temp = event.getCursor();
+							temp.setAmount(64);
+							event.setCursor(temp);
+							ItemStack temp2 = event.getCursor().clone();
+							temp2.setAmount(leftover);
+							event.setCurrentItem(temp2);
+							p.updateInventory();
+							event.setCancelled(true);
+						} else 
+						if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20)) {
+							//At least put what we can together.
+							int leftover = event.getCursor().getAmount()+event.getCurrentItem().getAmount()-(this.plugin.getJobLv("Brewer", p)+4-20);
+							//Bukkit.getLogger().info((event.getCursor().getAmount()+event.getCurrentItem().getAmount())+" is too high. Exceeds "+(this.plugin.getJobLv("Brewer", p)+4-20)+". LEftover is "+leftover+".");
+							ItemStack temp = event.getCursor();
+							temp.setAmount(this.plugin.getJobLv("Brewer", p)+4-20);
+							event.setCursor(temp);
+							ItemStack temp2 = event.getCursor().clone();
+							temp2.setAmount(leftover);
+							event.setCurrentItem(temp2);
+							p.updateInventory();
+							event.setCancelled(true);
+						}
+					}
+				}
+				else
+				if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20) && event.getCursor()!=null && event.getCurrentItem()!=null && event.getCursor().getType().equals(event.getCurrentItem().getType()) && event.getCursor().getType()==Material.POTION) {
+					//Literally swap them and cancel.
+					ItemStack temp = event.getCursor();
+					event.setCursor(event.getCurrentItem());
+					event.setCurrentItem(temp);
+					event.setCancelled(true);
+				}
+			} else {
+				if (event.getCursor()!=null && event.getCurrentItem()!=null && event.getCursor().getDurability()==event.getCurrentItem().getDurability() && event.getCursor().getType().equals(event.getCurrentItem().getType()) && event.getCursor().getDurability()==event.getCurrentItem().getDurability() && event.getCursor().getType()==Material.POTION && event.getCurrentItem().getAmount()==1 && event.getCursor().getAmount()==1 && this.plugin.hasJobBuff("Brewer", p, Job.JOB10)) {
+					//Combine them together.
+					ItemStack i = event.getCurrentItem();
+					i.setAmount(2);
+					event.setCurrentItem(new ItemStack(Material.AIR));
+					event.setCursor(i);
+					p.updateInventory();
+				}
+				else
+				if (event.getCursor()!=null && event.getCurrentItem()!=null && event.getCursor().getType().equals(event.getCurrentItem().getType()) && event.getCursor().getType()==Material.POTION) {
+					//Literally swap them and cancel.
+					ItemStack temp = event.getCursor();
+					event.setCursor(event.getCurrentItem());
+					event.setCurrentItem(temp);
+					event.setCancelled(true);
+				}
 			}
 		}
 		if ((event.getClick()==ClickType.SHIFT_RIGHT || event.getClick()==ClickType.SHIFT_LEFT) && (event.getInventory().getType()==InventoryType.WORKBENCH || event.getInventory().getType()==InventoryType.CRAFTING || event.getInventory().getType()==InventoryType.PLAYER) && event.getSlotType()==SlotType.RESULT) {
@@ -12945,17 +13672,22 @@ implements Listener
 				if (thrownpot.getItem().hasItemMeta() && thrownpot.getItem().getItemMeta().hasLore()) {
 					if (thrownpot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"Teleports shooter to target")) {
 						//Activate its effect.
-						p.teleport(thrownpot.getLocation());
-						thrownpot.setItem(new ItemStack(Material.POTION));
+						//Get pitch and yaw of player.
+						float pitch = p.getLocation().getPitch(), yaw = p.getLocation().getYaw();
+						Location loc = thrownpot.getLocation();
+						loc.setPitch(pitch);
+						loc.setYaw(yaw);
+						p.teleport(loc);
 					}
 					if (thrownpot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"Drink to reveal nearby mob tags.")) {
 						//Reveal nearby area.
-						for (int x=-3;x<=3;x++) {
-							for (int y=-3;y<=3;y++) {
-								for (int z=-3;z<=3;z++) {
+						int size = 5;
+						for (int x=-size;x<=size;x++) {
+							for (int y=-size;y<=size;y++) {
+								for (int z=-size;z<=size;z++) {
 									if (thrownpot.getWorld().getBlockAt(thrownpot.getLocation().add(x,y,z)).getType()==Material.STONE) {
 										thrownpot.getWorld().getBlockAt(thrownpot.getLocation().add(x,y,z)).setType(Material.GLASS);
-										if (Math.abs(x)==3 && Math.abs(y)==3 && Math.abs(z)==3) {
+										if (Math.abs(x)==size && Math.abs(y)==size && Math.abs(z)==size) {
 											thrownpot.getWorld().getBlockAt(thrownpot.getLocation().add(x,y,z)).setType(Material.JACK_O_LANTERN);
 										}
 										if (this.plugin.hasJobBuff("Brewer", p, Job.JOB20)) {
@@ -12967,8 +13699,6 @@ implements Listener
 								}
 							}
 						}
-						thrownpot.setItem(new ItemStack(Material.POTION));
-						return;
 					}
 				}
 			}

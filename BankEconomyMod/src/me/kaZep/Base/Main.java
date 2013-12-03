@@ -1123,10 +1123,10 @@ public class Main extends JavaPlugin
     Brewer_job.addData("GHAST TEAR", 0.30, 20, 0);
     Brewer_job.setBuffData("Gain access to the Teleport potion. Water Bottle + Lapis Lazuli. Throwing it will teleport you to the thrown location.",
     		"Potions can stack up to 2 at a time. Gain access to the Eye of Wonder potion. Teleport potion + Eye of Ender. Drinking it will reveal mobs' nametags nearby. Throwing it will turn stone into glass temporarily, revealing nearby ores within.", 
-    		"Potions you throw have double the duration. Gain access to the Potion of Fury (Gives you attack speed. Strength Potion + Blaze Rod) and Potion of Resistance (Heal Potion + Obsidian) Potions.", 
+    		"Potions you throw have double the duration. Potions can stack up to 4 at a time. The stacking amount goes up by 1 with each Brewer level after 20.", 
     		"Gain the ability to create Strength potions with Strength IV buffs. Heal potions created by you heal 4x their normal amount.",
-    		"Potions can stack up to 8 at a time. Gain the ability to brew Night Vision and Invisibility potions.",
-    		"Potions created by you last for 30 minutes. Potions can stack up to 64 at a time. Brewing wait time decreased by 4x the normal time.");
+    		"Gain access to the Potion of Fury (Gives you attack speed. Strength Potion + Blaze Rod) and Potion of Resistance (Heal Potion + Obsidian) Potions.",
+    		"Potions thrown by you last for 30 minutes. Potions can stack up to 64 at a time. Brewing wait time decreased by 4x the normal time.");
 
     Enchanter_job.setJobName("Enchanter");
     Enchanter_job.setJobDescription("An enchanter's job is to enchant items in order to make them more powerful and useful for everyday tasks.");
@@ -2676,6 +2676,14 @@ public void checkJukeboxes() {
           LOGGING_UPDATE_COUNTS++; //2
     		Player[] list = Bukkit.getOnlinePlayers();
     		for (int i=0;i<list.length;i++) {
+    			if (getPlayerData(list[i]).furytime!=0 && Main.SERVER_TICK_TIME>getPlayerData(list[i]).furytime) {
+    				getPlayerData(list[i]).furytime=0;
+    				list[i].sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Fury Potion effect has worn off...");
+    			}
+    			if (getPlayerData(list[i]).invulntime!=0 && Main.SERVER_TICK_TIME>getPlayerData(list[i]).invulntime) {
+    				getPlayerData(list[i]).invulntime=0;
+    				list[i].sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Invulnerability Potion effect has worn off...");
+    			}
     			if (hasJobBuff("Hunter", list[i],Job.JOB40)) {
     				if (Bukkit.getWorld("world").getTime()>13000) {
     					list[i].addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,200,1,true));
@@ -3333,6 +3341,10 @@ public void updateTime() {
   					  //Bukkit.getPlayer("sigonasr2").sendMessage("Brewing stand. "+brewingstandlist.get(i).getBrewingTime());
 	  				  if (brewingstandlist.get(i).getBrewingTime()>0 && !brewingstandlist.get(i).is_newTimeSet()) {
 	  					  //Bukkit.getPlayer("sigonasr2").sendMessage("Brewing, time is not set: "+brewingstandlist.get(i).getBrewingTime());
+	  					  if (hasJobBuff("Brewer", brewingstandlist.get(i).owner, Job.JOB40)) {
+	  						brewingstandlist.get(i).set_newTime(true);
+	  						brewingstandlist.get(i).setBrewingTime(brewingstandlist.get(i).getBrewingTime()/4);
+	  					  }
 	  					  if (PlayerinJob(brewingstandlist.get(i).owner, "Brewer") && getJobLv("Brewer", brewingstandlist.get(i).owner)>=5) {
 		  					  brewingstandlist.get(i).set_newTime(true);
 		  					  //Bukkit.getPlayer("sigonasr2").sendMessage("Old Brewing time: "+brewingstandlist.get(i).getBrewingTime());
