@@ -6945,8 +6945,8 @@ implements Listener
 			}break;
 			case 5: {
 				loc.getWorld().dropItemNaturally(loc, DiabloDropsHook.getRandomItem());
-				for (int i = 0; i < 10 && Math.random() < 0.2; i++) {
-					// 20% for one extra, 4% for two extra, 0.8% for three extra, etc. 
+				for (int i = 0; i < 30 && Math.random() < 0.8; i++) {
+					// Averages 5 drops, anywhere from 1 to 31 can be generated.  
 					loc.getWorld().dropItemNaturally(loc, DiabloDropsHook.getRandomItem());
 				}
 			}break;
