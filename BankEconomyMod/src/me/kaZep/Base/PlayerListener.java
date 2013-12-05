@@ -206,9 +206,6 @@ import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 
-import de.kumpelblase2.remoteentities.CreateEntityContext;
-import de.kumpelblase2.remoteentities.api.RemoteEntityType;
-
 import me.kaZep.Base.BrewingStandData;
 import me.kaZep.Base.FurnaceData;
 import me.kaZep.Base.PlayerBuffData;
