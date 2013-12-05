@@ -56,6 +56,7 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -1968,19 +1969,25 @@ public void runTick() {
 					  }
 				  }
 			  }
-			  if (Main.SERVER_TICK_TIME%60==0) {
+			  if (Main.SERVER_TICK_TIME%30==0) {
 				  if (p.getWorld().getName().compareTo("world")==0) {
-					  List<Entity> nearby = p.getNearbyEntities(30, 30, 30);
+					  List<Entity> nearby = p.getNearbyEntities(20, 20, 20);
 					  Location nearestwolf = null;
 					  int minions=0;
 					  for (int i=0;i<nearby.size();i++) {
+						  if (nearby.get(i).getType()==EntityType.CREEPER) {
+							  Creature l = (Creature)nearby.get(i);
+							  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.RED+"Suicidal Creeper") && l.getTarget()!=null) {
+								  l.removePotionEffect(PotionEffectType.INVISIBILITY);
+							  }
+						  }
 						  if (nearby.get(i).getType()==EntityType.WOLF) {
 							  minions++;
 							  if (nearestwolf==null || nearby.get(i).getLocation().distanceSquared(p.getLocation())<nearestwolf.distanceSquared(p.getLocation())) {
 								  nearestwolf = nearby.get(i).getLocation();
 							  }
 							  Creature l = (Creature)nearby.get(i);
-							  if (Math.random()<=0.4 && l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.RED+"Hound Caller")) {
+							  if (Math.random()<=0.6 && l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.RED+"Hound Caller")) {
 								  Wolf w = (Wolf)nearby.get(i);
 								  if (w.getOwner()==null) {
 									  if (!w.isAngry()) {
@@ -1995,7 +2002,7 @@ public void runTick() {
 							  }
 						  }
 					  }
-					  if (minions<5 && nearestwolf!=null) {
+					  if (minions<10 && nearestwolf!=null) {
 						  if (Math.random()<=0.05) {
 							  Entity entity = p.getWorld().spawnEntity(nearestwolf, EntityType.WOLF);
 								LivingEntity l = (LivingEntity)entity;
@@ -2005,6 +2012,12 @@ public void runTick() {
 								c.setTarget(p);
 								Wolf w = (Wolf)l;
 								w.setBaby();
+								  if (!w.isAngry()) {
+									  w.damage(0,p);
+									  w.setHealth(w.getMaxHealth());
+									  w.setAngry(true);
+								  }
+								l.setRemoveWhenFarAway(true);
 								l.setLastDamageCause(new EntityDamageEvent(p, DamageCause.CUSTOM, 0.01));
 								l.getLocation().getWorld().playSound(l.getLocation(), Sound.WOLF_HOWL, 0.2f, 0.9f);
 						  }

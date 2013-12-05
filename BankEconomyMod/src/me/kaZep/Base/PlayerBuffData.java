@@ -202,7 +202,7 @@ public class PlayerBuffData {
 			  }
 			if (!hasabsorption && this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat4")>0) {
 				p.removePotionEffect(PotionEffectType.ABSORPTION);
-				p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION,3590,this.plugin.getStatBonus(3, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat4")/3)/4-1));
+				p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION,3600,this.plugin.getStatBonus(3, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat4")/3)/4-1),true);
 				//p.sendMessage("Absorption level is "+(this.plugin.getStatBonus(3, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat4")/4)/4-1));
 			}
 			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat2")>0) {

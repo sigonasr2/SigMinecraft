@@ -52,7 +52,9 @@ import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.CreatureType;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EnderDragon;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ExperienceOrb;
@@ -72,6 +74,7 @@ import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Silverfish;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Skeleton.SkeletonType;
 import org.bukkit.entity.Slime;
@@ -105,6 +108,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
@@ -2396,6 +2400,36 @@ implements Listener
 
 	}
 
+	@EventHandler
+	public void onCreatureTeleport(final EntityTeleportEvent e) {
+		if (e.getEntity() instanceof Enderman) {
+			LivingEntity l = (LivingEntity)e.getEntity();
+			if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.RED+"Fish Caller")) {
+				//Spawn Silverfish in the vicinity of where it teleported from.
+				int trials=9;
+				boolean playernearby=false;
+				for (int i=0;i<Bukkit.getOnlinePlayers().length;i++) {
+					Player p = Bukkit.getOnlinePlayers()[i];
+					if (p.getLocation().distanceSquared(e.getFrom())<400) {
+						playernearby=true;
+						break;
+					}
+				}
+				//Bukkit.getLogger().info("Teleport from "+e.getFrom().toString()+", to "+e.getTo().toString());
+				final Location randloc = e.getFrom();
+				randloc.setX(randloc.getX()+Math.random()*3-Math.random()*3);
+				randloc.setY(randloc.getY()+Math.random()*6+2);
+				randloc.setZ(randloc.getZ()+Math.random()*3-Math.random()*3);
+				//Bukkit.getLogger().info("Set a new teleport area: "+randloc);
+				while (playernearby && trials>0) {
+					if (randloc.getBlock().getType()==Material.AIR) {
+						e.getEntity().getWorld().spawnEntity(randloc, EntityType.SILVERFISH);
+					}
+					trials--;
+				}
+			}
+		}
+	}
 
 	@EventHandler
 	public void onCreatureSpawn(CreatureSpawnEvent e) {
@@ -2574,7 +2608,18 @@ implements Listener
 						inven.setHelmetDropChance(0.02f);
 						inven.setItemInHandDropChance(0.02f);
 						if (e.getEntity().getType()==EntityType.SKELETON) {
-							inven.setItemInHand(new ItemStack(Material.BOW));
+							Skeleton sk = (Skeleton)e.getEntity();
+							if (sk.getSkeletonType()==SkeletonType.WITHER && Math.random()<=0.8) {
+								e.getEntity().setMaxHealth(80);
+								e.getEntity().setHealth(sk.getMaxHealth());
+								inven.setItemInHand(new ItemStack(Material.DIAMOND_SWORD));
+							} else {
+								if (Math.random()<=0.8) {
+									inven.setItemInHand(new ItemStack(Material.BOW));
+								} else {
+									inven.setItemInHand(new ItemStack(Material.STONE_SWORD));
+								}
+							}
 						}
 					}
 
@@ -2583,7 +2628,10 @@ implements Listener
 					double COUNTER_SLIME_SPAWN_RATE = 0.01,
 							VIRAL_SPIDER_SPAWN_RATE = 0.01,
 							SILENCER_SPAWN_RATE = 0.01,
-							HOUND_CALLER_SPAWN_RATE = 0.2;
+							HOUND_CALLER_SPAWN_RATE = 0.01,
+							FISH_CALLER_SPAWN_RATE = 0.01,
+							SUICIDAL_CREEPER_SPAWN_RATE = 0.01,
+							POWER_SURGE_ZOMBIE_SPAWN_RATE = 0.01;
 					
 					if (totallvs>80*levelsmult) {
 						//Try to spawn a counter slime.
@@ -2594,14 +2642,14 @@ implements Listener
 							s.setSize((int)(Math.random()*3)+2);
 							LivingEntity l = (LivingEntity)entity;
 							l.setCustomName(ChatColor.RED+"Counter Slime");
-							l.setCustomNameVisible(true);
+							l.setCustomNameVisible(false);
 						}
 						//Try to spawn a Viral Spider.
 						if (Math.random()<=VIRAL_SPIDER_SPAWN_RATE) {
 							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.SPIDER);
 							LivingEntity l = (LivingEntity)entity;
 							l.setCustomName(ChatColor.RED+"Viral Spider");
-							l.setCustomNameVisible(true);
+							l.setCustomNameVisible(false);
 							//Bukkit.getLogger().info("Viral Spider spawned at "+l.getLocation().toString());
 							l.setMaxHealth(85);
 							l.setHealth(85);
@@ -2612,7 +2660,7 @@ implements Listener
 							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.SKELETON);
 							LivingEntity l = (LivingEntity)entity;
 							l.setCustomName(ChatColor.RED+"Silencer");
-							l.setCustomNameVisible(true);
+							l.setCustomNameVisible(false);
 							//Bukkit.getLogger().info("Silencer spawned at "+l.getLocation().toString());
 							l.setMaxHealth(45);
 							l.setHealth(45);
@@ -2628,7 +2676,7 @@ implements Listener
 							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.WOLF);
 							LivingEntity l = (LivingEntity)entity;
 							l.setCustomName(ChatColor.RED+"Hound Caller");
-							l.setCustomNameVisible(true);
+							l.setCustomNameVisible(false);
 							//Bukkit.getLogger().info("Hound Caller spawned at "+l.getLocation().toString());
 							l.setMaxHealth(65);
 							l.setHealth(65);
@@ -2639,8 +2687,59 @@ implements Listener
 							//l.getEquipment().setItemInHand(new ItemStack(Material.BOW));
 							//w.setAngry(true);
 							w.setAdult();
+							l.setRemoveWhenFarAway(true);
 							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 999999, 1));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 2));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 0));
+						}
+						//Try to spawn a Fish Caller.
+						if (Math.random()<=FISH_CALLER_SPAWN_RATE) {
+							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.ENDERMAN);
+							LivingEntity l = (LivingEntity)entity;
+							l.setCustomName(ChatColor.RED+"Fish Caller");
+							l.setCustomNameVisible(false);
+							//Bukkit.getLogger().info("Hound Caller spawned at "+l.getLocation().toString());
+							l.setMaxHealth(50);
+							l.setHealth(50);
+							Enderman end = (Enderman)l;
+							//helm.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 32);
+							//l.getEquipment().setHelmet(helm);
+							//l.getEquipment().setHelmetDropChance(0.002f);
+							//l.getEquipment().setItemInHand(new ItemStack(Material.BOW));
+							//w.setAngry(true);
+							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 4));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 999999, 1));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 1));
+						}
+						//Try to spawn a Suicidal Creeper.
+						if (Math.random()<=SUICIDAL_CREEPER_SPAWN_RATE) {
+							Location ent = e.getEntity().getLocation();
+							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.CREEPER);
+							LivingEntity l = (LivingEntity)entity;
+							l.setCustomName(ChatColor.RED+"Suicidal Creeper");
+							l.setCustomNameVisible(false);
+							//Bukkit.getLogger().info("Suicidal Creeper spawned at "+l.getLocation().toString());
+							l.setMaxHealth(5);
+							l.setHealth(5);
+							Creeper creep = (Creeper)l;
+							creep.setPowered(true);
 							l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 999999, 3));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 2));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 4));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0));
+						}
+						//Try to spawn a Powersurge Zombie.
+						if (Math.random()<=POWER_SURGE_ZOMBIE_SPAWN_RATE) {
+							Location ent = e.getEntity().getLocation();
+							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.ZOMBIE);
+							LivingEntity l = (LivingEntity)entity;
+							l.setCustomName(ChatColor.RED+"Powersurge Zombie");
+							l.setCustomNameVisible(false);
+							//Bukkit.getLogger().info("Suicidal Creeper spawned at "+l.getLocation().toString());
+							l.setMaxHealth(60);
+							l.setHealth(60);
+							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
 							l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 2));
 							l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 0));
 						}
@@ -8716,19 +8815,31 @@ implements Listener
 				}
 			}
 			if (this.plugin.inventoryFull(e.getPlayer())) {
-				if (e.getRemaining()==0 && same) {
-					if (special_convert(e.getItem().getItemStack().getType())) {
-						p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+convertToItemName(e.getItem().getType().getName(),e.getItem().getItemStack().getData().getData(),e.getItem().getItemStack().getType())+".");
-					} else {
-						p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+String.valueOf(mod)+".");
+				if (e.getItem().getItemStack().hasItemMeta() && e.getItem().getItemStack().getItemMeta().hasDisplayName()) {
+					if (e.getRemaining()==0 && same) {
+						p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+e.getItem().getItemStack().getItemMeta().getDisplayName()+".");
 					}
-				}  
+				} else {
+					if (e.getRemaining()==0 && same) {
+						if (special_convert(e.getItem().getItemStack().getType())) {
+							p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+convertToItemName(e.getItem().getType().getName(),e.getItem().getItemStack().getData().getData(),e.getItem().getItemStack().getType())+".");
+						} else {
+							p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+String.valueOf(mod)+".");
+						}
+					}  
+				}
 			} else {
-				if (e.getRemaining()==0) {
-					if (special_convert(e.getItem().getItemStack().getType())) {
-						p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+convertToItemName(e.getItem().getType().getName(),e.getItem().getItemStack().getData().getData(),e.getItem().getItemStack().getType())+".");
-					} else {
-						p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+String.valueOf(mod)+".");
+				if (e.getItem().getItemStack().hasItemMeta() && e.getItem().getItemStack().getItemMeta().hasDisplayName()) {
+					if (e.getRemaining()==0) {
+						p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+e.getItem().getItemStack().getItemMeta().getDisplayName()+".");
+					}
+				} else {
+					if (e.getRemaining()==0) {
+						if (special_convert(e.getItem().getItemStack().getType())) {
+							p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+convertToItemName(e.getItem().getType().getName(),e.getItem().getItemStack().getData().getData(),e.getItem().getItemStack().getType())+".");
+						} else {
+							p.sendMessage(ChatColor.GRAY+""+ChatColor.ITALIC+"Picked up "+e.getItem().getItemStack().getAmount()+" "+String.valueOf(mod)+".");
+						}
 					}
 				}
 			}
@@ -9178,6 +9289,17 @@ implements Listener
 	  }*/
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			final Player p = (Player)e.getEntity();
+			if (e.getDamager() instanceof Silverfish && p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f) {
+				final LivingEntity ss = (LivingEntity)e.getDamager();
+				e.setDamage(e.getDamage()*3);
+				p.setNoDamageTicks((int)(p.getNoDamageTicks()/8));
+				Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+					@Override
+					public void run() {
+						ss.remove();
+					}
+				},10);
+			}
 			if (e.getDamager() instanceof Wolf) {
 				LivingEntity l = (LivingEntity)e.getDamager();
 				if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Hound Caller")) {
