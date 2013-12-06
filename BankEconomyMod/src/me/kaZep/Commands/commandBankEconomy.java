@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 import me.kaZep.Base.Main;
+import me.kaZep.Commands.JobsDataInfo.Job;
 import net.jmhertlein.mctowns.MCTowns;
 import net.jmhertlein.mctowns.MCTownsPlugin;
 import net.jmhertlein.mctowns.database.TownManager;
 import net.jmhertlein.mctowns.structure.Town;
-import me.kaZep.Commands.JobsDataInfo.Job;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;

@@ -1551,10 +1551,11 @@ implements Listener
 		}
 		tempteam.setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 		tempteam.addPlayer(p.getPlayer());
+		/*
 		if (this.plugin.getConfig().getBoolean("maintenance-mode") && !p.hasPermission("maintenance-mode")) {
 			p.kickPlayer("Sorry, the server is currently under "+ChatColor.GREEN+" Maintenance Mode.");
 			return;
-		}
+		}*/
 		//Look through inventory.
 		for (int i=0;i<p.getInventory().getArmorContents().length;i++) {
 			if (p.getInventory().getArmorContents()[i].getItemMeta()!=null && p.getInventory().getArmorContents()[i].getItemMeta().getLore()!=null) {
@@ -2628,7 +2629,7 @@ implements Listener
 							HOUND_CALLER_SPAWN_RATE = 0.01,
 							FISH_CALLER_SPAWN_RATE = 0.01,
 							SUICIDAL_CREEPER_SPAWN_RATE = 0.01,
-							POWER_SURGE_ZOMBIE_SPAWN_RATE = 0.01;
+							POWER_SURGE_ZOMBIE_SPAWN_RATE = 0.2;
 					
 					if (totallvs>80*levelsmult) {
 						//Try to spawn a counter slime.
@@ -6832,7 +6833,9 @@ implements Listener
 	@EventHandler
 	public void onItemChange(PlayerItemHeldEvent e) {
 		Player p = e.getPlayer();
-		
+		if (p.getInventory().getContents()[e.getNewSlot()]!=null) {
+			Bukkit.getLogger().info("Durability of this item is "+p.getInventory().getContents()[e.getNewSlot()].getDurability());
+		}
 		//**************************//Job Buffs begin here.
 		if (p.getInventory().getContents()[e.getNewSlot()]!=null) {
 			if (p.getInventory().getContents()[e.getNewSlot()].getType().name().toLowerCase().contains("pickaxe") && this.plugin.hasJobBuff("Miner", p, Job.JOB10)) {
@@ -8905,6 +8908,9 @@ implements Listener
 
 	@EventHandler
 	public void onEnemyHit(EntityDamageByEntityEvent e) {
+		
+		boolean blocked_attack=false; //Whether or not this attack was blocked. A flag used to detect durability reduction.
+		boolean blocked_hunter_buff=false; //Whether or not the block occurred due to the hunter buff.
 
 		//**********************************//Player buffs begin
 		if (e.getDamager() instanceof Player) {
@@ -9496,330 +9502,13 @@ implements Listener
 					break;
 				}
 			}
-			List<Integer>blocks = new ArrayList<Integer>(); //Corresponds to helmet, chestplate, leggings, and boots.
 			//Found the slot. Check armor values.
 			double block_chance=0,speed_boost_chance=0;
 			if (this.plugin.hasJobBuff("Hunter", p, Job.JOB30A)) {
 				block_chance+=(double)10*this.plugin.getPlayerData(p).blockstack;
-			}
-			if (p.getEquipment().getBoots()!=null) {
-				ItemStack item = p.getEquipment().getBoots();
-				if (this.plugin.isBroken(item)) {
-					//Add it either to our inventory, or drop on the ground.
-					if (this.plugin.inventoryFull(p)) {
-						//Drop it on the ground.
-						p.sendMessage(ChatColor.LIGHT_PURPLE+"Dropped "+item.getItemMeta().getDisplayName()+ChatColor.LIGHT_PURPLE+" on the ground since there is no room in your inventory.");
-						p.getWorld().dropItemNaturally(p.getLocation(), item);
-					} else {
-						p.getInventory().addItem(item);
-					}
-
-					//Remove it from the slot.
-					p.getEquipment().setBoots(new ItemStack(Material.AIR));
-				} else
-					if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
-						for (int i=0;i<item.getItemMeta().getLore().size();i++) {
-							if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Block Chance")) {
-								if (block_chance==0) {
-									block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
-								} else {
-									block_chance+=(75-block_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
-								}
-								blocks.add(3);
-							}
-							if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Speed Boost Chance")) {
-								if (speed_boost_chance==0) {
-									speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
-								} else {
-									speed_boost_chance+=(100-speed_boost_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
-								}
-							}
-						}
-					}
-				//Bukkit.getLogger().info("Made it through 2.1.1.");
-				//p.sendMessage(item.getItemMeta().getDisplayName());
-				if (item.getItemMeta().getDisplayName()!=null && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0 && item.getItemMeta().getLore().contains(ChatColor.RED+"-400% Durability")) {
-					//p.sendMessage("Weak Boots");
-					item.setDurability((short)(item.getDurability()+3));
-				} else {
-					//Bukkit.getLogger().info("Made it through 2.1.2.");
-					if (this.plugin.SPEED_CONTROL.get(slot).boots_durability==-1) {
-						this.plugin.SPEED_CONTROL.get(slot).boots_durability=item.getDurability();
-					}
-					//Bukkit.getLogger().info("Made it through 2.1.3.");
-					////Bukkit.getLogger().info("Durability went from "+this.plugin.SPEED_CONTROL.get(slot).boots_durability+" to "+item.getDurability()+". Attempting to save the armor.");
-					if (this.plugin.SPEED_CONTROL.get(slot).boots_durability<item.getDurability()) {
-						//Bukkit.getLogger().info("Made it through 2.1.4.");
-						double extradurability=0;
-						//See if we can increase the chances of keeping this item's durability.
-						if (!this.plugin.isBroken(item) && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
-							//Bukkit.getLogger().info("Made it through 2.1.5.");
-							for (int i=0;i<item.getItemMeta().getLore().size();i++) {
-								if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Durability")) {
-									if (this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))>100) {
-										extradurability=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
-									}
-								}
-							}
-
-							//Bukkit.getLogger().info("Made it through 2.1.6.");
-						}
-						int heal = item.getDurability()-this.plugin.SPEED_CONTROL.get(slot).boots_durability+1;
-						//p.sendMessage("Heal is "+heal+" ("+item.getDurability()+"-"+this.plugin.SPEED_CONTROL.get(slot).boots_durability+")");
-						if (Math.random()<=0.75 && heal>0) {
-							heal--;
-							item.setDurability((short)(item.getDurability()-1));
-							//p.sendMessage("Healed! "+item.getDurability());
-						}
-						if (heal!=0) {
-							while (extradurability>0) {
-								extradurability-=200;
-								if (Math.random()<=0.5 && heal>0) {
-									heal--;
-									item.setDurability((short)(item.getDurability()-1));
-									//p.sendMessage("Healed! "+item.getDurability());
-								}
-							}
-						}
-						//Bukkit.getLogger().info("Armor durability now "+item.getDurability());
-						//Bukkit.getLogger().info("Made it through 2.1.7.");
-						this.plugin.SPEED_CONTROL.get(slot).boots_durability=item.getDurability();
-						//p.sendMessage("New Durability: "+item.getDurability());
-						//Bukkit.getLogger().info("Made it through 2.1.8.");
-					}
+				if (Math.random()*100<=block_chance) {
+					blocked_hunter_buff=true;
 				}
-			} else {
-				this.plugin.SPEED_CONTROL.get(slot).boots_durability=-1;
-				//Bukkit.getLogger().info("Made it through 2.1.9.");
-			}
-			//Bukkit.getLogger().info("Made it through 2.1.");
-			if (p.getEquipment().getChestplate()!=null) {
-				ItemStack item = p.getEquipment().getChestplate();
-				if (this.plugin.isBroken(item)) {
-					//Add it either to our inventory, or drop on the ground.
-					if (this.plugin.inventoryFull(p)) {
-						//Drop it on the ground.
-						p.sendMessage(ChatColor.LIGHT_PURPLE+"Dropped "+item.getItemMeta().getDisplayName()+ChatColor.LIGHT_PURPLE+" on the ground since there is no room in your inventory.");
-						p.getWorld().dropItemNaturally(p.getLocation(), item);
-					} else {
-						p.getInventory().addItem(item);
-					}
-
-					//Remove it from the slot.
-					p.getEquipment().setChestplate(new ItemStack(Material.AIR));
-				} else
-					if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
-						for (int i=0;i<item.getItemMeta().getLore().size();i++) {
-							if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Block Chance")) {
-								if (block_chance==0) {
-									block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
-								} else {
-									block_chance+=(75-block_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
-								}
-								blocks.add(1);
-							}
-							if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Speed Boost Chance")) {
-								if (speed_boost_chance==0) {
-									speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
-								} else {
-									speed_boost_chance+=(100-speed_boost_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
-								}
-							}
-						}
-					}
-				//p.sendMessage(item.getItemMeta().getDisplayName());
-				if (item.getItemMeta().getDisplayName()!=null && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0 && item.getItemMeta().getLore().contains(ChatColor.RED+"-400% Durability")) {
-					//p.sendMessage("Weak Chestplate");
-					item.setDurability((short)(item.getDurability()+3));
-				} else {
-					if (this.plugin.SPEED_CONTROL.get(slot).chestplate_durability==-1) {
-						this.plugin.SPEED_CONTROL.get(slot).chestplate_durability=item.getDurability();
-					}
-					////Bukkit.getLogger().info("Durability went from "+this.plugin.SPEED_CONTROL.get(slot).chestplate_durability+" to "+item.getDurability()+". Attempting to save the armor.");
-					if (this.plugin.SPEED_CONTROL.get(slot).chestplate_durability<item.getDurability()) {
-						double extradurability=0;
-						//See if we can increase the chances of keeping this item's durability.
-						if (!this.plugin.isBroken(item) && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
-							for (int i=0;i<item.getItemMeta().getLore().size();i++) {
-								if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Durability")) {
-									if (this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))>100) {
-										extradurability=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
-									}
-								}
-							}	
-						}
-						boolean allow=false;
-						int heal = item.getDurability()-this.plugin.SPEED_CONTROL.get(slot).chestplate_durability+1;
-						if (Math.random()<=0.75 && heal>0) {
-							heal--;
-							item.setDurability((short)(item.getDurability()-1));
-						}
-						if (heal!=0) {
-							while (extradurability>0) {
-								extradurability-=200;
-								if (Math.random()<=0.5 && heal>0) {
-									heal--;
-									item.setDurability((short)(item.getDurability()-1));
-								}
-							}
-						}
-						this.plugin.SPEED_CONTROL.get(slot).chestplate_durability=item.getDurability();
-					}
-				}
-			} else {
-				this.plugin.SPEED_CONTROL.get(slot).chestplate_durability=-1;
-			}
-			//Bukkit.getLogger().info("Made it through 2.2.");
-			if (p.getEquipment().getLeggings()!=null) {
-				ItemStack item = p.getEquipment().getLeggings();
-				if (this.plugin.isBroken(item)) {
-					//Add it either to our inventory, or drop on the ground.
-					if (this.plugin.inventoryFull(p)) {
-						//Drop it on the ground.
-						p.sendMessage(ChatColor.LIGHT_PURPLE+"Dropped "+item.getItemMeta().getDisplayName()+ChatColor.LIGHT_PURPLE+" on the ground since there is no room in your inventory.");
-						p.getWorld().dropItemNaturally(p.getLocation(), item);
-					} else {
-						p.getInventory().addItem(item);
-					}
-
-					//Remove it from the slot.
-					p.getEquipment().setLeggings(new ItemStack(Material.AIR));
-				} else
-					if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
-						for (int i=0;i<item.getItemMeta().getLore().size();i++) {
-							if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Block Chance")) {
-								if (block_chance==0) {
-									block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
-								} else {
-									block_chance+=(75-block_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
-								}
-								blocks.add(2);
-							}
-							if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Speed Boost Chance")) {
-								if (speed_boost_chance==0) {
-									speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
-								} else {
-									speed_boost_chance+=(100-speed_boost_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
-								}
-							}
-						}
-					}
-				//p.sendMessage(item.getItemMeta().getDisplayName());
-				if (item.getItemMeta().getDisplayName()!=null && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0 && item.getItemMeta().getLore().contains(ChatColor.RED+"-400% Durability")) {
-					//p.sendMessage("Weak Leggings");
-					item.setDurability((short)(item.getDurability()+3));
-				} else {
-					if (this.plugin.SPEED_CONTROL.get(slot).leggings_durability==-1) {
-						this.plugin.SPEED_CONTROL.get(slot).leggings_durability=item.getDurability();
-					}
-					////Bukkit.getLogger().info("Durability went from "+this.plugin.SPEED_CONTROL.get(slot).leggings_durability+" to "+item.getDurability()+". Attempting to save the armor.");
-					if (this.plugin.SPEED_CONTROL.get(slot).leggings_durability<item.getDurability()) {
-						double extradurability=0;
-						//See if we can increase the chances of keeping this item's durability.
-						if (!this.plugin.isBroken(item) && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
-							for (int i=0;i<item.getItemMeta().getLore().size();i++) {
-								if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Durability")) {
-									if (this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))>100) {
-										extradurability=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
-									}
-								}
-							}
-						}
-						int heal = item.getDurability()-this.plugin.SPEED_CONTROL.get(slot).leggings_durability+1;
-						if (Math.random()<=0.75 && heal>0) {
-							heal--;
-							item.setDurability((short)(item.getDurability()-1));
-						}
-						if (heal!=0) {
-							while (extradurability>0) {
-								extradurability-=200;
-								if (Math.random()<=0.5 && heal>0) {
-									heal--;
-									item.setDurability((short)(item.getDurability()-1));
-								}
-							}
-						}
-						this.plugin.SPEED_CONTROL.get(slot).leggings_durability=item.getDurability();
-					}
-				}
-			} else {
-				this.plugin.SPEED_CONTROL.get(slot).leggings_durability=-1;
-			}
-			//Bukkit.getLogger().info("Made it through 2.3");
-			if (p.getEquipment().getHelmet()!=null) {
-				ItemStack item = p.getEquipment().getHelmet();
-				if (this.plugin.isBroken(item)) {
-					//Add it either to our inventory, or drop on the ground.
-					if (this.plugin.inventoryFull(p)) {
-						//Drop it on the ground.
-						p.sendMessage(ChatColor.LIGHT_PURPLE+"Dropped "+item.getItemMeta().getDisplayName()+ChatColor.LIGHT_PURPLE+" on the ground since there is no room in your inventory.");
-						p.getWorld().dropItemNaturally(p.getLocation(), item);
-					} else {
-						p.getInventory().addItem(item);
-					}
-
-					//Remove it from the slot.
-					p.getEquipment().setHelmet(new ItemStack(Material.AIR));
-				} else
-					if (item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
-						for (int i=0;i<item.getItemMeta().getLore().size();i++) {
-							if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Block Chance")) {
-								if (block_chance==0) {
-									block_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
-								} else {
-									block_chance+=(75-block_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))/100d);
-								}
-								blocks.add(0);
-							}
-							if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Speed Boost Chance")) {
-								if (speed_boost_chance==0) {
-									speed_boost_chance+=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
-								} else {
-									speed_boost_chance+=(100-speed_boost_chance)*(this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i)));
-								}
-							}
-						}
-					}
-				//p.sendMessage(item.getItemMeta().getDisplayName());
-				if (item.getItemMeta().getDisplayName()!=null && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0 && item.getItemMeta().getLore().contains(ChatColor.RED+"-400% Durability")) {
-					//p.sendMessage("Weak Helmet");
-					item.setDurability((short)(item.getDurability()+3));
-				} else {
-					if (this.plugin.SPEED_CONTROL.get(slot).helmet_durability==-1) {
-						this.plugin.SPEED_CONTROL.get(slot).helmet_durability=item.getDurability();
-					}
-					////Bukkit.getLogger().info("Durability went from "+this.plugin.SPEED_CONTROL.get(slot).helmet_durability+" to "+item.getDurability()+". Attempting to save the armor.");
-					if (this.plugin.SPEED_CONTROL.get(slot).helmet_durability<item.getDurability()) {
-						double extradurability=0;
-						//See if we can increase the chances of keeping this item's durability.
-						if (!this.plugin.isBroken(item) && item.getItemMeta()!=null && item.getItemMeta().getLore()!=null && item.getItemMeta().getLore().size()!=0) {
-							for (int i=0;i<item.getItemMeta().getLore().size();i++) {
-								if (this.plugin.containsEnchantment(item.getItemMeta().getLore().get(i), "Durability")) {
-									if (this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i))>100) {
-										extradurability=this.plugin.getEnchantmentNumb(item.getItemMeta().getLore().get(i));
-									}
-								}
-							}
-						}
-						int heal = item.getDurability()-this.plugin.SPEED_CONTROL.get(slot).helmet_durability+1;
-						if (Math.random()<=0.75 && heal>0) {
-							heal--;
-							item.setDurability((short)(item.getDurability()-1));
-						}
-						if (heal!=0) {
-							while (extradurability>0) {
-								extradurability-=200;
-								if (Math.random()<=0.5 && heal>0) {
-									heal--;
-									item.setDurability((short)(item.getDurability()-1));
-								}
-							}
-						}
-						this.plugin.SPEED_CONTROL.get(slot).helmet_durability=item.getDurability();
-					}
-				}
-			} else {
-				this.plugin.SPEED_CONTROL.get(slot).helmet_durability=-1;
 			}
 			//Bukkit.getLogger().info("Made it through 3.");
 			//This is the player getting hit.
@@ -9864,6 +9553,8 @@ implements Listener
 			if (Math.random()<=block_chance/100.0d) {
 				e.setDamage(0);
 				//Choose a random set to mark off.
+				blocked_attack=true;
+				/*
 				if (blocks.size()>0) {
 					int armor = blocks.get((int)(Math.random()*blocks.size()));
 					switch (armor) {
@@ -9880,7 +9571,7 @@ implements Listener
 						p.getInventory().getBoots().setDurability((short)(p.getInventory().getBoots().getDurability()+1));
 					}break;
 					}
-				}
+				}*/
 				e.setCancelled(true);
 			}
 			//Bukkit.getLogger().info("Made it through 4.");
@@ -10648,6 +10339,140 @@ implements Listener
 					}
 				}
 			}
+		}
+		if (e.getEntity().getType()==EntityType.PLAYER) {
+			final Player p = (Player)e.getEntity();
+			final boolean blocked = blocked_attack;
+			final boolean blocked_hunter = blocked_hunter_buff;
+			final Main plug = this.plugin;
+			p.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+				@Override
+				public void run() {
+					//This player lost durability, we will attempt to give it back based on certain conditions.
+					//CASE 1: The player actually loses more durability if it's weak armor.
+					//CASE 2: The player gains back -1 durability if they have +X% Durability. The chance of it occuring is Math.random()*X<=100
+					//CASE 3: The amount lost by the blocking stat has the possibility to be gained back.
+					int helm_dura=-1,chest_dura=-1,legs_dura=-1,boots_dura=-1;
+					boolean weak_helm=false,weak_chest=false,weak_legs=false,weak_boots=false;
+					if (p.getEquipment().getHelmet()!=null) {helm_dura=p.getEquipment().getHelmet().getDurability();}
+					if (p.getEquipment().getChestplate()!=null) {chest_dura=p.getEquipment().getChestplate().getDurability();}
+					if (p.getEquipment().getLeggings()!=null) {legs_dura=p.getEquipment().getLeggings().getDurability();}
+					if (p.getEquipment().getBoots()!=null) {boots_dura=p.getEquipment().getBoots().getDurability();}
+					Bukkit.getLogger().info("Durability of items are: "+helm_dura+","+chest_dura+","+legs_dura+","+boots_dura);
+					int gained_back=0;
+					if (!blocked_hunter && blocked) {
+						if (p.getEquipment().getHelmet()!=null && p.getEquipment().getHelmet().hasItemMeta() &&
+								p.getEquipment().getHelmet().getItemMeta().hasLore()) {
+							List<String> lore = p.getEquipment().getHelmet().getItemMeta().getLore();
+							for (int i=0;i<lore.size();i++) {
+								if (plug.containsEnchantment(lore.get(i), ChatColor.RED+"-400% Durability")) {
+									helm_dura+=3;
+									weak_helm=true;
+								}
+								if (plug.containsEnchantment(lore.get(i), "Block Chance")) {
+									helm_dura+=1;
+								}
+							}
+						}
+						if (p.getEquipment().getChestplate()!=null && p.getEquipment().getChestplate().hasItemMeta() &&
+								p.getEquipment().getChestplate().getItemMeta().hasLore()) {
+							List<String> lore = p.getEquipment().getChestplate().getItemMeta().getLore();
+							for (int i=0;i<lore.size();i++) {
+								if (plug.containsEnchantment(lore.get(i), ChatColor.RED+"-400% Durability")) {
+									chest_dura+=3;
+									weak_chest=true;
+								}
+								if (plug.containsEnchantment(lore.get(i), "Block Chance")) {
+									chest_dura+=1;
+								}
+							}
+						}
+						if (p.getEquipment().getLeggings()!=null && p.getEquipment().getLeggings().hasItemMeta() &&
+								p.getEquipment().getLeggings().getItemMeta().hasLore()) {
+							List<String> lore = p.getEquipment().getLeggings().getItemMeta().getLore();
+							for (int i=0;i<lore.size();i++) {
+								if (plug.containsEnchantment(lore.get(i), ChatColor.RED+"-400% Durability")) {
+									legs_dura+=3;
+									weak_legs=true;
+								}
+								if (plug.containsEnchantment(lore.get(i), "Block Chance")) {
+									legs_dura+=1;
+								}
+							}
+						}
+						if (p.getEquipment().getBoots()!=null && p.getEquipment().getBoots().hasItemMeta() &&
+								p.getEquipment().getBoots().getItemMeta().hasLore()) {
+							List<String> lore = p.getEquipment().getBoots().getItemMeta().getLore();
+							for (int i=0;i<lore.size();i++) {
+								if (plug.containsEnchantment(lore.get(i), ChatColor.RED+"-400% Durability")) {
+									boots_dura+=3;
+									weak_boots=true;
+								}
+								if (plug.containsEnchantment(lore.get(i), "Block Chance")) {
+									boots_dura+=1;
+								}
+							}
+						}
+					}
+					if (p.getEquipment().getHelmet()!=null && p.getEquipment().getHelmet().hasItemMeta() &&
+							p.getEquipment().getHelmet().getItemMeta().hasLore()) {
+						List<String> lore = p.getEquipment().getHelmet().getItemMeta().getLore();
+						for (int i=0;i<lore.size();i++) {
+							if (plug.containsEnchantment(lore.get(i), "Durability")) {
+								double dura_numb=plug.getEnchantmentNumb("Durability");
+								if (!weak_helm) {dura_numb+=300;}
+								if (Math.random()*dura_numb>100) {
+									helm_dura-=1;
+								}
+							}
+						}
+					}
+					if (p.getEquipment().getChestplate()!=null && p.getEquipment().getChestplate().hasItemMeta() &&
+							p.getEquipment().getChestplate().getItemMeta().hasLore()) {
+						List<String> lore = p.getEquipment().getChestplate().getItemMeta().getLore();
+						for (int i=0;i<lore.size();i++) {
+							if (plug.containsEnchantment(lore.get(i), "Durability")) {
+								double dura_numb=plug.getEnchantmentNumb("Durability");
+								if (!weak_chest) {dura_numb+=300;}
+								if (Math.random()*dura_numb>100) {
+									chest_dura-=1;
+								}
+							}
+						}
+					}
+					if (p.getEquipment().getLeggings()!=null && p.getEquipment().getLeggings().hasItemMeta() &&
+							p.getEquipment().getLeggings().getItemMeta().hasLore()) {
+						List<String> lore = p.getEquipment().getLeggings().getItemMeta().getLore();
+						for (int i=0;i<lore.size();i++) {
+							if (plug.containsEnchantment(lore.get(i), "Durability")) {
+								double dura_numb=plug.getEnchantmentNumb("Durability");
+								if (!weak_legs) {dura_numb+=300;}
+								if (Math.random()*dura_numb>100) {
+									legs_dura-=1;
+								}
+							}
+						}
+					}
+					if (p.getEquipment().getBoots()!=null && p.getEquipment().getBoots().hasItemMeta() &&
+							p.getEquipment().getBoots().getItemMeta().hasLore()) {
+						List<String> lore = p.getEquipment().getBoots().getItemMeta().getLore();
+						for (int i=0;i<lore.size();i++) {
+							if (plug.containsEnchantment(lore.get(i), "Durability")) {
+								double dura_numb=plug.getEnchantmentNumb("Durability");
+								if (!weak_boots) {dura_numb+=300;}
+								if (Math.random()*dura_numb>100) {
+									boots_dura-=1;
+								}
+							}
+						}
+					}
+					if (p.getEquipment().getBoots()!=null) {ItemStack i = p.getEquipment().getBoots(); i.setDurability((short)boots_dura); p.getEquipment().setBoots(i);}
+					if (p.getEquipment().getLeggings()!=null) {ItemStack i = p.getEquipment().getLeggings(); i.setDurability((short)legs_dura); p.getEquipment().setLeggings(i);}
+					if (p.getEquipment().getChestplate()!=null) {ItemStack i = p.getEquipment().getChestplate(); i.setDurability((short)chest_dura); p.getEquipment().setChestplate(i);}
+					if (p.getEquipment().getHelmet()!=null) {ItemStack i = p.getEquipment().getHelmet(); i.setDurability((short)helm_dura); p.getEquipment().setHelmet(i);}
+					Bukkit.getLogger().info("Durability of items now are: "+helm_dura+","+chest_dura+","+legs_dura+","+boots_dura);
+				}
+			},1);
 		}
 	}
 
@@ -17028,107 +16853,9 @@ implements Listener
 		}break;
 		}
 		if (name.equalsIgnoreCase("Dye")) {
-			switch (data) {
-			case 0:{
-				color = "Black";
-			}break;
-			case 1:{
-				color = "Red";
-			}break;
-			case 2:{
-				color = "Green";
-			}break;
-			case 3:{
-				color = "Brown";
-			}break;
-			case 4:{
-				color = "Blue";
-			}break;
-			case 5:{
-				color = "Purple";
-			}break;
-			case 6:{
-				color = "Cyan";
-			}break;
-			case 7:{
-				color = "Light Gray";
-			}break;
-			case 8:{
-				color = "Gray";
-			}break;
-			case 9:{
-				color = "Pink";
-			}break;
-			case 10:{
-				color = "Lime";
-			}break;
-			case 11:{
-				color = "Yellow";
-			}break;
-			case 12:{
-				color = "Light Blue";
-			}break;
-			case 13:{
-				color = "Magenta";
-			}break;
-			case 14:{
-				color = "Orange";
-			}break;
-			case 15:{
-				color = "White";
-			}break;
-			}
+			color = DyeColor.getByDyeData((byte)data).name();
 		} else {
-			switch (data) {
-			case 0:{
-				color = "White";
-			}break;
-			case 1:{
-				color = "Orange";
-			}break;
-			case 2:{
-				color = "Magenta";
-			}break;
-			case 3:{
-				color = "Light Blue";
-			}break;
-			case 4:{
-				color = "Yellow";
-			}break;
-			case 5:{
-				color = "Lime";
-			}break;
-			case 6:{
-				color = "Pink";
-			}break;
-			case 7:{
-				color = "Gray";
-			}break;
-			case 8:{
-				color = "Light Gray";
-			}break;
-			case 9:{
-				color = "Cyan";
-			}break;
-			case 10:{
-				color = "Purple";
-			}break;
-			case 11:{
-				color = "Blue";
-			}break;
-			case 12:{
-				color = "Brown";
-			}break;
-			case 13:{
-				color = "Green";
-			}break;
-			case 14:{
-				color = "Red";
-			}break;
-			case 15:{
-				color = "Black";
-			}break;
-			}
+			color = DyeColor.getByWoolData((byte)data).name();
 		}
 		return String.valueOf(color+" "+name);
 	}
