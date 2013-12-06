@@ -4892,7 +4892,7 @@ public void payDay(int time)
     }
     
     public boolean containsEnchantment(String s, String enchant) {
-  	  if (s.contains(enchant)) {
+  	  if (s.contains(enchant) && (!enchant.equals("Durability") || (enchant.equals("Durability") && !s.contains(ChatColor.RED+"-400% Durability")))) {
   		  return true;
   	  }
   	  return false;
@@ -5097,7 +5097,7 @@ public void payDay(int time)
     public double getEnchantmentNumb(String s) {
   	  //Parse the string for spaces.
   	  String[] enchant = s.split(" ");
-  	  if (enchant[0].contains(ChatColor.YELLOW+"")) {
+  	  if (!s.contains(ChatColor.RED+"-400% Durability") && enchant[0].contains(ChatColor.YELLOW+"")) {
   		  String newstring = ((enchant[0].replace(ChatColor.YELLOW.getChar(), ' ')).replace('%', ' ')).replace(Character.toString((char)0x00A7), Character.toString((char)0x0020));
   		  //Bukkit.getLogger().info("Enchant number is "+Double.valueOf(newstring));
   		  return Double.valueOf(newstring);

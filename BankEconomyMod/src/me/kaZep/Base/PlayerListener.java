@@ -9515,6 +9515,14 @@ implements Listener
 			for (int i=0;i<p.getEquipment().getArmorContents().length;i++) {
 				if (p.getEquipment().getArmorContents()[i]!=null && !this.plugin.isBroken(p.getEquipment().getArmorContents()[i]) && p.getEquipment().getArmorContents()[i].getItemMeta()!=null && p.getEquipment().getArmorContents()[i].getItemMeta().getLore()!=null) {
 					for (int j=0;j<p.getEquipment().getArmorContents()[i].getItemMeta().getLore().size();j++) {
+						if (this.plugin.containsEnchantment(p.getEquipment().getArmorContents()[i].getItemMeta().getLore().get(j), "Block Chance")) {
+							Bukkit.getLogger().info("Block chance check is "+this.plugin.getEnchantmentNumb(p.getEquipment().getArmorContents()[i].getItemMeta().getLore().get(j)));
+							if (block_chance==0) {
+								block_chance+=this.plugin.getEnchantmentNumb(p.getEquipment().getArmorContents()[i].getItemMeta().getLore().get(j));
+							} else {
+								block_chance+=(100-block_chance)*(this.plugin.getEnchantmentNumb(p.getEquipment().getArmorContents()[i].getItemMeta().getLore().get(j))/100.0d);
+							}
+						}
 						if (this.plugin.containsEnchantment(p.getEquipment().getArmorContents()[i].getItemMeta().getLore().get(j), "Damage Reduction")) {
 							e.setDamage(e.getDamage()*(1-(this.plugin.getEnchantmentNumb(p.getEquipment().getArmorContents()[i].getItemMeta().getLore().get(j))/100.0d)));
 						}
@@ -9572,10 +9580,11 @@ implements Listener
 					}break;
 					}
 				}*/
+				p.playSound(p.getLocation(), Sound.ANVIL_LAND, 0.1f, 3.6f);
 				e.setCancelled(true);
 			}
 			//Bukkit.getLogger().info("Made it through 4.");
-			p.updateInventory();
+			//p.updateInventory();
 			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat3")>0) {
 				double olddmg=e.getDamage();
 				e.setDamage(e.getDamage()*(((100-this.plugin.getStatBonus(2, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat3")/4))/100.0d)));
@@ -10345,32 +10354,32 @@ implements Listener
 			final boolean blocked = blocked_attack;
 			final boolean blocked_hunter = blocked_hunter_buff;
 			final Main plug = this.plugin;
-			p.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-				@Override
-				public void run() {
-					//This player lost durability, we will attempt to give it back based on certain conditions.
-					//CASE 1: The player actually loses more durability if it's weak armor.
-					//CASE 2: The player gains back -1 durability if they have +X% Durability. The chance of it occuring is Math.random()*X<=100
-					//CASE 3: The amount lost by the blocking stat has the possibility to be gained back.
-					int helm_dura=-1,chest_dura=-1,legs_dura=-1,boots_dura=-1;
-					boolean weak_helm=false,weak_chest=false,weak_legs=false,weak_boots=false;
-					if (p.getEquipment().getHelmet()!=null) {helm_dura=p.getEquipment().getHelmet().getDurability();}
-					if (p.getEquipment().getChestplate()!=null) {chest_dura=p.getEquipment().getChestplate().getDurability();}
-					if (p.getEquipment().getLeggings()!=null) {legs_dura=p.getEquipment().getLeggings().getDurability();}
-					if (p.getEquipment().getBoots()!=null) {boots_dura=p.getEquipment().getBoots().getDurability();}
-					Bukkit.getLogger().info("Durability of items are: "+helm_dura+","+chest_dura+","+legs_dura+","+boots_dura);
-					int gained_back=0;
-					if (!blocked_hunter && blocked) {
+			if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f) {
+				p.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+					@Override
+					public void run() {
+						//This player lost durability, we will attempt to give it back based on certain conditions.
+						//CASE 1: The player actually loses more durability if it's weak armor.
+						//CASE 2: The player gains back -1 durability if they have +X% Durability. The chance of it occuring is Math.random()*X<=100
+						//CASE 3: The amount lost by the blocking stat has the possibility to be gained back.
+						int helm_dura=-1,chest_dura=-1,legs_dura=-1,boots_dura=-1;
+						boolean weak_helm=false,weak_chest=false,weak_legs=false,weak_boots=false;
+						if (p.getEquipment().getHelmet()!=null) {helm_dura=p.getEquipment().getHelmet().getDurability();}
+						if (p.getEquipment().getChestplate()!=null) {chest_dura=p.getEquipment().getChestplate().getDurability();}
+						if (p.getEquipment().getLeggings()!=null) {legs_dura=p.getEquipment().getLeggings().getDurability();}
+						if (p.getEquipment().getBoots()!=null) {boots_dura=p.getEquipment().getBoots().getDurability();}
+						Bukkit.getLogger().info("Durability of items are: "+helm_dura+","+chest_dura+","+legs_dura+","+boots_dura);
+						int gained_back=0;
 						if (p.getEquipment().getHelmet()!=null && p.getEquipment().getHelmet().hasItemMeta() &&
 								p.getEquipment().getHelmet().getItemMeta().hasLore()) {
 							List<String> lore = p.getEquipment().getHelmet().getItemMeta().getLore();
 							for (int i=0;i<lore.size();i++) {
-								if (plug.containsEnchantment(lore.get(i), ChatColor.RED+"-400% Durability")) {
+								if (lore.get(i).contains(ChatColor.RED+"-400% Durability")) {
 									helm_dura+=3;
 									weak_helm=true;
 								}
-								if (plug.containsEnchantment(lore.get(i), "Block Chance")) {
-									helm_dura+=1;
+								if (!blocked_hunter && blocked && plug.containsEnchantment(lore.get(i), "Block Chance")) {
+									helm_dura+=3;
 								}
 							}
 						}
@@ -10378,12 +10387,12 @@ implements Listener
 								p.getEquipment().getChestplate().getItemMeta().hasLore()) {
 							List<String> lore = p.getEquipment().getChestplate().getItemMeta().getLore();
 							for (int i=0;i<lore.size();i++) {
-								if (plug.containsEnchantment(lore.get(i), ChatColor.RED+"-400% Durability")) {
+								if (lore.get(i).contains(ChatColor.RED+"-400% Durability")) {
 									chest_dura+=3;
 									weak_chest=true;
 								}
-								if (plug.containsEnchantment(lore.get(i), "Block Chance")) {
-									chest_dura+=1;
+								if (!blocked_hunter && blocked && plug.containsEnchantment(lore.get(i), "Block Chance")) {
+									chest_dura+=3;
 								}
 							}
 						}
@@ -10391,12 +10400,13 @@ implements Listener
 								p.getEquipment().getLeggings().getItemMeta().hasLore()) {
 							List<String> lore = p.getEquipment().getLeggings().getItemMeta().getLore();
 							for (int i=0;i<lore.size();i++) {
-								if (plug.containsEnchantment(lore.get(i), ChatColor.RED+"-400% Durability")) {
+								if (lore.get(i).contains(ChatColor.RED+"-400% Durability")) {
 									legs_dura+=3;
 									weak_legs=true;
 								}
-								if (plug.containsEnchantment(lore.get(i), "Block Chance")) {
-									legs_dura+=1;
+								if (!blocked_hunter && blocked && plug.containsEnchantment(lore.get(i), "Block Chance")) {
+									Bukkit.getLogger().info("Leggings Block Chance.");
+									legs_dura+=3;
 								}
 							}
 						}
@@ -10404,75 +10414,79 @@ implements Listener
 								p.getEquipment().getBoots().getItemMeta().hasLore()) {
 							List<String> lore = p.getEquipment().getBoots().getItemMeta().getLore();
 							for (int i=0;i<lore.size();i++) {
-								if (plug.containsEnchantment(lore.get(i), ChatColor.RED+"-400% Durability")) {
+								if (lore.get(i).contains(ChatColor.RED+"-400% Durability")) {
 									boots_dura+=3;
 									weak_boots=true;
 								}
-								if (plug.containsEnchantment(lore.get(i), "Block Chance")) {
-									boots_dura+=1;
+								if (!blocked_hunter && blocked && plug.containsEnchantment(lore.get(i), "Block Chance")) {
+									boots_dura+=3;
 								}
 							}
 						}
-					}
-					if (p.getEquipment().getHelmet()!=null && p.getEquipment().getHelmet().hasItemMeta() &&
-							p.getEquipment().getHelmet().getItemMeta().hasLore()) {
-						List<String> lore = p.getEquipment().getHelmet().getItemMeta().getLore();
-						for (int i=0;i<lore.size();i++) {
-							if (plug.containsEnchantment(lore.get(i), "Durability")) {
-								double dura_numb=plug.getEnchantmentNumb("Durability");
-								if (!weak_helm) {dura_numb+=300;}
+						if (p.getEquipment().getHelmet()!=null && p.getEquipment().getHelmet().hasItemMeta() &&
+								p.getEquipment().getHelmet().getItemMeta().hasLore()) {
+							List<String> lore = p.getEquipment().getHelmet().getItemMeta().getLore();
+							for (int i=0;i<lore.size();i++) {
+								double dura_numb=0;
+								if (plug.containsEnchantment(lore.get(i), "Durability")) {
+									dura_numb+=plug.getEnchantmentNumb("Durability");
+								}
+								if (!weak_helm) {dura_numb+=300; /*Bukkit.getLogger().info("1 not weak.");*/}
 								if (Math.random()*dura_numb>100) {
 									helm_dura-=1;
 								}
 							}
 						}
-					}
-					if (p.getEquipment().getChestplate()!=null && p.getEquipment().getChestplate().hasItemMeta() &&
-							p.getEquipment().getChestplate().getItemMeta().hasLore()) {
-						List<String> lore = p.getEquipment().getChestplate().getItemMeta().getLore();
-						for (int i=0;i<lore.size();i++) {
-							if (plug.containsEnchantment(lore.get(i), "Durability")) {
-								double dura_numb=plug.getEnchantmentNumb("Durability");
-								if (!weak_chest) {dura_numb+=300;}
+						if (p.getEquipment().getChestplate()!=null && p.getEquipment().getChestplate().hasItemMeta() &&
+								p.getEquipment().getChestplate().getItemMeta().hasLore()) {
+							List<String> lore = p.getEquipment().getChestplate().getItemMeta().getLore();
+							for (int i=0;i<lore.size();i++) {
+								double dura_numb=0;
+								if (plug.containsEnchantment(lore.get(i), "Durability")) {
+									dura_numb+=plug.getEnchantmentNumb("Durability");
+								}
+								if (!weak_chest) {dura_numb+=300; /*Bukkit.getLogger().info("2 not weak.");*/}
 								if (Math.random()*dura_numb>100) {
 									chest_dura-=1;
 								}
 							}
 						}
-					}
-					if (p.getEquipment().getLeggings()!=null && p.getEquipment().getLeggings().hasItemMeta() &&
-							p.getEquipment().getLeggings().getItemMeta().hasLore()) {
-						List<String> lore = p.getEquipment().getLeggings().getItemMeta().getLore();
-						for (int i=0;i<lore.size();i++) {
-							if (plug.containsEnchantment(lore.get(i), "Durability")) {
-								double dura_numb=plug.getEnchantmentNumb("Durability");
-								if (!weak_legs) {dura_numb+=300;}
+						if (p.getEquipment().getLeggings()!=null && p.getEquipment().getLeggings().hasItemMeta() &&
+								p.getEquipment().getLeggings().getItemMeta().hasLore()) {
+							List<String> lore = p.getEquipment().getLeggings().getItemMeta().getLore();
+							for (int i=0;i<lore.size();i++) {
+								double dura_numb=0;
+								if (plug.containsEnchantment(lore.get(i), "Durability")) {
+									dura_numb+=plug.getEnchantmentNumb("Durability");
+								}
+								if (!weak_legs) {dura_numb+=300; /*Bukkit.getLogger().info("3 not weak.");*/}
 								if (Math.random()*dura_numb>100) {
 									legs_dura-=1;
 								}
 							}
 						}
-					}
-					if (p.getEquipment().getBoots()!=null && p.getEquipment().getBoots().hasItemMeta() &&
-							p.getEquipment().getBoots().getItemMeta().hasLore()) {
-						List<String> lore = p.getEquipment().getBoots().getItemMeta().getLore();
-						for (int i=0;i<lore.size();i++) {
-							if (plug.containsEnchantment(lore.get(i), "Durability")) {
-								double dura_numb=plug.getEnchantmentNumb("Durability");
-								if (!weak_boots) {dura_numb+=300;}
+						if (p.getEquipment().getBoots()!=null && p.getEquipment().getBoots().hasItemMeta() &&
+								p.getEquipment().getBoots().getItemMeta().hasLore()) {
+							List<String> lore = p.getEquipment().getBoots().getItemMeta().getLore();
+							for (int i=0;i<lore.size();i++) {
+								double dura_numb=0;
+								if (plug.containsEnchantment(lore.get(i), "Durability")) {
+									dura_numb+=plug.getEnchantmentNumb("Durability");
+								}
+								if (!weak_boots) {dura_numb+=300; /*Bukkit.getLogger().info("4 not weak.");*/}
 								if (Math.random()*dura_numb>100) {
 									boots_dura-=1;
 								}
 							}
 						}
+						if (p.getEquipment().getBoots()!=null) {ItemStack i = p.getEquipment().getBoots(); i.setDurability((short)boots_dura); p.getEquipment().setBoots(i);}
+						if (p.getEquipment().getLeggings()!=null) {ItemStack i = p.getEquipment().getLeggings(); i.setDurability((short)legs_dura); p.getEquipment().setLeggings(i);}
+						if (p.getEquipment().getChestplate()!=null) {ItemStack i = p.getEquipment().getChestplate(); i.setDurability((short)chest_dura); p.getEquipment().setChestplate(i);}
+						if (p.getEquipment().getHelmet()!=null) {ItemStack i = p.getEquipment().getHelmet(); i.setDurability((short)helm_dura); p.getEquipment().setHelmet(i);}
+						Bukkit.getLogger().info("Durability of items now are: "+helm_dura+","+chest_dura+","+legs_dura+","+boots_dura);
 					}
-					if (p.getEquipment().getBoots()!=null) {ItemStack i = p.getEquipment().getBoots(); i.setDurability((short)boots_dura); p.getEquipment().setBoots(i);}
-					if (p.getEquipment().getLeggings()!=null) {ItemStack i = p.getEquipment().getLeggings(); i.setDurability((short)legs_dura); p.getEquipment().setLeggings(i);}
-					if (p.getEquipment().getChestplate()!=null) {ItemStack i = p.getEquipment().getChestplate(); i.setDurability((short)chest_dura); p.getEquipment().setChestplate(i);}
-					if (p.getEquipment().getHelmet()!=null) {ItemStack i = p.getEquipment().getHelmet(); i.setDurability((short)helm_dura); p.getEquipment().setHelmet(i);}
-					Bukkit.getLogger().info("Durability of items now are: "+helm_dura+","+chest_dura+","+legs_dura+","+boots_dura);
-				}
-			},1);
+				},1);
+			}
 		}
 	}
 
