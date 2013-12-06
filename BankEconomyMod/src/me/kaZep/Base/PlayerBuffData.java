@@ -209,11 +209,6 @@ public class PlayerBuffData {
 				p.removePotionEffect(PotionEffectType.FAST_DIGGING);
 				p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,399,this.plugin.getStatBonus(1, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat2")/5)/20-1));
 			}
-			//p.sendMessage("Health: "+p.getHealth()+"/"+p.getMaxHealth()+" Base HP Level: "+base_hplv);
-			if (p.getHealth()>p.getMaxHealth()) {
-				p.setHealth(p.getMaxHealth());
-				//p.sendMessage("Health: "+p.getHealth()+"/"+p.getMaxHealth()+" Set new health: "+p.getMaxHealth()+"+"+extra_hp);
-			}
 			if (base_hplv!=p.getMaxHealth()) {
 				double temphp=0;
 				if (base_hplv<p.getMaxHealth()) {
@@ -224,6 +219,11 @@ public class PlayerBuffData {
 					p.setMaxHealth(base_hplv-extra_hp);
 					p.setHealth(temphp);
 				}
+			}
+			//p.sendMessage("Health: "+p.getHealth()+"/"+p.getMaxHealth()+" Base HP Level: "+base_hplv);
+			if (p.getHealth()>p.getMaxHealth()) {
+				p.setHealth(p.getMaxHealth());
+				//p.sendMessage("Health: "+p.getHealth()+"/"+p.getMaxHealth()+" Set new health: "+p.getMaxHealth()+"+"+extra_hp);
 			}
 			/*if (base_hplv!=p.getMaxHealth()) {
 				p.setMaxHealth(base_hplv-extra_hp);

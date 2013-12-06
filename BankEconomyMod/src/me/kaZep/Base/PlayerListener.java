@@ -8940,6 +8940,101 @@ implements Listener
 
 		if (e.getEntity() instanceof LivingEntity) {
 			final LivingEntity l = (LivingEntity)e.getEntity();
+			if (e.getDamager() instanceof LivingEntity) {
+				LivingEntity l2 = (LivingEntity)e.getDamager();
+				if (l2.getCustomName()!=null && l2.getCustomName().contains(ChatColor.RED+"Powersurge Zombie")) {
+					int dmgamt = 0; //How much the bonus damage rating to do.
+					ItemStack item = l.getEquipment().getHelmet();
+					if (item!=null) {
+						Map<Enchantment,Integer> map = item.getEnchantments();
+						  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
+							dmgamt+=entry.getValue();
+						  }	
+							if (item.getType().name().toLowerCase().contains("diamond")) {
+								dmgamt+=5;
+							}
+							if (item.getType().name().toLowerCase().contains("iron")) {
+								dmgamt+=3;
+								dmgamt/=1.5;
+							}
+							if (item.getType().name().toLowerCase().contains("leather")) {
+								dmgamt+=1;
+								dmgamt/=8;
+							}
+							if (item.getType().name().toLowerCase().contains("gold") || item.getType().name().toLowerCase().contains("chain")) {
+								dmgamt+=2;
+								dmgamt/=4;
+							}
+					}
+					item = l.getEquipment().getChestplate();
+					if (item!=null) {
+						Map<Enchantment,Integer> map = item.getEnchantments();
+						  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
+							dmgamt+=entry.getValue();
+						  }	
+							if (item.getType().name().toLowerCase().contains("diamond")) {
+								dmgamt+=7;
+							}
+							if (item.getType().name().toLowerCase().contains("iron")) {
+								dmgamt+=5;
+								dmgamt/=1.5;
+							}
+							if (item.getType().name().toLowerCase().contains("leather")) {
+								dmgamt+=2;
+								dmgamt/=8;
+							}
+							if (item.getType().name().toLowerCase().contains("gold") || item.getType().name().toLowerCase().contains("chain")) {
+								dmgamt+=4;
+								dmgamt/=4;
+							}
+					}
+					item = l.getEquipment().getLeggings();
+					if (item!=null) {
+						Map<Enchantment,Integer> map = item.getEnchantments();
+						  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
+							dmgamt+=entry.getValue();
+						  }	
+							if (item.getType().name().toLowerCase().contains("diamond")) {
+								dmgamt+=4;
+							}
+							if (item.getType().name().toLowerCase().contains("iron")) {
+								dmgamt+=2;
+								dmgamt/=1.5;
+							}
+							if (item.getType().name().toLowerCase().contains("leather")) {
+								dmgamt+=1;
+								dmgamt/=8;
+							}
+							if (item.getType().name().toLowerCase().contains("gold") || item.getType().name().toLowerCase().contains("chain")) {
+								dmgamt+=1;
+								dmgamt/=4;
+							}
+					}
+					item = l.getEquipment().getBoots();
+					if (item!=null) {
+						Map<Enchantment,Integer> map = item.getEnchantments();
+						  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
+							dmgamt+=entry.getValue();
+						  }	
+							if (item.getType().name().toLowerCase().contains("diamond")) {
+								dmgamt+=2;
+							}
+							if (item.getType().name().toLowerCase().contains("iron")) {
+								dmgamt+=1;
+								dmgamt/=1.5;
+							}
+							if (item.getType().name().toLowerCase().contains("leather")) {
+								dmgamt+=0;
+								dmgamt/=8;
+							}
+							if (item.getType().name().toLowerCase().contains("gold") || item.getType().name().toLowerCase().contains("chain")) {
+								dmgamt+=1;
+								dmgamt/=4;
+							}
+					}
+					e.setDamage(e.getDamage()+dmgamt);
+				}
+			}
 			if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Wolf Minion")) {
 				e.setDamage(e.getDamage()*1.5);
 			}
