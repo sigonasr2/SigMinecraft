@@ -33,10 +33,15 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Slime;
+import org.bukkit.entity.Wolf;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -576,6 +581,9 @@ public String convertToItemName(String val) {
   					  p.sendMessage("Thanksgiving event enabled.");
   				  }
   				  this.plugin.saveConfig();
+  			  }
+  			  if (args[0].equalsIgnoreCase("newmobs")) {
+  				  p.sendMessage("/event newmobs <type>. <type> can be COUNTER_SLIME, VIRAL_SPIDER, SILENCER, HOUND_CALLER, FISH_CALLER, SUICIDAL_CREEPER, POWER_SURGE_ZOMBIE, LIGHTNING_MAGE");
   			  }
   			  if (args[0].equalsIgnoreCase("diablodrops")) {
   				  //Generates a random diablodrops item. Just like if you did /diablodrops
@@ -1206,6 +1214,131 @@ public String convertToItemName(String val) {
 				  Bukkit.getWorld("world").setDifficulty(Difficulty.HARD);
 				  this.plugin.harrowing_night=true;
   				  this.plugin.saveConfig();
+  			  }
+
+  			  if (args[0].equalsIgnoreCase("newmobs") && args.length>1) {
+  				//Try to spawn a counter slime.
+					if (args[1].equalsIgnoreCase("COUNTER_SLIME")) {
+						Entity entity = p.getWorld().spawnEntity(p.getLocation(), EntityType.SLIME);
+						Slime s = (Slime)entity;
+						//Bukkit.getLogger().info("Counter Slime spawned at "+s.getLocation().toString());
+						s.setSize((int)(Math.random()*3)+2);
+						LivingEntity l = (LivingEntity)entity;
+						l.setCustomName(ChatColor.RED+"Counter Slime");
+						l.setCustomNameVisible(false);
+					}
+					//Try to spawn a Viral Spider.
+					if (args[1].equalsIgnoreCase("VIRAL_SPIDER")) {
+						Entity entity = p.getWorld().spawnEntity(p.getLocation(), EntityType.SPIDER);
+						LivingEntity l = (LivingEntity)entity;
+						l.setCustomName(ChatColor.RED+"Viral Spider");
+						l.setCustomNameVisible(false);
+						//Bukkit.getLogger().info("Viral Spider spawned at "+l.getLocation().toString());
+						l.setMaxHealth(85);
+						l.setHealth(85);
+						l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
+					}
+					//Try to spawn a Silencer.
+					if (args[1].equalsIgnoreCase("SILENCER")) {
+						Entity entity = p.getWorld().spawnEntity(p.getLocation(), EntityType.SKELETON);
+						LivingEntity l = (LivingEntity)entity;
+						l.setCustomName(ChatColor.RED+"Silencer");
+						l.setCustomNameVisible(false);
+						//Bukkit.getLogger().info("Silencer spawned at "+l.getLocation().toString());
+						l.setMaxHealth(45);
+						l.setHealth(45);
+						ItemStack helm = new ItemStack(Material.DIAMOND_HELMET);
+						helm.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 24);
+						l.getEquipment().setHelmet(helm);
+						l.getEquipment().setHelmetDropChance(0.002f);
+						l.getEquipment().setItemInHand(new ItemStack(Material.BOW));
+						l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
+					}
+					//Try to spawn a Hound Caller.
+					if (args[1].equalsIgnoreCase("HOUND_CALLER")) {
+						Entity entity = p.getWorld().spawnEntity(p.getLocation(), EntityType.WOLF);
+						LivingEntity l = (LivingEntity)entity;
+						l.setCustomName(ChatColor.RED+"Hound Caller");
+						l.setCustomNameVisible(false);
+						//Bukkit.getLogger().info("Hound Caller spawned at "+l.getLocation().toString());
+						l.setMaxHealth(65);
+						l.setHealth(65);
+						Wolf w = (Wolf)l;
+						//helm.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 32);
+						//l.getEquipment().setHelmet(helm);
+						//l.getEquipment().setHelmetDropChance(0.002f);
+						//l.getEquipment().setItemInHand(new ItemStack(Material.BOW));
+						//w.setAngry(true);
+						w.setAdult();
+						l.setRemoveWhenFarAway(true);
+						l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
+						l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 999999, 1));
+						l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 2));
+						l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 0));
+					}
+					//Try to spawn a Fish Caller.
+					if (args[1].equalsIgnoreCase("FISH_CALLER")) {
+						Entity entity = p.getWorld().spawnEntity(p.getLocation(), EntityType.ENDERMAN);
+						LivingEntity l = (LivingEntity)entity;
+						l.setCustomName(ChatColor.RED+"Fish Caller");
+						l.setCustomNameVisible(false);
+						//Bukkit.getLogger().info("Hound Caller spawned at "+l.getLocation().toString());
+						l.setMaxHealth(50);
+						l.setHealth(50);
+						Enderman end = (Enderman)l;
+						//helm.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 32);
+						//l.getEquipment().setHelmet(helm);
+						//l.getEquipment().setHelmetDropChance(0.002f);
+						//l.getEquipment().setItemInHand(new ItemStack(Material.BOW));
+						//w.setAngry(true);
+						l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 4));
+						l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 999999, 1));
+						l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 1));
+					}
+					//Try to spawn a Suicidal Creeper.
+					if (args[1].equalsIgnoreCase("SUICIDAL_CREEPER")) {
+						Location ent = p.getLocation();
+						Entity entity = p.getWorld().spawnEntity(p.getLocation(), EntityType.CREEPER);
+						LivingEntity l = (LivingEntity)entity;
+						l.setCustomName(ChatColor.RED+"Suicidal Creeper");
+						l.setCustomNameVisible(false);
+						//Bukkit.getLogger().info("Suicidal Creeper spawned at "+l.getLocation().toString());
+						l.setMaxHealth(5);
+						l.setHealth(5);
+						Creeper creep = (Creeper)l;
+						creep.setPowered(true);
+						l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 999999, 3));
+						l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 2));
+						l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 4));
+						l.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0));
+					}
+					//Try to spawn a Powersurge Zombie.
+					if (args[1].equalsIgnoreCase("POWER_SURGE_ZOMBIE")) {
+						Location ent = p.getLocation();
+						Entity entity = p.getWorld().spawnEntity(p.getLocation(), EntityType.ZOMBIE);
+						LivingEntity l = (LivingEntity)entity;
+						l.setCustomName(ChatColor.RED+"Powersurge Zombie");
+						l.setCustomNameVisible(false);
+						//Bukkit.getLogger().info("Suicidal Creeper spawned at "+l.getLocation().toString());
+						l.setMaxHealth(60);
+						l.setHealth(60);
+						l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
+						l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 2));
+						l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 0));
+					}
+					//Try to spawn a Lightning Mage.
+					if (args[1].equalsIgnoreCase("LIGHTNING_MAGE")) {
+						Location ent = p.getLocation();
+						Entity entity = p.getWorld().spawnEntity(p.getLocation(), EntityType.ENDERMAN);
+						LivingEntity l = (LivingEntity)entity;
+						l.setCustomName(ChatColor.RED+"Lightning Mage");
+						l.setCustomNameVisible(false);
+						//Bukkit.getLogger().info("Suicidal Creeper spawned at "+l.getLocation().toString());
+						l.setMaxHealth(105);
+						l.setHealth(105);
+						l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 4));
+						l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 1));
+					}
   			  }
 			  if (args[0].equalsIgnoreCase("spawn_dungeon") && args[1].equalsIgnoreCase("boss")) {
 				//Empty the whole area.

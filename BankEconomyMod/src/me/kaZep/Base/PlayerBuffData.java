@@ -192,7 +192,7 @@ public class PlayerBuffData {
 				p.setHealth(p.getMaxHealth());
 			}
 			
-			Bukkit.getLogger().info("Base hp level: "+base_hplv+" Max Health: "+p.getMaxHealth());
+			//Bukkit.getLogger().info("Base hp level: "+base_hplv+" Max Health: "+p.getMaxHealth());
 			if (base_hplv!=p.getMaxHealth()) {
 				double temphp=0;
 				temphp = p.getHealth();

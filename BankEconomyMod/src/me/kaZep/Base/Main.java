@@ -54,11 +54,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.EnderDragon;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.PigZombie;
@@ -1975,6 +1977,16 @@ public void runTick() {
 					  Location nearestwolf = null;
 					  int minions=0;
 					  for (int i=0;i<nearby.size();i++) {
+						  if (nearby.get(i).getType()==EntityType.ENDERMAN) {
+							  Creature l = (Creature)nearby.get(i);
+							  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.RED+"Lightning Mage") && l.getTarget()!=null) {
+								  if (l.getTarget() instanceof Player) {
+									  l.getTarget().getWorld().strikeLightning(l.getTarget().getLocation());
+									  l.getTarget().getWorld().strikeLightning(l.getTarget().getLocation().add(-0.5,0,0.5));
+									  l.getTarget().getWorld().strikeLightning(l.getTarget().getLocation().add(0.5,0,-0.5));
+								  }
+							  }
+						  }
 						  if (nearby.get(i).getType()==EntityType.CREEPER) {
 							  Creature l = (Creature)nearby.get(i);
 							  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.RED+"Suicidal Creeper") && l.getTarget()!=null) {

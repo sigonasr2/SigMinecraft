@@ -2629,9 +2629,10 @@ implements Listener
 							HOUND_CALLER_SPAWN_RATE = 0.01,
 							FISH_CALLER_SPAWN_RATE = 0.01,
 							SUICIDAL_CREEPER_SPAWN_RATE = 0.01,
-							POWER_SURGE_ZOMBIE_SPAWN_RATE = 0.2;
+							POWER_SURGE_ZOMBIE_SPAWN_RATE = 0.01,
+							LIGHTNING_MAGE_SPAWN_RATE = 0.01;
 					
-					if (totallvs>80*levelsmult) {
+					if (totallvs>10*levelsmult) {
 						//Try to spawn a counter slime.
 						if (Math.random()<=COUNTER_SLIME_SPAWN_RATE) {
 							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.SLIME);
@@ -2663,7 +2664,7 @@ implements Listener
 							l.setMaxHealth(45);
 							l.setHealth(45);
 							ItemStack helm = new ItemStack(Material.DIAMOND_HELMET);
-							helm.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 32);
+							helm.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 24);
 							l.getEquipment().setHelmet(helm);
 							l.getEquipment().setHelmetDropChance(0.002f);
 							l.getEquipment().setItemInHand(new ItemStack(Material.BOW));
@@ -2740,6 +2741,19 @@ implements Listener
 							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
 							l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 2));
 							l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 0));
+						}
+						//Try to spawn a Lightning Mage.
+						if (Math.random()<=POWER_SURGE_ZOMBIE_SPAWN_RATE) {
+							Location ent = e.getEntity().getLocation();
+							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.ENDERMAN);
+							LivingEntity l = (LivingEntity)entity;
+							l.setCustomName(ChatColor.RED+"Lightning Mage");
+							l.setCustomNameVisible(false);
+							//Bukkit.getLogger().info("Suicidal Creeper spawned at "+l.getLocation().toString());
+							l.setMaxHealth(105);
+							l.setHealth(105);
+							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 4));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 1));
 						}
 					}
 					
@@ -6833,9 +6847,6 @@ implements Listener
 	@EventHandler
 	public void onItemChange(PlayerItemHeldEvent e) {
 		Player p = e.getPlayer();
-		if (p.getInventory().getContents()[e.getNewSlot()]!=null) {
-			Bukkit.getLogger().info("Durability of this item is "+p.getInventory().getContents()[e.getNewSlot()].getDurability());
-		}
 		//**************************//Job Buffs begin here.
 		if (p.getInventory().getContents()[e.getNewSlot()]!=null) {
 			if (p.getInventory().getContents()[e.getNewSlot()].getType().name().toLowerCase().contains("pickaxe") && this.plugin.hasJobBuff("Miner", p, Job.JOB10)) {
@@ -8247,9 +8258,9 @@ implements Listener
 			if (this.plugin.hasJobBuff("Fisherman", p, Job.JOB30B)) {
 				this.plugin.getPlayerData(p).fishingstreak++;
 				this.plugin.getPlayerData(p).fishingrodcatchrate+=this.plugin.getPlayerData(p).fishingrodcatchrate*0.05;
-				DecimalFormat df = new DecimalFormat("#0.00");
+				DecimalFormat df = new DecimalFormat("#0.0");
 				if (this.plugin.getPlayerData(p).fishingstreak%5==0) {
-					p.sendMessage(ChatColor.GREEN+""+this.plugin.getPlayerData(p).fishingstreak+" in a row! "+ChatColor.GRAY+""+ChatColor.ITALIC+"Current Fish Catch Rate: "+((this.plugin.getPlayerData(p).fishingrodcatchrate/0.002))+"%");
+					p.sendMessage(ChatColor.GREEN+""+this.plugin.getPlayerData(p).fishingstreak+" in a row! "+ChatColor.GRAY+""+ChatColor.ITALIC+"Current Fish Catch Rate: "+(df.format((this.plugin.getPlayerData(p).fishingrodcatchrate/0.002)*100))+"%");
 				}
 			}
 			if (this.plugin.PlayerinJob(p, "Fisherman")) {
@@ -8913,6 +8924,14 @@ implements Listener
 		boolean blocked_hunter_buff=false; //Whether or not the block occurred due to the hunter buff.
 
 		//**********************************//Player buffs begin
+		if (e.getDamager() instanceof LightningStrike) {
+			if (e.getEntity() instanceof Enderman) {
+				LivingEntity l = (LivingEntity)e.getEntity();
+				if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Lightning Mage")) {
+					e.setCancelled(true);
+				}
+			}
+		}
 		if (e.getDamager() instanceof Player) {
 			Player p = (Player)e.getDamager();
 			if (p.hasPotionEffect(PotionEffectType.BLINDNESS)) {
@@ -8950,95 +8969,149 @@ implements Listener
 				LivingEntity l2 = (LivingEntity)e.getDamager();
 				if (l2.getCustomName()!=null && l2.getCustomName().contains(ChatColor.RED+"Powersurge Zombie")) {
 					int dmgamt = 0; //How much the bonus damage rating to do.
+					double dmgamt1=0,dmgamt2=0,dmgamt3=0,dmgamt4=0;
 					ItemStack item = l.getEquipment().getHelmet();
 					if (item!=null) {
 						Map<Enchantment,Integer> map = item.getEnchantments();
 						  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
-							dmgamt+=entry.getValue();
+							dmgamt1+=entry.getValue();
 						  }	
 							if (item.getType().name().toLowerCase().contains("diamond")) {
-								dmgamt+=5;
+								dmgamt1+=5;
+								if (l instanceof Player) {
+									Player p = (Player)l;
+									p.playSound(p.getLocation(), Sound.EXPLODE, 0.5f, 1.8f);
+								}
 							}
 							if (item.getType().name().toLowerCase().contains("iron")) {
-								dmgamt+=3;
-								dmgamt/=1.5;
+								dmgamt1+=3;
 							}
 							if (item.getType().name().toLowerCase().contains("leather")) {
-								dmgamt+=1;
-								dmgamt/=8;
+								dmgamt1+=1;
 							}
 							if (item.getType().name().toLowerCase().contains("gold") || item.getType().name().toLowerCase().contains("chain")) {
-								dmgamt+=2;
-								dmgamt/=4;
+								dmgamt1+=2;
+							}
+							if (item.getType().name().toLowerCase().contains("iron")) {
+								dmgamt1/=1.5;
+								dmgamt+=1.5;
+							}
+							if (item.getType().name().toLowerCase().contains("leather")) {
+								dmgamt1/=8;
+								dmgamt+=8;
+							}
+							if (item.getType().name().toLowerCase().contains("gold") || item.getType().name().toLowerCase().contains("chain")) {
+								dmgamt1/=4;
+								dmgamt+=4;
 							}
 					}
 					item = l.getEquipment().getChestplate();
 					if (item!=null) {
 						Map<Enchantment,Integer> map = item.getEnchantments();
 						  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
-							dmgamt+=entry.getValue();
+							dmgamt2+=entry.getValue();
 						  }	
 							if (item.getType().name().toLowerCase().contains("diamond")) {
-								dmgamt+=7;
+								dmgamt2+=7;
+								if (l instanceof Player) {
+									Player p = (Player)l;
+									p.playSound(p.getLocation(), Sound.EXPLODE, 0.5f, 1.8f);
+								}
 							}
 							if (item.getType().name().toLowerCase().contains("iron")) {
-								dmgamt+=5;
-								dmgamt/=1.5;
+								dmgamt2+=5;
 							}
 							if (item.getType().name().toLowerCase().contains("leather")) {
-								dmgamt+=2;
-								dmgamt/=8;
+								dmgamt2+=2;
 							}
 							if (item.getType().name().toLowerCase().contains("gold") || item.getType().name().toLowerCase().contains("chain")) {
+								dmgamt2+=4;
+							}
+							if (item.getType().name().toLowerCase().contains("iron")) {
+								dmgamt2/=1.5;
+								dmgamt+=1.5;
+							}
+							if (item.getType().name().toLowerCase().contains("leather")) {
+								dmgamt2/=8;
+								dmgamt+=8;
+							}
+							if (item.getType().name().toLowerCase().contains("gold") || item.getType().name().toLowerCase().contains("chain")) {
+								dmgamt2/=4;
 								dmgamt+=4;
-								dmgamt/=4;
 							}
 					}
 					item = l.getEquipment().getLeggings();
 					if (item!=null) {
 						Map<Enchantment,Integer> map = item.getEnchantments();
 						  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
-							dmgamt+=entry.getValue();
+							dmgamt3+=entry.getValue();
 						  }	
 							if (item.getType().name().toLowerCase().contains("diamond")) {
-								dmgamt+=4;
+								dmgamt3+=4;
+								if (l instanceof Player) {
+									Player p = (Player)l;
+									p.playSound(p.getLocation(), Sound.EXPLODE, 0.5f, 1.8f);
+								}
 							}
 							if (item.getType().name().toLowerCase().contains("iron")) {
-								dmgamt+=2;
-								dmgamt/=1.5;
+								dmgamt3+=2;
 							}
 							if (item.getType().name().toLowerCase().contains("leather")) {
-								dmgamt+=1;
-								dmgamt/=8;
+								dmgamt3+=1;
 							}
 							if (item.getType().name().toLowerCase().contains("gold") || item.getType().name().toLowerCase().contains("chain")) {
-								dmgamt+=1;
-								dmgamt/=4;
+								dmgamt3+=1;
+							}
+							if (item.getType().name().toLowerCase().contains("iron")) {
+								dmgamt3/=1.5;
+								dmgamt+=1.5;
+							}
+							if (item.getType().name().toLowerCase().contains("leather")) {
+								dmgamt3/=8;
+								dmgamt+=8;
+							}
+							if (item.getType().name().toLowerCase().contains("gold") || item.getType().name().toLowerCase().contains("chain")) {
+								dmgamt3/=4;
+								dmgamt+=4;
 							}
 					}
 					item = l.getEquipment().getBoots();
 					if (item!=null) {
 						Map<Enchantment,Integer> map = item.getEnchantments();
 						  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
-							dmgamt+=entry.getValue();
+							dmgamt4+=entry.getValue();
 						  }	
 							if (item.getType().name().toLowerCase().contains("diamond")) {
-								dmgamt+=2;
+								dmgamt4+=2;
+								if (l instanceof Player) {
+									Player p = (Player)l;
+									p.playSound(p.getLocation(), Sound.EXPLODE, 0.5f, 1.8f);
+								}
 							}
 							if (item.getType().name().toLowerCase().contains("iron")) {
-								dmgamt+=1;
-								dmgamt/=1.5;
+								dmgamt4+=1;
 							}
 							if (item.getType().name().toLowerCase().contains("leather")) {
-								dmgamt+=0;
-								dmgamt/=8;
+								dmgamt4+=0;
 							}
 							if (item.getType().name().toLowerCase().contains("gold") || item.getType().name().toLowerCase().contains("chain")) {
-								dmgamt+=1;
-								dmgamt/=4;
+								dmgamt4+=1;
+							}
+							if (item.getType().name().toLowerCase().contains("iron")) {
+								dmgamt4/=1.5;
+								dmgamt+=1.5;
+							}
+							if (item.getType().name().toLowerCase().contains("leather")) {
+								dmgamt4/=8;
+								dmgamt+=8;
+							}
+							if (item.getType().name().toLowerCase().contains("gold") || item.getType().name().toLowerCase().contains("chain")) {
+								dmgamt4/=4;
+								dmgamt+=4;
 							}
 					}
-					e.setDamage(e.getDamage()+dmgamt);
+					e.setDamage((e.getDamage()+dmgamt1+dmgamt2+dmgamt3+dmgamt4)/dmgamt);
+					e.setDamage(e.getDamage()+Math.pow(dmgamt,1.65));
 				}
 			}
 			if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Wolf Minion")) {
@@ -9423,7 +9496,7 @@ implements Listener
 				if (((Projectile)e.getDamager()).getShooter() instanceof LivingEntity) {
 					LivingEntity l = ((Projectile)e.getDamager()).getShooter();
 					if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Silencer")) {
-						p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 90, 64));
+						p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 64));
 					}
 				}
 			}
@@ -9562,6 +9635,11 @@ implements Listener
 				e.setDamage(0);
 				//Choose a random set to mark off.
 				blocked_attack=true;
+				//Reduce all armor by one as if it was a normal hit.
+				if (p.getInventory().getHelmet()!=null) {p.getInventory().getHelmet().setDurability((short)(p.getInventory().getHelmet().getDurability()+1));}
+				if (p.getInventory().getChestplate()!=null) {p.getInventory().getChestplate().setDurability((short)(p.getInventory().getChestplate().getDurability()+1));}
+				if (p.getInventory().getLeggings()!=null) {p.getInventory().getLeggings().setDurability((short)(p.getInventory().getLeggings().getDurability()+1));}
+				if (p.getInventory().getBoots()!=null) {p.getInventory().getBoots().setDurability((short)(p.getInventory().getBoots().getDurability()+1));}
 				/*
 				if (blocks.size()>0) {
 					int armor = blocks.get((int)(Math.random()*blocks.size()));
@@ -10354,6 +10432,12 @@ implements Listener
 			final boolean blocked = blocked_attack;
 			final boolean blocked_hunter = blocked_hunter_buff;
 			final Main plug = this.plugin;
+			int helm_dura=-1,chest_dura=-1,legs_dura=-1,boots_dura=-1;
+			if (p.getEquipment().getHelmet()!=null) {helm_dura=p.getEquipment().getHelmet().getDurability();}
+			if (p.getEquipment().getChestplate()!=null) {chest_dura=p.getEquipment().getChestplate().getDurability();}
+			if (p.getEquipment().getLeggings()!=null) {legs_dura=p.getEquipment().getLeggings().getDurability();}
+			if (p.getEquipment().getBoots()!=null) {boots_dura=p.getEquipment().getBoots().getDurability();}
+			final int prev_helm_dura=helm_dura,prev_chest_dura=chest_dura,prev_legs_dura=legs_dura,prev_boots_dura=boots_dura;
 			if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f) {
 				p.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 					@Override
@@ -10365,12 +10449,12 @@ implements Listener
 						int helm_dura=-1,chest_dura=-1,legs_dura=-1,boots_dura=-1;
 						boolean weak_helm=false,weak_chest=false,weak_legs=false,weak_boots=false;
 						if (p.getEquipment().getHelmet()!=null) {helm_dura=p.getEquipment().getHelmet().getDurability();}
-						if (p.getEquipment().getChestplate()!=null) {chest_dura=p.getEquipment().getChestplate().getDurability();}
+						if (p.getEquipment().getChestplate()!=null ) {chest_dura=p.getEquipment().getChestplate().getDurability();}
 						if (p.getEquipment().getLeggings()!=null) {legs_dura=p.getEquipment().getLeggings().getDurability();}
 						if (p.getEquipment().getBoots()!=null) {boots_dura=p.getEquipment().getBoots().getDurability();}
 						Bukkit.getLogger().info("Durability of items are: "+helm_dura+","+chest_dura+","+legs_dura+","+boots_dura);
 						int gained_back=0;
-						if (p.getEquipment().getHelmet()!=null && p.getEquipment().getHelmet().hasItemMeta() &&
+						if (p.getEquipment().getHelmet()!=null && helm_dura!=-1 && p.getEquipment().getHelmet().hasItemMeta() &&
 								p.getEquipment().getHelmet().getItemMeta().hasLore()) {
 							List<String> lore = p.getEquipment().getHelmet().getItemMeta().getLore();
 							for (int i=0;i<lore.size();i++) {
@@ -10383,7 +10467,7 @@ implements Listener
 								}
 							}
 						}
-						if (p.getEquipment().getChestplate()!=null && p.getEquipment().getChestplate().hasItemMeta() &&
+						if (p.getEquipment().getChestplate()!=null && chest_dura!=-1 && p.getEquipment().getChestplate().hasItemMeta() &&
 								p.getEquipment().getChestplate().getItemMeta().hasLore()) {
 							List<String> lore = p.getEquipment().getChestplate().getItemMeta().getLore();
 							for (int i=0;i<lore.size();i++) {
@@ -10396,7 +10480,7 @@ implements Listener
 								}
 							}
 						}
-						if (p.getEquipment().getLeggings()!=null && p.getEquipment().getLeggings().hasItemMeta() &&
+						if (p.getEquipment().getLeggings()!=null && legs_dura!=-1 && p.getEquipment().getLeggings().hasItemMeta() &&
 								p.getEquipment().getLeggings().getItemMeta().hasLore()) {
 							List<String> lore = p.getEquipment().getLeggings().getItemMeta().getLore();
 							for (int i=0;i<lore.size();i++) {
@@ -10410,7 +10494,7 @@ implements Listener
 								}
 							}
 						}
-						if (p.getEquipment().getBoots()!=null && p.getEquipment().getBoots().hasItemMeta() &&
+						if (p.getEquipment().getBoots()!=null && boots_dura!=-1 && p.getEquipment().getBoots().hasItemMeta() &&
 								p.getEquipment().getBoots().getItemMeta().hasLore()) {
 							List<String> lore = p.getEquipment().getBoots().getItemMeta().getLore();
 							for (int i=0;i<lore.size();i++) {
@@ -10423,13 +10507,13 @@ implements Listener
 								}
 							}
 						}
-						if (p.getEquipment().getHelmet()!=null && p.getEquipment().getHelmet().hasItemMeta() &&
+						if (p.getEquipment().getHelmet()!=null && helm_dura!=-1 && p.getEquipment().getHelmet().hasItemMeta() &&
 								p.getEquipment().getHelmet().getItemMeta().hasLore()) {
 							List<String> lore = p.getEquipment().getHelmet().getItemMeta().getLore();
 							for (int i=0;i<lore.size();i++) {
 								double dura_numb=0;
 								if (plug.containsEnchantment(lore.get(i), "Durability")) {
-									dura_numb+=plug.getEnchantmentNumb("Durability");
+									dura_numb+=plug.getEnchantmentNumb(lore.get(i));
 								}
 								if (!weak_helm) {dura_numb+=300; /*Bukkit.getLogger().info("1 not weak.");*/}
 								if (Math.random()*dura_numb>100) {
@@ -10437,13 +10521,13 @@ implements Listener
 								}
 							}
 						}
-						if (p.getEquipment().getChestplate()!=null && p.getEquipment().getChestplate().hasItemMeta() &&
+						if (p.getEquipment().getChestplate()!=null && chest_dura!=-1 && p.getEquipment().getChestplate().hasItemMeta() &&
 								p.getEquipment().getChestplate().getItemMeta().hasLore()) {
 							List<String> lore = p.getEquipment().getChestplate().getItemMeta().getLore();
 							for (int i=0;i<lore.size();i++) {
 								double dura_numb=0;
 								if (plug.containsEnchantment(lore.get(i), "Durability")) {
-									dura_numb+=plug.getEnchantmentNumb("Durability");
+									dura_numb+=plug.getEnchantmentNumb(lore.get(i));
 								}
 								if (!weak_chest) {dura_numb+=300; /*Bukkit.getLogger().info("2 not weak.");*/}
 								if (Math.random()*dura_numb>100) {
@@ -10451,13 +10535,13 @@ implements Listener
 								}
 							}
 						}
-						if (p.getEquipment().getLeggings()!=null && p.getEquipment().getLeggings().hasItemMeta() &&
+						if (p.getEquipment().getLeggings()!=null && legs_dura!=-1 && p.getEquipment().getLeggings().hasItemMeta() &&
 								p.getEquipment().getLeggings().getItemMeta().hasLore()) {
 							List<String> lore = p.getEquipment().getLeggings().getItemMeta().getLore();
 							for (int i=0;i<lore.size();i++) {
 								double dura_numb=0;
 								if (plug.containsEnchantment(lore.get(i), "Durability")) {
-									dura_numb+=plug.getEnchantmentNumb("Durability");
+									dura_numb+=plug.getEnchantmentNumb(lore.get(i));
 								}
 								if (!weak_legs) {dura_numb+=300; /*Bukkit.getLogger().info("3 not weak.");*/}
 								if (Math.random()*dura_numb>100) {
@@ -10465,13 +10549,13 @@ implements Listener
 								}
 							}
 						}
-						if (p.getEquipment().getBoots()!=null && p.getEquipment().getBoots().hasItemMeta() &&
+						if (p.getEquipment().getBoots()!=null && boots_dura!=-1 && p.getEquipment().getBoots().hasItemMeta() &&
 								p.getEquipment().getBoots().getItemMeta().hasLore()) {
 							List<String> lore = p.getEquipment().getBoots().getItemMeta().getLore();
 							for (int i=0;i<lore.size();i++) {
 								double dura_numb=0;
 								if (plug.containsEnchantment(lore.get(i), "Durability")) {
-									dura_numb+=plug.getEnchantmentNumb("Durability");
+									dura_numb+=plug.getEnchantmentNumb(lore.get(i));
 								}
 								if (!weak_boots) {dura_numb+=300; /*Bukkit.getLogger().info("4 not weak.");*/}
 								if (Math.random()*dura_numb>100) {
@@ -10479,10 +10563,10 @@ implements Listener
 								}
 							}
 						}
-						if (p.getEquipment().getBoots()!=null) {ItemStack i = p.getEquipment().getBoots(); i.setDurability((short)boots_dura); p.getEquipment().setBoots(i);}
-						if (p.getEquipment().getLeggings()!=null) {ItemStack i = p.getEquipment().getLeggings(); i.setDurability((short)legs_dura); p.getEquipment().setLeggings(i);}
-						if (p.getEquipment().getChestplate()!=null) {ItemStack i = p.getEquipment().getChestplate(); i.setDurability((short)chest_dura); p.getEquipment().setChestplate(i);}
-						if (p.getEquipment().getHelmet()!=null) {ItemStack i = p.getEquipment().getHelmet(); i.setDurability((short)helm_dura); p.getEquipment().setHelmet(i);}
+						if (p.getEquipment().getBoots()!=null && boots_dura!=-1) {ItemStack i = p.getEquipment().getBoots(); i.setDurability((short)boots_dura); p.getEquipment().setBoots(i);}
+						if (p.getEquipment().getLeggings()!=null && legs_dura!=-1) {ItemStack i = p.getEquipment().getLeggings(); i.setDurability((short)legs_dura); p.getEquipment().setLeggings(i);}
+						if (p.getEquipment().getChestplate()!=null && chest_dura!=-1) {ItemStack i = p.getEquipment().getChestplate(); i.setDurability((short)chest_dura); p.getEquipment().setChestplate(i);}
+						if (p.getEquipment().getHelmet()!=null && helm_dura!=-1) {ItemStack i = p.getEquipment().getHelmet(); i.setDurability((short)helm_dura); p.getEquipment().setHelmet(i);}
 						Bukkit.getLogger().info("Durability of items now are: "+helm_dura+","+chest_dura+","+legs_dura+","+boots_dura);
 					}
 				},1);
@@ -11428,12 +11512,12 @@ implements Listener
 	@EventHandler
 	public void onInventoryClickEvent(InventoryClickEvent event) {
 		Player p = (Player)event.getWhoClicked();
-		p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.DARK_GRAY+"");
+		p.getScoreboard().getTeam(p.getName().toLowerCase()).setPrefix(ChatColor.DARK_GRAY+"");
 		if (p.hasPermission("group.moderator")) {
-			p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.DARK_GREEN+"");
+			p.getScoreboard().getTeam(p.getName().toLowerCase()).setPrefix(ChatColor.DARK_GREEN+"");
 		}
 		if (p.hasPermission("group.administrators")) {
-			p.getScoreboard().getTeam(p.getName()).setPrefix(ChatColor.DARK_PURPLE+"");
+			p.getScoreboard().getTeam(p.getName().toLowerCase()).setPrefix(ChatColor.DARK_PURPLE+"");
 		}
 		
 		//Bukkit.getLogger().info("Slot is "+event.getSlot());
