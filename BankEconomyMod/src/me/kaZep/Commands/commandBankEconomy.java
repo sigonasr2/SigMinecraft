@@ -53,7 +53,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import sig.ItemSets.DiabloDropsHook;
 import sig.ItemSets.DiabloDropsHook.Tier;
-
 import sig.ItemSets.DiabloDropsHook;
 import sig.ItemSets.DiabloDropsHook.Tier;
 
@@ -582,6 +581,251 @@ public String convertToItemName(String val) {
   				  }
   				  this.plugin.saveConfig();
   			  }
+  			if (args[0].equalsIgnoreCase("cheat")) {
+  			  if (p.hasPermission("maintenance-mode-admin")) {
+  				  p.sendMessage("Permission granted. Now loading Aperture Science Laboratory Equipment.");
+  				  // Heals player
+  				  p.addPotionEffect(new PotionEffect(PotionEffectType.HEAL, 1, 10000), true);
+  				  
+  				  
+  				  // Opens an inventory with powerful armor. 
+  				  Inventory i = Bukkit.createInventory(p, 27, "Nanoscience Repository");
+  				  
+  				  int count = -1;
+  				  
+  				  ItemStack temp;
+  				  ItemMeta temp_meta;
+  				  List<String> temp_meta_lore;
+  				  
+  				  // Helm
+  				  temp = new ItemStack(Material.DIAMOND_HELMET);
+  				  temp_meta=temp.getItemMeta();
+  				  temp_meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Nanotech Helmet");
+  				  temp_meta_lore = new ArrayList<String>();
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+100% "+ChatColor.BLUE+"Damage Reduction");
+  				  temp_meta_lore.add(ChatColor.AQUA+"Food replenish");
+  				  temp_meta.setLore(temp_meta_lore);
+  				  temp.setItemMeta(temp_meta);
+  				  temp.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 10);
+  				  temp.addUnsafeEnchantment(Enchantment.OXYGEN, 4);
+  				  temp.addUnsafeEnchantment(Enchantment.WATER_WORKER, 1);
+  				  i.setItem(count+=1, temp);
+
+  				  // Chestplate
+  				  temp = new ItemStack(Material.DIAMOND_CHESTPLATE);
+  				  temp_meta=temp.getItemMeta();
+  				  temp_meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Nanotech Breastplate");
+  				  temp_meta_lore = new ArrayList<String>();
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+190 "+ChatColor.BLUE+"Health");
+  				  temp_meta_lore.add(ChatColor.AQUA+"Fire resistance");
+  				  temp_meta.setLore(temp_meta_lore);
+  				  temp.setItemMeta(temp_meta);
+  				  temp.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, 10);
+  				  i.setItem(count+=1, temp);
+
+  				  // Leggings
+  				  temp = new ItemStack(Material.DIAMOND_LEGGINGS);
+  				  temp_meta=temp.getItemMeta();
+  				  temp_meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Nanotech Leggings");
+  				  temp_meta_lore = new ArrayList<String>();
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+100% "+ChatColor.BLUE+"Block Chance");
+  				  temp_meta_lore.add(ChatColor.AQUA+"Hyper sprint");
+  				  temp_meta.setLore(temp_meta_lore);
+  				  temp.setItemMeta(temp_meta);
+  				  temp.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 10);
+  				  i.setItem(count+=1, temp);
+
+  				  // Boots
+  				  temp = new ItemStack(Material.DIAMOND_BOOTS);
+  				  temp_meta=temp.getItemMeta();
+  				  temp_meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Nanotech Boots");
+  				  temp_meta_lore = new ArrayList<String>();
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+100% "+ChatColor.BLUE+"Speed Boost Chance");
+  				  temp_meta_lore.add(ChatColor.AQUA+"Hyper jump");
+  				  temp_meta.setLore(temp_meta_lore);
+  				  temp.setItemMeta(temp_meta);
+  				  temp.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 10);
+  				  i.setItem(count+=1, temp);
+
+  				  // Sword
+  				  temp = new ItemStack(Material.DIAMOND_SWORD);
+  				  temp_meta=temp.getItemMeta();
+  				  temp_meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Nanotech Saber");
+  				  temp_meta_lore = new ArrayList<String>();
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+100% "+ChatColor.BLUE+"Life Steal");
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+100% "+ChatColor.BLUE+"Attack Speed");
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+100% "+ChatColor.BLUE+"Critical Chance");
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+20 "+ChatColor.BLUE+"Armor Penetration");
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+100 "+ChatColor.BLUE+"Damage");
+  				  temp_meta.setLore(temp_meta_lore);
+  				  temp.setItemMeta(temp_meta);
+  				  temp.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 10);
+  				  i.setItem(count+=1, temp);
+
+  				  // Bow
+  				  temp = new ItemStack(Material.BOW);
+  				  temp_meta=temp.getItemMeta();
+  				  temp_meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Nanotech Longbow");
+  				  temp_meta_lore = new ArrayList<String>();
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+100% "+ChatColor.BLUE+"Life Steal");
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+100% "+ChatColor.BLUE+"Attack Speed");
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+100% "+ChatColor.BLUE+"Critical Chance");
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+20 "+ChatColor.BLUE+"Armor Penetration");
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+100 "+ChatColor.BLUE+"Damage");
+  				  temp_meta.setLore(temp_meta_lore);
+  				  temp.setItemMeta(temp_meta);
+  				  temp.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 10);
+  				  temp.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 10);
+  				  i.setItem(count+=1, temp);
+
+  				  // Pickaxe
+  				  temp = new ItemStack(Material.DIAMOND_PICKAXE);
+  				  temp.addUnsafeEnchantment(Enchantment.DIG_SPEED, 10);
+  				  temp.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
+  				  temp.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, 10);
+  				  i.setItem(count+=1, temp);
+
+  				  // Shovel
+  				  temp = new ItemStack(Material.DIAMOND_SPADE);
+  				  temp.addUnsafeEnchantment(Enchantment.DIG_SPEED, 10);
+  				  temp.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
+  				  temp.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 10);
+  				  i.setItem(count+=1, temp);
+
+  				  // Axe
+  				  temp = new ItemStack(Material.DIAMOND_AXE);
+  				  temp.addUnsafeEnchantment(Enchantment.DIG_SPEED, 10);
+  				  temp.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
+  				  temp.addUnsafeEnchantment(Enchantment.SILK_TOUCH, 10);
+  				  i.setItem(count+=1, temp);
+
+  				  // Helm
+  				  temp = new ItemStack(Material.DIAMOND_HELMET);
+  				  temp_meta=temp.getItemMeta();
+  				  temp_meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Adamantium Helmet");
+  				  temp_meta_lore = new ArrayList<String>();
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+60% "+ChatColor.BLUE+"Damage Reduction");
+  				  temp_meta_lore.add(ChatColor.AQUA+"Food replenish");
+  				  temp_meta.setLore(temp_meta_lore);
+  				  temp.setItemMeta(temp_meta);
+  				  temp.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 5);
+  				  temp.addUnsafeEnchantment(Enchantment.OXYGEN, 4);
+  				  temp.addUnsafeEnchantment(Enchantment.WATER_WORKER, 1);
+  				  i.setItem(count+=1, temp);
+
+  				  // Chestplate
+  				  temp = new ItemStack(Material.DIAMOND_CHESTPLATE);
+  				  temp_meta=temp.getItemMeta();
+  				  temp_meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Adamantium Breastplate");
+  				  temp_meta_lore = new ArrayList<String>();
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+40 "+ChatColor.BLUE+"Health");
+  				  temp_meta_lore.add(ChatColor.AQUA+"Fire resistance");
+  				  temp_meta.setLore(temp_meta_lore);
+  				  temp.setItemMeta(temp_meta);
+  				  temp.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, 5);
+  				  i.setItem(count+=1, temp);
+
+  				  // Leggings
+  				  temp = new ItemStack(Material.DIAMOND_LEGGINGS);
+  				  temp_meta=temp.getItemMeta();
+  				  temp_meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Adamantium Leggings");
+  				  temp_meta_lore = new ArrayList<String>();
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+50% "+ChatColor.BLUE+"Block Chance");
+  				  temp_meta_lore.add(ChatColor.AQUA+"Hyper sprint");
+  				  temp_meta.setLore(temp_meta_lore);
+  				  temp.setItemMeta(temp_meta);
+  				  temp.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, 5);
+  				  i.setItem(count+=1, temp);
+
+  				  // Boots
+  				  temp = new ItemStack(Material.DIAMOND_BOOTS);
+  				  temp_meta=temp.getItemMeta();
+  				  temp_meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Adamantium Boots");
+  				  temp_meta_lore = new ArrayList<String>();
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+100% "+ChatColor.BLUE+"Speed Boost Chance");
+  				  temp_meta_lore.add(ChatColor.AQUA+"Hyper jump");
+  				  temp_meta.setLore(temp_meta_lore);
+  				  temp.setItemMeta(temp_meta);
+  				  temp.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, 5);
+  				  i.setItem(count+=1, temp);
+
+  				  // Sword
+  				  temp = new ItemStack(Material.DIAMOND_SWORD);
+  				  temp_meta=temp.getItemMeta();
+  				  temp_meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Adamantium Saber");
+  				  temp_meta_lore = new ArrayList<String>();
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+20% "+ChatColor.BLUE+"Life Steal");
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+50% "+ChatColor.BLUE+"Attack Speed");
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+6 "+ChatColor.BLUE+"Armor Penetration");
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+10 "+ChatColor.BLUE+"Damage");
+  				  temp_meta.setLore(temp_meta_lore);
+  				  temp.setItemMeta(temp_meta);
+  				  temp.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 4);
+  				  temp.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 5);
+  				  temp.addUnsafeEnchantment(Enchantment.DAMAGE_UNDEAD, 5);
+  				  temp.addUnsafeEnchantment(Enchantment.DAMAGE_ARTHROPODS, 5);
+  				  i.setItem(count+=1, temp);
+
+  				  // Bow
+  				  temp = new ItemStack(Material.BOW);
+  				  temp_meta=temp.getItemMeta();
+  				  temp_meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Adamantium Longbow");
+  				  temp_meta_lore = new ArrayList<String>();
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+20% "+ChatColor.BLUE+"Life Steal");
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+100% "+ChatColor.BLUE+"Attack Speed");
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+8 "+ChatColor.BLUE+"Armor Penetration");
+  				  temp_meta_lore.add(ChatColor.YELLOW+"+15 "+ChatColor.BLUE+"Damage");
+  				  temp_meta.setLore(temp_meta_lore);
+  				  temp.setItemMeta(temp_meta);
+  				  temp.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 6);
+  				  temp.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 4);
+  				  temp.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, 2);
+  				  temp.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
+  				  i.setItem(count+=1, temp);
+  				  
+  				  // Pocket Crafting Table
+  				  ItemStack table = new ItemStack(Material.WORKBENCH);
+  				  ItemMeta table_name = table.getItemMeta();
+  				  table_name.setDisplayName(ChatColor.YELLOW+"Pocket Crafting Table");
+
+  				  List<String> tablelore = new ArrayList<String>();
+  				  tablelore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"This workbench can be");
+  				  tablelore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"used anywhere! Simply");
+  				  tablelore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"right click to open its");
+  				  tablelore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"crafting interface.");
+  				  table_name.setLore(tablelore);
+  				  table.setItemMeta(table_name);
+  				  i.setItem(count+=1, table);
+  				  
+  				  // Witherless Rose
+  				  ItemStack rose = new ItemStack(Material.RED_ROSE, 1);
+  				  ItemMeta rose_name = rose.getItemMeta();
+
+  				  List<String> roselore = new ArrayList<String>();
+  				  roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+  				  roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"This flower is infused with");
+  				  roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"overwhelming magical power,");
+  				  roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"causing it to never wilt.");
+  				  roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+  				  roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"The holder of this flower");
+  				  roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"will also be resistant to");
+  				  roselore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"any "+ChatColor.RESET+"WITHER"+ChatColor.GRAY+""+ChatColor.ITALIC+" effects.");
+  				  rose_name.setLore(roselore);
+  				  rose_name.setDisplayName(ChatColor.AQUA+"Unwilting Flower");
+
+  				  rose.setItemMeta(rose_name);
+  				  rose.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+  				  rose.setAmount(64);
+  				  i.setItem(count+=1, rose);
+
+  				  // Arrows
+  				  i.setItem(count+=1, new ItemStack(Material.ARROW, 64));
+  				  
+  				  p.openInventory(i);
+
+
+  			  }
+            }
   			  if (args[0].equalsIgnoreCase("newmobs")) {
   				  p.sendMessage("/event newmobs <type>. <type> can be COUNTER_SLIME, VIRAL_SPIDER, SILENCER, HOUND_CALLER, FISH_CALLER, SUICIDAL_CREEPER, POWER_SURGE_ZOMBIE, LIGHTNING_MAGE");
   			  }

@@ -22,6 +22,7 @@ import net.milkbowl.vault.economy.EconomyResponse;
 
 
 
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -158,6 +159,7 @@ import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
@@ -1429,12 +1431,20 @@ implements Listener
 	
 	@EventHandler
 	public void onPlayerSneak(PlayerToggleSneakEvent e) {
+		Player p = e.getPlayer();
 		if (e.isSneaking()) {
-			if (this.plugin.hasJobBuff("Hunter", e.getPlayer(), Job.JOB10)) {
-				e.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 9999999, 0, true));
-				if (Main.SERVER_TICK_TIME-this.plugin.getPlayerData(e.getPlayer()).lastsneaktime>60) {
-					this.plugin.getPlayerData(e.getPlayer()).lastsneaktime=Main.SERVER_TICK_TIME;
-					Player p = e.getPlayer();
+			if (p.getInventory().getBoots() != null && p.getInventory().getBoots().hasItemMeta() && p.getInventory().getBoots().getItemMeta().getLore() != null) { // Screw null pointer exceptions
+				for(String s : p.getInventory().getBoots().getItemMeta().getLore()) {
+					// Check for hyper jump modifier (admins). If it exists, give Jump Boost X to player.
+					if (s.contains(ChatColor.AQUA+"Hyper jump")) {
+						p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 200, 10));
+					}
+				}
+			}
+			if (this.plugin.hasJobBuff("Hunter", p, Job.JOB10)) {
+				p.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 9999999, 0, true));
+				if (Main.SERVER_TICK_TIME-this.plugin.getPlayerData(p).lastsneaktime>60) {
+					this.plugin.getPlayerData(p).lastsneaktime=Main.SERVER_TICK_TIME;
 					  List<Entity> nearby = p.getNearbyEntities(20, 12, 20);
 					  //List<Entity> nearby2 = p.getNearbyEntities(10, 6, 10);
 					  for (int i=0;i<nearby.size();i++) {
@@ -1452,14 +1462,14 @@ implements Listener
 				}
 			}
 		} else {
-			if (this.plugin.hasJobBuff("Hunter", e.getPlayer(), Job.JOB10)) {
-				if (e.getPlayer().hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+			if (this.plugin.hasJobBuff("Hunter", p, Job.JOB10)) {
+				if (p.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
 					try {
-						Collection<PotionEffect> effects = e.getPlayer().getActivePotionEffects();
+						Collection<PotionEffect> effects = p.getActivePotionEffects();
 						for (PotionEffect nextpotioneffect : effects) {
 							if (nextpotioneffect.getType().getName().compareTo("INVISIBILITY")==0 && nextpotioneffect.getDuration()>24000) {
 								//This is definitely not a potion given to you.
-								e.getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
+								p.removePotionEffect(PotionEffectType.INVISIBILITY);
 								break;
 							}
 						}
@@ -3856,12 +3866,7 @@ implements Listener
 		//p.sendMessage("Has name: "+p.getItemInHand().getItemMeta().hasDisplayName());
 		//p.sendMessage("Name is: "+p.getItemInHand().getItemMeta().getDisplayName());
 		int myData=this.plugin.getPlayerDataSlot(p);
-		boolean has_silktouch=false;
-		if (!p.getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH)) {
-			has_silktouch=false;
-		} else {
-			has_silktouch=true;
-		}
+		boolean has_silktouch=p.getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH);
 
 		//*******************************//Job Buffs Begin here!
 		if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && p.getAllowFlight()) {
@@ -3985,8 +3990,9 @@ implements Listener
 						p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING, 200, 0, true));
 					}
 				}
-				if (this.plugin.hasJobBuff("Miner", p, Job.JOB20)) {
-					if (p.getItemInHand().getType()==Material.DIAMOND_PICKAXE && (e.getBlock().getType()==Material.STONE || e.getBlock().getType()==Material.COBBLESTONE)) {
+				
+				if (this.plugin.hasJobBuff("Miner", p, Job.JOB20) && false) { // Disabled atm
+					 if (p.getItemInHand().getType()==Material.DIAMOND_PICKAXE && (e.getBlock().getType()==Material.STONE || e.getBlock().getType()==Material.COBBLESTONE)) {
 						for (int i=-1;i<2;i++) {
 							for (int j=-1;j<2;j++) {
 								for (int k=-1;k<2;k++) {
@@ -4002,11 +4008,14 @@ implements Listener
 											}
 										}
 										if (e.getBlock().getLocation().add(i,j,k).getBlock().getType()==Material.STONE || e.getBlock().getLocation().add(i,j,k).getBlock().getType()==Material.COBBLESTONE) {
+											
 											if (has_silktouch) {
 												e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(i,j,k), new ItemStack(e.getBlock().getLocation().add(i,j,k).getBlock().getType()));
 											} else {
 												e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation().add(i,j,k), new ItemStack(Material.COBBLESTONE));
 											}
+											
+											e.getBlock().breakNaturally(p.getItemInHand());
 											e.getBlock().getLocation().add(i,j,k).getBlock().setType(Material.AIR);
 										}
 									}
@@ -8101,7 +8110,17 @@ implements Listener
 					}
 				}
 			}
+			if (p.getInventory().getHelmet() != null && p.getInventory().getHelmet().hasItemMeta() && p.getInventory().getHelmet().getItemMeta().getLore() != null) { // Screw null pointer exceptions
+				for(String s : p.getInventory().getHelmet().getItemMeta().getLore()) {
+					// Check for food replenish.
+					if (s.contains(ChatColor.AQUA+"Food replenish")) {
+						e.setFoodLevel(20);
+					}
+				}
+			}
 		}
+
+
 	}
 
 	@EventHandler
@@ -8864,17 +8883,28 @@ implements Listener
 
 	@EventHandler
 	public void onPlayerOnFire(EntityCombustEvent e) {
-		if (e.getEntity() instanceof LivingEntity) {
-			if (!((LivingEntity)(e.getEntity())).hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
-				doFireAspectDamage(((LivingEntity)e.getEntity()), this.plugin);
-			}
-		}
+		boolean fireResist = false;
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			Player p = (Player)e.getEntity();
 			if (this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat6")>0) {
 				p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, (this.plugin.getStatBonus(5, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat6"))/3)*20, 0));
 			}
+			if (p.getInventory().getChestplate() != null && p.getInventory().getChestplate().hasItemMeta() && p.getInventory().getChestplate().getItemMeta().getLore() != null) { // Screw null pointer exceptions
+				for(String s : p.getInventory().getChestplate().getItemMeta().getLore()) {
+					// Check for fire resist
+					if (s.contains(ChatColor.AQUA+"Fire resistance")) {
+						e.setCancelled(true);
+						fireResist = true;
+					}
+				}
+			}
 		}
+		if (e.getEntity() instanceof LivingEntity && !fireResist) {
+			if (!((LivingEntity)(e.getEntity())).hasPotionEffect(PotionEffectType.FIRE_RESISTANCE)) {
+				doFireAspectDamage(((LivingEntity)e.getEntity()), this.plugin);
+			}
+		}
+
 	}
 
 	@EventHandler
@@ -11511,6 +11541,23 @@ implements Listener
 			p.getInventory().addItem(finalitem);
 		} else {
 			p.getWorld().dropItemNaturally(p.getLocation(), finalitem); //Drop item on the ground if our inventory is full. That way we don't lose it.
+		}
+	}
+
+
+	@EventHandler
+	public void onSprintToggle(PlayerToggleSprintEvent event) {
+		Player p = event.getPlayer();
+		
+		if (p.getInventory().getLeggings() != null && p.getInventory().getLeggings().hasItemMeta() && p.getInventory().getLeggings().getItemMeta().getLore() != null) { // Screw null pointer exceptions
+			for(String s : p.getInventory().getLeggings().getItemMeta().getLore()) {
+				// Check for hyper sprint modifier (admins). If it exists, give Speed V to player.
+				if (s.contains(ChatColor.AQUA+"Hyper sprint")) {
+					if (event.isSprinting()) {
+						p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 200, 10));
+					}
+				}
+			}
 		}
 	}
 
@@ -15943,7 +15990,7 @@ implements Listener
 			return false;
 		}
 	}
-
+	
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e)
 	{
@@ -15961,6 +16008,44 @@ implements Listener
 		}
 		
 		//******************************//All Job Buff related items go in here.
+		if (e.getAction()==Action.RIGHT_CLICK_BLOCK && this.plugin.hasJobBuff("Miner", p, Job.JOB20)) {
+			// Right click miner buff
+			int myData=this.plugin.getPlayerDataSlot(p);
+			
+			if (p.getItemInHand().getType()==Material.DIAMOND_PICKAXE && (e.getClickedBlock().getType()==Material.STONE || e.getClickedBlock().getType()==Material.COBBLESTONE)) {
+				boolean has_silktouch = p.getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH);
+				for (int i=-1;i<2;i++) {
+					for (int j=-1;j<2;j++) {
+						for (int k=-1;k<2;k++) {
+							if (e.getClickedBlock().getLocation().add(i,j,k).getBlock().getType().name().toLowerCase().contains("ore")) {
+								destroyNearbyOres(e.getClickedBlock().getWorld(), p, e.getClickedBlock().getLocation(), has_silktouch, 4);
+							} else {
+								if (this.plugin.PlayerinJob(p, "Miner")) {
+									myData=this.plugin.getPlayerDataSlot(p);
+									if (this.plugin.playerdata_list.get(myData).GoodInteract()) {
+										if (e.getClickedBlock().getType()==Material.STONE) {
+											this.plugin.gainMoneyExp(p,"Miner",0.0025,1);
+										}
+									}
+								}
+								if (e.getClickedBlock().getLocation().add(i,j,k).getBlock().getType()==Material.STONE || e.getClickedBlock().getLocation().add(i,j,k).getBlock().getType()==Material.COBBLESTONE) {
+									
+									if (has_silktouch) {
+										e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation().add(i,j,k), new ItemStack(e.getClickedBlock().getLocation().add(i,j,k).getBlock().getType()));
+									} else {
+										e.getClickedBlock().getWorld().dropItemNaturally(e.getClickedBlock().getLocation().add(i,j,k), new ItemStack(Material.COBBLESTONE));
+									}
+									
+									e.getClickedBlock().breakNaturally(p.getItemInHand());
+									e.getClickedBlock().getLocation().add(i,j,k).getBlock().setType(Material.AIR);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
 		if (e.getAction()==Action.LEFT_CLICK_BLOCK && this.plugin.hasJobBuff("Woodcutter", p, Job.JOB5)) {
 			if (e.getClickedBlock().getType()==Material.LEAVES) {
 				if ((e.getClickedBlock().getData()<4 || e.getClickedBlock().getData()>7) && e.getClickedBlock().getData()%4==0) {
