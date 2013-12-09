@@ -8693,7 +8693,12 @@ implements Listener
 				e.setDamage(e.getDamage()*2);
 			}
 			if (e.getCause()==DamageCause.WITHER) {
-				e.setDamage(e.getDamage()*Math.pow(0.5, this.plugin.getWitherlessRoseCount(p)));
+				// e.setDamage(e.getDamage()*Math.pow(0.5, this.plugin.getWitherlessRoseCount(p)));
+
+				// For each Witherless Rose, add a multiplicative 25% chance to negate this tick of wither damage.
+				if (Math.random() > Math.pow(0.75, this.plugin.getWitherlessRoseCount(p))) {
+					e.setCancelled(true);
+				}
 			}
 			Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 				@Override

@@ -5135,6 +5135,10 @@ public void payDay(int time)
     	return false;
     }
     
+    /**
+     * @param p - The player which we're checking the rose count for
+     * @return - The number of Witherless Roses (Unwilting Flowers) in the player's inventory. 
+     */
     public int getWitherlessRoseCount(Player p) {
     	int count = 0;
     	for (int m=0;m<p.getInventory().getContents().length;m++) {
