@@ -316,6 +316,7 @@ public class Main extends JavaPlugin
     ninjavisible_list = new ArrayList<InvisibilityData>();
     revive_inventory_list = new ArrayList<ReviveInventory>();
     chunk_queue_list = new ArrayList<Chunk>();
+    bonus_enchantment_list = new ArrayList<BonusEnchantment>();
     
     recycling_center_list = new ArrayList<RecyclingCenterNode>();
     
@@ -6127,11 +6128,11 @@ public void payDay(int time)
 
 class BonusEnchantment {
 	public enum ItemType { WEAPONS, ARMOR, BOTH }
-	String name; //The string name of the Bonus Enchantment.
-	boolean percent; //Whether or not this enchantment is a percentage value, or an integer value.
-	boolean enchant_format; //Whether or not this enchantment is type 1 (false) or type 2 (true). Type 2 enchants are the ones that look like actual in-game enchantments.
-	ItemType item_type; //The item type this enchantment can apply to.
-	Range value_range;
+	String name = ""; //The string name of the Bonus Enchantment.
+	boolean percent = false; //Whether or not this enchantment is a percentage value, or an integer value.
+	boolean enchant_format = false; //Whether or not this enchantment is type 1 (false) or type 2 (true). Type 2 enchants are the ones that look like actual in-game enchantments.
+	ItemType item_type = ItemType.BOTH; //The item type this enchantment can apply to.
+	Range value_range = new IntRange(0,0);
 	/**
 	 * Creates a new BonusEnchantment.
 	 * @param name The string name of the Bonus enchantment.
@@ -6146,6 +6147,7 @@ class BonusEnchantment {
 		this.enchant_format=enchant_format;
 		this.item_type = type;
 		this.value_range = values_range;
+		Bukkit.getLogger().info("Initialized new Bonus Enchantment: "+name+" ("+values_range.getMinimumNumber().toString()+","+values_range.getMaximumNumber().toString()+")");
 		Main.bonus_enchantment_list.add(this);
 	}
 }
