@@ -792,16 +792,16 @@ public class Main extends JavaPlugin
     ENCHANT_CRITICAL_CHANCE = new BonusEnchantment("Critical Chance",true,false,ItemType.WEAPONS,new IntRange(0,100));
     ENCHANT_ARMOR_PENETRATION = new BonusEnchantment("Armor Penetration",false,false,ItemType.WEAPONS,new IntRange(0,100));
     ENCHANT_LIFE_STEAL = new BonusEnchantment("Life Steal",true,false,ItemType.WEAPONS,new IntRange(0,100));
-    ENCHANT_ATTACK_SPEED = new BonusEnchantment("Attack Speed",true,false,ItemType.WEAPONS,new IntRange(0,500));
-    ENCHANT_DAMAGE = new BonusEnchantment("Damage",false,false,ItemType.WEAPONS,new IntRange(0,1000));
-    ENCHANT_HEALTH = new BonusEnchantment("Health",false,false,ItemType.ARMOR,new IntRange(0,1000));
+    ENCHANT_ATTACK_SPEED = new BonusEnchantment("Attack Speed",true,false,ItemType.WEAPONS,new IntRange(0,200));
+    ENCHANT_DAMAGE = new BonusEnchantment("Damage",false,false,ItemType.WEAPONS,new IntRange(0,40));
+    ENCHANT_HEALTH = new BonusEnchantment("Health",false,false,ItemType.ARMOR,new IntRange(0,60));
     ENCHANT_DAMAGE_REDUCTION = new BonusEnchantment("Damage Reduction",true,false,ItemType.ARMOR,new IntRange(0,100));
-    ENCHANT_DURABILITY = new BonusEnchantment("Durability",false,false,ItemType.ARMOR,new IntRange(0,9999999));
+    ENCHANT_DURABILITY = new BonusEnchantment("Durability",false,false,ItemType.ARMOR,new IntRange(0,2000));
     ENCHANT_BLOCK_CHANCE = new BonusEnchantment("Block Chance",true,false,ItemType.ARMOR,new IntRange(0,100));
     ENCHANT_SPEED_BOOST_CHANCE = new BonusEnchantment("Speed Boost Chance",true,false,ItemType.ARMOR,new IntRange(0,100));
-    ENCHANT_STURDY = new BonusEnchantment("Sturdy",false,true,ItemType.ARMOR,new IntRange(0,1000));
-    ENCHANT_REPAIR = new BonusEnchantment("Repair",false,true,ItemType.ARMOR,new IntRange(0,1000));
-    ENCHANT_EXECUTE = new BonusEnchantment("Execute",false,true,ItemType.WEAPONS,new IntRange(0,1000));
+    ENCHANT_STURDY = new BonusEnchantment("Sturdy",false,true,ItemType.ARMOR,new IntRange(0,10));
+    ENCHANT_REPAIR = new BonusEnchantment("Repair",false,true,ItemType.ARMOR,new IntRange(0,10));
+    ENCHANT_EXECUTE = new BonusEnchantment("Execute",false,true,ItemType.WEAPONS,new IntRange(0,10));
     
     DMGCALC = new DamageAPI();
     //System.out.println("Running BankEconomy in "+this.getDataFolder().getAbsolutePath());
@@ -5143,7 +5143,9 @@ public void payDay(int time)
     	//This function determines if the certain lore property is supposed to be kept on the item.
     	//Useful for checking what to remove and not remove from lore.
     	List<String> permanent_properties = new ArrayList<String>();
+    	permanent_properties.add(ChatColor.DARK_GRAY+"[BROKEN]");
     	permanent_properties.add(ChatColor.RED+"-400% Durability");
+    	permanent_properties.add(ChatColor.RED+"Irrepairable");
     	permanent_properties.add(ChatColor.RED+"Duplicated");
     	if (permanent_properties.contains(property)) {
     		return true;
@@ -5322,6 +5324,58 @@ public void payDay(int time)
     }
     
     /**
+     * Gets the enchantment level of this bonus enchantment.
+     * @param item The item to check for.
+     * @param enchant The bonus enchantment to check the level of.
+     * @return If the bonus enchantment doesn't exist on the item, -1 is returned. (Note that it is slightly faster to check with hasBonusEnchantment() than with this method.)
+     *  
+     *  If the bonus enchantment exists, then it will return the value. For percentage enchantments, it returns
+     *  the percentage number itself. (So 77% would return the number 77.). For roman numerals, the numeric
+     *  version of the roman numeral is returned. (IV returns 4)
+     */
+    public int getBonusEnchantmentLevel(ItemStack item, BonusEnchantment enchant) {
+    	List<String> lore = null;
+    	String enchant_string = enchant.name;
+    	boolean enchant_format=enchant.enchant_format;
+    	if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
+    		lore = item.getItemMeta().getLore();
+    		//Make sure the lore doesn't already exist. If it does, we have to actually
+    		//replace it.
+    		for (int i=0;i<lore.size();i++) {
+    			if (lore.get(i).contains(enchant_string)) {
+    				if (!enchant_format) {
+    					//Take that old amount and add onto it.
+    					return (int)getEnchantmentNumb(lore.get(i));
+    				} else {
+    					String parser = lore.get(i);
+    					parser.replace(enchant_string, "");
+    					return toNumber(parser);
+    				}
+    			}
+    		}
+    	}
+    	return -1;
+    }
+
+    /**
+     * Checks if an item has a particular bonus enchantment on it.
+     * @param item The item to check for.
+     * @param enchant The bonus enchantment to find. (See Main.ENCHANT_)
+     * @return true if the bonus enchantment exists on the item, false otherwise.
+     */
+    public boolean hasBonusEnchantment(ItemStack item, BonusEnchantment enchant) {
+    	if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
+    		List<String> newlore = item.getItemMeta().getLore();
+    		for (int i=0;i<item.getItemMeta().getLore().size();i++) {
+    			if (item.getItemMeta().getLore().get(i).contains(enchant.name)) {
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
+    }
+    
+    /**
      * Removes a bonus enchantment from the item.
      * If the enchantment does not exist on the item,
      * the same exact copy of the item is returned.
@@ -5397,7 +5451,6 @@ public void payDay(int time)
     					lore.set(i, ChatColor.YELLOW+"+"+(int)(oldamt+amt)+((percent)?"% ":" ")+ChatColor.BLUE+enchant_string);
     				} else {
     					double oldamt=0;
-    					if (!override) {oldamt = getEnchantmentNumb(lore.get(i));} else {oldamt=0;}
     					String parser = lore.get(i);
     					parser.replace(enchant_string, "");
     					if (!override) {oldamt=toNumber(parser);} else {oldamt=0;}
@@ -6085,7 +6138,7 @@ class BonusEnchantment {
 	 * @param percent Whether or not this enchantment is a percentage value (true), or an integer value (false).
 	 * @param enchant_format Whether or not this enchantment is type 1 (false) or type 2 (true). Type 2 enchants are the ones that look like actual in-game enchantments.
 	 * @param type The type of items this enchantment can apply to (See BonusEnchantment.ItemType)
-	 * @param values_range A value range that determines what the minimum and maximum amounts of these numbers can be. (Useful for other functions that need to determine how much of this enchantment to apply.)
+	 * @param values_range A value range that determines what the minimum and maximum amounts of these numbers can be. (Useful for other functions that need to determine how much of this enchantment to apply.) These limits are set to the extent that the strongest item in the game that is obtainable has the maximum amount of these values.
 	 */
 	public BonusEnchantment(String name, boolean percent, boolean enchant_format, ItemType type, Range values_range) {
 		this.name=name;

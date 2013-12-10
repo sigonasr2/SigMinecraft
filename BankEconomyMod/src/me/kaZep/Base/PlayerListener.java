@@ -2711,7 +2711,6 @@ implements Listener
 	public void onCreatureSpawn(CreatureSpawnEvent e) {
 		if (isPermanentSpawn(e, e.getEntity())) {
 			e.getEntity().setRemoveWhenFarAway(false);
-
 			//If this is a boss that spawns from a command block, make sure the command blocks are removed.
 			if (e.getEntity().getCustomName()!=null && (e.getEntity().getCustomName().contains(ChatColor.DARK_PURPLE+"") || e.getEntity().getCustomName().contains(ChatColor.DARK_AQUA+"Polymorphed Creature"))) {
 				for (int i=-2;i<3;i++) {
@@ -2878,11 +2877,11 @@ implements Listener
 					//Modify the difficulty of the mobs based on who is around.
 					EntityEquipment inven = e.getEntity().getEquipment();
 					if (inven!=null) {
-						inven.setBootsDropChance(0.02f);
-						inven.setChestplateDropChance(0.02f);
-						inven.setLeggingsDropChance(0.02f);
-						inven.setHelmetDropChance(0.02f);
-						inven.setItemInHandDropChance(0.02f);
+						inven.setBootsDropChance(0.08f);
+						inven.setChestplateDropChance(0.08f);
+						inven.setLeggingsDropChance(0.08f);
+						inven.setHelmetDropChance(0.08f);
+						inven.setItemInHandDropChance(0.002f);
 						if (e.getEntity().getType()==EntityType.SKELETON) {
 							Skeleton sk = (Skeleton)e.getEntity();
 							if (sk.getSkeletonType()==SkeletonType.WITHER && Math.random()<=0.8) {
@@ -2920,6 +2919,9 @@ implements Listener
 							LivingEntity l = (LivingEntity)entity;
 							l.setCustomName(ChatColor.RED+"Counter Slime");
 							l.setCustomNameVisible(false);
+							l.setMaxHealth(35);
+							l.setHealth(35);
+							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
 						}
 						//Try to spawn a Viral Spider.
 						if (Math.random()<=VIRAL_SPIDER_SPAWN_RATE) {
@@ -3149,25 +3151,53 @@ implements Listener
 											if (Math.random()<=0.75) {
 												l.getEquipment().setChestplate(new ItemStack(Material.CHAINMAIL_CHESTPLATE));
 											} else {
-												l.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+												ItemStack item = new ItemStack(Material.IRON_CHESTPLATE);
+												ItemMeta meta = item.getItemMeta();
+												meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+												List<String> newlore = new ArrayList<String>();
+												newlore.add(ChatColor.RED+"-400% Durability");
+												meta.setLore(newlore);
+												item.setItemMeta(meta);
+												l.getEquipment().setChestplate(item);
 											}
 											if (Math.random()>=0.45) {
 												if (Math.random()<=0.75) {
 													l.getEquipment().setLeggings(new ItemStack(Material.CHAINMAIL_LEGGINGS));
 												} else {
-													l.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+													ItemStack item = new ItemStack(Material.IRON_LEGGINGS);
+													ItemMeta meta = item.getItemMeta();
+													meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+													List<String> newlore = new ArrayList<String>();
+													newlore.add(ChatColor.RED+"-400% Durability");
+													meta.setLore(newlore);
+													item.setItemMeta(meta);
+													l.getEquipment().setLeggings(item);
 												}
 												if (Math.random()>=0.65) {
 													if (Math.random()<=0.75) {
 														l.getEquipment().setHelmet(new ItemStack(Material.CHAINMAIL_HELMET));
 													} else {
-														l.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+														ItemStack item = new ItemStack(Material.IRON_HELMET);
+														ItemMeta meta = item.getItemMeta();
+														meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+														List<String> newlore = new ArrayList<String>();
+														newlore.add(ChatColor.RED+"-400% Durability");
+														meta.setLore(newlore);
+														item.setItemMeta(meta);
+														l.getEquipment().setHelmet(item);
 													}
 													if (Math.random()>=0.95) {
 														if (Math.random()<=0.75) {
 															l.getEquipment().setBoots(new ItemStack(Material.CHAINMAIL_BOOTS));
 														} else {
-															l.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
+															ItemStack item = new ItemStack(Material.IRON_BOOTS);
+															ItemMeta meta = item.getItemMeta();
+															meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+															List<String> newlore = new ArrayList<String>();
+															newlore.add(ChatColor.RED+"-400% Durability");
+															meta.setLore(newlore);
+															item.setItemMeta(meta);
+															l.getEquipment().setBoots(item);
 														}
 													}
 												}
@@ -3214,27 +3244,83 @@ implements Listener
 												}
 											if (Math.random()>=0.25) {
 												if (Math.random()<=0.75) {
-													l.getEquipment().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+													ItemStack item = new ItemStack(Material.IRON_CHESTPLATE);
+													ItemMeta meta = item.getItemMeta();
+													meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+													List<String> newlore = new ArrayList<String>();
+													newlore.add(ChatColor.RED+"-400% Durability");
+													meta.setLore(newlore);
+													item.setItemMeta(meta);
+													l.getEquipment().setChestplate(item);
 												} else {
-													l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+													ItemStack item = new ItemStack(Material.DIAMOND_CHESTPLATE);
+													ItemMeta meta = item.getItemMeta();
+													meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+													List<String> newlore = new ArrayList<String>();
+													newlore.add(ChatColor.RED+"-400% Durability");
+													meta.setLore(newlore);
+													item.setItemMeta(meta);
+													l.getEquipment().setChestplate(item);
 												}
 												if (Math.random()>=0.45) {
 													if (Math.random()<=0.75) {
-														l.getEquipment().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+														ItemStack item = new ItemStack(Material.IRON_LEGGINGS);
+														ItemMeta meta = item.getItemMeta();
+														meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+														List<String> newlore = new ArrayList<String>();
+														newlore.add(ChatColor.RED+"-400% Durability");
+														meta.setLore(newlore);
+														item.setItemMeta(meta);
+														l.getEquipment().setLeggings(item);
 													} else {
-														l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+														ItemStack item = new ItemStack(Material.DIAMOND_LEGGINGS);
+														ItemMeta meta = item.getItemMeta();
+														meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+														List<String> newlore = new ArrayList<String>();
+														newlore.add(ChatColor.RED+"-400% Durability");
+														meta.setLore(newlore);
+														item.setItemMeta(meta);
+														l.getEquipment().setLeggings(item);
 													}
 													if (Math.random()>=0.65) {
 														if (Math.random()<=0.75) {
-															l.getEquipment().setHelmet(new ItemStack(Material.IRON_HELMET));
+															ItemStack item = new ItemStack(Material.IRON_HELMET);
+															ItemMeta meta = item.getItemMeta();
+															meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+															List<String> newlore = new ArrayList<String>();
+															newlore.add(ChatColor.RED+"-400% Durability");
+															meta.setLore(newlore);
+															item.setItemMeta(meta);
+															l.getEquipment().setHelmet(item);
 														} else {
-															l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+															ItemStack item = new ItemStack(Material.DIAMOND_HELMET);
+															ItemMeta meta = item.getItemMeta();
+															meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+															List<String> newlore = new ArrayList<String>();
+															newlore.add(ChatColor.RED+"-400% Durability");
+															meta.setLore(newlore);
+															item.setItemMeta(meta);
+															l.getEquipment().setHelmet(item);
 														}
 														if (Math.random()>=0.95) {
 															if (Math.random()<=0.75) {
-																l.getEquipment().setBoots(new ItemStack(Material.IRON_BOOTS));
+																ItemStack item = new ItemStack(Material.IRON_BOOTS);
+																ItemMeta meta = item.getItemMeta();
+																meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																List<String> newlore = new ArrayList<String>();
+																newlore.add(ChatColor.RED+"-400% Durability");
+																meta.setLore(newlore);
+																item.setItemMeta(meta);
+																l.getEquipment().setBoots(item);
 															} else {
-																l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+																ItemStack item = new ItemStack(Material.DIAMOND_BOOTS);
+																ItemMeta meta = item.getItemMeta();
+																meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																List<String> newlore = new ArrayList<String>();
+																newlore.add(ChatColor.RED+"-400% Durability");
+																meta.setLore(newlore);
+																item.setItemMeta(meta);
+																l.getEquipment().setBoots(item);
 															}
 														}
 													}
@@ -3282,34 +3368,86 @@ implements Listener
 													}
 												if (Math.random()>=0.25) {
 													if (Math.random()<=0.75) {
-														l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+														ItemStack item = new ItemStack(Material.DIAMOND_CHESTPLATE);
+														ItemMeta meta = item.getItemMeta();
+														meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+														List<String> newlore = new ArrayList<String>();
+														newlore.add(ChatColor.RED+"-400% Durability");
+														meta.setLore(newlore);
+														item.setItemMeta(meta);
+														l.getEquipment().setChestplate(item);
 													} else {
 														ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
 														enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
+														ItemMeta meta = enchanted.getItemMeta();
+														meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+														List<String> newlore = new ArrayList<String>();
+														newlore.add(ChatColor.RED+"-400% Durability");
+														meta.setLore(newlore);
+														enchanted.setItemMeta(meta);
 														l.getEquipment().setChestplate(enchanted);
 													}
 													if (Math.random()>=0.45) {
 														if (Math.random()<=0.75) {
-															l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+															ItemStack item = new ItemStack(Material.DIAMOND_LEGGINGS);
+															ItemMeta meta = item.getItemMeta();
+															meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+															List<String> newlore = new ArrayList<String>();
+															newlore.add(ChatColor.RED+"-400% Durability");
+															meta.setLore(newlore);
+															item.setItemMeta(meta);
+															l.getEquipment().setLeggings(item);
 														} else {
 															ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
 															enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
+															ItemMeta meta = enchanted.getItemMeta();
+															meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+															List<String> newlore = new ArrayList<String>();
+															newlore.add(ChatColor.RED+"-400% Durability");
+															meta.setLore(newlore);
+															enchanted.setItemMeta(meta);
 															l.getEquipment().setLeggings(enchanted);
 														}
 														if (Math.random()>=0.65) {
 															if (Math.random()<=0.75) {
-																l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+																ItemStack item = new ItemStack(Material.DIAMOND_HELMET);
+																ItemMeta meta = item.getItemMeta();
+																meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																List<String> newlore = new ArrayList<String>();
+																newlore.add(ChatColor.RED+"-400% Durability");
+																meta.setLore(newlore);
+																item.setItemMeta(meta);
+																l.getEquipment().setHelmet(item);
 															} else {
 																ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
 																enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
+																ItemMeta meta = enchanted.getItemMeta();
+																meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+																List<String> newlore = new ArrayList<String>();
+																newlore.add(ChatColor.RED+"-400% Durability");
+																meta.setLore(newlore);
+																enchanted.setItemMeta(meta);
 																l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 															}
 															if (Math.random()>=0.95) {
 																if (Math.random()<=0.75) {
-																	l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+																	ItemStack item = new ItemStack(Material.DIAMOND_BOOTS);
+																	ItemMeta meta = item.getItemMeta();
+																	meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																	List<String> newlore = new ArrayList<String>();
+																	newlore.add(ChatColor.RED+"-400% Durability");
+																	meta.setLore(newlore);
+																	item.setItemMeta(meta);
+																	l.getEquipment().setBoots(item);
 																} else {
 																	ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
 																	enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*1.0d)+1);
+																	ItemMeta meta = enchanted.getItemMeta();
+																	meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+																	List<String> newlore = new ArrayList<String>();
+																	newlore.add(ChatColor.RED+"-400% Durability");
+																	meta.setLore(newlore);
+																	enchanted.setItemMeta(meta);
 																	l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
 																}
 															}
@@ -3376,46 +3514,98 @@ implements Listener
 														}
 													if (Math.random()>=0.25) {
 														if (Math.random()<=0.75) {
-															l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+															ItemStack item = new ItemStack(Material.DIAMOND_CHESTPLATE);
+															ItemMeta meta = item.getItemMeta();
+															meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+															List<String> newlore = new ArrayList<String>();
+															newlore.add(ChatColor.RED+"-400% Durability");
+															meta.setLore(newlore);
+															item.setItemMeta(meta);
+															l.getEquipment().setChestplate(item);
 														} else {
 															ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
 															enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
 															if (Math.random()<=0.5) {
 																enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*1.0d)+1);
 															}
+															ItemMeta meta = enchanted.getItemMeta();
+															meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+															List<String> newlore = new ArrayList<String>();
+															newlore.add(ChatColor.RED+"-400% Durability");
+															meta.setLore(newlore);
+															enchanted.setItemMeta(meta);
 															l.getEquipment().setChestplate(enchanted);
 														}
 														if (Math.random()>=0.45) {
 															if (Math.random()<=0.75) {
-																l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+																ItemStack item = new ItemStack(Material.DIAMOND_LEGGINGS);
+																ItemMeta meta = item.getItemMeta();
+																meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																List<String> newlore = new ArrayList<String>();
+																newlore.add(ChatColor.RED+"-400% Durability");
+																meta.setLore(newlore);
+																item.setItemMeta(meta);
+																l.getEquipment().setLeggings(item);
 															} else {
 																ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
 																enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
 																if (Math.random()<=0.5) {
 																	enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
 																}
+																ItemMeta meta = enchanted.getItemMeta();
+																meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+																List<String> newlore = new ArrayList<String>();
+																newlore.add(ChatColor.RED+"-400% Durability");
+																meta.setLore(newlore);
+																enchanted.setItemMeta(meta);
 																l.getEquipment().setLeggings(enchanted);
 															}
 															if (Math.random()>=0.65) {
 																if (Math.random()<=0.75) {
-																	l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+																	ItemStack item = new ItemStack(Material.DIAMOND_HELMET);
+																	ItemMeta meta = item.getItemMeta();
+																	meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																	List<String> newlore = new ArrayList<String>();
+																	newlore.add(ChatColor.RED+"-400% Durability");
+																	meta.setLore(newlore);
+																	item.setItemMeta(meta);
+																	l.getEquipment().setHelmet(item);
 																} else {
 																	ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
 																	enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
 																	if (Math.random()<=0.5) {
 																		enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
 																	}
+																	ItemMeta meta = enchanted.getItemMeta();
+																	meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+																	List<String> newlore = new ArrayList<String>();
+																	newlore.add(ChatColor.RED+"-400% Durability");
+																	meta.setLore(newlore);
+																	enchanted.setItemMeta(meta);
 																	l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 																}
 																if (Math.random()>=0.95) {
 																	if (Math.random()<=0.75) {
-																		l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+																		ItemStack item = new ItemStack(Material.DIAMOND_BOOTS);
+																		ItemMeta meta = item.getItemMeta();
+																		meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																		List<String> newlore = new ArrayList<String>();
+																		newlore.add(ChatColor.RED+"-400% Durability");
+																		meta.setLore(newlore);
+																		item.setItemMeta(meta);
+																		l.getEquipment().setBoots(item);
 																	} else {
 																		ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
 																		enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
 																		if (Math.random()<=0.5) {
 																			enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
 																		}
+																		ItemMeta meta = enchanted.getItemMeta();
+																		meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+																		List<String> newlore = new ArrayList<String>();
+																		newlore.add(ChatColor.RED+"-400% Durability");
+																		meta.setLore(newlore);
+																		enchanted.setItemMeta(meta);
 																		l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
 																	}
 																}
@@ -3483,7 +3673,14 @@ implements Listener
 															}
 														if (Math.random()>=0.25) {
 															if (Math.random()<=0.75) {
-																l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+																ItemStack item = new ItemStack(Material.DIAMOND_CHESTPLATE);
+																ItemMeta meta = item.getItemMeta();
+																meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																List<String> newlore = new ArrayList<String>();
+																newlore.add(ChatColor.RED+"-400% Durability");
+																meta.setLore(newlore);
+																item.setItemMeta(meta);
+																l.getEquipment().setChestplate(item);
 															} else {
 																ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
 																enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*3.0d)+1);
@@ -3493,11 +3690,24 @@ implements Listener
 																if (Math.random()<=0.5) {
 																	enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
 																}
+																ItemMeta meta = enchanted.getItemMeta();
+																meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+																List<String> newlore = new ArrayList<String>();
+																newlore.add(ChatColor.RED+"-400% Durability");
+																meta.setLore(newlore);
+																enchanted.setItemMeta(meta);
 																l.getEquipment().setChestplate(enchanted);
 															}
 															if (Math.random()>=0.45) {
 																if (Math.random()<=0.75) {
-																	l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+																	ItemStack item = new ItemStack(Material.DIAMOND_LEGGINGS);
+																	ItemMeta meta = item.getItemMeta();
+																	meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																	List<String> newlore = new ArrayList<String>();
+																	newlore.add(ChatColor.RED+"-400% Durability");
+																	meta.setLore(newlore);
+																	item.setItemMeta(meta);
+																	l.getEquipment().setLeggings(item);
 																} else {
 																	ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
 																	enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*2.0d)+1);
@@ -3507,11 +3717,24 @@ implements Listener
 																	if (Math.random()<=0.5) {
 																		enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
 																	}
+																	ItemMeta meta = enchanted.getItemMeta();
+																	meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+																	List<String> newlore = new ArrayList<String>();
+																	newlore.add(ChatColor.RED+"-400% Durability");
+																	meta.setLore(newlore);
+																	enchanted.setItemMeta(meta);
 																	l.getEquipment().setLeggings(enchanted);
 																}
 																if (Math.random()>=0.65) {
 																	if (Math.random()<=0.75) {
-																		l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+																		ItemStack item = new ItemStack(Material.DIAMOND_HELMET);
+																		ItemMeta meta = item.getItemMeta();
+																		meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																		List<String> newlore = new ArrayList<String>();
+																		newlore.add(ChatColor.RED+"-400% Durability");
+																		meta.setLore(newlore);
+																		item.setItemMeta(meta);
+																		l.getEquipment().setHelmet(item);
 																	} else {
 																		ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
 																		enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
@@ -3521,11 +3744,24 @@ implements Listener
 																		if (Math.random()<=0.5) {
 																			enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
 																		}
+																		ItemMeta meta = enchanted.getItemMeta();
+																		meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+																		List<String> newlore = new ArrayList<String>();
+																		newlore.add(ChatColor.RED+"-400% Durability");
+																		meta.setLore(newlore);
+																		enchanted.setItemMeta(meta);
 																		l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 																	}
 																	if (Math.random()>=0.95) {
 																		if (Math.random()<=0.75) {
-																			l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+																			ItemStack item = new ItemStack(Material.DIAMOND_BOOTS);
+																			ItemMeta meta = item.getItemMeta();
+																			meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																			List<String> newlore = new ArrayList<String>();
+																			newlore.add(ChatColor.RED+"-400% Durability");
+																			meta.setLore(newlore);
+																			item.setItemMeta(meta);
+																			l.getEquipment().setBoots(item);
 																		} else {
 																			ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
 																			enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
@@ -3535,6 +3771,12 @@ implements Listener
 																			if (Math.random()<=0.5) {
 																				enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
 																			}
+																			ItemMeta meta = enchanted.getItemMeta();
+																			meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+																			List<String> newlore = new ArrayList<String>();
+																			newlore.add(ChatColor.RED+"-400% Durability");
+																			meta.setLore(newlore);
+																			enchanted.setItemMeta(meta);
 																			l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
 																		}
 																	}
@@ -3580,7 +3822,14 @@ implements Listener
 														}
 														if (Math.random()>=0.25) {
 															if (Math.random()<=0.75) {
-																l.getEquipment().setChestplate(new ItemStack(Material.DIAMOND_CHESTPLATE));
+																ItemStack item = new ItemStack(Material.DIAMOND_CHESTPLATE);
+																ItemMeta meta = item.getItemMeta();
+																meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																List<String> newlore = new ArrayList<String>();
+																newlore.add(ChatColor.RED+"-400% Durability");
+																meta.setLore(newlore);
+																item.setItemMeta(meta);
+																l.getEquipment().setChestplate(item);
 															} else {
 																ItemStack enchanted = new ItemStack(Material.DIAMOND_CHESTPLATE);
 																enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
@@ -3590,11 +3839,24 @@ implements Listener
 																if (Math.random()<=0.5) {
 																	enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
 																}
+																ItemMeta meta = enchanted.getItemMeta();
+																meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+																List<String> newlore = new ArrayList<String>();
+																newlore.add(ChatColor.RED+"-400% Durability");
+																meta.setLore(newlore);
+																enchanted.setItemMeta(meta);
 																l.getEquipment().setChestplate(enchanted);
 															}
 															if (Math.random()>=0.45) {
 																if (Math.random()<=0.75) {
-																	l.getEquipment().setLeggings(new ItemStack(Material.DIAMOND_LEGGINGS));
+																	ItemStack item = new ItemStack(Material.DIAMOND_LEGGINGS);
+																	ItemMeta meta = item.getItemMeta();
+																	meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																	List<String> newlore = new ArrayList<String>();
+																	newlore.add(ChatColor.RED+"-400% Durability");
+																	meta.setLore(newlore);
+																	item.setItemMeta(meta);
+																	l.getEquipment().setLeggings(item);
 																} else {
 																	ItemStack enchanted = new ItemStack(Material.DIAMOND_LEGGINGS);
 																	enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
@@ -3604,11 +3866,24 @@ implements Listener
 																	if (Math.random()<=0.5) {
 																		enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
 																	}
+																	ItemMeta meta = enchanted.getItemMeta();
+																	meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+																	List<String> newlore = new ArrayList<String>();
+																	newlore.add(ChatColor.RED+"-400% Durability");
+																	meta.setLore(newlore);
+																	enchanted.setItemMeta(meta);
 																	l.getEquipment().setLeggings(enchanted);
 																}
 																if (Math.random()>=0.65) {
 																	if (Math.random()<=0.75) {
-																		l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
+																		ItemStack item = new ItemStack(Material.DIAMOND_HELMET);
+																		ItemMeta meta = item.getItemMeta();
+																		meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																		List<String> newlore = new ArrayList<String>();
+																		newlore.add(ChatColor.RED+"-400% Durability");
+																		meta.setLore(newlore);
+																		item.setItemMeta(meta);
+																		l.getEquipment().setHelmet(item);
 																	} else {
 																		ItemStack enchanted = new ItemStack(Material.DIAMOND_HELMET);
 																		enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
@@ -3618,11 +3893,24 @@ implements Listener
 																		if (Math.random()<=0.5) {
 																			enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*4.0d)+1);
 																		}
+																		ItemMeta meta = enchanted.getItemMeta();
+																		meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+																		List<String> newlore = new ArrayList<String>();
+																		newlore.add(ChatColor.RED+"-400% Durability");
+																		meta.setLore(newlore);
+																		enchanted.setItemMeta(meta);
 																		l.getEquipment().setHelmet(new ItemStack(Material.DIAMOND_HELMET));
 																	}
 																	if (Math.random()>=0.95) {
 																		if (Math.random()<=0.75) {
-																			l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
+																			ItemStack item = new ItemStack(Material.DIAMOND_BOOTS);
+																			ItemMeta meta = item.getItemMeta();
+																			meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(item.getType().name()));
+																			List<String> newlore = new ArrayList<String>();
+																			newlore.add(ChatColor.RED+"-400% Durability");
+																			meta.setLore(newlore);
+																			item.setItemMeta(meta);
+																			l.getEquipment().setBoots(item);
 																		} else {
 																			ItemStack enchanted = new ItemStack(Material.DIAMOND_BOOTS);
 																			enchanted.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, (int)(Math.random()*4.0d)+1);
@@ -3632,6 +3920,12 @@ implements Listener
 																			if (Math.random()<=0.5) {
 																				enchanted.addUnsafeEnchantment(Enchantment.THORNS, (int)(Math.random()*2.0d)+1);
 																			}
+																			ItemMeta meta = enchanted.getItemMeta();
+																			meta.setDisplayName(ChatColor.DARK_AQUA+"Weak "+convertToItemName(enchanted.getType().name()));
+																			List<String> newlore = new ArrayList<String>();
+																			newlore.add(ChatColor.RED+"-400% Durability");
+																			meta.setLore(newlore);
+																			enchanted.setItemMeta(meta);
 																			l.getEquipment().setBoots(new ItemStack(Material.DIAMOND_BOOTS));
 																		}
 																	}
@@ -7474,100 +7768,36 @@ implements Listener
 				}
 				List<String> ourLore = new ArrayList<String>();
 				if (rarity==3) {
-					int choice1=0;
-					if (Math.random()<=0.2) {
-						ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+20+1)+"% "+ChatColor.BLUE+"Critical Chance");
-					} else
-						if (Math.random()<=0.2) {
-							choice1=1;
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+4+1)+" "+ChatColor.BLUE+"Armor Penetration");
-						} else
-							if (Math.random()<=0.2) {
-								choice1=2;
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+20+1)+"% "+ChatColor.BLUE+"Life Steal");
-							} else
-								if (Math.random()<=0.2) {
-									choice1=3;
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*180)+60+1)+"% "+ChatColor.BLUE+"Attack Speed");
-								} else {
-									choice1=4;
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+10+1)+" "+ChatColor.BLUE+"Damage");
-								}
+					int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+					//Select a random enchantment.
+					//This is a mythical. Random amount is 70% guaranteed + 30% random.
+					item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.3))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.7), true);
+					ourLore = item.getItemMeta().getLore(); 
 				} else
 					if (rarity==2) {
-						int choice1=0;
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Critical Chance");
-						} else
-							if (Math.random()<=0.2) {
-								choice1=1;
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*12)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-							} else
-								if (Math.random()<=0.2) {
-									choice1=2;
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Life Steal");
-								} else
-									if (Math.random()<=0.2) {
-										choice1=3;
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*120)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-									} else {
-										choice1=4;
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+" "+ChatColor.BLUE+"Damage");
-									}
+						//This is a legendary. Random amount is 30% guaranteed + 60% random.
+						int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+						item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.6))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.3), true);
+						ourLore = item.getItemMeta().getLore();
 					} else
 						if (rarity==1) {
-							int choice1=0;
-							if (Math.random()<=0.2) {
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
-							} else
-								if (Math.random()<=0.2) {
-									choice1=1;
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-								} else
-									if (Math.random()<=0.2) {
-										choice1=2;
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
-									} else
-										if (Math.random()<=0.2) {
-											choice1=3;
-											ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-										} else {
-											choice1=4;
-											ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
-										}
-							if (Math.random()<=0.2 && choice1!=0) {
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
-							} else
-								if (Math.random()<=0.2 && choice1!=1) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-								} else
-									if (Math.random()<=0.2 && choice1!=2) {
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
-									} else
-										if (Math.random()<=0.2 && choice1!=3) {
-											ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-										} else {
-											if (choice1!=4) {
-												ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
-											}
-										}
+							//This is a rare. Random amount is 20% guaranteed + 40% random.
+							int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+							item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.4))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.2), true);
+							int choice2=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+							while (choice2==choice1) {
+								choice2=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+							}
+							item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice2), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice2).value_range.getMaximumInteger()*0.4))+Main.getBonusWeaponEnchantments().get(choice2).value_range.getMaximumInteger()*0.2), true);
+							ourLore = item.getItemMeta().getLore();
 						}
 						else {
-							if (Math.random()<=0.2) {
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
-							}
-							if (Math.random()<=0.2) {
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*3)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-							}
-							if (Math.random()<=0.2) {
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Life Steal");
-							}
-							if (Math.random()<=0.2) {
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-							}
-							if (Math.random()<=0.2) {
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+1)+" "+ChatColor.BLUE+"Damage");
-							}
+							//This is a normal item. Random amount is 5% guaranteed + 20% random.
+							//It is also irrepairable.
+							int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+							item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.2))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.05), true);
+							ourLore = item.getItemMeta().getLore();
+							ourLore.add(ChatColor.RED+"Irrepairable");
 						}
 				ItemMeta meta = item.getItemMeta();
 				meta.setLore(ourLore);
@@ -7601,100 +7831,36 @@ implements Listener
 					}
 					List<String> ourLore = new ArrayList<String>();
 					if (rarity==3) {
-						int choice1=0;
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+20+1)+"% "+ChatColor.BLUE+"Critical Chance");
-						} else
-							if (Math.random()<=0.2) {
-								choice1=1;
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+4+1)+" "+ChatColor.BLUE+"Armor Penetration");
-							} else
-								if (Math.random()<=0.2) {
-									choice1=2;
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+20+1)+"% "+ChatColor.BLUE+"Life Steal");
-								} else
-									if (Math.random()<=0.2) {
-										choice1=3;
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*180)+60+1)+"% "+ChatColor.BLUE+"Attack Speed");
-									} else {
-										choice1=4;
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+10+1)+" "+ChatColor.BLUE+"Damage");
-									}
+						int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+						//Select a random enchantment.
+						//This is a mythical. Random amount is 70% guaranteed + 30% random.
+						item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.3))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.7), true);
+						ourLore = item.getItemMeta().getLore(); 
 					} else
 						if (rarity==2) {
-							int choice1=0;
-							if (Math.random()<=0.2) {
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Critical Chance");
-							} else
-								if (Math.random()<=0.2) {
-									choice1=1;
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*12)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-								} else
-									if (Math.random()<=0.2) {
-										choice1=2;
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Life Steal");
-									} else
-										if (Math.random()<=0.2) {
-											choice1=3;
-											ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*120)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-										} else {
-											choice1=4;
-											ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+" "+ChatColor.BLUE+"Damage");
-										}
+							//This is a legendary. Random amount is 30% guaranteed + 60% random.
+							int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+							item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.6))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.3), true);
+							ourLore = item.getItemMeta().getLore();
 						} else
 							if (rarity==1) {
-								int choice1=0;
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
-								} else
-									if (Math.random()<=0.2) {
-										choice1=1;
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-									} else
-										if (Math.random()<=0.2) {
-											choice1=2;
-											ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
-										} else
-											if (Math.random()<=0.2) {
-												choice1=3;
-												ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-											} else {
-												choice1=4;
-												ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
-											}
-								if (Math.random()<=0.2 && choice1!=0) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
-								} else
-									if (Math.random()<=0.2 && choice1!=1) {
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-									} else
-										if (Math.random()<=0.2 && choice1!=2) {
-											ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
-										} else
-											if (Math.random()<=0.2 && choice1!=3) {
-												ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-											} else {
-												if (choice1!=4) {
-													ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
-												}
-											}
+								//This is a rare. Random amount is 20% guaranteed + 40% random.
+								int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+								item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.4))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.2), true);
+								int choice2=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+								while (choice2==choice1) {
+									choice2=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+								}
+								item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice2), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice2).value_range.getMaximumInteger()*0.4))+Main.getBonusWeaponEnchantments().get(choice2).value_range.getMaximumInteger()*0.2), true);
+								ourLore = item.getItemMeta().getLore();
 							}
 							else {
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
-								}
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*3)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-								}
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Life Steal");
-								}
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-								}
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+1)+" "+ChatColor.BLUE+"Damage");
-								}
+								//This is a normal item. Random amount is 5% guaranteed + 20% random.
+								//It is also irrepairable.
+								int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+								item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.2))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.05), true);
+								ourLore = item.getItemMeta().getLore();
+								ourLore.add(ChatColor.RED+"Irrepairable");
 							}
 					ItemMeta meta = item.getItemMeta();
 					meta.setLore(ourLore);
@@ -7748,100 +7914,36 @@ implements Listener
 					}
 					List<String> ourLore = new ArrayList<String>();
 					if (rarity==3) {
-						int choice1=0;
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+20+1)+"% "+ChatColor.BLUE+"Critical Chance");
-						} else
-							if (Math.random()<=0.2) {
-								choice1=1;
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+4+1)+" "+ChatColor.BLUE+"Armor Penetration");
-							} else
-								if (Math.random()<=0.2) {
-									choice1=2;
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+20+1)+"% "+ChatColor.BLUE+"Life Steal");
-								} else
-									if (Math.random()<=0.2) {
-										choice1=3;
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*180)+60+1)+"% "+ChatColor.BLUE+"Attack Speed");
-									} else {
-										choice1=4;
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+10+1)+" "+ChatColor.BLUE+"Damage");
-									}
+						int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+						//Select a random enchantment.
+						//This is a mythical. Random amount is 70% guaranteed + 30% random.
+						item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.3))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.7), true);
+						ourLore = item.getItemMeta().getLore(); 
 					} else
 						if (rarity==2) {
-							int choice1=0;
-							if (Math.random()<=0.2) {
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Critical Chance");
-							} else
-								if (Math.random()<=0.2) {
-									choice1=1;
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*12)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-								} else
-									if (Math.random()<=0.2) {
-										choice1=2;
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Life Steal");
-									} else
-										if (Math.random()<=0.2) {
-											choice1=3;
-											ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*120)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-										} else {
-											choice1=4;
-											ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+" "+ChatColor.BLUE+"Damage");
-										}
+							//This is a legendary. Random amount is 30% guaranteed + 60% random.
+							int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+							item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.6))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.3), true);
+							ourLore = item.getItemMeta().getLore();
 						} else
 							if (rarity==1) {
-								int choice1=0;
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
-								} else
-									if (Math.random()<=0.2) {
-										choice1=1;
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-									} else
-										if (Math.random()<=0.2) {
-											choice1=2;
-											ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
-										} else
-											if (Math.random()<=0.2) {
-												choice1=3;
-												ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-											} else {
-												choice1=4;
-												ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
-											}
-								if (Math.random()<=0.2 && choice1!=0) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
-								} else
-									if (Math.random()<=0.2 && choice1!=1) {
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-									} else
-										if (Math.random()<=0.2 && choice1!=2) {
-											ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
-										} else
-											if (Math.random()<=0.2 && choice1!=3) {
-												ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-											} else {
-												if (choice1!=4) {
-													ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
-												}
-											}
+								//This is a rare. Random amount is 20% guaranteed + 40% random.
+								int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+								item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.4))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.2), true);
+								int choice2=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+								while (choice2==choice1) {
+									choice2=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+								}
+								item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice2), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice2).value_range.getMaximumInteger()*0.4))+Main.getBonusWeaponEnchantments().get(choice2).value_range.getMaximumInteger()*0.2), true);
+								ourLore = item.getItemMeta().getLore();
 							}
 							else {
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Critical Chance");
-								}
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*3)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-								}
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Life Steal");
-								}
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*30)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-								}
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*5)+1)+" "+ChatColor.BLUE+"Damage");
-								}
+								//This is a normal item. Random amount is 5% guaranteed + 20% random.
+								//It is also irrepairable.
+								int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+								item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.2))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.05), true);
+								ourLore = item.getItemMeta().getLore();
+								ourLore.add(ChatColor.RED+"Irrepairable");
 							}
 					ItemMeta meta = item.getItemMeta();
 					meta.setLore(ourLore);
@@ -7872,95 +7974,37 @@ implements Listener
 						}
 					}
 					List<String> ourLore = new ArrayList<String>();
-					if (rarity==3) { 
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*48)+16+1)+" "+ChatColor.BLUE+"Health");
+					if (rarity==3) {
+						int choice1=(int)(Math.random()*Main.getBonusArmorEnchantments().size());
+						//Select a random enchantment.
+						//This is a mythical. Random amount is 70% guaranteed + 30% random.
+						item = this.plugin.addBonusEnchantment(item, Main.getBonusArmorEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusArmorEnchantments().get(choice1).value_range.getMaximumInteger()*0.3))+Main.getBonusArmorEnchantments().get(choice1).value_range.getMaximumInteger()*0.7), true);
+						ourLore = item.getItemMeta().getLore(); 
+					} else
+						if (rarity==2) {
+							//This is a legendary. Random amount is 30% guaranteed + 60% random.
+							int choice1=(int)(Math.random()*Main.getBonusArmorEnchantments().size());
+							item = this.plugin.addBonusEnchantment(item, Main.getBonusArmorEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusArmorEnchantments().get(choice1).value_range.getMaximumInteger()*0.6))+Main.getBonusArmorEnchantments().get(choice1).value_range.getMaximumInteger()*0.3), true);
+							ourLore = item.getItemMeta().getLore();
 						} else
-							if (Math.random()<=0.2) {
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+20+1)+"% "+ChatColor.BLUE+"Damage Reduction");
-							} else
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*400)+100+1)*10)+"% "+ChatColor.BLUE+"Durability");
-								} else
-									if (Math.random()<=0.2) {
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+10+1)+"% "+ChatColor.BLUE+"Block Chance");
-									} else
-									{
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*70)+20+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
-									}
-					} else 
-						if (rarity==2) { 
-							if (Math.random()<=0.2) {
-								ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*16)+1)+" "+ChatColor.BLUE+"Health");
-							} else
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Damage Reduction");
-								} else
-									if (Math.random()<=0.2) {
-										ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*200)+1)*10)+"% "+ChatColor.BLUE+"Durability");
-									} else
-										if (Math.random()<=0.2) {
-											ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Block Chance");
-										} else
-										{
-											ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*40)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
-										}
-						} else 
 							if (rarity==1) {
-								int choice1=0;
-								if (Math.random()<=0.2) {
-									choice1=0;
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*8)+1)+" "+ChatColor.BLUE+"Health");
-								} else
-									if (Math.random()<=0.2) {
-										choice1=1;
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Damage Reduction");
-									} else
-										if (Math.random()<=0.2) {
-											choice1=2;
-											ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*100)+1)*10)+"% "+ChatColor.BLUE+"Durability");
-										} else
-											if (Math.random()<=0.2) {
-												choice1=3;
-												ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Block Chance");
-											} else
-											{ 
-												choice1=4;
-												ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
-											}
-								if (Math.random()<=0.2 && choice1!=0) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*8)+1)+" "+ChatColor.BLUE+"Health");
-								} else
-									if (Math.random()<=0.2 && choice1!=1) {
-										ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Damage Reduction");
-									} else
-										if (Math.random()<=0.2 && choice1!=2) {
-											ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*100)+1)*10)+"% "+ChatColor.BLUE+"Durability");
-										} else
-											if (Math.random()<=0.2 && choice1!=3) {
-												ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Block Chance");
-											} else
-											{
-												if (choice1!=4) {
-													ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
-												}
-											}
-							} else {
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*4)+1)+" "+ChatColor.BLUE+"Health");
+								//This is a rare. Random amount is 20% guaranteed + 40% random.
+								int choice1=(int)(Math.random()*Main.getBonusArmorEnchantments().size());
+								item = this.plugin.addBonusEnchantment(item, Main.getBonusArmorEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusArmorEnchantments().get(choice1).value_range.getMaximumInteger()*0.4))+Main.getBonusArmorEnchantments().get(choice1).value_range.getMaximumInteger()*0.2), true);
+								int choice2=(int)(Math.random()*Main.getBonusArmorEnchantments().size());
+								while (choice2==choice1) {
+									choice2=(int)(Math.random()*Main.getBonusArmorEnchantments().size());
 								}
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Damage Reduction");
-								}
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*50)+1)*10)+"% "+ChatColor.BLUE+"Durability");
-								}
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Block Chance");
-								}
-								if (Math.random()<=0.2) {
-									ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
-								}
+								item = this.plugin.addBonusEnchantment(item, Main.getBonusArmorEnchantments().get(choice2), (int)((Math.random()*(Main.getBonusArmorEnchantments().get(choice2).value_range.getMaximumInteger()*0.4))+Main.getBonusArmorEnchantments().get(choice2).value_range.getMaximumInteger()*0.2), true);
+								ourLore = item.getItemMeta().getLore();
+							}
+							else {
+								//This is a normal item. Random amount is 5% guaranteed + 20% random.
+								//It is also irrepairable.
+								int choice1=(int)(Math.random()*Main.getBonusArmorEnchantments().size());
+								item = this.plugin.addBonusEnchantment(item, Main.getBonusArmorEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusArmorEnchantments().get(choice1).value_range.getMaximumInteger()*0.2))+Main.getBonusArmorEnchantments().get(choice1).value_range.getMaximumInteger()*0.05), true);
+								ourLore = item.getItemMeta().getLore();
+								ourLore.add(ChatColor.RED+"Irrepairable");
 							}
 					ItemMeta meta = item.getItemMeta();
 					meta.setLore(ourLore);
@@ -7984,7 +8028,7 @@ implements Listener
 			case 9:
 			case 10:
 			case 11:{
-				item = new ItemStack(Material.IRON_INGOT,(int)(Math.random()*20)+10);
+				item = new ItemStack(Material.IRON_INGOT,(int)(Math.random()*10)+5);
 			}break;
 			case 1 :{
 				item = new ItemStack(Material.IRON_BLOCK,(int)(Math.random()*2)+1);
@@ -7993,25 +8037,27 @@ implements Listener
 			case 12:
 			case 13:
 			case 14:{
-				item = new ItemStack(Material.GOLD_INGOT,(int)(Math.random()*10)+5);
+				item = new ItemStack(Material.GOLD_INGOT,(int)(Math.random()*5)+2);
 			}break;
 			case 3 :{
-				item = new ItemStack(Material.GOLD_BLOCK,(int)(Math.random()*1)+1);
+				item = new ItemStack(Material.GOLD_BLOCK,(int)(Math.random()*2)+1);
 			}break;
 			case 4 :
 			case 15:
 			case 16:
 			case 17: {
-				item = new ItemStack(Material.LAPIS_BLOCK,(int)(Math.random()*20)+10);
+				item = new ItemStack(Material.LAPIS_BLOCK,(int)(Math.random()*10)+5);
 			}break;
 			case 5 :{
-				item = new ItemStack(Material.REDSTONE_BLOCK,(int)(Math.random()*12)+2);
+				item = new ItemStack(Material.REDSTONE_BLOCK,(int)(Math.random()*6)+1);
 			}break;
 			case 6 :{
 				item = new ItemStack(Material.DIAMOND,(int)(Math.random()*2)+1);
 			}break;
 			case 7 :{
-				item = new ItemStack(Material.DIAMOND_BLOCK,(int)(Math.random()*1)+1);
+				if (Math.random()<=0.5) {
+					item = new ItemStack(Material.DIAMOND_BLOCK,1);
+				}
 			}break;
 			case 8 :{
 				item = new ItemStack(Material.EMERALD,(int)(Math.random()*2)+1);
