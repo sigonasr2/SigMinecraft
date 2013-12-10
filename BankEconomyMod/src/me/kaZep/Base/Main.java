@@ -5504,9 +5504,11 @@ public void payDay(int time)
     		List<String> newLoreData = new ArrayList<String>();
     		//First find all 'extra' special enchantments.
     		for (int i=0;i<LoreData.size();i++) {
-    			if (LoreData.get(i).contains(ChatColor.GRAY+"Sturdy ")) {
-    				newLoreData.add(LoreData.get(i));
-    				LoreData.remove(i);
+    			for (int j=0;j<getBonusRomanNumeralEnchantments().size();j++) {
+	    			if (LoreData.get(i).contains(ChatColor.GRAY+getBonusRomanNumeralEnchantments().get(j).name+" ")) {
+	    				newLoreData.add(LoreData.get(i));
+	    				LoreData.remove(i);
+	    			}
     			}
     		}
     		//Now find all bonus enchantments.
@@ -6119,6 +6121,20 @@ public void payDay(int time)
     	for (int i=0;i<bonus_enchantment_list.size();i++) {
     		if (bonus_enchantment_list.get(i).item_type==ItemType.ARMOR ||
     				bonus_enchantment_list.get(i).item_type==ItemType.BOTH) {
+    			finallist.add(bonus_enchantment_list.get(i));
+    		}
+    	}
+    	return finallist;
+    }
+
+    /**
+     * A helper function for Bonus Enchantments.
+     * @return Returns all enchantments in a list that are formatted like real Minecraft enchantments.
+     */
+    public static List<BonusEnchantment> getBonusRomanNumeralEnchantments() {
+    	List<BonusEnchantment> finallist = new ArrayList<BonusEnchantment>();
+    	for (int i=0;i<bonus_enchantment_list.size();i++) {
+    		if (bonus_enchantment_list.get(i).enchant_format) {
     			finallist.add(bonus_enchantment_list.get(i));
     		}
     	}

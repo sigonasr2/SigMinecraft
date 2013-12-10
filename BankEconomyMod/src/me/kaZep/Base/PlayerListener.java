@@ -480,7 +480,7 @@ implements Listener
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_BLOCK_CHANCE, 5*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_SPEED_BOOST_CHANCE, 20*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_STURDY, lvs/10+1);inv.addItem(base);
-			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_REPAIR, lvs/10+1);inv.addItem(base);}
+			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_REPAIR, 1);inv.addItem(base);}
 		} else
 		if (input.getType().name().toLowerCase().contains("chestplate") || input.getType().name().toLowerCase().contains("leggings")) {
 			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, base.getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL)+lvs/10+1);inv.addItem(base);
@@ -495,7 +495,7 @@ implements Listener
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_BLOCK_CHANCE, 5*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_SPEED_BOOST_CHANCE, 20*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_STURDY, lvs/10+1);inv.addItem(base);
-			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_REPAIR, lvs/10+1);inv.addItem(base);}
+			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_REPAIR, 1);inv.addItem(base);}
 		} else
 		if (input.getType().name().toLowerCase().contains("boots")) {
 			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, base.getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL)+lvs/10+1);inv.addItem(base);
@@ -511,7 +511,7 @@ implements Listener
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_BLOCK_CHANCE, 5*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_SPEED_BOOST_CHANCE, 20*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_STURDY, lvs/10+1);inv.addItem(base);
-			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_REPAIR, lvs/10+1);inv.addItem(base);}
+			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_REPAIR, 1);inv.addItem(base);}
 		} else
 		if (input.getType().name().toLowerCase().contains("sword")) {
 			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, base.getEnchantmentLevel(Enchantment.DAMAGE_ALL)+lvs/10+1);inv.addItem(base);
@@ -526,7 +526,7 @@ implements Listener
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
-			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);
 		} else
 		if (input.getType().name().toLowerCase().contains("axe") && !input.getType().name().toLowerCase().contains("pickaxe")) {
 			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, base.getEnchantmentLevel(Enchantment.DAMAGE_ALL)+lvs/10+1);inv.addItem(base);
@@ -540,7 +540,7 @@ implements Listener
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
-			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);
 		} else
 		if (input.getType().name().toLowerCase().contains("spade") || input.getType().name().toLowerCase().contains("pickaxe")) {
 			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.DIG_SPEED, base.getEnchantmentLevel(Enchantment.DIG_SPEED)+lvs/10+1);inv.addItem(base);
@@ -552,7 +552,7 @@ implements Listener
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
-			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);
 		} else
 		if (input.getType().name().toLowerCase().contains("bow")) {
 			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, base.getEnchantmentLevel(Enchantment.ARROW_DAMAGE)+lvs/10+1);inv.addItem(base);
@@ -565,7 +565,7 @@ implements Listener
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
-			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);
 		} else
 		if (input.getType().name().toLowerCase().contains("hoe")) {
 			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.DURABILITY, base.getEnchantmentLevel(Enchantment.DURABILITY)+lvs/10+1);inv.addItem(base);
@@ -574,7 +574,7 @@ implements Listener
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
-			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);
 		} else
 		if (input.getType().name().toLowerCase().contains("shears")) {
 			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.DIG_SPEED, base.getEnchantmentLevel(Enchantment.DIG_SPEED)+lvs/10+1);inv.addItem(base);
@@ -585,7 +585,7 @@ implements Listener
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
-			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);
 		} else
 		if (input.getType().name().toLowerCase().contains("flint")) {
 			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.DURABILITY, base.getEnchantmentLevel(Enchantment.DURABILITY)+lvs/10+1);inv.addItem(base);
@@ -594,7 +594,7 @@ implements Listener
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
-			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);
 		} else
 		if (input.getType().name().toLowerCase().contains("carrot")) {
 			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.DURABILITY, base.getEnchantmentLevel(Enchantment.DURABILITY)+lvs/10+1);inv.addItem(base);
@@ -603,7 +603,7 @@ implements Listener
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
 			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
-			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);
 		} else {
 			return null;
 		}
@@ -13098,10 +13098,6 @@ implements Listener
 				}
 			} else
 				if (event.getInventory().getTitle().equalsIgnoreCase("Choose an additional bonus:")) {
-					if (event.getClick()!=ClickType.LEFT) {
-						event.setCancelled(true);
-						p.updateInventory();
-					}
 					if (event.getClick()==ClickType.LEFT) {
 						//Select this one. Drop it on the ground.
 						//Bukkit.getLogger().info("Raw slot is "+event.getRawSlot());
@@ -13117,6 +13113,8 @@ implements Listener
 										p.getInventory().removeItem(p.getInventory().getContents()[i]);
 									}
 								}
+								event.setCancelled(true);
+								p.updateInventory();
 								p.closeInventory();
 							}
 						} else {
