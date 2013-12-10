@@ -187,7 +187,6 @@ public class PlayerBuffData {
 				p.removePotionEffect(PotionEffectType.FAST_DIGGING);
 				p.addPotionEffect(new PotionEffect(PotionEffectType.FAST_DIGGING,399,this.plugin.getStatBonus(1, this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase()+".stats.stat2")/5)/20-1));
 			}
-			
 			if (p.getHealth()>p.getMaxHealth()) {
 				p.setHealth(p.getMaxHealth());
 			}
