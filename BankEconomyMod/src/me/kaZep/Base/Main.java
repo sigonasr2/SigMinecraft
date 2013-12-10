@@ -5380,7 +5380,7 @@ public void payDay(int time)
     					String parser = lore.get(i);
     					parser.replace(enchant_string, "");
     					if (!override) {oldamt=toNumber(parser);} else {oldamt=0;}
-    					lore.set(i, ChatColor.GRAY+enchant_string+" "+toRomanNumeral((int)amt));
+    					lore.set(i, ChatColor.GRAY+enchant_string+" "+toRomanNumeral((int)(oldamt+amt)));
     				}
     				added=true;
     				break;
