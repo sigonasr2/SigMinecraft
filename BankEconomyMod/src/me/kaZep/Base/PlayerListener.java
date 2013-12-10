@@ -454,10 +454,168 @@ implements Listener
 		}
 	}
 
+	/**
+	 * Opens the bonus inventory for Enchanters who have
+	 * the Level 30 A buff.
+	 * @param input The input item that determines what bonuses exist.
+	 * @return The Inventory containing all the appropriate bonuses.
+	 */
+	private Inventory openBonusInventory(Player p, ItemStack input, int lvs) {
+		//Determine what the bonus sets are via the input.
+		Inventory inv = Bukkit.createInventory(p, 18, "Choose an additional bonus:");
+		if (input.getType().name().toLowerCase().contains("helmet")) {
+			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, base.getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, base.getEnchantmentLevel(Enchantment.PROTECTION_FIRE)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, base.getEnchantmentLevel(Enchantment.PROTECTION_EXPLOSIONS)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, base.getEnchantmentLevel(Enchantment.PROTECTION_PROJECTILE)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.OXYGEN, base.getEnchantmentLevel(Enchantment.OXYGEN)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.WATER_WORKER, base.getEnchantmentLevel(Enchantment.WATER_WORKER)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.THORNS, base.getEnchantmentLevel(Enchantment.THORNS)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.DURABILITY, base.getEnchantmentLevel(Enchantment.DURABILITY)+lvs/10+1);inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_HEALTH, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE_REDUCTION, 3*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DURABILITY, 200*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_BLOCK_CHANCE, 5*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_SPEED_BOOST_CHANCE, 20*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_STURDY, lvs/10+1);inv.addItem(base);
+			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_REPAIR, lvs/10+1);inv.addItem(base);}
+		} else
+		if (input.getType().name().toLowerCase().contains("chestplate") || input.getType().name().toLowerCase().contains("leggings")) {
+			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, base.getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, base.getEnchantmentLevel(Enchantment.PROTECTION_FIRE)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, base.getEnchantmentLevel(Enchantment.PROTECTION_EXPLOSIONS)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, base.getEnchantmentLevel(Enchantment.PROTECTION_PROJECTILE)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.THORNS, base.getEnchantmentLevel(Enchantment.THORNS)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.DURABILITY, base.getEnchantmentLevel(Enchantment.DURABILITY)+lvs/10+1);inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_HEALTH, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE_REDUCTION, 3*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DURABILITY, 200*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_BLOCK_CHANCE, 5*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_SPEED_BOOST_CHANCE, 20*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_STURDY, lvs/10+1);inv.addItem(base);
+			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_REPAIR, lvs/10+1);inv.addItem(base);}
+		} else
+		if (input.getType().name().toLowerCase().contains("boots")) {
+			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, base.getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_FIRE, base.getEnchantmentLevel(Enchantment.PROTECTION_FIRE)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_EXPLOSIONS, base.getEnchantmentLevel(Enchantment.PROTECTION_EXPLOSIONS)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_PROJECTILE, base.getEnchantmentLevel(Enchantment.PROTECTION_PROJECTILE)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.THORNS, base.getEnchantmentLevel(Enchantment.THORNS)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, base.getEnchantmentLevel(Enchantment.PROTECTION_FALL)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.DURABILITY, base.getEnchantmentLevel(Enchantment.DURABILITY)+lvs/10+1);inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_HEALTH, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE_REDUCTION, 3*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DURABILITY, 200*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_BLOCK_CHANCE, 5*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_SPEED_BOOST_CHANCE, 20*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_STURDY, lvs/10+1);inv.addItem(base);
+			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_REPAIR, lvs/10+1);inv.addItem(base);}
+		} else
+		if (input.getType().name().toLowerCase().contains("sword")) {
+			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, base.getEnchantmentLevel(Enchantment.DAMAGE_ALL)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.DAMAGE_UNDEAD, base.getEnchantmentLevel(Enchantment.DAMAGE_UNDEAD)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.DAMAGE_ARTHROPODS, base.getEnchantmentLevel(Enchantment.DAMAGE_ARTHROPODS)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.KNOCKBACK, base.getEnchantmentLevel(Enchantment.KNOCKBACK)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, base.getEnchantmentLevel(Enchantment.FIRE_ASPECT)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, base.getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.DURABILITY, base.getEnchantmentLevel(Enchantment.DURABILITY)+lvs/10+1);inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_CRITICAL_CHANCE, 5*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ARMOR_PENETRATION, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
+			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+		} else
+		if (input.getType().name().toLowerCase().contains("axe") && !input.getType().name().toLowerCase().contains("pickaxe")) {
+			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, base.getEnchantmentLevel(Enchantment.DAMAGE_ALL)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.DAMAGE_UNDEAD, base.getEnchantmentLevel(Enchantment.DAMAGE_UNDEAD)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.DAMAGE_ARTHROPODS, base.getEnchantmentLevel(Enchantment.DAMAGE_ARTHROPODS)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.DIG_SPEED, base.getEnchantmentLevel(Enchantment.DIG_SPEED)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.SILK_TOUCH, base.getEnchantmentLevel(Enchantment.SILK_TOUCH)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, base.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)+lvs/10+1);inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_CRITICAL_CHANCE, 5*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ARMOR_PENETRATION, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
+			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+		} else
+		if (input.getType().name().toLowerCase().contains("spade") || input.getType().name().toLowerCase().contains("pickaxe")) {
+			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.DIG_SPEED, base.getEnchantmentLevel(Enchantment.DIG_SPEED)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.SILK_TOUCH, base.getEnchantmentLevel(Enchantment.SILK_TOUCH)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.LOOT_BONUS_BLOCKS, base.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.DURABILITY, base.getEnchantmentLevel(Enchantment.DURABILITY)+lvs/10+1);inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_CRITICAL_CHANCE, 5*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ARMOR_PENETRATION, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
+			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+		} else
+		if (input.getType().name().toLowerCase().contains("bow")) {
+			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, base.getEnchantmentLevel(Enchantment.ARROW_DAMAGE)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.ARROW_KNOCKBACK, base.getEnchantmentLevel(Enchantment.ARROW_KNOCKBACK)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.ARROW_FIRE, base.getEnchantmentLevel(Enchantment.ARROW_FIRE)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, base.getEnchantmentLevel(Enchantment.ARROW_INFINITE)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.DURABILITY, base.getEnchantmentLevel(Enchantment.DURABILITY)+lvs/10+1);inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_CRITICAL_CHANCE, 5*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ARMOR_PENETRATION, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
+			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+		} else
+		if (input.getType().name().toLowerCase().contains("hoe")) {
+			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.DURABILITY, base.getEnchantmentLevel(Enchantment.DURABILITY)+lvs/10+1);inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_CRITICAL_CHANCE, 5*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ARMOR_PENETRATION, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
+			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+		} else
+		if (input.getType().name().toLowerCase().contains("shears")) {
+			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.DIG_SPEED, base.getEnchantmentLevel(Enchantment.DIG_SPEED)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.SILK_TOUCH, base.getEnchantmentLevel(Enchantment.SILK_TOUCH)+lvs/10+1);inv.addItem(base);
+			base = input.clone();base.addUnsafeEnchantment(Enchantment.DURABILITY, base.getEnchantmentLevel(Enchantment.DURABILITY)+lvs/10+1);inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_CRITICAL_CHANCE, 5*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ARMOR_PENETRATION, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
+			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+		} else
+		if (input.getType().name().toLowerCase().contains("flint")) {
+			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.DURABILITY, base.getEnchantmentLevel(Enchantment.DURABILITY)+lvs/10+1);inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_CRITICAL_CHANCE, 5*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ARMOR_PENETRATION, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
+			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+		} else
+		if (input.getType().name().toLowerCase().contains("carrot")) {
+			ItemStack base = input.clone();base.addUnsafeEnchantment(Enchantment.DURABILITY, base.getEnchantmentLevel(Enchantment.DURABILITY)+lvs/10+1);inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_CRITICAL_CHANCE, 5*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ARMOR_PENETRATION, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_LIFE_STEAL, 2*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_ATTACK_SPEED, 10*(lvs/10+1));inv.addItem(base);
+			base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_DAMAGE, 2*(lvs/10+1));inv.addItem(base);
+			if (lvs==30) {base = input.clone();this.plugin.addBonusEnchantment(base, Main.ENCHANT_EXECUTE, lvs/10+1);inv.addItem(base);}
+		} else {
+			return null;
+		}
+		return inv;
+	}
 
+	/**
+	 * DO NOT use e.getItem() to get the final results! It gets
+	 * manually handled and will not return what you want in terms
+	 * of enchantments! The variable "finalitem" stores the correct
+	 * resulting ItemStack after all adjustments are made.
+	 */
 	@EventHandler
 	public void onEnchantItem(EnchantItemEvent e) {
-		Map<Enchantment,Integer> map = e.getEnchantsToAdd();
 		Player p = e.getEnchanter();
 		/*e.getEnchanter().sendMessage("Enchantments are:");
 	  for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
@@ -523,10 +681,10 @@ implements Listener
 	    p.sendMessage(ChatColor.LIGHT_PURPLE+"You feel a magical presence get inserted into your inventory.");
 	  }*/
 
+		ItemStack finalitem=e.getItem().clone();
 
 		if (this.plugin.PlayerinJob(p, "Enchanter")) {
 			if (this.plugin.getJobLv("Enchanter", p)>=10) {
-				e.setExpLevelCost((int)(e.getExpLevelCost()*0.75));
 				if (e.getItem().getType()==Material.BOW) {
 					int enchants[] = {48,49,50,51};
 					for (int j=0;j<enchants.length;j++) {
@@ -561,6 +719,7 @@ implements Listener
 					ItemMeta meta = e.getItem().getItemMeta();
 					meta.setLore(ourLore);
 					e.getItem().setItemMeta(meta);
+					finalitem.setItemMeta(meta);
 				} else {
 					if (e.getItem().getType().toString().toLowerCase().contains("sword")) {
 						int enchants[] = {16,17,18,19,20,21,34};
@@ -596,6 +755,7 @@ implements Listener
 						ItemMeta meta = e.getItem().getItemMeta();
 						meta.setLore(ourLore);
 						e.getItem().setItemMeta(meta);
+						finalitem.setItemMeta(meta);
 					} else if (e.getItem().getType().toString().toLowerCase().contains("spade") ||
 							e.getItem().getType().toString().toLowerCase().contains("axe") ||
 							e.getItem().getType().toString().toLowerCase().contains("hoe") ||
@@ -633,6 +793,7 @@ implements Listener
 						ItemMeta meta = e.getItem().getItemMeta();
 						meta.setLore(ourLore);
 						e.getItem().setItemMeta(meta);
+						finalitem.setItemMeta(meta);
 					} else {
 						int enchants[] = {0,1,2,3,4,5,6,7,34};
 						for (int j=0;j<enchants.length;j++) {
@@ -667,20 +828,53 @@ implements Listener
 						ItemMeta meta = e.getItem().getItemMeta();
 						meta.setLore(ourLore);
 						e.getItem().setItemMeta(meta);
+						finalitem.setItemMeta(meta);
 					}
 				}
 			}
-			for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
-				if (this.plugin.getJobLv("Enchanter", p)>=20) {
-					if (entry.getKey().getMaxLevel()<entry.getValue()) {
-						entry.setValue(entry.getValue()+((int)(Math.random()*2)+1));
+			if (e.getItem().getType()==Material.BOW) {
+				int enchants[] = {48,49,50,51};
+				for (int j=0;j<enchants.length;j++) {
+					if (Math.random()<1.0d/enchants.length) {
+						e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+						finalitem.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
 					}
 				}
-				if (e.getItem().getType()==Material.BOW) {
-					int enchants[] = {48,49,50,51};
+				List<String> ourLore = new ArrayList<String>();
+				if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
+					List<String> thelore = e.getItem().getItemMeta().getLore();
+					for (int i=0;i<thelore.size();i++) {
+						if (this.plugin.is_PermanentProperty(thelore.get(i))) {
+							ourLore.add(thelore.get(i));
+						}
+					}
+				}
+				if (Math.random()<=0.2) {
+					ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+				}
+				if (Math.random()<=0.2) {
+					ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+				}
+				if (Math.random()<=0.2) {
+					ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
+				}
+				if (Math.random()<=0.2) {
+					ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+				}
+				if (Math.random()<=0.2) {
+					ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
+				}
+				ItemMeta meta = e.getItem().getItemMeta();
+				meta.setLore(ourLore);
+				e.getItem().setItemMeta(meta);
+				finalitem.setItemMeta(meta);
+			} else {
+				if (e.getItem().getType().toString().toLowerCase().contains("sword")) {
+					int enchants[] = {16,17,18,19,20,21,34};
 					for (int j=0;j<enchants.length;j++) {
 						if (Math.random()<1.0d/enchants.length) {
 							e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+							finalitem.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
 						}
 					}
 					List<String> ourLore = new ArrayList<String>();
@@ -710,123 +904,107 @@ implements Listener
 					ItemMeta meta = e.getItem().getItemMeta();
 					meta.setLore(ourLore);
 					e.getItem().setItemMeta(meta);
+					finalitem.setItemMeta(meta);
+				} else if (e.getItem().getType().toString().toLowerCase().contains("spade") ||
+						e.getItem().getType().toString().toLowerCase().contains("axe") ||
+						e.getItem().getType().toString().toLowerCase().contains("hoe") ||
+						e.getItem().getType().toString().toLowerCase().contains("pickaxe")) {
+					int enchants[] = {32,33,34,35};
+					for (int j=0;j<enchants.length;j++) {
+						if (Math.random()<1.0d/enchants.length) {
+							if (enchants[j]==33) {
+								if (e.getItem().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)==0) {
+									e.getItem().addEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+									finalitem.addEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+								}
+							}
+							if (enchants[j]==35) {
+								if (e.getItem().getEnchantmentLevel(Enchantment.SILK_TOUCH)==0) {
+									e.getItem().addEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+									finalitem.addEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+								}
+							}
+						}
+					}
+					List<String> ourLore = new ArrayList<String>();
+					if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
+						List<String> thelore = e.getItem().getItemMeta().getLore();
+						for (int i=0;i<thelore.size();i++) {
+							if (this.plugin.is_PermanentProperty(thelore.get(i))) {
+								ourLore.add(thelore.get(i));
+							}
+						}
+					}
+					if (Math.random()<=0.2) {
+						ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+					}
+					if (Math.random()<=0.2) {
+						ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
+					}
+					if (Math.random()<=0.2) {
+						ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
+					}
+					if (Math.random()<=0.2) {
+						ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
+					}
+					if (Math.random()<=0.2) {
+						ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
+					}
+					ItemMeta meta = e.getItem().getItemMeta();
+					meta.setLore(ourLore);
+					e.getItem().setItemMeta(meta);
+					finalitem.setItemMeta(meta);
 				} else {
-					if (e.getItem().getType().toString().toLowerCase().contains("sword")) {
-						int enchants[] = {16,17,18,19,20,21,34};
-						for (int j=0;j<enchants.length;j++) {
-							if (Math.random()<1.0d/enchants.length) {
-								e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+					int enchants[] = {0,1,2,3,4,5,6,7,34};
+					for (int j=0;j<enchants.length;j++) {
+						if (Math.random()<1.0d/enchants.length) {
+							e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+							finalitem.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+						}
+					}
+					List<String> ourLore = new ArrayList<String>();
+					if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
+						List<String> thelore = e.getItem().getItemMeta().getLore();
+						for (int i=0;i<thelore.size();i++) {
+							if (this.plugin.is_PermanentProperty(thelore.get(i))) {
+								ourLore.add(thelore.get(i));
 							}
 						}
-						List<String> ourLore = new ArrayList<String>();
-						if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
-							List<String> thelore = e.getItem().getItemMeta().getLore();
-							for (int i=0;i<thelore.size();i++) {
-								if (this.plugin.is_PermanentProperty(thelore.get(i))) {
-									ourLore.add(thelore.get(i));
-								}
-							}
+					}
+					if (Math.random()<=0.2) {
+						ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Health");
+					}
+					if (Math.random()<=0.2) {
+						ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Damage Reduction");
+					}
+					if (Math.random()<=0.2) {
+						ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*100)+1)*10)+"% "+ChatColor.BLUE+"Durability");
+					}
+					if (Math.random()<=0.2) {
+						ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Block Chance");
+					}
+					if (Math.random()<=0.2) {
+						ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
+					}
+					ItemMeta meta = e.getItem().getItemMeta();
+					meta.setLore(ourLore);
+					e.getItem().setItemMeta(meta);
+					finalitem.setItemMeta(meta);
+				}
+			}
+			Map<Enchantment,Integer> map = finalitem.getEnchantments();
+			for (Map.Entry<Enchantment,Integer> entry : map.entrySet()) {
+				if (this.plugin.getJobLv("Enchanter", p)>=20) {
+					if (entry.getKey().getMaxLevel()<entry.getValue()) {
+						try {
+							entry.setValue(entry.getValue()+((int)(Math.random()*2)+1));
 						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
+						catch (UnsupportedOperationException except) {
+							Bukkit.getLogger().warning("Could not handle this particular enchantment.");
 						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
-						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
-						}
-						ItemMeta meta = e.getItem().getItemMeta();
-						meta.setLore(ourLore);
-						e.getItem().setItemMeta(meta);
-					} else if (e.getItem().getType().toString().toLowerCase().contains("spade") ||
-							e.getItem().getType().toString().toLowerCase().contains("axe") ||
-							e.getItem().getType().toString().toLowerCase().contains("hoe") ||
-							e.getItem().getType().toString().toLowerCase().contains("pickaxe")) {
-						int enchants[] = {32,33,34,35};
-						for (int j=0;j<enchants.length;j++) {
-							if (Math.random()<1.0d/enchants.length) {
-								if (enchants[j]==33) {
-									if (e.getItem().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)==0) {
-										e.getItem().addEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
-									}
-								}
-								if (enchants[j]==35) {
-									if (e.getItem().getEnchantmentLevel(Enchantment.SILK_TOUCH)==0) {
-										e.getItem().addEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
-									}
-								}
-							}
-						}
-						List<String> ourLore = new ArrayList<String>();
-						if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
-							List<String> thelore = e.getItem().getItemMeta().getLore();
-							for (int i=0;i<thelore.size();i++) {
-								if (this.plugin.is_PermanentProperty(thelore.get(i))) {
-									ourLore.add(thelore.get(i));
-								}
-							}
-						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Critical Chance");
-						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Armor Penetration");
-						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Life Steal");
-						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*60)+1)+"% "+ChatColor.BLUE+"Attack Speed");
-						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*10)+1)+" "+ChatColor.BLUE+"Damage");
-						}
-						ItemMeta meta = e.getItem().getItemMeta();
-						meta.setLore(ourLore);
-						e.getItem().setItemMeta(meta);
-					} else {
-						int enchants[] = {0,1,2,3,4,5,6,7,34};
-						for (int j=0;j<enchants.length;j++) {
-							if (Math.random()<1.0d/enchants.length) {
-								e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
-							}
-						}
-						List<String> ourLore = new ArrayList<String>();
-						if (e.getItem().hasItemMeta() && e.getItem().getItemMeta().getLore()!=null) { //Check the lore for any weak item conflicts.
-							List<String> thelore = e.getItem().getItemMeta().getLore();
-							for (int i=0;i<thelore.size();i++) {
-								if (this.plugin.is_PermanentProperty(thelore.get(i))) {
-									ourLore.add(thelore.get(i));
-								}
-							}
-						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*6)+1)+" "+ChatColor.BLUE+"Health");
-						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Damage Reduction");
-						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+(((int)(Math.random()*100)+1)*10)+"% "+ChatColor.BLUE+"Durability");
-						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Block Chance");
-						}
-						if (Math.random()<=0.2) {
-							ourLore.add(ChatColor.YELLOW+"+"+((int)(Math.random()*20)+1)+"% "+ChatColor.BLUE+"Speed Boost Chance");
-						}
-						ItemMeta meta = e.getItem().getItemMeta();
-						meta.setLore(ourLore);
-						e.getItem().setItemMeta(meta);
 					}
 				}
+				Bukkit.getLogger().info("Enchantment "+entry.getKey().toString()+" at level "+entry.getValue());
 				if (entry.getKey().getName()==Enchantment.PROTECTION_ENVIRONMENTAL.getName()) {
 					this.plugin.gainMoneyExp(p,"Enchanter",0.08*entry.getValue(),4*Math.pow(entry.getValue(),2));
 				}
@@ -888,6 +1066,96 @@ implements Listener
 					this.plugin.gainMoneyExp(p,"Enchanter",0.50*entry.getValue(),40*Math.pow(entry.getValue(),2));
 				}
 			}
+			Map<Enchantment,Integer> map2 = e.getEnchantsToAdd();
+			for (Map.Entry<Enchantment,Integer> entry : map2.entrySet()) {
+				if (this.plugin.getJobLv("Enchanter", p)>=20) {
+					if (entry.getKey().getMaxLevel()<entry.getValue()) {
+						entry.setValue(entry.getValue()+((int)(Math.random()*2)+1));
+					}
+				}
+				finalitem.addUnsafeEnchantment(entry.getKey(), entry.getValue());
+				Bukkit.getLogger().info("Enchantment "+entry.getKey().toString()+" at level "+entry.getValue());
+				if (entry.getKey().getName()==Enchantment.PROTECTION_ENVIRONMENTAL.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.08*entry.getValue(),4*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.DAMAGE_UNDEAD.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),8*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.PROTECTION_FIRE.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.10*entry.getValue(),6*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.DAMAGE_ARTHROPODS.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.12*entry.getValue(),8*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.PROTECTION_FALL.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.14*entry.getValue(),10*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.DAMAGE_ALL.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.15*entry.getValue(),14*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.DIG_SPEED.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.15*entry.getValue(),14*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.PROTECTION_EXPLOSIONS.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),16*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.THORNS.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),16*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.KNOCKBACK.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),18*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.ARROW_KNOCKBACK.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.20*entry.getValue(),18*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.FIRE_ASPECT.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.22*entry.getValue(),20*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.ARROW_FIRE.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.22*entry.getValue(),20*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.WATER_WORKER.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.25*entry.getValue(),16*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.OXYGEN.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.30*entry.getValue(),20*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.DURABILITY.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.35*entry.getValue(),24*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.ARROW_INFINITE.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.40*entry.getValue(),40*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.LOOT_BONUS_MOBS.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.40*entry.getValue(),30*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.LOOT_BONUS_BLOCKS.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.50*entry.getValue(),40*Math.pow(entry.getValue(),2));
+				}
+				if (entry.getKey().getName()==Enchantment.SILK_TOUCH.getName()) {
+					this.plugin.gainMoneyExp(p,"Enchanter",0.50*entry.getValue(),40*Math.pow(entry.getValue(),2));
+				}
+			}
+		}
+		
+		/////////////////////////////////////////////finalitem contains the item with ALL enchantments that were added on.
+		//Perform all maintenance operations below.
+		
+		
+		if (this.plugin.hasJobBuff("Enchanter", p, Job.JOB30A)) {
+			//Open up another inventory giving you the ability to choose an upgrade as well.
+			//p.closeInventory();
+			//Bukkit.getLogger().info("Final item: "+finalitem.toString());
+			Inventory open = openBonusInventory(p, finalitem, e.getExpLevelCost());
+			ItemMeta meta = e.getItem().getItemMeta();
+			meta.setDisplayName(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"[Temporary Item]");
+			e.getItem().setItemMeta(meta);
+			if (open!=null) {
+				p.openInventory(open);
+			}
+		}
+		if (this.plugin.hasJobBuff("Enchanter", p, Job.JOB10)) {
+			e.setExpLevelCost((int)(e.getExpLevelCost()*0.75));
 		}
 	}
 
@@ -4560,6 +4828,15 @@ implements Listener
 	public void onItemDrop(PlayerDropItemEvent e) {
 		//If the player is a support, drop it with only 1 second of wait time.
 		Player p = e.getPlayer();
+		if (e.getItemDrop().getItemStack().hasItemMeta() && e.getItemDrop().getItemStack().getItemMeta().hasDisplayName()) {
+			if (e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"[Temporary Item]")) {
+				//Bukkit.getLogger().info("This is a temporary item.");
+				e.getItemDrop().setPickupDelay(0);
+				//p.getInventory().addItem(e.getItemDrop().getItemStack());
+				//e.getItemDrop().getItemStack().getItemMeta(
+				//e.getItemDrop().remove();
+			}
+		}
 		if (this.plugin.PlayerinJob(p, "Support")) {
 			//This item drops with half the pickup speed of normal items.
 			e.getItemDrop().setPickupDelay(20);
@@ -11201,7 +11478,8 @@ implements Listener
 
 	@EventHandler
 	public void onInventoryCloseEvent(InventoryCloseEvent e) {
-		Player p = (Player)e.getPlayer();
+		final Player p = (Player)e.getPlayer();
+		final Inventory inv = e.getInventory();
 		//Bukkit.getLogger().info("GEt close inventory event.");
 		p.getScoreboard().getTeam(p.getName().toLowerCase()).setPrefix(ChatColor.WHITE+"");
 		if (p.hasPermission("group.moderator")) {
@@ -11210,6 +11488,21 @@ implements Listener
 		if (p.hasPermission("group.administrators")) {
 			p.getScoreboard().getTeam(p.getName().toLowerCase()).setPrefix(ChatColor.LIGHT_PURPLE+"");
 		}
+		if (e.getInventory().getName().contains("Choose an additional bonus:")) {
+			//If we still have the temporary item, we will re-open the window soon after.
+			for (int i=0;i<p.getInventory().getContents().length;i++) {
+				if (p.getInventory().getContents()[i]!=null && p.getInventory().getContents()[i].hasItemMeta() &&
+						p.getInventory().getContents()[i].getItemMeta().hasDisplayName() && 
+						p.getInventory().getContents()[i].getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"[Temporary Item]")) {
+					p.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+						@Override
+						public void run() {
+							p.openInventory(inv);
+						}
+					}, 1);
+				}
+			}
+		} else
 		if (e.getInventory().getName().contains("Item Cube")) {
 			int identifier=-1;
 			//Get idenfitier.
@@ -12706,6 +12999,34 @@ implements Listener
 					}
 				}
 			} else
+				if (event.getInventory().getTitle().equalsIgnoreCase("Choose an additional bonus:")) {
+					if (event.getClick()!=ClickType.LEFT) {
+						event.setCancelled(true);
+						p.updateInventory();
+					}
+					if (event.getClick()==ClickType.LEFT) {
+						//Select this one. Drop it on the ground.
+						//Bukkit.getLogger().info("Raw slot is "+event.getRawSlot());
+						if (event.getRawSlot()<18) {
+							ItemStack itemselected = event.getCurrentItem();
+							if (itemselected!=null && itemselected.getType()!=Material.AIR) {
+								Item it = p.getWorld().dropItemNaturally(p.getLocation(), itemselected);
+								it.setPickupDelay(0);
+								for (int i=0;i<p.getInventory().getContents().length;i++) {
+									if (p.getInventory().getContents()[i]!=null && p.getInventory().getContents()[i].hasItemMeta() &&
+											p.getInventory().getContents()[i].getItemMeta().hasDisplayName() && 
+											p.getInventory().getContents()[i].getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"[Temporary Item]")) {
+										p.getInventory().removeItem(p.getInventory().getContents()[i]);
+									}
+								}
+								p.closeInventory();
+							}
+						} else {
+							event.setCancelled(true);
+							p.updateInventory();
+						}
+					}
+				}
 				if (event.getInventory().getTitle().equalsIgnoreCase("Repair and Enchant")) {
 					final int INPUT = 10;
 					final int MATERIALS = 12;

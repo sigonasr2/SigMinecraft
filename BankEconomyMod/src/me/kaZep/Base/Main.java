@@ -21,12 +21,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.text.*;
 
+import me.kaZep.Base.BonusEnchantment.ItemType;
 import me.kaZep.Commands.JobsDataInfo;
 import me.kaZep.Commands.JobsDataInfo.Job;
 import me.kaZep.Commands.commandBankEconomy;
 import net.jmhertlein.mctowns.MCTowns;
 import net.milkbowl.vault.economy.Economy;
 
+import org.apache.commons.lang.math.IntRange;
+import org.apache.commons.lang.math.Range;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -189,9 +192,15 @@ public class Main extends JavaPlugin
   public List<ReviveInventory> revive_inventory_list = null;
   public List<Chunk> chunk_queue_list = null;
   public static List<RecyclingCenterNode> recycling_center_list = null;
+  public static List<BonusEnchantment> bonus_enchantment_list = null;
   public DamageAPI DMGCALC = null;
   public long lastMessage = 0;
   public static ItemSetList ItemSetList = null;
+  
+  
+  public static BonusEnchantment ENCHANT_CRITICAL_CHANCE, ENCHANT_ARMOR_PENETRATION, ENCHANT_LIFE_STEAL,
+  	ENCHANT_ATTACK_SPEED, ENCHANT_DAMAGE, ENCHANT_HEALTH, ENCHANT_DAMAGE_REDUCTION, ENCHANT_DURABILITY,
+  	ENCHANT_BLOCK_CHANCE, ENCHANT_SPEED_BOOST_CHANCE, ENCHANT_STURDY, ENCHANT_REPAIR, ENCHANT_EXECUTE;
   
 
   public FileWriter outputStream = null;
@@ -778,6 +787,21 @@ public class Main extends JavaPlugin
     		"gives you 10% block chance.",
     		"When jumping, you cannot be hit.");
     ItemSetList.addSet(set);
+    
+    //Add in custom enchantments.
+    ENCHANT_CRITICAL_CHANCE = new BonusEnchantment("Critical Chance",true,false,ItemType.WEAPONS,new IntRange(0,100));
+    ENCHANT_ARMOR_PENETRATION = new BonusEnchantment("Armor Penetration",false,false,ItemType.WEAPONS,new IntRange(0,100));
+    ENCHANT_LIFE_STEAL = new BonusEnchantment("Life Steal",true,false,ItemType.WEAPONS,new IntRange(0,100));
+    ENCHANT_ATTACK_SPEED = new BonusEnchantment("Attack Speed",true,false,ItemType.WEAPONS,new IntRange(0,500));
+    ENCHANT_DAMAGE = new BonusEnchantment("Damage",false,false,ItemType.WEAPONS,new IntRange(0,1000));
+    ENCHANT_HEALTH = new BonusEnchantment("Health",false,false,ItemType.ARMOR,new IntRange(0,1000));
+    ENCHANT_DAMAGE_REDUCTION = new BonusEnchantment("Damage Reduction",true,false,ItemType.ARMOR,new IntRange(0,100));
+    ENCHANT_DURABILITY = new BonusEnchantment("Durability",false,false,ItemType.ARMOR,new IntRange(0,9999999));
+    ENCHANT_BLOCK_CHANCE = new BonusEnchantment("Block Chance",true,false,ItemType.ARMOR,new IntRange(0,100));
+    ENCHANT_SPEED_BOOST_CHANCE = new BonusEnchantment("Speed Boost Chance",true,false,ItemType.ARMOR,new IntRange(0,100));
+    ENCHANT_STURDY = new BonusEnchantment("Sturdy",false,true,ItemType.ARMOR,new IntRange(0,1000));
+    ENCHANT_REPAIR = new BonusEnchantment("Repair",false,true,ItemType.ARMOR,new IntRange(0,1000));
+    ENCHANT_EXECUTE = new BonusEnchantment("Execute",false,true,ItemType.WEAPONS,new IntRange(0,1000));
     
     DMGCALC = new DamageAPI();
     //System.out.println("Running BankEconomy in "+this.getDataFolder().getAbsolutePath());
@@ -5272,6 +5296,120 @@ public void payDay(int time)
     }
     
     /**
+     * Removes a bonus enchantment from the item.
+     * If the enchantment does not exist on the item,
+     * the same exact copy of the item is returned.
+     * If you want to instead lower the enchantment
+     * level that exists on the item, use addEnchantment()
+     * with the override argument turned on to do so.
+     * @param item The item to remove the bonus enchant from.
+     * @param enchant The bonus enchantment to remove. (See Main.ENCHANT_)
+     * @return The new item with the given enchantment removed.
+     */
+    public ItemStack removeBonusEnchantment(ItemStack item, BonusEnchantment enchant) {
+    	if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
+    		List<String> newlore = item.getItemMeta().getLore();
+    		for (int i=0;i<item.getItemMeta().getLore().size();i++) {
+    			if (item.getItemMeta().getLore().get(i).contains(enchant.name)) {
+    				//Include it in the new meta.
+    				newlore.remove(i);
+    				break;
+    			}
+    		}
+    		ItemMeta meta = item.getItemMeta();
+    		meta.setLore(newlore);
+    		item.setItemMeta(meta);
+    		return item;
+    	} else {
+    		return item;
+    	}
+    }
+    
+    /**
+     * Adds a bonus enchantment to an item.
+     * If the enchantment already exists on the item,
+     * it will add to the old amount unless override
+     * is turned off. This version of the function 
+     * automatically has override set to false, meaning 
+     * it will add to the enchantment amount.
+     * @param item The item to add the bonus enchant to.
+     * @param enchant The bonus enchantment to apply. (See Main.ENCHANT_)
+     * @param amt The value of the enchantment to apply.
+     * @param override Whether or not the enchantment should be overwritten.
+     * @return The item with the new enchantment added in.
+     */
+    public ItemStack addBonusEnchantment(ItemStack item, BonusEnchantment enchant, int amt) {
+    	return addBonusEnchantment(item, enchant, amt, false);
+    }
+    
+    /**
+     * Adds a bonus enchantment to an item.
+     * If the enchantment already exists on the item,
+     * it will add to the old amount unless override
+     * is turned off.
+     * @param item The item to add the bonus enchant to.
+     * @param enchant The bonus enchantment to apply. (See Main.ENCHANT_)
+     * @param amt The value of the enchantment to apply.
+     * @param override Whether or not the enchantment should be overwritten.
+     * @return The item with the new enchantment added in.
+     */
+    public ItemStack addBonusEnchantment(ItemStack item, BonusEnchantment enchant, int amt, boolean override) {
+    	List<String> lore = null;
+    	String enchant_string = enchant.name;
+    	boolean percent=enchant.percent, enchant_format=enchant.enchant_format;
+    	if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
+    		ItemMeta meta = item.getItemMeta();
+    		lore = item.getItemMeta().getLore();
+    		//Make sure the lore doesn't already exist. If it does, we have to actually
+    		//replace it.
+    		boolean added=false;
+    		for (int i=0;i<lore.size();i++) {
+    			if (lore.get(i).contains(enchant_string)) {
+    				if (!enchant_format) {
+    					//Take that old amount and add onto it.
+    					double oldamt=0;
+    					if (!override) {oldamt = getEnchantmentNumb(lore.get(i));} else {oldamt=0;}
+    					lore.set(i, ChatColor.YELLOW+"+"+(int)(oldamt+amt)+((percent)?"% ":" ")+ChatColor.BLUE+enchant_string);
+    				} else {
+    					double oldamt=0;
+    					if (!override) {oldamt = getEnchantmentNumb(lore.get(i));} else {oldamt=0;}
+    					String parser = lore.get(i);
+    					parser.replace(enchant_string, "");
+    					if (!override) {oldamt=toNumber(parser);} else {oldamt=0;}
+    					lore.set(i, ChatColor.GRAY+enchant_string+" "+toRomanNumeral((int)amt));
+    				}
+    				added=true;
+    				break;
+    			}
+    		}
+    		if (!added) {
+    			//Add onto the lore.
+				if (!enchant_format) {
+					lore.add(ChatColor.YELLOW+"+"+(int)amt+((percent)?"% ":" ")+ChatColor.BLUE+enchant_string);
+				} else {
+					lore.add(ChatColor.GRAY+enchant_string+" "+toRomanNumeral((int)amt));
+				}
+				added=true;
+    		}
+    		meta.setLore(lore);
+    		item.setItemMeta(meta);
+    		return sortEnchantments(item); //Sort all enchants before returning.
+    	} else {
+    		lore = new ArrayList<String>();
+    		ItemMeta meta = item.getItemMeta();
+			//Add onto the lore.
+			if (!enchant_format) {
+				lore.add(ChatColor.YELLOW+"+"+(int)amt+((percent)?"% ":" ")+ChatColor.BLUE+enchant_string);
+			} else {
+				lore.add(ChatColor.GRAY+enchant_string+" "+toRomanNumeral((int)amt));
+			}
+    		meta.setLore(lore);
+    		item.setItemMeta(meta);
+    		return sortEnchantments(item); //Sort all enchants before returning.
+    	}
+    }
+    
+    /**
      * 
      * @param item The item to sort Enchantments on.
      * @return The item with all enchantments sorted out.
@@ -5869,4 +6007,67 @@ public void payDay(int time)
 			  	},total_tick_delay+=tick_delay);
     	}
     }
+    
+    /**
+     * A helper function for Bonus Enchantments.
+     * @return Returns all bonus enchantments in a list.
+     */
+    public static List<BonusEnchantment> getBonusEnchantments() {
+    	return bonus_enchantment_list;
+    }
+    
+    /**
+     * A helper function for Bonus Enchantments.
+     * @return Returns all enchantments in a list that weapons can use.
+     */
+    public static List<BonusEnchantment> getBonusWeaponEnchantments() {
+    	List<BonusEnchantment> finallist = new ArrayList<BonusEnchantment>();
+    	for (int i=0;i<bonus_enchantment_list.size();i++) {
+    		if (bonus_enchantment_list.get(i).item_type==ItemType.WEAPONS ||
+    				bonus_enchantment_list.get(i).item_type==ItemType.BOTH) {
+    			finallist.add(bonus_enchantment_list.get(i));
+    		}
+    	}
+    	return finallist;
+    }
+    
+    /**
+     * A helper function for Bonus Enchantments.
+     * @return Returns all enchantments in a list that armor can use.
+     */
+    public static List<BonusEnchantment> getBonusArmorEnchantments() {
+    	List<BonusEnchantment> finallist = new ArrayList<BonusEnchantment>();
+    	for (int i=0;i<bonus_enchantment_list.size();i++) {
+    		if (bonus_enchantment_list.get(i).item_type==ItemType.ARMOR ||
+    				bonus_enchantment_list.get(i).item_type==ItemType.BOTH) {
+    			finallist.add(bonus_enchantment_list.get(i));
+    		}
+    	}
+    	return finallist;
+    }
+}
+
+class BonusEnchantment {
+	public enum ItemType { WEAPONS, ARMOR, BOTH }
+	String name; //The string name of the Bonus Enchantment.
+	boolean percent; //Whether or not this enchantment is a percentage value, or an integer value.
+	boolean enchant_format; //Whether or not this enchantment is type 1 (false) or type 2 (true). Type 2 enchants are the ones that look like actual in-game enchantments.
+	ItemType item_type; //The item type this enchantment can apply to.
+	Range value_range;
+	/**
+	 * Creates a new BonusEnchantment.
+	 * @param name The string name of the Bonus enchantment.
+	 * @param percent Whether or not this enchantment is a percentage value (true), or an integer value (false).
+	 * @param enchant_format Whether or not this enchantment is type 1 (false) or type 2 (true). Type 2 enchants are the ones that look like actual in-game enchantments.
+	 * @param type The type of items this enchantment can apply to (See BonusEnchantment.ItemType)
+	 * @param values_range A value range that determines what the minimum and maximum amounts of these numbers can be. (Useful for other functions that need to determine how much of this enchantment to apply.)
+	 */
+	public BonusEnchantment(String name, boolean percent, boolean enchant_format, ItemType type, Range values_range) {
+		this.name=name;
+		this.percent=percent;
+		this.enchant_format=enchant_format;
+		this.item_type = type;
+		this.value_range = values_range;
+		Main.bonus_enchantment_list.add(this);
+	}
 }
