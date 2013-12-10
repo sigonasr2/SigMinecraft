@@ -2864,7 +2864,7 @@ implements Listener
 								if (Math.random()<=1.00-((m+4)*0.05d)) {
 									Location checkloc = e.getEntity().getLocation().add(k,m,j);
 									Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-									if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER || bl.getType()!=Material.COMMAND || bl.getType()!=Material.MOSSY_COBBLESTONE && naturalBlock(bl.getType())) {
+									if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND && bl.getType()!=Material.MOSSY_COBBLESTONE && naturalBlock(bl.getType())) {
 										bl.setType(Material.AIR);
 									}
 								}
@@ -4447,7 +4447,7 @@ implements Listener
 						for (int k=2;k>-1;k--) {
 							for (int l=5;l>-6;l--) {
 								Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(20+j,k,spread+l));
-								if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE || b.getType()==Material.COMMAND || b.getType()==Material.MOSSY_COBBLESTONE && naturalBlock(b.getType())) {
+								if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE || b.getType()==Material.COMMAND || b.getType()==Material.MOSSY_COBBLESTONE) {
 									torch1=true;
 								}
 							}
@@ -4473,7 +4473,7 @@ implements Listener
 						for (int k=2;k>-1;k--) {
 							for (int l=5;l>-6;l--) {
 								Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(-10+j,k,spread+l));
-								if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE || b.getType()==Material.COMMAND || b.getType()==Material.MOSSY_COBBLESTONE && naturalBlock(b.getType())) {
+								if (b.getType()==Material.TORCH || b.getType()==Material.GLOWSTONE || b.getType()==Material.COMMAND || b.getType()==Material.MOSSY_COBBLESTONE) {
 									torch2=true;
 								}
 							}

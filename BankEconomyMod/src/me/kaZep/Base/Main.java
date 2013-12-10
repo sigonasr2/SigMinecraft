@@ -1357,6 +1357,28 @@ public void onDisable()
 	  sign.update();
   }
 
+	public boolean naturalBlock(Material mat) {
+		List<Material> natural_mats = new ArrayList<Material>();
+		natural_mats.add(Material.DIRT);
+		natural_mats.add(Material.STONE);
+		natural_mats.add(Material.WOOD);
+		natural_mats.add(Material.FENCE);
+		natural_mats.add(Material.GRAVEL);
+		natural_mats.add(Material.SAND);
+		natural_mats.add(Material.CLAY);
+		natural_mats.add(Material.WEB);
+		natural_mats.add(Material.IRON_ORE);
+		natural_mats.add(Material.GOLD_ORE);
+		natural_mats.add(Material.DIAMOND_ORE);
+		natural_mats.add(Material.EMERALD_ORE);
+		natural_mats.add(Material.LAPIS_ORE);
+		natural_mats.add(Material.REDSTONE_ORE);
+		if (natural_mats.contains(mat)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 public void runTick() {
 	final Main plugin = this;
   this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new  Runnable(){
@@ -2939,7 +2961,7 @@ public void checkJukeboxes() {
 		        				for (int k=2;k>-1;k--) {
 		            				for (int l=lb2;l>-ub2;l--) {
 		            					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(20+j,k,spread+l));
-		            					if (Math.random()<=0.75 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME) {
+		            					if (Math.random()<=0.75 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
 		            						b.setType(Material.AIR);
 		            					}
 		            				}
@@ -2965,7 +2987,7 @@ public void checkJukeboxes() {
 		        				for (int k=2;k>-1;k--) {
 		            				for (int l=lb2;l>-ub2;l--) {
 		            					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(-20+j,k,spread+l));
-		            					if (Math.random()<=0.75 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME) {
+		            					if (Math.random()<=0.75 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
 		            						b.setType(Material.AIR);
 		            					}
 		            				}
@@ -2990,7 +3012,7 @@ public void checkJukeboxes() {
 		        				for (int k=2;k>-1;k--) {
 		            				for (int l=lb2;l>-ub2;l--) {
 			        					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(spread+j,k,20+l));
-			        					if (Math.random()<=0.75 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME) {
+			        					if (Math.random()<=0.75 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
 			        						b.setType(Material.AIR);
 			        					}
 			        				}
@@ -3015,7 +3037,7 @@ public void checkJukeboxes() {
 		        				for (int k=2;k>-1;k--) {
 		            				for (int l=lb2;l>-ub2;l--) {
 		            					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(spread+j,k,-20+l));
-		            					if (Math.random()<=0.75 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME) {
+		            					if (Math.random()<=0.75 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
 		            						b.setType(Material.AIR);
 		            					}
 		            				}
@@ -5339,7 +5361,6 @@ public void payDay(int time)
      * @param item The item to add the bonus enchant to.
      * @param enchant The bonus enchantment to apply. (See Main.ENCHANT_)
      * @param amt The value of the enchantment to apply.
-     * @param override Whether or not the enchantment should be overwritten.
      * @return The item with the new enchantment added in.
      */
     public ItemStack addBonusEnchantment(ItemStack item, BonusEnchantment enchant, int amt) {
