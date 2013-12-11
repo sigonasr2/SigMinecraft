@@ -2076,9 +2076,18 @@ public void runTick() {
 						  }
 						  if (nearby.get(i).getType()==EntityType.SKELETON ||
 								  nearby.get(i).getType()==EntityType.ZOMBIE ||
-								  nearby.get(i).getType()==EntityType.SPIDER) {
+								  nearby.get(i).getType()==EntityType.SPIDER||
+								  nearby.get(i).getType()==EntityType.CREEPER||
+								  nearby.get(i).getType()==EntityType.ENDERMAN) {
 							  LivingEntity l = (LivingEntity)nearby.get(i);
-							  if (l.getKiller()!=null && Math.random()<=0.5/l.getNearbyEntities(10, 10, 10).size()) {
+							  List<Entity> ents = l.getNearbyEntities(10, 10, 10);
+							  for (int m=0;m<ents.size();m++) {
+								  if (!(ents.get(m) instanceof Monster)) {
+									  ents.remove(m);
+									  m--;
+								  }
+							  }
+							  if (l.getKiller()!=null && Math.random()<=1.15/ents.size()) {
 								  if (!contains_mob) {
 									  powered_mob_list.add(new PoweredMob(l.getUniqueId(), Main.SERVER_TICK_TIME));
 									  l.getWorld().playSound(l.getLocation(), Sound.SPIDER_DEATH, 0.4f, 0.04f);

@@ -834,6 +834,16 @@ public String convertToItemName(String val) {
   				  // Arrows
   				  i.setItem(count+=1, new ItemStack(Material.ARROW, 64));
   				  
+				  temp = new ItemStack(Material.getMaterial(34),64);
+				  ItemMeta meta = temp.getItemMeta();
+				  meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Job Boost Card");
+				  List<String> lore = new ArrayList<String>();
+				  lore.add("Use /jobs boost <jobname> to instantly level up");
+				  lore.add("that job with this card!");
+				  meta.setLore(lore);
+				  temp.setItemMeta(meta);
+				  i.setItem(count+=1, temp);
+  				  
   				  p.openInventory(i);
 
 
