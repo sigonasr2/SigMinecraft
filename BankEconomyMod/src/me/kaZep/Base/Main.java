@@ -73,6 +73,7 @@ import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Zombie;
+import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -268,6 +269,7 @@ public class Main extends JavaPlugin
     getCommand("ticktime").setExecutor(new commandBankEconomy(this));
     getCommand("line").setExecutor(new commandBankEconomy(this));
     getCommand("rectangle").setExecutor(new commandBankEconomy(this));
+    getCommand("rename").setExecutor(new commandBankEconomy(this));
 
     setupEconomy();
 
@@ -771,7 +773,14 @@ public class Main extends JavaPlugin
     Bukkit.addRecipe(DeConv_gold_spade);
     Bukkit.addRecipe(DeConv_stone_spade);
     
-
+	for (int i=0;i<16;i++) {
+	    ShapelessRecipe nametag_color = new ShapelessRecipe(new ItemStack(Material.NAME_TAG));
+	    nametag_color.addIngredient(Material.NAME_TAG);
+	    MaterialData md = new MaterialData(Material.INK_SACK, (byte)i);
+	    nametag_color.addIngredient(md);
+	    Bukkit.addRecipe(nametag_color);
+    }
+    
     ItemSetList = new ItemSetList();
     ItemSetList.Init();
     //Create a list of item sets.
@@ -5508,31 +5517,27 @@ public void payDay(int time)
 	    			if (LoreData.get(i).contains(ChatColor.GRAY+getBonusRomanNumeralEnchantments().get(j).name+" ")) {
 	    				newLoreData.add(LoreData.get(i));
 	    				LoreData.remove(i);
+	    				i--;
 	    			}
     			}
     		}
     		//Now find all bonus enchantments.
     		for (int i=0;i<LoreData.size();i++) {
-    			if (LoreData.get(i).contains(ChatColor.YELLOW+"+") &&
-    					LoreData.get(i).contains(" ") &&
-    					(LoreData.get(i).contains(ChatColor.BLUE+"Damage Reduction") ||
-    							LoreData.get(i).contains(ChatColor.BLUE+"Health") ||
-    							LoreData.get(i).contains(ChatColor.BLUE+"Armor Penetration") ||
-    							LoreData.get(i).contains(ChatColor.BLUE+"Critical Chance") ||
-    							LoreData.get(i).contains(ChatColor.BLUE+"Life Steal") ||
-    							LoreData.get(i).contains(ChatColor.BLUE+"Attack Speed") ||
-    							LoreData.get(i).contains(ChatColor.BLUE+"Damage") ||
-    							LoreData.get(i).contains(ChatColor.BLUE+"Durability") ||
-    							LoreData.get(i).contains(ChatColor.BLUE+"Block Chance") ||
-    							LoreData.get(i).contains(ChatColor.BLUE+"Speed Boost Chance"))) {
-    				newLoreData.add(LoreData.get(i));
-    				LoreData.remove(i);
+    			if (LoreData.get(i).contains(ChatColor.YELLOW+"+")) {
+        			for (int j=0;j<getBonusNotRomanNumeralEnchantments().size();j++) {
+        				if (LoreData.get(i).contains(getBonusNotRomanNumeralEnchantments().get(j).name)) {
+		    				newLoreData.add(LoreData.get(i));
+		    				LoreData.remove(i);
+		    				i--;
+        				}
+        			}
     			}
     		}
     		//Now everything else.
     		for (int i=0;i<LoreData.size();i++) {
 				newLoreData.add(LoreData.get(i));
 				LoreData.remove(i);
+				i--;
     		}
     		meta.setLore(newLoreData);
     		item.setItemMeta(meta);
@@ -6106,6 +6111,20 @@ public void payDay(int time)
     	for (int i=0;i<bonus_enchantment_list.size();i++) {
     		if (bonus_enchantment_list.get(i).item_type==ItemType.WEAPONS ||
     				bonus_enchantment_list.get(i).item_type==ItemType.BOTH) {
+    			finallist.add(bonus_enchantment_list.get(i));
+    		}
+    	}
+    	return finallist;
+    }
+    
+    /**
+     * A helper function for Bonus Enchantments.
+     * @return Returns all enchantments in a list that are non-roman numeral.
+     */
+    public static List<BonusEnchantment> getBonusNotRomanNumeralEnchantments() {
+    	List<BonusEnchantment> finallist = new ArrayList<BonusEnchantment>();
+    	for (int i=0;i<bonus_enchantment_list.size();i++) {
+    		if (!bonus_enchantment_list.get(i).enchant_format) {
     			finallist.add(bonus_enchantment_list.get(i));
     		}
     	}

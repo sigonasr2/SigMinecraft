@@ -5132,6 +5132,12 @@ implements Listener
 		//If the player is a support, drop it with only 1 second of wait time.
 		Player p = e.getPlayer();
 		if (e.getItemDrop().getItemStack().hasItemMeta() && e.getItemDrop().getItemStack().getItemMeta().hasDisplayName()) {
+			if (e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.DARK_BLUE+""+ChatColor.ITALIC+"Rename Item")) {
+				e.getItemDrop().setPickupDelay(0);
+				e.getItemDrop().teleport(p);
+				this.plugin.getPlayerData(p).is_renaming_item=true;
+				p.sendMessage(ChatColor.GREEN+"Please type in chat the new name of your "+convertToItemName(e.getItemDrop().getItemStack().getType().name())+".");
+			}
 			if (e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"[Temporary Item]")) {
 				//Bukkit.getLogger().info("This is a temporary item.");
 				e.getItemDrop().setPickupDelay(0);
@@ -6272,6 +6278,60 @@ implements Listener
 		
 		//****************************//Job Non-Boofs go below.
 		
+		if (result.getResult().getType()==Material.NAME_TAG) {
+			ItemStack dye = null;
+			ItemStack name_tag = null;
+			for (int i=0;i<result.getMatrix().length;i++) {
+				if (result.getMatrix()[i]!=null &&
+						result.getMatrix()[i].getType()==Material.NAME_TAG) {
+					name_tag = result.getMatrix()[i].clone();
+				}
+				if (result.getMatrix()[i]!=null &&
+						result.getMatrix()[i].getType()==Material.INK_SACK) {
+					dye = result.getMatrix()[i];
+					if (dye.getData().getData()==(byte)3 ||
+							dye.getData().getData()==(byte)13) {
+						result.setResult(new ItemStack(Material.AIR));
+						return;
+					}
+					//Bukkit.getLogger().info("Dye is valid.");
+				}
+			}
+			ChatColor color = null;
+			if (dye!=null) {
+				//Bukkit.getLogger().info("Dye is not null, converting color. Data is "+dye.getData().getData());
+				switch (dye.getData().getData()) {
+					case (byte)0:{color = ChatColor.BLACK;}break;
+					case (byte)1:{color = ChatColor.RED;}break;
+					case (byte)2:{color = ChatColor.DARK_GREEN;}break;
+					case (byte)4:{color = ChatColor.BLUE;}break;
+					case (byte)5:{color = ChatColor.DARK_PURPLE;}break;
+					case (byte)6:{color = ChatColor.DARK_AQUA;}break;
+					case (byte)7:{color = ChatColor.GRAY;}break;
+					case (byte)8:{color = ChatColor.DARK_GRAY;}break;
+					case (byte)9:{color = ChatColor.LIGHT_PURPLE;}break;
+					case (byte)10:{color = ChatColor.GREEN;}break;
+					case (byte)11:{color = ChatColor.YELLOW;}break;
+					case (byte)12:{color = ChatColor.AQUA;}break;
+					case (byte)14:{color = ChatColor.GOLD;}break;
+					case (byte)15:{color = ChatColor.WHITE;}break;
+				}
+				//Bukkit.getLogger().info("color resolved to "+color.toString());
+			}
+			//Bukkit.getLogger().info("Display name is "+result.getResult().getItemMeta().getDisplayName()+". Item is "+result.getResult().toString());
+			if (color!=null && name_tag!=null && name_tag.getItemMeta().getDisplayName()!=null) {
+				//Bukkit.getLogger().info("Dye color is "+color);
+				ItemStack newresult = name_tag;
+				ItemMeta meta = name_tag.getItemMeta();
+				meta.setDisplayName(color+""+ChatColor.stripColor(meta.getDisplayName()));
+				newresult.setItemMeta(meta);
+				newresult.setAmount(1);
+				result.setResult(newresult);
+			} else {
+				result.setResult(new ItemStack(Material.AIR));
+				return;
+			}
+		}
 
 		ItemStack armor1 = null;
 		for (int i=0;i<result.getMatrix().length;i++) {
@@ -8069,11 +8129,24 @@ implements Listener
 
 	@EventHandler
 	public void onEnemyKill(EntityDeathEvent e) {
-		if (e.getEntity().getType()==EntityType.SQUID || e.getEntity().getType()==EntityType.SLIME || e.getEntity().getType()==EntityType.ZOMBIE || e.getEntity().getType()==EntityType.SPIDER || e.getEntity().getType()==EntityType.SKELETON || e.getEntity().getType()==EntityType.CREEPER
-				|| e.getEntity().getType()==EntityType.PIG_ZOMBIE || e.getEntity().getType()==EntityType.GHAST || e.getEntity().getType()==EntityType.ENDERMAN || e.getEntity().getType()==EntityType.BLAZE
-				|| e.getEntity().getType()==EntityType.ENDER_DRAGON || e.getEntity().getType()==EntityType.WITHER || e.getEntity().getType()==EntityType.CHICKEN || e.getEntity().getType()==EntityType.SHEEP
-				|| e.getEntity().getType()==EntityType.PIG || e.getEntity().getType()==EntityType.COW || e.getEntity().getType()==EntityType.OCELOT || e.getEntity().getType()==EntityType.WOLF
-				|| e.getEntity().getType()==EntityType.MUSHROOM_COW) {
+		if (e.getEntity() instanceof Monster) {
+			double chance_increase=0;
+			if (e.getEntity().getKiller()!=null && ((Player)e.getEntity().getKiller()).getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS)>0) {
+				chance_increase=((Player)e.getEntity().getKiller()).getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS)/2;
+			}
+			for (int i=0;i<e.getDrops().size();i++) {
+				if (e.getDrops().get(i).getType()==Material.SKULL_ITEM) {
+					if (Math.random()>0.085*chance_increase) {
+						e.getDrops().remove(i);
+					}
+				}
+			}
+			if (Math.random()<=0.00390625*chance_increase) {
+				ItemStack rename_token = new ItemStack(Material.NAME_TAG);
+				e.getDrops().add(rename_token);
+			}
+		}
+		if (e.getEntity() instanceof LivingEntity) {
 			LivingEntity f = e.getEntity();
 			if (f instanceof Monster) {
 				if (this.plugin.getConfig().getBoolean("thanksgiving-enabled") && Math.random()<=0.01) {
@@ -8228,15 +8301,20 @@ implements Listener
 				if (f.getCustomName().contains("Mythical Wither")) {
 					e.setDroppedExp(e.getDroppedExp()*4000);
 					boolean dropMythical=false;
+					boolean dropMythical2=false;
 					for (int j=0;j<10;j++) {
 						Location dd = f.getLocation().add(Math.random()*4,Math.random()*4,Math.random()*4);
 						Bukkit.getWorld("world").getBlockAt(dd).setType(Material.CHEST);
 						Chest c=(Chest)Bukkit.getWorld("world").getBlockAt(dd).getState();
 						for (int i=0;i<27;i++) {
 							ItemStack item = null;
-							if (Math.random()<=0.05 && !dropMythical) {
+							if (Math.random()<=0.1 && !dropMythical) {
 								dropMythical=true;
-								item = getGoodie(2);
+								item = getGoodie(1);
+							} else
+							if (Math.random()<=0.03 && !dropMythical2) {
+								dropMythical2=true;
+								item = getGoodie(1);
 							}
 							if (Math.random()<=0.2) {
 								item = getGoodie();
@@ -9994,10 +10072,10 @@ implements Listener
 				//Choose a random set to mark off.
 				blocked_attack=true;
 				//Reduce all armor by one as if it was a normal hit.
-				if (p.getInventory().getHelmet()!=null) {p.getInventory().getHelmet().setDurability((short)(p.getInventory().getHelmet().getDurability()+1));}
-				if (p.getInventory().getChestplate()!=null) {p.getInventory().getChestplate().setDurability((short)(p.getInventory().getChestplate().getDurability()+1));}
-				if (p.getInventory().getLeggings()!=null) {p.getInventory().getLeggings().setDurability((short)(p.getInventory().getLeggings().getDurability()+1));}
-				if (p.getInventory().getBoots()!=null) {p.getInventory().getBoots().setDurability((short)(p.getInventory().getBoots().getDurability()+1));}
+				if (p.getInventory().getHelmet()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getHelmet(), Main.ENCHANT_BLOCK_CHANCE)) {p.getInventory().getHelmet().setDurability((short)(p.getInventory().getHelmet().getDurability()+1));}
+				if (p.getInventory().getChestplate()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getChestplate(), Main.ENCHANT_BLOCK_CHANCE)) {p.getInventory().getChestplate().setDurability((short)(p.getInventory().getChestplate().getDurability()+1));}
+				if (p.getInventory().getLeggings()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getLeggings(), Main.ENCHANT_BLOCK_CHANCE)) {p.getInventory().getLeggings().setDurability((short)(p.getInventory().getLeggings().getDurability()+1));}
+				if (p.getInventory().getBoots()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getBoots(), Main.ENCHANT_BLOCK_CHANCE)) {p.getInventory().getBoots().setDurability((short)(p.getInventory().getBoots().getDurability()+1));}
 				/*
 				if (blocks.size()>0) {
 					int armor = blocks.get((int)(Math.random()*blocks.size()));
@@ -11911,8 +11989,6 @@ implements Listener
 			p.getScoreboard().getTeam(p.getName().toLowerCase()).setPrefix(ChatColor.DARK_PURPLE+"");
 		}
 		
-		//Bukkit.getLogger().info("Slot is "+event.getSlot());
-		
 		//*****************************// Job buffs here
 		if (event.getInventory().getType()==InventoryType.BREWING && event.getSlot()==3) {
 			//Check if the brewing stand can start up.
@@ -12816,6 +12892,9 @@ implements Listener
 			}
 		}
 		//****************************//End job buffs.
+
+		if (event.getInventory().getType()==InventoryType.FURNACE) {
+		}
 		
 		if (event.getCursor()!=null || event.getCurrentItem()!=null) {
 			if (event.getCursor().getType()==Material.SULPHUR) {
@@ -12995,43 +13074,16 @@ implements Listener
 				}
 			}, 1);
 		}
-		if (event.getSlot() != -999) {
-			ItemStack item = event.getCurrentItem();
-			if (event.getInventory().getType() == InventoryType.ANVIL)
-			{
-				if (item != null && item.hasItemMeta() && item.getItemMeta().hasLore()) {
-					List<String> lore = item.getItemMeta().getLore();
-					for (int i=0;i<lore.size();i++) {
-						if (lore.get(i).contains(ChatColor.YELLOW+"[Halloween]")) {
-							event.setCancelled(true);
-							return;
-						}
-					}
-				}
-				if (item != null && item.hasItemMeta()) {
-					String tempname = "";
-
-					if (item.getItemMeta()
-							.hasDisplayName()) {
-						tempname = item.getItemMeta()
-								.getDisplayName();
-					}
-
-					if (!tempname.equals(event
-							.getInventory().getItem(0)
-							.getItemMeta()
-							.getDisplayName()) && event
-							.getInventory().getItem(0)
-							.getItemMeta()
-							.getDisplayName().contains(Character.toString((char)0x00A7))) {
-						item.setItemMeta(event.getInventory().getItem(0).getItemMeta());
-					}
-				}
-			}
-		}
 		if (isViewingEnderCube(p)) {
 			//If we are viewing an ender cube, every single click should prompt an update for all viewers of it. In case it does something.
-			ItemCube_updateSameEnderCube(getViewingEnderCubeID(p),p);
+			final Player p2 = p;
+		  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+		      @Override
+		      public void run() {
+					ItemCube_save(p2, getViewingEnderCubeID(p2), Cube.ENDER);
+					ItemCube_updateSameEnderCube(getViewingEnderCubeID(p2),p2);
+		      }
+		  	},1);
 		}
 		if (event.getCursor()!=null) {
 			//Regardless of the inventory, if we try to put it inside a chest, got to try to insert it in there.
@@ -15793,6 +15845,26 @@ implements Listener
 	public void onPlayerChat(PlayerChatEvent e) {
 		//Check if they are withdrawing or depositing money.
 		DecimalFormat df = new DecimalFormat("#0.00");
+		if (this.plugin.getPlayerData(e.getPlayer()).is_renaming_item) {
+			boolean found=false;
+			for (int i=0;i<e.getPlayer().getInventory().getContents().length;i++) {
+				if (e.getPlayer().getInventory().getContents()[i]!=null &&
+						e.getPlayer().getInventory().getContents()[i].hasItemMeta() &&
+						e.getPlayer().getInventory().getContents()[i].getItemMeta().hasDisplayName() &&
+						e.getPlayer().getInventory().getContents()[i].getItemMeta().getDisplayName().equalsIgnoreCase(ChatColor.DARK_BLUE+""+ChatColor.ITALIC+"Rename Item")) {
+					found=true;
+					ItemMeta meta = e.getPlayer().getInventory().getContents()[i].getItemMeta();
+					meta.setDisplayName(e.getMessage());
+					e.getPlayer().getInventory().getContents()[i].setItemMeta(meta);
+					e.getPlayer().sendMessage("The Item name has been changed to: "+ChatColor.YELLOW+e.getPlayer().getInventory().getContents()[i].getItemMeta().getDisplayName());
+					this.plugin.getPlayerData(e.getPlayer()).is_renaming_item=false;
+					break;
+				}
+			}
+			if (!found) {
+				e.getPlayer().sendMessage(ChatColor.RED+"Something bad happened! Please let the administrator know about this event. Your name change did not go through.");
+			}
+		}
 		if (e.getPlayer().getName().equalsIgnoreCase(this.plugin.last_bank_deposit_user) && this.plugin.last_bank_deposit_use_time+200>Main.SERVER_TICK_TIME) {
 			//Parse the amount.
 			double val=0;
@@ -16006,9 +16078,7 @@ implements Listener
 					if (Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().contains("Ender Item Cube") && Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().length()>0) {
 						if (Integer.valueOf(Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().substring(Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().indexOf("#")).replace("#", ""))==cube_id) {
 							//It is! We need to close it out and re-open with the updated properties of the cube.
-							Inventory new_inven = player.getOpenInventory().getTopInventory();
-							Bukkit.getOnlinePlayers()[i].closeInventory();
-							Bukkit.getOnlinePlayers()[i].openInventory(new_inven);
+							ItemCube_load(Bukkit.getOnlinePlayers()[i], cube_id, Cube.ENDER);
 						}
 					}
 				}
@@ -16026,10 +16096,61 @@ implements Listener
 					if (Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().contains("Ender Item Cube") && Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().length()>0) {
 						if (Integer.valueOf(Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().substring(Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().indexOf("#")).replace("#", ""))==cube_id) {
 							//It is! "Add" it to that inventory list too.
-							player.getOpenInventory().getTopInventory().addItem(add_item);
+							Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().addItem(add_item);
 						}
 					}
 				}
+			}
+		}
+	}
+
+	private void ItemCube_save(Player p, int identifier, Cube size) {
+		FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
+		int slots = -1;
+		String heading = "";
+		switch (size) {
+			case SMALL: {
+				slots = 9;
+				heading = "";
+			}break;
+			case LARGE: {
+				slots = 54;
+				heading = "Large";
+			}break;
+			case ENDER: {
+				slots = 27;
+				heading = "Ender";
+			}break;
+		}
+		for (int i=0;i<p.getOpenInventory().getTopInventory().getContents().length;i++) {
+			f.set("item-"+i, p.getOpenInventory().getTopInventory().getItem(i));
+		}
+		this.plugin.saveItemCubeConfig(f, identifier);
+	}
+	
+	private void ItemCube_load(Player p, int identifier, Cube size) {
+		FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
+		int slots = -1;
+		String heading = "";
+		switch (size) {
+			case SMALL: {
+				slots = 9;
+				heading = "";
+			}break;
+			case LARGE: {
+				slots = 54;
+				heading = "Large";
+			}break;
+			case ENDER: {
+				slots = 27;
+				heading = "Ender";
+			}break;
+		}
+		p.getOpenInventory().getTopInventory().clear();
+		for (int i=0;i<slots;i++) {
+			//items.add(f.getItemStack("item-"+i));
+			if (f.contains("item-"+i)) {
+				p.getOpenInventory().getTopInventory().addItem(f.getItemStack("item-"+i));
 			}
 		}
 	}
@@ -17410,7 +17531,7 @@ implements Listener
 		} else {
 			color = DyeColor.getByWoolData((byte)data).name();
 		}
-		return String.valueOf(color+" "+name);
+		return String.valueOf(convertToItemName(color+" "+name));
 	}
 
 	@EventHandler

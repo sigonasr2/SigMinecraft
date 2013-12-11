@@ -15,6 +15,7 @@ public class PlayerData {
 	long furytime=0;
 	long invulntime=0;
 	int furyamt=0;
+	boolean is_renaming_item=false;
 	boolean haslanded=true;
 	long lasteattime=Main.SERVER_TICK_TIME;
 	int blockstack=0; //The amount of times you've gotten hit (The amount of "blocking" stacks you now have)

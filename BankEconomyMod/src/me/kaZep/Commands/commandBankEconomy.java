@@ -560,6 +560,14 @@ public String convertToItemName(String val) {
               "- Reloads config and accounts.");
           }
         } else 
+            if (cmd.getName().toLowerCase().equalsIgnoreCase("rename") && args.length==1) {
+            	if (p.getItemInHand().getType()==Material.NAME_TAG) {
+            		ItemMeta meta = p.getItemInHand().getItemMeta();
+            		meta.setDisplayName(ChatColor.RESET+""+args[0]);
+            		p.getItemInHand().setItemMeta(meta);
+            		p.sendMessage("Changed name tag's title to "+p.getItemInHand().getItemMeta().getDisplayName()+".");
+            	}
+            } else
             if (cmd.getName().toLowerCase().equalsIgnoreCase("event") && args.length==1 && p.hasPermission("maintenance-mode-admin")) {
   			  if (args[0].equalsIgnoreCase("halloween")) {
   				  if (this.plugin.getConfig().getBoolean("halloween-enabled")) {
