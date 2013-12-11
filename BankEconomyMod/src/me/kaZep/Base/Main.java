@@ -141,6 +141,7 @@ public class Main extends JavaPlugin
   public long check_nether_time=0;
   public long check_lights_time=0;
   public long check_spleef_game=0;
+  public static boolean ender_cube_active=true;
   public boolean harrowing_night=false;
   public double randomitemchance = 800;
   public static long SERVER_TICK_TIME = 0;
@@ -5518,6 +5519,7 @@ public void payDay(int time)
 	    				newLoreData.add(LoreData.get(i));
 	    				LoreData.remove(i);
 	    				i--;
+	    				break;
 	    			}
     			}
     		}
@@ -5529,6 +5531,7 @@ public void payDay(int time)
 		    				newLoreData.add(LoreData.get(i));
 		    				LoreData.remove(i);
 		    				i--;
+		    				break;
         				}
         			}
     			}

@@ -196,7 +196,11 @@ public class PlayerBuffData {
 				double temphp=0;
 				temphp = p.getHealth();
 				p.setMaxHealth(base_hplv-extra_hp);
-				p.setHealth(temphp);
+				if (temphp>p.getMaxHealth()) {
+					p.setHealth(p.getMaxHealth());
+				} else {
+					p.setHealth(temphp);
+				}
 			}
 			
 			//Send new speed totals so the player's speed can be manually adjusted.

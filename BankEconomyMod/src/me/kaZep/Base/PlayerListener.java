@@ -130,6 +130,7 @@ import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
@@ -916,14 +917,14 @@ implements Listener
 						if (Math.random()<1.0d/enchants.length) {
 							if (enchants[j]==33) {
 								if (e.getItem().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS)==0) {
-									e.getItem().addEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
-									finalitem.addEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+									e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+									finalitem.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
 								}
 							}
 							if (enchants[j]==35) {
 								if (e.getItem().getEnchantmentLevel(Enchantment.SILK_TOUCH)==0) {
-									e.getItem().addEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
-									finalitem.addEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+									e.getItem().addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
+									finalitem.addUnsafeEnchantment(Enchantment.getById(enchants[j]), (int)(Math.random()*5)+1);
 								}
 							}
 						}
@@ -1646,10 +1647,6 @@ implements Listener
 				this.plugin.gainMoneyExp(p,"Breeder",0.005,1);
 			}
 		} 
-		if (e.getEntity().getType()==EntityType.MUSHROOM_COW) {
-			Bukkit.getWorld("world").spawnEntity(e.getEntity().getLocation(), EntityType.COW);
-		}
-		Bukkit.getWorld("world").spawnEntity((Location) e.getEntity(), EntityType.COW);
 	}
 
 	@EventHandler
@@ -11634,6 +11631,32 @@ implements Listener
 		  }
 	  }
   }*/
+	
+	@EventHandler
+	public void onInventoryDragEvent(InventoryDragEvent e) {
+		Player p = (Player)e.getWhoClicked();
+		if (isViewingEnderCube(p)) {
+			if (this.plugin.ender_cube_active) {
+				final Player p2 = p;
+				this.plugin.ender_cube_active=false;
+				int inven_amount=0;
+				int item_count=0;
+				for (int i=0;i<27;i++) {
+					if (e.getInventory().getContents()[i]!=null) {
+						inven_amount+=e.getInventory().getContents()[i].getAmount();
+						item_count++;
+						//Bukkit.getLogger().info("Check at "+e.getInventory().getContents()[i].toString());
+					}
+				}
+				//Bukkit.getLogger().info("Marked at "+inven_amount+".");
+				ItemCube_attemptUpdate(inven_amount,item_count,p2);
+			} else {
+				//Bukkit.getLogger().info("Cannot perform! We are waiting on an update.");
+				e.setCancelled(true);
+				e.setResult(Result.DENY);
+			}
+		}
+	}
 
 	@EventHandler
 	public void onInventoryCloseEvent(InventoryCloseEvent e) {
@@ -11671,6 +11694,8 @@ implements Listener
 				Bukkit.getLogger().severe("SEVERE error when saving Item Cube contents! Could not get ID!");
 				return;
 			}
+			//Do an item cube load, just to be safe.
+			//ItemCube_load(p, identifier, Cube.LARGE);
 			//We are going to save the contents of this inventory appropriately.
 			FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
 			for (int i=0;i<e.getInventory().getContents().length;i++) {
@@ -12892,9 +12917,6 @@ implements Listener
 			}
 		}
 		//****************************//End job buffs.
-
-		if (event.getInventory().getType()==InventoryType.FURNACE) {
-		}
 		
 		if (event.getCursor()!=null || event.getCurrentItem()!=null) {
 			if (event.getCursor().getType()==Material.SULPHUR) {
@@ -13074,16 +13096,48 @@ implements Listener
 				}
 			}, 1);
 		}
-		if (isViewingEnderCube(p)) {
-			//If we are viewing an ender cube, every single click should prompt an update for all viewers of it. In case it does something.
-			final Player p2 = p;
-		  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
-		      @Override
-		      public void run() {
-					ItemCube_save(p2, getViewingEnderCubeID(p2), Cube.ENDER);
-					ItemCube_updateSameEnderCube(getViewingEnderCubeID(p2),p2);
-		      }
-		  	},1);
+		//Bukkit.getLogger().info("Click type is "+event.getClick().toString());
+		if (isViewingEnderCube(p) && (event.getClick()==ClickType.NUMBER_KEY || ((event.getClick()==ClickType.SHIFT_LEFT || event.getClick()==ClickType.SHIFT_RIGHT) && event.getCurrentItem()!=null && event.getCurrentItem().getType()!=Material.AIR) || ((event.getClick()==ClickType.LEFT || event.getClick()==ClickType.RIGHT) && event.getRawSlot()<27 && ((event.getCursor()!=null && event.getCursor().getType()!=Material.AIR) || (event.getCurrentItem()!=null && event.getCurrentItem().getType()!=Material.AIR)))) ) {
+			boolean item_cube=false;
+			Bukkit.getLogger().info("Got to 1.");
+			if (event.getClick()==ClickType.LEFT && (event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST)) {
+				int identifier=-1;
+				Bukkit.getLogger().info("Got to 2.");
+				if (event.getCurrentItem().getItemMeta().getLore()!=null) {
+					//Check to see if the Lore contains anything.
+					for (int i=0;i<event.getCurrentItem().getItemMeta().getLore().size();i++) {
+						if (event.getCurrentItem().getItemMeta().getLore().get(i).contains("ID#")) {
+							identifier=Integer.valueOf(event.getCurrentItem().getItemMeta().getLore().get(i).replace("ID#", ""));
+						}
+					}
+					if (identifier!=-1) {
+						Bukkit.getLogger().info("Got to 2.5.");
+						//This is an item cube. We will not continue.
+						item_cube=true;
+					}
+				}
+			}
+			if (!item_cube || (item_cube && (event.getCursor()==null || event.getCursor().getType()==Material.AIR))) {
+				Bukkit.getLogger().info("Got to 3.");
+				if (this.plugin.ender_cube_active) {
+					final Player p2 = p;
+					this.plugin.ender_cube_active=false;
+					int inven_amount=0, inven_items=0;
+					for (int i=0;i<27;i++) {
+						if (event.getInventory().getContents()[i]!=null) {
+							inven_amount+=event.getInventory().getContents()[i].getAmount();
+							inven_items++;
+							//Bukkit.getLogger().info("Check at "+event.getInventory().getContents()[i].toString());
+						}
+					}
+					//Bukkit.getLogger().info("Marked at "+inven_amount+".");
+					ItemCube_attemptUpdate(inven_amount,inven_items,p2);
+				} else {
+					//Bukkit.getLogger().info("Cannot perform! We are waiting on an update.");
+					event.setCancelled(true);
+					event.setResult(Result.DENY);
+				}
+			}
 		}
 		if (event.getCursor()!=null) {
 			//Regardless of the inventory, if we try to put it inside a chest, got to try to insert it in there.
@@ -13101,7 +13155,7 @@ implements Listener
 				}
 			}
 		}
-		if (event.getInventory().getType()==InventoryType.CRAFTING /*|| event.getInventory().getType()==InventoryType.CHEST*//*Buggy for some reason. We can't open chests in chests.*/) {
+		if (event.getInventory().getType()==InventoryType.CRAFTING || event.getInventory().getType()==InventoryType.CHEST/*Buggy for some reason. We can't open chests in chests.*/) {
 			if (event.getCurrentItem()!=null) {
 				if (isItemCube(event.getCurrentItem()) && event.getClick()==ClickType.RIGHT && event.getCurrentItem().hasItemMeta()) {
 					if (isItemCube(event.getCurrentItem())) {
@@ -13142,6 +13196,7 @@ implements Listener
 								ider=Integer.valueOf(ident_string);
 								if (identifier==ider) {
 									event.setCancelled(true);
+									event.setResult(Result.DENY);
 									return;
 								}
 							}
@@ -16043,9 +16098,48 @@ implements Listener
 			}break;
 			}
 			if (screen!=null) {
-				p.closeInventory();
-				p.openInventory(screen);
+				final Player p2 = p;
+				final Inventory screen2 = screen;
+			  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+			      @Override
+			      public void run() {
+						p2.closeInventory();
+						p2.openInventory(screen2);
+			      }
+			  	},1);
 			}
+		}
+	}
+
+	public void ItemCube_attemptUpdate(final int amt,final int count,final Player p) {
+		ItemCube_attemptUpdate(amt,count,p,0);
+	}
+	
+	public void ItemCube_attemptUpdate(final int amt,final int count,final Player p,int tracking_amt) {
+		int cur_amt=0;
+		int cur_count=0;
+		p.updateInventory();
+		for (int i=0;i<p.getOpenInventory().getTopInventory().getContents().length;i++) {
+			if (p.getOpenInventory().getTopInventory().getContents()[i]!=null) {
+				cur_amt+=p.getOpenInventory().getTopInventory().getContents()[i].getAmount();
+				cur_count++;
+			}
+		}
+		//Bukkit.getLogger().info("Compare "+cur_amt+" to "+amt+".");
+		if (cur_amt!=amt || cur_count!=count) {
+			ItemCube_save(p, getViewingEnderCubeID(p), Cube.ENDER);
+			ItemCube_updateSameEnderCube(getViewingEnderCubeID(p),p);
+			Main.ender_cube_active=true;
+		} else {
+			final int new_amt = cur_amt;
+			final int new_count = cur_count;
+			final int new_track = tracking_amt++;
+		  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+		      @Override
+		      public void run() {
+		    	  ItemCube_attemptUpdate(new_amt,new_count,p,new_track);
+		      }
+		  	},1);
 		}
 	}
 
@@ -16072,13 +16166,16 @@ implements Listener
 	public void ItemCube_updateSameEnderCube(int cube_id, Player player) {
 		//If a player attempts to do something in an Ender Cube, update the Ender Cube for all other viewers that is not player. (The player argument is the player making modifications to the inventory.)
 		for (int i=0;i<Bukkit.getOnlinePlayers().length;i++) {
-			if (!Bukkit.getOnlinePlayers()[i].equals(player)) {
+			if (!Bukkit.getOnlinePlayers()[i].getName().equals(player.getName())) {
 				if (Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory()!=null) {
 					//Check if it's the same ID.
 					if (Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().contains("Ender Item Cube") && Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().length()>0) {
 						if (Integer.valueOf(Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().substring(Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().indexOf("#")).replace("#", ""))==cube_id) {
-							//It is! We need to close it out and re-open with the updated properties of the cube.
-							ItemCube_load(Bukkit.getOnlinePlayers()[i], cube_id, Cube.ENDER);
+							//It is! We need to close it out and re-open with the updated properties of the cube.							
+							final int i2 = i;
+							final int cube_id2 = cube_id;
+							ItemCube_load(Bukkit.getOnlinePlayers()[i2], cube_id2, Cube.ENDER);
+							//Bukkit.getLogger().info("Re-loading Item Cube for "+Bukkit.getOnlinePlayers()[i].getName());
 						}
 					}
 				}
@@ -16151,8 +16248,10 @@ implements Listener
 			//items.add(f.getItemStack("item-"+i));
 			if (f.contains("item-"+i)) {
 				p.getOpenInventory().getTopInventory().addItem(f.getItemStack("item-"+i));
+				//Bukkit.getLogger().info("Reloading item "+f.getItemStack("item-"+i).toString());
 			}
 		}
+		p.updateInventory();
 	}
 
 	private ItemStack ItemCube_add(Player p, int identifier, Cube size, ItemStack insert_item) {

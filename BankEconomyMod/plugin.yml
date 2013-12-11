@@ -25,6 +25,8 @@ commands:
     description: Toggles or untoggles events.
   ticktime:
     description: Displays the server tick time.
+  rename:
+    description: Renames a name tag item.
   line:
     description: Gives the player a line builder tool.
   rectangle:
