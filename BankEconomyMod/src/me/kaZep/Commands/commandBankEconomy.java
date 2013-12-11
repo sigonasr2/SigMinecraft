@@ -560,10 +560,15 @@ public String convertToItemName(String val) {
               "- Reloads config and accounts.");
           }
         } else 
-            if (cmd.getName().toLowerCase().equalsIgnoreCase("rename") && args.length==1) {
+            if (cmd.getName().toLowerCase().equalsIgnoreCase("rename") && args.length>=1) {
             	if (p.getItemInHand().getType()==Material.NAME_TAG) {
             		ItemMeta meta = p.getItemInHand().getItemMeta();
-            		meta.setDisplayName(ChatColor.RESET+""+args[0]);
+            		if (meta.getDisplayName()==null) {
+            			meta.setDisplayName(ChatColor.RESET+"");
+            		}
+            		for (int i=0;i<args.length;i++) {
+            			meta.setDisplayName(meta.getDisplayName()+" "+args[i]);
+            		}
             		p.getItemInHand().setItemMeta(meta);
             		p.sendMessage("Changed name tag's title to "+p.getItemInHand().getItemMeta().getDisplayName()+".");
             	}

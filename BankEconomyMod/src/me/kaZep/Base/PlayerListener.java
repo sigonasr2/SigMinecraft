@@ -9400,6 +9400,27 @@ implements Listener
 			final LivingEntity l = (LivingEntity)e.getEntity();
 			if (e.getDamager() instanceof LivingEntity) {
 				LivingEntity l2 = (LivingEntity)e.getDamager();
+				for (int i=0;i<this.plugin.powered_mob_list.size();i++) {
+					if (this.plugin.powered_mob_list.get(i).id.equals(l2.getUniqueId())) {
+						//This mob will damage you if you are not blocking.
+						if (l instanceof Player) {
+							Player p = (Player)l;
+							if (!p.isBlocking()) {
+								if (p.getHealth()-e.getDamage()<0) {
+									p.setHealth(0);
+								} else {
+									p.setHealth(p.getHealth()-e.getDamage());
+								}
+								Main.playFirework(p.getLocation());
+								Main.playFirework(p.getLocation());
+								Main.playFirework(p.getLocation());
+							}
+						}
+						this.plugin.powered_mob_list.remove(i);
+						i--;
+						break;
+					}
+				}
 				if (l2.getCustomName()!=null && l2.getCustomName().contains(ChatColor.RED+"Powersurge Zombie")) {
 					int dmgamt = 0; //How much the bonus damage rating to do.
 					double dmgamt1=0,dmgamt2=0,dmgamt3=0,dmgamt4=0;
@@ -15858,40 +15879,40 @@ implements Listener
 	public int getSongDuration(Material record) {
 		int padding=20;
 		if (record==Material.RECORD_3) {
-			return 345/2+5+padding;
+			return 345+5+padding;
 		} else
 			if (record==Material.RECORD_4) {
-				return 185/2+5+padding;
+				return 185+5+padding;
 			} else
 				if (record==Material.RECORD_5) {
-					return 174/2+5+padding;
+					return 174+5+padding;
 				} else
 					if (record==Material.RECORD_6) {
-						return 197/2+5+padding;
+						return 197+5+padding;
 					} else
 						if (record==Material.RECORD_7) {
-							return 96/2+5+padding;
+							return 96+5+padding;
 						} else
 							if (record==Material.RECORD_8) {
-								return 150/2+5+padding;
+								return 150+5+padding;
 							} else
 								if (record==Material.RECORD_9) {
-									return 188/2+5+padding;
+									return 188+5+padding;
 								} else
 									if (record==Material.RECORD_10) {
-										return 251/2+5+padding;
+										return 251+5+padding;
 									} else
 										if (record==Material.RECORD_11) {
-											return 71/2+5+padding;
+											return 71+5+padding;
 										} else
 											if (record==Material.RECORD_12) {
-												return 238/2+5+padding;
+												return 238+5+padding;
 											} else
 												if (record==Material.GOLD_RECORD) {
-													return 178/2+5+padding;
+													return 178+5+padding;
 												} else
 													if (record==Material.GREEN_RECORD) {
-														return 185/2+5+padding;
+														return 185+5+padding;
 													} else
 														return 0;
 	}
@@ -15900,6 +15921,7 @@ implements Listener
 	public void onPlayerChat(PlayerChatEvent e) {
 		//Check if they are withdrawing or depositing money.
 		DecimalFormat df = new DecimalFormat("#0.00");
+		//e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.SPIDER_DEATH, 5.0f, 0.04f);
 		if (this.plugin.getPlayerData(e.getPlayer()).is_renaming_item) {
 			boolean found=false;
 			for (int i=0;i<e.getPlayer().getInventory().getContents().length;i++) {

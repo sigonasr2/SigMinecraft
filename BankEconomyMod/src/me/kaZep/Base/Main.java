@@ -192,6 +192,7 @@ public class Main extends JavaPlugin
   public List<PlayerData> playerdata_list = null;
   public List<InvisibilityData> ninjavisible_list = null;
   public List<ReviveInventory> revive_inventory_list = null;
+  public List<PoweredMob> powered_mob_list = null;
   public List<Chunk> chunk_queue_list = null;
   public static List<RecyclingCenterNode> recycling_center_list = null;
   public static List<BonusEnchantment> bonus_enchantment_list = null;
@@ -320,6 +321,7 @@ public class Main extends JavaPlugin
     revive_inventory_list = new ArrayList<ReviveInventory>();
     chunk_queue_list = new ArrayList<Chunk>();
     bonus_enchantment_list = new ArrayList<BonusEnchantment>();
+    powered_mob_list = new ArrayList<PoweredMob>();
     
     recycling_center_list = new ArrayList<RecyclingCenterNode>();
     
@@ -1481,7 +1483,7 @@ public void runTick() {
 			  }
 			  if (BOSS_DEFEAT>0) {
 				  if (BOSS_DEFEAT%4==0) {
-					  Bukkit.getWorld("world").playEffect(BOSS_DEFEAT_LOC.add(Math.random()*5-Math.random()*5, BOSS_DEFEAT/20, Math.random()*5-Math.random()*5), Effect.SMOKE, 0);
+					  Bukkit.getWorld("world").playEffect(new Location(BOSS_DEFEAT_LOC.getWorld(),BOSS_DEFEAT_LOC.getX()+Math.random()*5-Math.random()*5, BOSS_DEFEAT_LOC.getY()+BOSS_DEFEAT/20, BOSS_DEFEAT_LOC.getZ()+Math.random()*5-Math.random()*5), Effect.SMOKE, 0);
 				  }
 				  if (BOSS_DEFEAT==1) {
 					  Bukkit.getWorld("world").playEffect(BOSS_DEFEAT_LOC, Effect.ZOMBIE_DESTROY_DOOR, 0);
@@ -1782,6 +1784,12 @@ public void runTick() {
 					  }
 				  }
 				  if (Main.SERVER_TICK_TIME%20==0) {
+					  for (int j=0;j<powered_mob_list.size();j++) {
+						  if (powered_mob_list.get(j).power_time+1200<Main.SERVER_TICK_TIME) {
+							  powered_mob_list.remove(j);
+							  j--;
+						  }
+					  }
 			    	for (int d=0;d<chunk_queue_list.size();d++) {
 			    		if (chunk_queue_list.get(d)==null || !chunk_queue_list.get(d).isLoaded()) {
 			    			chunk_queue_list.remove(0);
@@ -2025,7 +2033,7 @@ public void runTick() {
 					  //List<Entity> nearby2 = p.getNearbyEntities(10, 6, 10);
 					  for (int i=0;i<nearby.size();i++) {
 						  //EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
-						  boolean contains=nearby.get(i) instanceof Monster;
+						  boolean contains=nearby.get(i) instanceof LivingEntity;
 						  if (contains) {
 							  LivingEntity l = (LivingEntity)nearby.get(i);
 							  if (l.getCustomName()!=null && l.hasLineOfSight(p)) {
@@ -2048,6 +2056,35 @@ public void runTick() {
 					  Location nearestwolf = null;
 					  int minions=0;
 					  for (int i=0;i<nearby.size();i++) {
+						  boolean contains_mob=false;
+						  for (int j=0;j<powered_mob_list.size();j++) {
+							  if (powered_mob_list.get(j).id.equals(nearby.get(i).getUniqueId())) {
+								  contains_mob=true;
+								  //Play particley effects.
+								  nearby.get(i).getWorld().playEffect(nearby.get(i).getLocation(), Effect.BLAZE_SHOOT, 0);
+								  for (int z=0;z<10;z++) {
+									  final Entity mob = nearby.get(i);
+										Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+											@Override
+											public void run() {
+												mob.getWorld().playEffect(new Location(mob.getWorld(), mob.getLocation().getX()+(Math.random()*1-Math.random()*1), mob.getLocation().getY()+(Math.random()*1-Math.random()*1), mob.getLocation().getZ()+(Math.random()*1-Math.random()*1)), Effect.MOBSPAWNER_FLAMES, 0);
+											}
+										},(int)(Math.random()*30));
+								  }
+								  break;
+							  }
+						  }
+						  if (nearby.get(i).getType()==EntityType.SKELETON ||
+								  nearby.get(i).getType()==EntityType.ZOMBIE ||
+								  nearby.get(i).getType()==EntityType.SPIDER) {
+							  LivingEntity l = (LivingEntity)nearby.get(i);
+							  if (l.getKiller()!=null && Math.random()<=0.5/l.getNearbyEntities(10, 10, 10).size()) {
+								  if (!contains_mob) {
+									  powered_mob_list.add(new PoweredMob(l.getUniqueId(), Main.SERVER_TICK_TIME));
+									  l.getWorld().playSound(l.getLocation(), Sound.SPIDER_DEATH, 0.4f, 0.04f);
+								  }
+							  }
+						  }
 						  if (nearby.get(i).getType()==EntityType.ENDERMAN) {
 							  Creature l = (Creature)nearby.get(i);
 							  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.RED+"Lightning Mage") && l.getTarget()!=null) {
@@ -3433,6 +3470,7 @@ public void checkJukeboxes() {
 		    			  if (((Jukebox)(jukeboxlist.get(i).getJukebox().getState())).getPlaying()==Material.AIR) {
 		    				  jukeboxlist.remove(i);
 		    				  i--;
+		    				  break;
 		    			  } else {
 		    				  //We are playing something still.
 		    				  jukeboxlist.get(i).updateClosestPlayer();
@@ -3455,6 +3493,7 @@ public void checkJukeboxes() {
 			    					  if (!jukeboxlist.get(i).Restart()) {
 			    	    				  jukeboxlist.remove(i);
 			    	    				  i--;
+					    				  break;
 			    					  } else {
 			    						  //Bukkit.getPlayer("sigonasr2").sendMessage("Restarted Jukebox "+i+" Properties: "+((Jukebox)(jukeboxlist.get(i).getJukebox().getState())).getPlaying()+","+((Jukebox)(jukeboxlist.get(i).getJukebox().getState())).isPlaying());
 			    					  }
@@ -3464,6 +3503,7 @@ public void checkJukeboxes() {
     			  	  } else {
 	    				  jukeboxlist.remove(i);
 	    				  i--;
+	    				  break;
     			  	  }
     			  //Bukkit.getPlayer("sigonasr2").sendMessage("Jukebox "+i+" Properties: "+((Jukebox)(jukeboxlist.get(i).getJukebox().getState())).getPlaying()+","+((Jukebox)(jukeboxlist.get(i).getJukebox().getState())).isPlaying());
     		  }
