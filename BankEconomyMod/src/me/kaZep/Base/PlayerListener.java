@@ -13099,10 +13099,10 @@ implements Listener
 		//Bukkit.getLogger().info("Click type is "+event.getClick().toString());
 		if (isViewingEnderCube(p) && (event.getClick()==ClickType.NUMBER_KEY || ((event.getClick()==ClickType.SHIFT_LEFT || event.getClick()==ClickType.SHIFT_RIGHT) && event.getCurrentItem()!=null && event.getCurrentItem().getType()!=Material.AIR) || ((event.getClick()==ClickType.LEFT || event.getClick()==ClickType.RIGHT) && event.getRawSlot()<27 && ((event.getCursor()!=null && event.getCursor().getType()!=Material.AIR) || (event.getCurrentItem()!=null && event.getCurrentItem().getType()!=Material.AIR)))) ) {
 			boolean item_cube=false;
-			Bukkit.getLogger().info("Got to 1.");
+			//Bukkit.getLogger().info("Got to 1.");
 			if (event.getClick()==ClickType.LEFT && (event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST)) {
 				int identifier=-1;
-				Bukkit.getLogger().info("Got to 2.");
+				//Bukkit.getLogger().info("Got to 2.");
 				if (event.getCurrentItem().getItemMeta().getLore()!=null) {
 					//Check to see if the Lore contains anything.
 					for (int i=0;i<event.getCurrentItem().getItemMeta().getLore().size();i++) {
@@ -13111,14 +13111,14 @@ implements Listener
 						}
 					}
 					if (identifier!=-1) {
-						Bukkit.getLogger().info("Got to 2.5.");
+						//Bukkit.getLogger().info("Got to 2.5.");
 						//This is an item cube. We will not continue.
 						item_cube=true;
 					}
 				}
 			}
 			if (!item_cube || (item_cube && (event.getCursor()==null || event.getCursor().getType()==Material.AIR))) {
-				Bukkit.getLogger().info("Got to 3.");
+				//Bukkit.getLogger().info("Got to 3.");
 				if (this.plugin.ender_cube_active) {
 					final Player p2 = p;
 					this.plugin.ender_cube_active=false;

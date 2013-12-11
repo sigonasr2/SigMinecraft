@@ -396,7 +396,7 @@ public class Main extends JavaPlugin
     shovel.setItemMeta(shovel_meta);
     shovel.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
     ShapedRecipe battle_shovel = new ShapedRecipe(shovel);
-    battle_shovel.shape("-a-","-b-","-b-");
+    battle_shovel.shape("a","b","b");
     battle_shovel.setIngredient('a', Material.LAPIS_BLOCK);
     battle_shovel.setIngredient('b', Material.STICK);
     Bukkit.addRecipe(battle_shovel);
@@ -618,6 +618,20 @@ public class Main extends JavaPlugin
 	    woolRecipe.setIngredient('b', new MaterialData(Material.INK_SACK, (byte) (15 - i)));
 	    Bukkit.addRecipe(woolRecipe);
     }
+    
+    ShapelessRecipe flint_and_steel_Recipe = new ShapelessRecipe(new ItemStack(Material.FLINT_AND_STEEL));
+    flint_and_steel_Recipe.addIngredient(Material.FLINT);
+    flint_and_steel_Recipe.addIngredient(Material.IRON_INGOT);
+    Bukkit.addRecipe(flint_and_steel_Recipe);
+    
+    ShapelessRecipe sticky_piston_Recipe = new ShapelessRecipe(new ItemStack(Material.PISTON_STICKY_BASE));
+    sticky_piston_Recipe.addIngredient(Material.PISTON_BASE);
+    sticky_piston_Recipe.addIngredient(Material.SLIME_BALL);
+    Bukkit.addRecipe(sticky_piston_Recipe);
+    
+    ShapelessRecipe Deconv_sticky_piston_Recipe = new ShapelessRecipe(new ItemStack(Material.PISTON_BASE));
+    Deconv_sticky_piston_Recipe.addIngredient(Material.PISTON_STICKY_BASE);
+    Bukkit.addRecipe(Deconv_sticky_piston_Recipe);
     
     // Add Recipes for Item cube crafting.
     ItemStack temp = new ItemStack(Material.CHEST);
