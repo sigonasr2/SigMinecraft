@@ -2051,107 +2051,144 @@ public void runTick() {
 				  }
 			  }
 			  if (Main.SERVER_TICK_TIME%30==0) {
-				  if (p.getWorld().getName().compareTo("world")==0) {
-					  List<Entity> nearby = p.getNearbyEntities(20, 20, 20);
-					  Location nearestwolf = null;
-					  int minions=0;
-					  for (int i=0;i<nearby.size();i++) {
-						  boolean contains_mob=false;
-						  for (int j=0;j<powered_mob_list.size();j++) {
-							  if (powered_mob_list.get(j).id.equals(nearby.get(i).getUniqueId())) {
-								  contains_mob=true;
-								  //Play particley effects.
-								  nearby.get(i).getWorld().playEffect(nearby.get(i).getLocation(), Effect.BLAZE_SHOOT, 0);
-								  for (int z=0;z<10;z++) {
-									  final Entity mob = nearby.get(i);
-										Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-											@Override
-											public void run() {
-												mob.getWorld().playEffect(new Location(mob.getWorld(), mob.getLocation().getX()+(Math.random()*1-Math.random()*1), mob.getLocation().getY()+(Math.random()*1-Math.random()*1), mob.getLocation().getZ()+(Math.random()*1-Math.random()*1)), Effect.MOBSPAWNER_FLAMES, 0);
-											}
-										},(int)(Math.random()*30));
-								  }
+				  List<Entity> nearby = p.getNearbyEntities(20, 20, 20);
+				  Location nearestwolf = null;
+				  int minions=0;
+				  for (int i=0;i<nearby.size();i++) {
+					  boolean contains_mob=false;
+					  for (int j=0;j<powered_mob_list.size();j++) {
+						  if (powered_mob_list.get(j).id.equals(nearby.get(i).getUniqueId())) {
+							  contains_mob=true;
+							  //Play particley effects.
+							  //nearby.get(i).getWorld().playEffect(nearby.get(i).getLocation(), Effect.BLAZE_SHOOT, 0);
+							  nearby.get(i).getWorld().playSound(nearby.get(i).getLocation(), Sound.BLAZE_BREATH, 0.1f, 0.2f);
+							  for (int z=0;z<10;z++) {
+								  final Entity mob = nearby.get(i);
+									Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+										@Override
+										public void run() {
+											mob.getWorld().playEffect(new Location(mob.getWorld(), mob.getLocation().getX()+(Math.random()*1-Math.random()*1), mob.getLocation().getY()+(Math.random()*1-Math.random()*1), mob.getLocation().getZ()+(Math.random()*1-Math.random()*1)), Effect.MOBSPAWNER_FLAMES, 0);
+										}
+									},(int)(Math.random()*30));
+							  }
+							  break;
+						  }
+					  }
+					  if (nearby.get(i).getType()==EntityType.SKELETON ||
+							  nearby.get(i).getType()==EntityType.ZOMBIE ||
+							  nearby.get(i).getType()==EntityType.SPIDER ||
+							  nearby.get(i).getType()==EntityType.CREEPER ||
+							  nearby.get(i).getType()==EntityType.ENDERMAN ||
+							  nearby.get(i).getType()==EntityType.PIG_ZOMBIE) {
+						  LivingEntity l = (LivingEntity)nearby.get(i);
+						  List<Entity> ents = l.getNearbyEntities(10, 10, 10);
+						  for (int m=0;m<ents.size();m++) {
+							  if (!(ents.get(m) instanceof Monster)) {
+								  ents.remove(m);
+								  m--;
+							  }
+						  }
+						  double chance=1.0d;
+						  boolean something=false;
+						  for (int m=0;m<l.getEquipment().getArmorContents().length;m++) {
+							  if (l.getEquipment().getArmorContents()[m]!=null && 
+									  l.getEquipment().getArmorContents()[m].getType().name().contains("LEATHER")) {
+								  chance/=4;
+								  something=true;
+								  break;
+							  }
+							  if (l.getEquipment().getArmorContents()[m]!=null && 
+									  l.getEquipment().getArmorContents()[m].getType().name().contains("CHAIN")) {
+								  chance/=3;
+								  something=true;
+								  break;
+							  }
+							  if (l.getEquipment().getArmorContents()[m]!=null && 
+									  l.getEquipment().getArmorContents()[m].getType().name().contains("GOLD")) {
+								  chance/=2;
+								  something=true;
+								  break;
+							  }
+							  if (l.getEquipment().getArmorContents()[m]!=null && 
+									  l.getEquipment().getArmorContents()[m].getType().name().contains("IRON")) {
+								  something=true;
+								  break;
+							  }
+							  if (l.getEquipment().getArmorContents()[m]!=null && 
+									  l.getEquipment().getArmorContents()[m].getType().name().contains("DIAMOND")) {
+								  something=true;
 								  break;
 							  }
 						  }
-						  if (nearby.get(i).getType()==EntityType.SKELETON ||
-								  nearby.get(i).getType()==EntityType.ZOMBIE ||
-								  nearby.get(i).getType()==EntityType.SPIDER||
-								  nearby.get(i).getType()==EntityType.CREEPER||
-								  nearby.get(i).getType()==EntityType.ENDERMAN) {
-							  LivingEntity l = (LivingEntity)nearby.get(i);
-							  List<Entity> ents = l.getNearbyEntities(10, 10, 10);
-							  for (int m=0;m<ents.size();m++) {
-								  if (!(ents.get(m) instanceof Monster)) {
-									  ents.remove(m);
-									  m--;
-								  }
-							  }
-							  if (l.getKiller()!=null && Math.random()<=1.15/ents.size()) {
-								  if (!contains_mob) {
-									  powered_mob_list.add(new PoweredMob(l.getUniqueId(), Main.SERVER_TICK_TIME));
-									  l.getWorld().playSound(l.getLocation(), Sound.SPIDER_DEATH, 0.4f, 0.04f);
-								  }
-							  }
+						  if (!something) {
+							  chance/=4;
 						  }
-						  if (nearby.get(i).getType()==EntityType.ENDERMAN) {
-							  Creature l = (Creature)nearby.get(i);
-							  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.RED+"Lightning Mage") && l.getTarget()!=null) {
-								  if (l.getTarget() instanceof Player) {
-									  l.getTarget().getWorld().strikeLightning(l.getTarget().getLocation());
-									  l.getTarget().getWorld().strikeLightning(l.getTarget().getLocation().add(-0.5,0,0.5));
-									  l.getTarget().getWorld().strikeLightning(l.getTarget().getLocation().add(0.5,0,-0.5));
-								  }
-							  }
-						  }
-						  if (nearby.get(i).getType()==EntityType.CREEPER) {
-							  Creature l = (Creature)nearby.get(i);
-							  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.RED+"Suicidal Creeper") && l.getTarget()!=null) {
-								  l.removePotionEffect(PotionEffectType.INVISIBILITY);
-							  }
-						  }
-						  if (nearby.get(i).getType()==EntityType.WOLF) {
-							  minions++;
-							  if (nearestwolf==null || nearby.get(i).getLocation().distanceSquared(p.getLocation())<nearestwolf.distanceSquared(p.getLocation())) {
-								  nearestwolf = nearby.get(i).getLocation();
-							  }
-							  Creature l = (Creature)nearby.get(i);
-							  if (Math.random()<=0.6 && l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.RED+"Hound Caller")) {
-								  Wolf w = (Wolf)nearby.get(i);
-								  if (w.getOwner()==null) {
-									  if (!w.isAngry()) {
-										  w.damage(0,p);
-										  w.setHealth(w.getMaxHealth());
-										  w.setAngry(true);
-									  }
-									  l.setTarget(p);
-									  l.setLastDamage(0.01);
-									  l.setLastDamageCause(new EntityDamageEvent(p, DamageCause.CUSTOM, 0.01));
-								  }
+						  if (Math.random()<=0.05/ents.size() && l.hasLineOfSight(p)) {
+							  if (!contains_mob) {
+								  powered_mob_list.add(new PoweredMob(l.getUniqueId(), Main.SERVER_TICK_TIME));
+								  l.getWorld().playSound(l.getLocation(), Sound.SPIDER_DEATH, 0.4f, 0.04f);
 							  }
 						  }
 					  }
-					  if (minions<10 && nearestwolf!=null) {
-						  if (Math.random()<=0.05) {
-							  Entity entity = p.getWorld().spawnEntity(nearestwolf, EntityType.WOLF);
-								LivingEntity l = (LivingEntity)entity;
-								Creature c = (Creature)l;
-								l.setCustomName(ChatColor.RED+"Wolf Minion");
-								l.setCustomNameVisible(true);
-								c.setTarget(p);
-								Wolf w = (Wolf)l;
-								w.setBaby();
+					  if (nearby.get(i).getType()==EntityType.ENDERMAN) {
+						  Creature l = (Creature)nearby.get(i);
+						  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.RED+"Lightning Mage") && l.getTarget()!=null) {
+							  if (l.getTarget() instanceof Player) {
+								  l.getTarget().getWorld().strikeLightning(l.getTarget().getLocation());
+								  l.getTarget().getWorld().strikeLightning(l.getTarget().getLocation().add(-0.5,0,0.5));
+								  l.getTarget().getWorld().strikeLightning(l.getTarget().getLocation().add(0.5,0,-0.5));
+							  }
+						  }
+					  }
+					  if (nearby.get(i).getType()==EntityType.CREEPER) {
+						  Creature l = (Creature)nearby.get(i);
+						  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.RED+"Suicidal Creeper") && l.getTarget()!=null) {
+							  l.removePotionEffect(PotionEffectType.INVISIBILITY);
+						  }
+					  }
+					  /*
+					  if (nearby.get(i).getType()==EntityType.WOLF) {
+						  minions++;
+						  if (nearestwolf==null || nearby.get(i).getLocation().distanceSquared(p.getLocation())<nearestwolf.distanceSquared(p.getLocation())) {
+							  nearestwolf = nearby.get(i).getLocation();
+						  }
+						  Creature l = (Creature)nearby.get(i);
+						  if (Math.random()<=0.6 && l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.RED+"Hound Caller")) {
+							  Wolf w = (Wolf)nearby.get(i);
+							  if (w.getOwner()==null) {
 								  if (!w.isAngry()) {
-									  w.damage(0,p);
+									  w.damage(0.01,p);
 									  w.setHealth(w.getMaxHealth());
 									  w.setAngry(true);
 								  }
-								l.setRemoveWhenFarAway(true);
-								l.setLastDamageCause(new EntityDamageEvent(p, DamageCause.CUSTOM, 0.01));
-								l.getLocation().getWorld().playSound(l.getLocation(), Sound.WOLF_HOWL, 0.2f, 0.9f);
+								  l.setTarget(p);
+								  l.setLastDamage(0.01);
+								  l.setLastDamageCause(new EntityDamageEvent(p, DamageCause.CUSTOM, 0.01));
+							  }
 						  }
-					  }
+					  }*/
 				  }
+				  /*
+				  if (minions<10 && nearestwolf!=null) {
+					  if (Math.random()<=0.05) {
+						  Entity entity = p.getWorld().spawnEntity(nearestwolf, EntityType.WOLF);
+							LivingEntity l = (LivingEntity)entity;
+							Creature c = (Creature)l;
+							l.setCustomName(ChatColor.RED+"Wolf Minion");
+							l.setCustomNameVisible(true);
+							c.setTarget(p);
+							Wolf w = (Wolf)l;
+							w.setBaby();
+							  if (!w.isAngry()) {
+								  w.damage(0,p);
+								  w.setHealth(w.getMaxHealth());
+								  w.setAngry(true);
+							  }
+							l.setRemoveWhenFarAway(true);
+							l.setLastDamageCause(new EntityDamageEvent(p, DamageCause.CUSTOM, 0.01));
+							l.getLocation().getWorld().playSound(l.getLocation(), Sound.WOLF_HOWL, 0.2f, 0.9f);
+					  }
+				  }*/
 			  }
 			  if (p.getWorld().getName().compareTo("world_nether")==0) {
 				  if (Main.SERVER_TICK_TIME%60==0) {

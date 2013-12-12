@@ -1319,6 +1319,14 @@ implements Listener
 		//When right-clicked on, check if it already exists in the entity list.
 		boolean contains=false;
 		int slot=0;
+		/*
+		if (Math.random()<=0.5) {
+			p.sendMessage("Using entity tele.");
+			e.getRightClicked().teleport(p);
+		} else {
+			p.sendMessage("Using location tele.");
+			e.getRightClicked().teleport(p.getLocation());
+		}*/
 		for (int i=0;i<this.plugin.animallist.size();i++) {
 			if (this.plugin.animallist.get(i).getID()==e.getRightClicked().getUniqueId()) {
 				contains=true;
@@ -2897,16 +2905,16 @@ implements Listener
 
 					double levelsmult=1.0;
 					
-					double COUNTER_SLIME_SPAWN_RATE = 0.01,
-							VIRAL_SPIDER_SPAWN_RATE = 0.01,
-							SILENCER_SPAWN_RATE = 0.01,
+					double COUNTER_SLIME_SPAWN_RATE = 0.04,
+							VIRAL_SPIDER_SPAWN_RATE = 0.02,
+							SILENCER_SPAWN_RATE = 0.02,
 							HOUND_CALLER_SPAWN_RATE = 0.01,
-							FISH_CALLER_SPAWN_RATE = 0.01,
-							SUICIDAL_CREEPER_SPAWN_RATE = 0.01,
-							POWER_SURGE_ZOMBIE_SPAWN_RATE = 0.01,
-							LIGHTNING_MAGE_SPAWN_RATE = 0.01;
+							FISH_CALLER_SPAWN_RATE = 0.04,
+							SUICIDAL_CREEPER_SPAWN_RATE = 0.05,
+							POWER_SURGE_ZOMBIE_SPAWN_RATE = 0.02,
+							LIGHTNING_MAGE_SPAWN_RATE = 0.04;
 					
-					if (totallvs>10*levelsmult) {
+					if (totallvs>60*levelsmult && e.getEntity().getLocation().getY()<50 && e.getEntity().getWorld().getName().equalsIgnoreCase("world")) {
 						//Try to spawn a counter slime.
 						if (Math.random()<=COUNTER_SLIME_SPAWN_RATE) {
 							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.SLIME);
@@ -2920,6 +2928,8 @@ implements Listener
 							l.setHealth(35);
 							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
 						}
+					}
+					if (totallvs>120*levelsmult && e.getEntity().getWorld().getName().equalsIgnoreCase("world")) {
 						//Try to spawn a Viral Spider.
 						if (Math.random()<=VIRAL_SPIDER_SPAWN_RATE) {
 							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.SPIDER);
@@ -2931,6 +2941,8 @@ implements Listener
 							l.setHealth(85);
 							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
 						}
+					}
+					if (totallvs>120*levelsmult && e.getEntity().getWorld().getName().equalsIgnoreCase("world")) {
 						//Try to spawn a Silencer.
 						if (Math.random()<=SILENCER_SPAWN_RATE) {
 							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.SKELETON);
@@ -2941,12 +2953,15 @@ implements Listener
 							l.setMaxHealth(45);
 							l.setHealth(45);
 							ItemStack helm = new ItemStack(Material.DIAMOND_HELMET);
-							helm.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 24);
+							helm.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 32);
 							l.getEquipment().setHelmet(helm);
 							l.getEquipment().setHelmetDropChance(0.002f);
 							l.getEquipment().setItemInHand(new ItemStack(Material.BOW));
 							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 3));
 						}
+					}
+					/*
+					if (totallvs>120*levelsmult && e.getEntity().getLocation().getY()>=63) {
 						//Try to spawn a Hound Caller.
 						if (Math.random()<=HOUND_CALLER_SPAWN_RATE) {
 							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.WOLF);
@@ -2969,6 +2984,8 @@ implements Listener
 							l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 2));
 							l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 0));
 						}
+					}*/
+					if (totallvs>60*levelsmult && e.getEntity().getWorld().getName().equalsIgnoreCase("world")) {
 						//Try to spawn a Fish Caller.
 						if (Math.random()<=FISH_CALLER_SPAWN_RATE) {
 							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.ENDERMAN);
@@ -2988,6 +3005,15 @@ implements Listener
 							l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 999999, 1));
 							l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 1));
 						}
+					}
+					boolean haslineofsight=false;
+					for (int i=0;i<Bukkit.getOnlinePlayers().length;i++) {
+						if (e.getEntity().hasLineOfSight(Bukkit.getOnlinePlayers()[i])) {
+							haslineofsight=true;
+							break;
+						}
+					}
+					if (totallvs>90*levelsmult && !haslineofsight && e.getEntity().getWorld().getName().equalsIgnoreCase("world")) {
 						//Try to spawn a Suicidal Creeper.
 						if (Math.random()<=SUICIDAL_CREEPER_SPAWN_RATE) {
 							Location ent = e.getEntity().getLocation();
@@ -3005,6 +3031,8 @@ implements Listener
 							l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 4));
 							l.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0));
 						}
+					}
+					if (totallvs>180*levelsmult && e.getEntity().getWorld().getName().equalsIgnoreCase("world")) {
 						//Try to spawn a Powersurge Zombie.
 						if (Math.random()<=POWER_SURGE_ZOMBIE_SPAWN_RATE) {
 							Location ent = e.getEntity().getLocation();
@@ -3019,8 +3047,10 @@ implements Listener
 							l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 2));
 							l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 0));
 						}
+					}
+					if (totallvs>60*levelsmult && e.getEntity().getWorld().getName().equalsIgnoreCase("world")) {
 						//Try to spawn a Lightning Mage.
-						if (Math.random()<=POWER_SURGE_ZOMBIE_SPAWN_RATE) {
+						if (Math.random()<=LIGHTNING_MAGE_SPAWN_RATE) {
 							Location ent = e.getEntity().getLocation();
 							Entity entity = e.getEntity().getWorld().spawnEntity(e.getEntity().getLocation(), EntityType.ENDERMAN);
 							LivingEntity l = (LivingEntity)entity;
@@ -9097,6 +9127,32 @@ implements Listener
 	@EventHandler
 	public void onHurt(EntityDamageEvent e) {
 		final EntityDamageEvent f = e;
+		if (e.getEntity() instanceof Monster && e.getCause()==DamageCause.SUFFOCATION) {
+			LivingEntity l = (LivingEntity)e.getEntity();
+			if (l.getTicksLived()<60) {
+				//Check around itself for other mobs. Teleport it there possibly. Higher chance
+				//of teleporting to mobs of the same type.
+				List<Entity> nearby = l.getNearbyEntities(20, 20, 20);
+				for (int i=0;i<nearby.size();i++) {
+					if (!(nearby.get(i) instanceof Monster)) {
+						nearby.remove(i);
+						i--;
+					}
+				}
+				for (int i=0;i<nearby.size();i++) {
+					double chancer=0;
+					if (nearby.get(i).getType()==l.getType()) {
+						chancer=0.5;
+					}
+					if (Math.random()<=chancer+0.25 && nearby.get(i).getTicksLived()>60) {
+						e.getEntity().teleport(nearby.get(i).getLocation());
+						break;
+					}
+				}
+				e.setDamage(0);
+				//e.setCancelled(true);
+			}
+		}
 		if (e.getEntity().getType()==EntityType.PLAYER) {
 			final Player p = (Player)e.getEntity();
 			if (this.plugin.getPlayerData(p).invulntime!=0) {
@@ -9110,8 +9166,6 @@ implements Listener
 				e.setDamage(e.getDamage()*2);
 			}
 			if (e.getCause()==DamageCause.WITHER) {
-				// e.setDamage(e.getDamage()*Math.pow(0.5, this.plugin.getWitherlessRoseCount(p)));
-
 				// For each Witherless Rose, add a multiplicative 25% chance to negate this tick of wither damage.
 				if (Math.random() > Math.pow(0.75, this.plugin.getWitherlessRoseCount(p))) {
 					e.setCancelled(true);
@@ -9361,6 +9415,7 @@ implements Listener
 			if (e.getEntity() instanceof Enderman) {
 				LivingEntity l = (LivingEntity)e.getEntity();
 				if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Lightning Mage")) {
+					e.setDamage(0);
 					e.setCancelled(true);
 				}
 			}
@@ -9368,6 +9423,7 @@ implements Listener
 		if (e.getDamager() instanceof Player) {
 			Player p = (Player)e.getDamager();
 			if (p.hasPotionEffect(PotionEffectType.BLINDNESS)) {
+				e.setDamage(0);
 				e.setCancelled(true);
 				return;
 			}
@@ -9401,12 +9457,24 @@ implements Listener
 			if (e.getDamager() instanceof Projectile) {
 				if (((Projectile)e.getDamager()).getShooter() instanceof LivingEntity) {
 					LivingEntity l2 = ((Projectile)e.getDamager()).getShooter();
+					if (l2.hasPotionEffect(PotionEffectType.INVISIBILITY)) {l2.removePotionEffect(PotionEffectType.INVISIBILITY);}
 					for (int i=0;i<this.plugin.powered_mob_list.size();i++) {
-						if (this.plugin.powered_mob_list.get(i).id.equals(l2.getUniqueId())) {
+						if (this.plugin.powered_mob_list.get(i).power_time+40<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).id.equals(l2.getUniqueId())) {
 							//This mob will damage you if you are not blocking.
 							if (l instanceof Player) {
 								Player p = (Player)l;
-								if (!p.isBlocking()) {
+								if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
+									if (l2.getCustomName()!=null) {
+										DecimalFormat df = new DecimalFormat("#0.0");
+										DecimalFormat df2 = new DecimalFormat("#0");
+										p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(e.getDamage()*2)+" damage from "+l2.getCustomName()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((e.getDamage()*2)/p.getMaxHealth())*100)+"%)");
+									} else {
+										DecimalFormat df = new DecimalFormat("#0.0");
+										DecimalFormat df2 = new DecimalFormat("#0");
+										p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(e.getDamage()*2)+" damage from "+ChatColor.WHITE+""+l2.getType().name()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((e.getDamage()*2)/p.getMaxHealth())*100)+"%)");
+									}
+								}
+								if (!p.isBlocking()) {									
 									if (p.getHealth()-e.getDamage()*4<0) {
 										p.setHealth(0);
 									} else {
@@ -9415,6 +9483,9 @@ implements Listener
 									Main.playFirework(p.getLocation());
 									Main.playFirework(p.getLocation());
 									Main.playFirework(p.getLocation());
+								} else {
+									p.playSound(p.getLocation(), Sound.ANVIL_LAND, 0.1f, 3.6f);
+									e.setDamage(e.getDamage()/8);
 								}
 							}
 							this.plugin.powered_mob_list.remove(i);
@@ -9426,12 +9497,24 @@ implements Listener
 			}
 			if (e.getDamager() instanceof LivingEntity) {
 				LivingEntity l2 = (LivingEntity)e.getDamager();
+				if (l2.hasPotionEffect(PotionEffectType.INVISIBILITY)) {l2.removePotionEffect(PotionEffectType.INVISIBILITY);}
 				for (int i=0;i<this.plugin.powered_mob_list.size();i++) {
-					if (this.plugin.powered_mob_list.get(i).id.equals(l2.getUniqueId())) {
+					if (this.plugin.powered_mob_list.get(i).power_time+40<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).id.equals(l2.getUniqueId())) {
 						//This mob will damage you if you are not blocking.
 						if (l instanceof Player) {
 							Player p = (Player)l;
 							if (!p.isBlocking()) {
+								if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
+									if (l2.getCustomName()!=null) {
+										DecimalFormat df = new DecimalFormat("#0.0");
+										DecimalFormat df2 = new DecimalFormat("#0");
+										p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(e.getDamage()*2)+" damage from "+l2.getCustomName()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((e.getDamage()*2)/p.getMaxHealth())*100)+"%)");
+									} else {
+										DecimalFormat df = new DecimalFormat("#0.0");
+										DecimalFormat df2 = new DecimalFormat("#0");
+										p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(e.getDamage()*2)+" damage from "+ChatColor.WHITE+""+l2.getType().name()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((e.getDamage()*2)/p.getMaxHealth())*100)+"%)");
+									}
+								}
 								if (p.getHealth()-e.getDamage()*2<0) {
 									p.setHealth(0);
 								} else {
@@ -9440,6 +9523,9 @@ implements Listener
 								Main.playFirework(p.getLocation());
 								Main.playFirework(p.getLocation());
 								Main.playFirework(p.getLocation());
+							} else {
+								p.playSound(p.getLocation(), Sound.ANVIL_LAND, 0.1f, 3.6f);
+								e.setDamage(e.getDamage()/8);
 							}
 						}
 						this.plugin.powered_mob_list.remove(i);
@@ -9651,8 +9737,8 @@ implements Listener
 				if (e.getDamager() instanceof LivingEntity) {
 					LivingEntity l2 = (LivingEntity)e.getDamager();
 					double dmg = this.plugin.DMGCALC.getDamage(l2.getEquipment().getHelmet(), l2.getEquipment().getChestplate(), l2.getEquipment().getLeggings(), l2.getEquipment().getBoots(), e.getDamage()*2, e.getCause(), false);
-					if (l2.getHealth()-dmg>0) {
-						l2.setHealth(l2.getHealth()-dmg);
+					if (l2.getHealth()-dmg*2>0) {
+						l2.setHealth(l2.getHealth()-dmg*2);
 						if (l2 instanceof Player) {
 							Player p = (Player)l2;
 							p.playSound(p.getLocation(), Sound.HURT_FLESH, 0.5f, 1.0f);
@@ -9667,9 +9753,13 @@ implements Listener
 							Player p = (Player)l2;
 							p.setLastDamage(dmg);
 							p.setLastDamageCause(new EntityDamageEvent(l, e.getCause().ENTITY_ATTACK, dmg));
+							DecimalFormat df = new DecimalFormat("#0.0");
+							DecimalFormat df2 = new DecimalFormat("#0");
+							if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
+								p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(dmg)+" damage from "+ChatColor.RED+"COUNTER SLIME"+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((dmg)/p.getMaxHealth())*100)+"%)");
+							}
 						}
 						l2.setHealth(0);
-						
 					}
 				}
 				if (e.getDamager() instanceof Projectile) {
@@ -10116,10 +10206,10 @@ implements Listener
 				//Choose a random set to mark off.
 				blocked_attack=true;
 				//Reduce all armor by one as if it was a normal hit.
-				if (p.getInventory().getHelmet()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getHelmet(), Main.ENCHANT_BLOCK_CHANCE)) {p.getInventory().getHelmet().setDurability((short)(p.getInventory().getHelmet().getDurability()+1));}
-				if (p.getInventory().getChestplate()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getChestplate(), Main.ENCHANT_BLOCK_CHANCE)) {p.getInventory().getChestplate().setDurability((short)(p.getInventory().getChestplate().getDurability()+1));}
-				if (p.getInventory().getLeggings()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getLeggings(), Main.ENCHANT_BLOCK_CHANCE)) {p.getInventory().getLeggings().setDurability((short)(p.getInventory().getLeggings().getDurability()+1));}
-				if (p.getInventory().getBoots()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getBoots(), Main.ENCHANT_BLOCK_CHANCE)) {p.getInventory().getBoots().setDurability((short)(p.getInventory().getBoots().getDurability()+1));}
+				if (p.getInventory().getHelmet()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getHelmet(), Main.ENCHANT_BLOCK_CHANCE)) {p.getInventory().getHelmet().setDurability((short)(p.getInventory().getHelmet().getDurability()+3));}
+				if (p.getInventory().getChestplate()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getChestplate(), Main.ENCHANT_BLOCK_CHANCE)) {p.getInventory().getChestplate().setDurability((short)(p.getInventory().getChestplate().getDurability()+3));}
+				if (p.getInventory().getLeggings()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getLeggings(), Main.ENCHANT_BLOCK_CHANCE)) {p.getInventory().getLeggings().setDurability((short)(p.getInventory().getLeggings().getDurability()+3));}
+				if (p.getInventory().getBoots()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getBoots(), Main.ENCHANT_BLOCK_CHANCE)) {p.getInventory().getBoots().setDurability((short)(p.getInventory().getBoots().getDurability()+3));}
 				/*
 				if (blocks.size()>0) {
 					int armor = blocks.get((int)(Math.random()*blocks.size()));
@@ -10139,6 +10229,7 @@ implements Listener
 					}
 				}*/
 				p.playSound(p.getLocation(), Sound.ANVIL_LAND, 0.1f, 3.6f);
+				e.setDamage(0);
 				e.setCancelled(true);
 			}
 			//Bukkit.getLogger().info("Made it through 4.");
@@ -13163,7 +13254,7 @@ implements Listener
 					}
 				}
 			}
-			if (!item_cube || (item_cube && (event.getCursor()==null || event.getCursor().getType()==Material.AIR))) {
+			if (!item_cube || (item_cube && (event.getClick()!=ClickType.RIGHT && (event.getCursor()==null || event.getCursor().getType()==Material.AIR)))) {
 				//Bukkit.getLogger().info("Got to 3.");
 				if (this.plugin.ender_cube_active) {
 					final Player p2 = p;
@@ -16333,7 +16424,7 @@ implements Listener
 			for (int i=0;i<slots;i++) {
 				f.set("item-"+i, new ItemStack(Material.AIR));
 			}
-			f.set("item-0", insert_item);
+			//f.set("item-0", insert_item);
 			f.set("created", Boolean.valueOf(true));
 			//return insert_item;
 		}

@@ -253,6 +253,9 @@ public class PlayerBuffData {
 				money_gained=0;
 			}
 			p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
+		} else {
+			base_hplv=20;
+			p.setMaxHealth(base_hplv);
 		}
 	}
 }
