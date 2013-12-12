@@ -3001,7 +3001,7 @@ implements Listener
 							//l.getEquipment().setHelmetDropChance(0.002f);
 							//l.getEquipment().setItemInHand(new ItemStack(Material.BOW));
 							//w.setAngry(true);
-							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 4));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 5));
 							l.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 999999, 1));
 							l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 1));
 						}
@@ -3059,7 +3059,8 @@ implements Listener
 							//Bukkit.getLogger().info("Suicidal Creeper spawned at "+l.getLocation().toString());
 							l.setMaxHealth(105);
 							l.setHealth(105);
-							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 4));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 999999, 4));
+							l.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, 5));
 							l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 1));
 						}
 					}
@@ -3071,7 +3072,7 @@ implements Listener
 							//Can't have baby zombies at this level.
 							if (e.getEntity().getType()==EntityType.ZOMBIE) {
 								Zombie z = (Zombie)e.getEntity();
-								if (z.isBaby()) {
+								if (z.isBaby() && e.getEntity().getCustomName()==null) {
 									z.setBaby(false);
 								}
 							}
@@ -3096,7 +3097,7 @@ implements Listener
 								//Can't have baby zombies at this level.
 								if (e.getEntity().getType()==EntityType.ZOMBIE) {
 									Zombie z = (Zombie)e.getEntity();
-									if (z.isBaby()) {
+									if (z.isBaby() && e.getEntity().getCustomName()==null) {
 										z.setBaby(false);
 									}
 								}
@@ -7564,6 +7565,9 @@ implements Listener
     	// 3 = plentiful items
     	// 4 = multiple items
     	// 5 = chaos items (diablodrops items)
+    	// 6 = boss items
+    	// 7 = mythic boss items
+    	// 8 = boss assist items
     	// 999 = Survivor's kit
 		switch (tier) {
 			case 1: {
@@ -7629,7 +7633,50 @@ implements Listener
 				}
 			}break;
 			case 6: {
-				// OMG NOT CODED YET WTF THIS SHOULDN'T HAPPEN
+				for (int i=0;i<27;i++) {
+					if (Math.random()<=0.3) {
+						ItemStack dropitem = null;
+						if ((dropitem=getGoodie())!=null) {
+							loc.getWorld().dropItemNaturally(loc, dropitem);
+						}
+					}
+				}
+			}break;
+			case 7: {
+				boolean dropMythical=false;
+				boolean dropMythical2=false;
+				for (int i=0;i<27;i++) {
+					if (Math.random()<=0.1 && !dropMythical) {
+						dropMythical=true;
+						ItemStack dropitem = null;
+						if ((dropitem=getGoodie(1))!=null) {
+							loc.getWorld().dropItemNaturally(loc, dropitem);
+						}
+					} else
+					if (Math.random()<=0.03 && !dropMythical2) {
+						dropMythical2=true;
+						ItemStack dropitem = null;
+						if ((dropitem=getGoodie(1))!=null) {
+							loc.getWorld().dropItemNaturally(loc, dropitem);
+						}
+					}
+					if (Math.random()<=0.2) {
+						ItemStack dropitem = null;
+						if ((dropitem=getGoodie())!=null) {
+							loc.getWorld().dropItemNaturally(loc, dropitem);
+						}
+					}
+				}
+			}break;
+			case 8: {
+				for (int i=0;i<8;i++) {
+					if (Math.random()<=0.75) {
+						ItemStack dropitem = null;
+						if ((dropitem=getGoodie())!=null) {
+							loc.getWorld().dropItemNaturally(loc, dropitem);
+						}
+					}
+				}
 			}break;
 			case 999: {
 				// Not yet obtainable
@@ -7859,13 +7906,13 @@ implements Listener
 					//Select a random enchantment.
 					//This is a mythical. Random amount is 70% guaranteed + 30% random.
 					item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.3))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.7), true);
-					ourLore = item.getItemMeta().getLore(); 
+					if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 				} else
 					if (rarity==2) {
 						//This is a legendary. Random amount is 30% guaranteed + 60% random.
 						int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
 						item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.6))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.3), true);
-						ourLore = item.getItemMeta().getLore();
+						if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 					} else
 						if (rarity==1) {
 							//This is a rare. Random amount is 20% guaranteed + 40% random.
@@ -7876,14 +7923,14 @@ implements Listener
 								choice2=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
 							}
 							item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice2), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice2).value_range.getMaximumInteger()*0.4))+Main.getBonusWeaponEnchantments().get(choice2).value_range.getMaximumInteger()*0.2), true);
-							ourLore = item.getItemMeta().getLore();
+							if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 						}
 						else {
 							//This is a normal item. Random amount is 5% guaranteed + 20% random.
 							//It is also irrepairable.
 							int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
 							item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.2))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.05), true);
-							ourLore = item.getItemMeta().getLore();
+							if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 							ourLore.add(ChatColor.RED+"Irrepairable");
 						}
 				ItemMeta meta = item.getItemMeta();
@@ -7922,13 +7969,13 @@ implements Listener
 						//Select a random enchantment.
 						//This is a mythical. Random amount is 70% guaranteed + 30% random.
 						item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.3))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.7), true);
-						ourLore = item.getItemMeta().getLore(); 
+						if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 					} else
 						if (rarity==2) {
 							//This is a legendary. Random amount is 30% guaranteed + 60% random.
 							int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
 							item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.6))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.3), true);
-							ourLore = item.getItemMeta().getLore();
+							if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 						} else
 							if (rarity==1) {
 								//This is a rare. Random amount is 20% guaranteed + 40% random.
@@ -7939,14 +7986,14 @@ implements Listener
 									choice2=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
 								}
 								item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice2), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice2).value_range.getMaximumInteger()*0.4))+Main.getBonusWeaponEnchantments().get(choice2).value_range.getMaximumInteger()*0.2), true);
-								ourLore = item.getItemMeta().getLore();
+								if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 							}
 							else {
 								//This is a normal item. Random amount is 5% guaranteed + 20% random.
 								//It is also irrepairable.
 								int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
 								item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.2))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.05), true);
-								ourLore = item.getItemMeta().getLore();
+								if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 								ourLore.add(ChatColor.RED+"Irrepairable");
 							}
 					ItemMeta meta = item.getItemMeta();
@@ -8005,13 +8052,13 @@ implements Listener
 						//Select a random enchantment.
 						//This is a mythical. Random amount is 70% guaranteed + 30% random.
 						item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.3))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.7), true);
-						ourLore = item.getItemMeta().getLore(); 
+						if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 					} else
 						if (rarity==2) {
 							//This is a legendary. Random amount is 30% guaranteed + 60% random.
 							int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
 							item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.6))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.3), true);
-							ourLore = item.getItemMeta().getLore();
+							if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 						} else
 							if (rarity==1) {
 								//This is a rare. Random amount is 20% guaranteed + 40% random.
@@ -8022,14 +8069,14 @@ implements Listener
 									choice2=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
 								}
 								item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice2), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice2).value_range.getMaximumInteger()*0.4))+Main.getBonusWeaponEnchantments().get(choice2).value_range.getMaximumInteger()*0.2), true);
-								ourLore = item.getItemMeta().getLore();
+								if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 							}
 							else {
 								//This is a normal item. Random amount is 5% guaranteed + 20% random.
 								//It is also irrepairable.
 								int choice1=(int)(Math.random()*Main.getBonusWeaponEnchantments().size());
 								item = this.plugin.addBonusEnchantment(item, Main.getBonusWeaponEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.2))+Main.getBonusWeaponEnchantments().get(choice1).value_range.getMaximumInteger()*0.05), true);
-								ourLore = item.getItemMeta().getLore();
+								if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 								ourLore.add(ChatColor.RED+"Irrepairable");
 							}
 					ItemMeta meta = item.getItemMeta();
@@ -8066,13 +8113,13 @@ implements Listener
 						//Select a random enchantment.
 						//This is a mythical. Random amount is 70% guaranteed + 30% random.
 						item = this.plugin.addBonusEnchantment(item, Main.getBonusArmorEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusArmorEnchantments().get(choice1).value_range.getMaximumInteger()*0.3))+Main.getBonusArmorEnchantments().get(choice1).value_range.getMaximumInteger()*0.7), true);
-						ourLore = item.getItemMeta().getLore(); 
+						if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 					} else
 						if (rarity==2) {
 							//This is a legendary. Random amount is 30% guaranteed + 60% random.
 							int choice1=(int)(Math.random()*Main.getBonusArmorEnchantments().size());
 							item = this.plugin.addBonusEnchantment(item, Main.getBonusArmorEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusArmorEnchantments().get(choice1).value_range.getMaximumInteger()*0.6))+Main.getBonusArmorEnchantments().get(choice1).value_range.getMaximumInteger()*0.3), true);
-							ourLore = item.getItemMeta().getLore();
+							if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 						} else
 							if (rarity==1) {
 								//This is a rare. Random amount is 20% guaranteed + 40% random.
@@ -8083,14 +8130,14 @@ implements Listener
 									choice2=(int)(Math.random()*Main.getBonusArmorEnchantments().size());
 								}
 								item = this.plugin.addBonusEnchantment(item, Main.getBonusArmorEnchantments().get(choice2), (int)((Math.random()*(Main.getBonusArmorEnchantments().get(choice2).value_range.getMaximumInteger()*0.4))+Main.getBonusArmorEnchantments().get(choice2).value_range.getMaximumInteger()*0.2), true);
-								ourLore = item.getItemMeta().getLore();
+								if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 							}
 							else {
 								//This is a normal item. Random amount is 5% guaranteed + 20% random.
 								//It is also irrepairable.
 								int choice1=(int)(Math.random()*Main.getBonusArmorEnchantments().size());
 								item = this.plugin.addBonusEnchantment(item, Main.getBonusArmorEnchantments().get(choice1), (int)((Math.random()*(Main.getBonusArmorEnchantments().get(choice1).value_range.getMaximumInteger()*0.2))+Main.getBonusArmorEnchantments().get(choice1).value_range.getMaximumInteger()*0.05), true);
-								ourLore = item.getItemMeta().getLore();
+								if (item.getItemMeta().hasLore()) {ourLore = item.getItemMeta().getLore();} 
 								ourLore.add(ChatColor.RED+"Irrepairable");
 							}
 					ItemMeta meta = item.getItemMeta();
@@ -8177,8 +8224,19 @@ implements Listener
 			LivingEntity f = e.getEntity();
 			if (f instanceof Monster) {
 				if (this.plugin.getConfig().getBoolean("thanksgiving-enabled") && Math.random()<=0.01) {
-					// 0.5% chance of loot chest dropping
+					//1% chance of loot chest dropping
 				    f.getWorld().dropItemNaturally(f.getLocation(), this.plugin.generate_LootChest());
+				}
+				if (f.getCustomName()!=null && f.getCustomName().contains(ChatColor.RED+"Counter Slime")) {
+					if (f.getLastDamageCause().getEntity() instanceof Player) {
+						Player p = (Player)f.getLastDamageCause().getEntity();
+						p.damage(f.getLastDamage()*2);
+						DecimalFormat df = new DecimalFormat("#0.0");
+						DecimalFormat df2 = new DecimalFormat("#0");
+						if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
+							p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(f.getLastDamage()*2)+" damage from "+ChatColor.RED+"COUNTER SLIME"+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((f.getLastDamage()*2)/p.getMaxHealth())*100)+"%)");
+						}
+					}
 				}
 				if (f.getCustomName()!=null && f.getCustomName().contains(ChatColor.RED+"Viral Spider")) {
 					List<Entity> nearents = f.getNearbyEntities(20, 20, 20);
@@ -8195,8 +8253,8 @@ implements Listener
 									}
 								}
 								if (poisonlevel>0) {
-									if (p.getHealth()-(poisonlevel/1.5d)>0) {
-										p.setHealth(p.getHealth()-(poisonlevel/1.5d));
+									if (p.getHealth()-(poisonlevel/1.15d)>0) {
+										p.setHealth(p.getHealth()-(poisonlevel/1.15d));
 									} else {
 										p.setHealth(0);
 									}
@@ -8215,8 +8273,8 @@ implements Listener
 				if (f instanceof Zombie) {
 					Zombie z = (Zombie)f;
 					if (z.isBaby()) {
-						//Randomly drop a loot chest sometimes. (4.5% of the time.)
-						if (Math.random() <= 0.045) {
+						//Randomly drop a loot chest sometimes. (10.5% of the time.)
+						if (Math.random() <= 0.105) {
 							z.getWorld().dropItemNaturally(z.getLocation(), this.plugin.generate_LootChest());
 						}
 					}
@@ -8311,15 +8369,30 @@ implements Listener
 				}
 				if (f.getCustomName().contains("Mega Wither")) {
 					e.setDroppedExp(e.getDroppedExp()*500);
-					for (int j=0;j<4;j++) {
-						Location dd = f.getLocation().add(Math.random()*4,Math.random()*4,Math.random()*4);
-						Bukkit.getWorld("world").getBlockAt(dd).setType(Material.CHEST);
-						Chest c=(Chest)Bukkit.getWorld("world").getBlockAt(dd).getState();
-						for (int i=0;i<27;i++) {
-							ItemStack item = null;
-							if (Math.random()<=0.3) {
-								item = getGoodie();
-								c.getBlockInventory().setItem(i, item);
+					if (f.getKiller()!=null) {
+						Item id = f.getKiller().getWorld().dropItemNaturally(f.getKiller().getLocation(), this.plugin.generate_LootChest(6));id.setPickupDelay(0);
+						id = f.getKiller().getWorld().dropItemNaturally(f.getKiller().getLocation(), this.plugin.generate_LootChest(6));id.setPickupDelay(0);
+						id = f.getKiller().getWorld().dropItemNaturally(f.getKiller().getLocation(), this.plugin.generate_LootChest(6));id.setPickupDelay(0);
+					}
+					for (int i=0;i<this.plugin.hitmoblist.size();i++) {
+						for (int j=0;j<this.plugin.hitmoblist.get(i).id.size();j++) {
+							if (!this.plugin.hitmoblist.get(i).p.equals(f.getKiller()) && this.plugin.hitmoblist.get(i).id.contains(e.getEntity().getUniqueId())) {
+								//Award the assisting player.
+								Item id = this.plugin.hitmoblist.get(i).p.getWorld().dropItemNaturally(this.plugin.hitmoblist.get(i).p.getLocation(), this.plugin.generate_LootChest(8));id.setPickupDelay(0);
+								id = this.plugin.hitmoblist.get(i).p.getWorld().dropItemNaturally(this.plugin.hitmoblist.get(i).p.getLocation(), this.plugin.generate_LootChest(8));id.setPickupDelay(0);
+								id = this.plugin.hitmoblist.get(i).p.getWorld().dropItemNaturally(this.plugin.hitmoblist.get(i).p.getLocation(), this.plugin.generate_LootChest(8));id.setPickupDelay(0);
+								break;
+							}
+						}
+					}
+					for (int i=0;i<this.plugin.supportmoblist.size();i++) {
+						for (int j=0;j<this.plugin.supportmoblist.get(i).id.size();j++) {
+							if (!this.plugin.supportmoblist.get(i).p.equals(f.getKiller()) && this.plugin.supportmoblist.get(i).id.contains(e.getEntity().getUniqueId())) {
+								//Award the supporting assisting player.
+								Item id = this.plugin.hitmoblist.get(i).p.getWorld().dropItemNaturally(this.plugin.hitmoblist.get(i).p.getLocation(), this.plugin.generate_LootChest(8));id.setPickupDelay(0);
+								id = this.plugin.hitmoblist.get(i).p.getWorld().dropItemNaturally(this.plugin.hitmoblist.get(i).p.getLocation(), this.plugin.generate_LootChest(8));id.setPickupDelay(0);
+								id = this.plugin.hitmoblist.get(i).p.getWorld().dropItemNaturally(this.plugin.hitmoblist.get(i).p.getLocation(), this.plugin.generate_LootChest(8));id.setPickupDelay(0);
+								break;
 							}
 						}
 					}
@@ -8329,41 +8402,59 @@ implements Listener
 					e.setDroppedExp(e.getDroppedExp()*4000);
 					boolean dropMythical=false;
 					boolean dropMythical2=false;
-					for (int j=0;j<10;j++) {
-						Location dd = f.getLocation().add(Math.random()*4,Math.random()*4,Math.random()*4);
-						Bukkit.getWorld("world").getBlockAt(dd).setType(Material.CHEST);
-						Chest c=(Chest)Bukkit.getWorld("world").getBlockAt(dd).getState();
-						for (int i=0;i<27;i++) {
-							ItemStack item = null;
-							if (Math.random()<=0.1 && !dropMythical) {
-								dropMythical=true;
-								item = getGoodie(1);
-							} else
-							if (Math.random()<=0.03 && !dropMythical2) {
-								dropMythical2=true;
-								item = getGoodie(1);
-							}
-							if (Math.random()<=0.2) {
-								item = getGoodie();
-								c.getBlockInventory().setItem(i, item);
+					if (f.getKiller()!=null) {
+						Item id = f.getKiller().getWorld().dropItemNaturally(f.getKiller().getLocation(), this.plugin.generate_LootChest(7));id.setPickupDelay(0);
+						id = f.getKiller().getWorld().dropItemNaturally(f.getKiller().getLocation(), this.plugin.generate_LootChest(6));id.setPickupDelay(0);
+						id = f.getKiller().getWorld().dropItemNaturally(f.getKiller().getLocation(), this.plugin.generate_LootChest(6));id.setPickupDelay(0);
+					}
+					for (int i=0;i<this.plugin.hitmoblist.size();i++) {
+						for (int j=0;j<this.plugin.hitmoblist.get(i).id.size();j++) {
+							if (!this.plugin.hitmoblist.get(i).p.equals(f.getKiller()) && this.plugin.hitmoblist.get(i).id.contains(e.getEntity().getUniqueId())) {
+								//Award the assisting player.
+								Item id = this.plugin.hitmoblist.get(i).p.getWorld().dropItemNaturally(this.plugin.hitmoblist.get(i).p.getLocation(), this.plugin.generate_LootChest(8));id.setPickupDelay(0);
+								id = this.plugin.hitmoblist.get(i).p.getWorld().dropItemNaturally(this.plugin.hitmoblist.get(i).p.getLocation(), this.plugin.generate_LootChest(8));id.setPickupDelay(0);
+								id = this.plugin.hitmoblist.get(i).p.getWorld().dropItemNaturally(this.plugin.hitmoblist.get(i).p.getLocation(), this.plugin.generate_LootChest(8));id.setPickupDelay(0);
+								break;
 							}
 						}
 					}
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule mobGriefing false");
+					for (int i=0;i<this.plugin.supportmoblist.size();i++) {
+						for (int j=0;j<this.plugin.supportmoblist.get(i).id.size();j++) {
+							if (!this.plugin.supportmoblist.get(i).p.equals(f.getKiller()) && this.plugin.supportmoblist.get(i).id.contains(e.getEntity().getUniqueId())) {
+								//Award the supporting assisting player.
+								Item id = this.plugin.hitmoblist.get(i).p.getWorld().dropItemNaturally(this.plugin.hitmoblist.get(i).p.getLocation(), this.plugin.generate_LootChest(8));id.setPickupDelay(0);
+								id = this.plugin.hitmoblist.get(i).p.getWorld().dropItemNaturally(this.plugin.hitmoblist.get(i).p.getLocation(), this.plugin.generate_LootChest(8));id.setPickupDelay(0);
+								id = this.plugin.hitmoblist.get(i).p.getWorld().dropItemNaturally(this.plugin.hitmoblist.get(i).p.getLocation(), this.plugin.generate_LootChest(8));id.setPickupDelay(0);
+								break;
+							}
+						}
+					}
+					//Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule mobGriefing false");
 				}
 				if (f.getCustomName().contains(ChatColor.DARK_PURPLE+"")) {
 					e.setDroppedExp(e.getDroppedExp()*20);
 					f.setHealth(0);
 					this.plugin.BOSS_DEFEAT=100;
 					this.plugin.BOSS_DEFEAT_LOC=f.getLocation();
-					//Create a chest at the death spot.
-					Bukkit.getWorld("world").getBlockAt(f.getLocation()).setType(Material.CHEST);
-					Chest c=(Chest)Bukkit.getWorld("world").getBlockAt(f.getLocation()).getState();
-					for (int i=0;i<27;i++) {
-						ItemStack item = null;
-						if (Math.random()<=0.3) {
-							item = getGoodie();
-							c.getBlockInventory().setItem(i, item);
+					if (f.getKiller()!=null) {
+						Item id = f.getKiller().getWorld().dropItemNaturally(f.getKiller().getLocation(), this.plugin.generate_LootChest(6));id.setPickupDelay(0);
+					}
+					for (int i=0;i<this.plugin.hitmoblist.size();i++) {
+						for (int j=0;j<this.plugin.hitmoblist.get(i).id.size();j++) {
+							if (!this.plugin.hitmoblist.get(i).p.equals(f.getKiller()) && this.plugin.hitmoblist.get(i).id.contains(e.getEntity().getUniqueId())) {
+								//Award the assisting player.
+								Item id = this.plugin.hitmoblist.get(i).p.getWorld().dropItemNaturally(this.plugin.hitmoblist.get(i).p.getLocation(), this.plugin.generate_LootChest(8));id.setPickupDelay(0);
+								break;
+							}
+						}
+					}
+					for (int i=0;i<this.plugin.supportmoblist.size();i++) {
+						for (int j=0;j<this.plugin.supportmoblist.get(i).id.size();j++) {
+							if (!this.plugin.supportmoblist.get(i).p.equals(f.getKiller()) && this.plugin.supportmoblist.get(i).id.contains(e.getEntity().getUniqueId())) {
+								//Award the supporting assisting player.
+								Item id = this.plugin.hitmoblist.get(i).p.getWorld().dropItemNaturally(this.plugin.hitmoblist.get(i).p.getLocation(), this.plugin.generate_LootChest(8));id.setPickupDelay(0);
+								break;
+							}
 						}
 					}
 				}
@@ -9132,6 +9223,7 @@ implements Listener
 			if (l.getTicksLived()<60) {
 				//Check around itself for other mobs. Teleport it there possibly. Higher chance
 				//of teleporting to mobs of the same type.
+				boolean mobfound=false;
 				List<Entity> nearby = l.getNearbyEntities(20, 20, 20);
 				for (int i=0;i<nearby.size();i++) {
 					if (!(nearby.get(i) instanceof Monster)) {
@@ -9144,13 +9236,27 @@ implements Listener
 					if (nearby.get(i).getType()==l.getType()) {
 						chancer=0.5;
 					}
-					if (Math.random()<=chancer+0.25 && nearby.get(i).getTicksLived()>60) {
-						e.getEntity().teleport(nearby.get(i).getLocation());
+					final Entity teleport_entity = e.getEntity();
+					final Entity teleport_to = nearby.get(i);
+					if (Math.random()<=chancer+0.25 && nearby.get(i).getTicksLived()>60 && (nearby.get(i).getLastDamageCause()==null || nearby.get(i).getLastDamageCause().getCause()!=DamageCause.SUFFOCATION)) {
+						Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+							@Override
+							public void run() {
+								teleport_entity.teleport(teleport_to);
+							}
+						},1);
+						mobfound=true;
 						break;
 					}
 				}
-				e.setDamage(0);
-				//e.setCancelled(true);
+				if (mobfound) {
+					e.setDamage(0);
+					e.setCancelled(true);
+				} else {
+					e.getEntity().remove();
+					e.setDamage(0);
+					e.setCancelled(true);
+				}
 			}
 		}
 		if (e.getEntity().getType()==EntityType.PLAYER) {
@@ -9417,6 +9523,7 @@ implements Listener
 				if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Lightning Mage")) {
 					e.setDamage(0);
 					e.setCancelled(true);
+					return;
 				}
 			}
 		}
@@ -9427,7 +9534,14 @@ implements Listener
 				e.setCancelled(true);
 				return;
 			}
-			if (p.getItemInHand().getType().name().toLowerCase().contains("axe") && !p.getItemInHand().getType().name().toLowerCase().contains("pickaxe") && this.plugin.hasJobBuff("Woodcutter", p, Job.JOB30A)) {
+			if (p.getItemInHand()!=null && this.plugin.hasBonusEnchantment(p.getItemInHand(), this.plugin.ENCHANT_EXECUTE)) {
+				if (e.getEntity() instanceof LivingEntity) {
+					LivingEntity l = (LivingEntity)e.getEntity();
+					e.setDamage(e.getDamage()+(5-((l.getHealth()/l.getMaxHealth())*100/20))*(0.5*this.plugin.getBonusEnchantmentLevel(p.getItemInHand(), this.plugin.ENCHANT_EXECUTE)));
+					Bukkit.getLogger().info("Dealt "+((5-((l.getHealth()/l.getMaxHealth())*100/20))*(0.5*this.plugin.getBonusEnchantmentLevel(p.getItemInHand(), this.plugin.ENCHANT_EXECUTE)))+" extra damage to target.");
+				}
+			}
+			if (p.getItemInHand()!=null && p.getItemInHand().getType().name().toLowerCase().contains("axe") && !p.getItemInHand().getType().name().toLowerCase().contains("pickaxe") && this.plugin.hasJobBuff("Woodcutter", p, Job.JOB30A)) {
 				p.getItemInHand().setDurability((short)0);
 			}
 			Collection<PotionEffect> effects = p.getActivePotionEffects();
@@ -9451,9 +9565,12 @@ implements Listener
 			}
 		}
 		//**********************************//Player buffs end
-
+		boolean hitByPoweredMob=false;
 		if (e.getEntity() instanceof LivingEntity) {
 			final LivingEntity l = (LivingEntity)e.getEntity();
+			if (e.getDamager() instanceof Monster) {
+				e.getDamager().teleport(e.getDamager());
+			}
 			if (e.getDamager() instanceof Projectile) {
 				if (((Projectile)e.getDamager()).getShooter() instanceof LivingEntity) {
 					LivingEntity l2 = ((Projectile)e.getDamager()).getShooter();
@@ -9474,7 +9591,8 @@ implements Listener
 										p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(e.getDamage()*2)+" damage from "+ChatColor.WHITE+""+l2.getType().name()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((e.getDamage()*2)/p.getMaxHealth())*100)+"%)");
 									}
 								}
-								if (!p.isBlocking()) {									
+								if (!p.isBlocking()) {
+									hitByPoweredMob=true;
 									if (p.getHealth()-e.getDamage()*4<0) {
 										p.setHealth(0);
 									} else {
@@ -9504,6 +9622,7 @@ implements Listener
 						if (l instanceof Player) {
 							Player p = (Player)l;
 							if (!p.isBlocking()) {
+								hitByPoweredMob=true;
 								if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
 									if (l2.getCustomName()!=null) {
 										DecimalFormat df = new DecimalFormat("#0.0");
@@ -9745,6 +9864,7 @@ implements Listener
 							DecimalFormat df = new DecimalFormat("#0.0");
 							DecimalFormat df2 = new DecimalFormat("#0");
 							if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
+								hitByPoweredMob=true;
 								p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(dmg)+" damage from "+ChatColor.RED+"COUNTER SLIME"+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((dmg)/p.getMaxHealth())*100)+"%)");
 							}
 						}
@@ -9756,6 +9876,7 @@ implements Listener
 							DecimalFormat df = new DecimalFormat("#0.0");
 							DecimalFormat df2 = new DecimalFormat("#0");
 							if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
+								hitByPoweredMob=true;
 								p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(dmg)+" damage from "+ChatColor.RED+"COUNTER SLIME"+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((dmg)/p.getMaxHealth())*100)+"%)");
 							}
 						}
@@ -9999,24 +10120,28 @@ implements Listener
 					for (int i=-20;i<21;i++) {
 						for (int j=-20;j<21;j++) {
 							for (int k=-20;k<21;k++) {
-								if (Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).getType()==Material.COMMAND) {
-									Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).setType(Material.COBBLESTONE);
-								}
-								if (Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).getType()==Material.TORCH || Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).getType()==Material.GLOWSTONE) {
-									Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).breakNaturally();
+								if (l.getLocation().add(i,j,k).getY()>0 && l.getLocation().add(i,j,k).getY()<50) {
+									if (Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).getType()==Material.COMMAND) {
+										Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).setType(Material.COBBLESTONE);
+									}
+									if (Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).getType()==Material.TORCH || Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).getType()==Material.GLOWSTONE) {
+										Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).breakNaturally();
+									}
 								}
 							}
 						}
 					}
 				} else {
 					for (int i=-20;i<21;i++) {
-						for (int j=-20;j<21;j++) {
+						for (int j=0;j<10;j++) {
 							for (int k=-20;k<21;k++) {
-								if (Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).getType()==Material.COMMAND) {
-									Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).setType(Material.COBBLESTONE);
-								}
-								if (Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).getType()==Material.SAND && Math.random()<=0.1) {
-									Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).breakNaturally();
+								if (l.getLocation().add(i,j,k).getY()>0 && l.getLocation().add(i,j,k).getY()<50) {
+									if (Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).getType()==Material.COMMAND) {
+										Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).setType(Material.COBBLESTONE);
+									}
+									if (Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).getType()==Material.SAND && Math.random()<=0.1) {
+										Bukkit.getWorld("world").getBlockAt(l.getLocation().add(i,j,k)).breakNaturally();
+									}
 								}
 							}
 						}
@@ -10087,45 +10212,55 @@ implements Listener
 				final LivingEntity l = (LivingEntity)e.getDamager();
 				if (p.getNoDamageTicks()<p.getMaximumNoDamageTicks()/2.0f && this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
 					final Main plug = this.plugin;
-					Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
-						@Override
-						public void run() {
-							DecimalFormat df = new DecimalFormat("#0.0");
-							DecimalFormat df2 = new DecimalFormat("#0");
-							if (l.getCustomName()!=null) {
-								p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(player_starthp-p.getHealth())+" damage from "+l.getCustomName()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((player_starthp-p.getHealth())/p.getMaxHealth())*100)+"%)");
-							} else {
-								p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(player_starthp-p.getHealth())+" damage from "+ChatColor.WHITE+l.getType()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((player_starthp-p.getHealth())/p.getMaxHealth())*100)+"%)");
-							}
-							if (plugin.PlayerinJob(p, "Explorer")) {
-								if (plugin.getJobLv("Explorer", p)>=10) {
-									//Check to see if our "fatal s	urvivor" effect is available.
-									boolean survivor=false;
-									for (int i=0;i<plugin.explorers.size();i++) {
-										if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName().toLowerCase())==0) {
-											survivor=true;
-											break;
+					if (!hitByPoweredMob) {
+						Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+							@Override
+							public void run() {
+								DecimalFormat df = new DecimalFormat("#0.0");
+								DecimalFormat df2 = new DecimalFormat("#0");
+								if (l.getCustomName()!=null) {
+									p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(player_starthp-p.getHealth())+" damage from "+l.getCustomName()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((player_starthp-p.getHealth())/p.getMaxHealth())*100)+"%)");
+								} else {
+									p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(player_starthp-p.getHealth())+" damage from "+ChatColor.WHITE+l.getType()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((player_starthp-p.getHealth())/p.getMaxHealth())*100)+"%)");
+								}
+								if (plugin.PlayerinJob(p, "Explorer")) {
+									if (plugin.getJobLv("Explorer", p)>=10) {
+										//Check to see if our "fatal s	urvivor" effect is available.
+										boolean survivor=false;
+										for (int i=0;i<plugin.explorers.size();i++) {
+											if (plugin.explorers.get(i).event==0 && plugin.explorers.get(i).name.compareTo(p.getName().toLowerCase())==0) {
+												survivor=true;
+												break;
+											}
 										}
-									}
-									PersistentExplorerList eve = new PersistentExplorerList(p.getName().toLowerCase());
-									eve.event=1;
-									eve.data=p.getExp();
-									eve.data2=p.getLevel();
-									eve.expiretime=Main.SERVER_TICK_TIME+1200;
-									plugin.explorers.add(eve);
-									if (!survivor) {
-										if (p.getHealth()<=0) {
-											FatalSurvivor(p);
+										PersistentExplorerList eve = new PersistentExplorerList(p.getName().toLowerCase());
+										eve.event=1;
+										eve.data=p.getExp();
+										eve.data2=p.getLevel();
+										eve.expiretime=Main.SERVER_TICK_TIME+1200;
+										plugin.explorers.add(eve);
+										if (!survivor) {
+											if (p.getHealth()<=0) {
+												FatalSurvivor(p);
+											}
 										}
 									}
 								}
 							}
-						}
-
-					},1);
+	
+						},1);
+					}
 				}
 			}
+			int knockbacklevels = 0;
+			if (p.getInventory().getBoots()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getBoots(), this.plugin.ENCHANT_STURDY)) {knockbacklevels+=this.plugin.getBonusEnchantmentLevel(p.getInventory().getBoots(), this.plugin.ENCHANT_STURDY);}
+			if (p.getInventory().getChestplate()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getChestplate(), this.plugin.ENCHANT_STURDY)) {knockbacklevels+=this.plugin.getBonusEnchantmentLevel(p.getInventory().getChestplate(), this.plugin.ENCHANT_STURDY);}
+			if (p.getInventory().getLeggings()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getLeggings(), this.plugin.ENCHANT_STURDY)) {knockbacklevels+=this.plugin.getBonusEnchantmentLevel(p.getInventory().getLeggings(), this.plugin.ENCHANT_STURDY);}
+			if (p.getInventory().getHelmet()!=null && this.plugin.hasBonusEnchantment(p.getInventory().getHelmet(), this.plugin.ENCHANT_STURDY)) {knockbacklevels+=this.plugin.getBonusEnchantmentLevel(p.getInventory().getHelmet(), this.plugin.ENCHANT_STURDY);}
 			if (p.isBlocking()) {
+				knockbacklevels+=8;
+				e.setDamage(e.getDamage()/2.0d);}
+			if (knockbacklevels>0) {
 				final Player p2 = p;
 				Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
 					@Override
@@ -10136,7 +10271,7 @@ implements Listener
 						p2.setVelocity(knockback);
 					}
 				}, 1L);
-				e.setDamage(e.getDamage()/2.0d);}
+			}
 			p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 			int slot=0;
 			for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
@@ -10201,7 +10336,7 @@ implements Listener
 				}
 				p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,200,2));
 			}
-			if (Math.random()<=block_chance/100.0d) {
+			if (Math.random()<=(block_chance/100.0d)/2) {
 				e.setDamage(0);
 				//Choose a random set to mark off.
 				blocked_attack=true;
@@ -10231,6 +10366,7 @@ implements Listener
 				p.playSound(p.getLocation(), Sound.ANVIL_LAND, 0.1f, 3.6f);
 				e.setDamage(0);
 				e.setCancelled(true);
+				return;
 			}
 			//Bukkit.getLogger().info("Made it through 4.");
 			//p.updateInventory();
@@ -10389,18 +10525,18 @@ implements Listener
 				if (!enemy.isDead()) {
 					for (int k=-1;k<2;k++) {
 						for (int j=-1;j<2;j++) {
-							Location checkloc = enemy.getLocation().add(k,1,j);
+							Location checkloc = new Location(enemy.getLocation().getWorld(),enemy.getLocation().getX()+k,enemy.getLocation().getY()+1,enemy.getLocation().getZ()+j);
 							Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
 							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && naturalBlock(bl.getType())) {
 								bl.breakNaturally();
 							}
 							bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-							checkloc = enemy.getLocation().add(k,2,j);
+							checkloc = new Location(enemy.getLocation().getWorld(),enemy.getLocation().getX()+k,enemy.getLocation().getY()+2,enemy.getLocation().getZ()+j);
 							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && naturalBlock(bl.getType())) {
 								bl.breakNaturally();
 							}
 							bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-							checkloc = enemy.getLocation().add(k,0,j);
+							checkloc = new Location(enemy.getLocation().getWorld(),enemy.getLocation().getX()+k,enemy.getLocation().getY(),enemy.getLocation().getZ()+j);
 							if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && naturalBlock(bl.getType())) {
 								bl.breakNaturally();
 							}
@@ -10490,18 +10626,18 @@ implements Listener
 					if (!enemy.isDead()) {
 						for (int k=-2;k<3;k++) {
 							for (int j=-2;j<3;j++) {
-								Location checkloc = enemy.getLocation().add(k,1,j);
+								Location checkloc = new Location(enemy.getLocation().getWorld(),enemy.getLocation().getX()+k,enemy.getLocation().getY()+1,enemy.getLocation().getZ()+j);
 								Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
 								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && naturalBlock(bl.getType())) {
 									bl.breakNaturally();
 								}
 								bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-								checkloc = enemy.getLocation().add(k,2,j);
+								checkloc = new Location(enemy.getLocation().getWorld(),enemy.getLocation().getX()+k,enemy.getLocation().getY()+2,enemy.getLocation().getZ()+j);
 								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && naturalBlock(bl.getType())) {
 									bl.breakNaturally();
 								}
 								bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-								checkloc = enemy.getLocation().add(k,0,j);
+								checkloc = new Location(enemy.getLocation().getWorld(),enemy.getLocation().getX()+k,enemy.getLocation().getY(),enemy.getLocation().getZ()+j);
 								if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && naturalBlock(bl.getType())) {
 									bl.breakNaturally();
 								}
@@ -10585,6 +10721,7 @@ implements Listener
 					if (p.getItemInHand().hasItemMeta() && p.getItemInHand().getItemMeta().getDisplayName()!=null && p.getItemInHand().getItemMeta().getDisplayName().contains(ChatColor.DARK_GRAY+"[BROKEN]")) {
 						e.setDamage(0);
 						e.setCancelled(true);
+						return;
 					}
 					p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 					//p.sendMessage("No Damage Ticks: "+f.getNoDamageTicks());
@@ -11023,6 +11160,10 @@ implements Listener
 					if (p.getEquipment().getChestplate()!=null ) {chest_dura=p.getEquipment().getChestplate().getDurability();}
 					if (p.getEquipment().getLeggings()!=null) {legs_dura=p.getEquipment().getLeggings().getDurability();}
 					if (p.getEquipment().getBoots()!=null) {boots_dura=p.getEquipment().getBoots().getDurability();}
+					if (helm_dura<=prev_helm_dura) {helm_dura=-1;}
+					if (chest_dura<=prev_chest_dura) {chest_dura=-1;}
+					if (legs_dura<=prev_legs_dura) {legs_dura=-1;}
+					if (boots_dura<=prev_boots_dura) {boots_dura=-1;}
 					Bukkit.getLogger().info("Durability of items are: "+helm_dura+","+chest_dura+","+legs_dura+","+boots_dura);
 					int gained_back=0;
 					if (p.getEquipment().getHelmet()!=null && helm_dura!=-1 && p.getEquipment().getHelmet().hasItemMeta() &&
@@ -11428,7 +11569,8 @@ implements Listener
 			return;
 		}
 		if (this.plugin.is_LootChest(e.getItemInHand())) {
-			open_LootChest(this.plugin.get_LootChestTier(e.getItemInHand()), e.getBlockPlaced().getLocation());
+			int tier = -1;
+			open_LootChest(tier = this.plugin.get_LootChestTier(e.getItemInHand()), e.getBlockPlaced().getLocation());
 
 			
 			e.setCancelled(true);
@@ -11439,7 +11581,9 @@ implements Listener
 			}
 			// e.getPlayer().getWorld().dropItemNaturally(e.getBlockPlaced().getLocation(), getGoodie());
 			
-			p.sendMessage(ChatColor.GREEN+"You open the chest and find treasure inside!");
+			if (tier<=5) {
+				p.sendMessage(ChatColor.GREEN+"You open the chest and find treasure inside!");
+			}
 			p.playSound(p.getLocation(), Sound.ORB_PICKUP, 10, 1);
 			p.updateInventory();
 			return;

@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import java.text.*;
 
 import me.kaZep.Base.BonusEnchantment.ItemType;
+import me.kaZep.Base.PlayerListener.Cube;
 import me.kaZep.Commands.JobsDataInfo;
 import me.kaZep.Commands.JobsDataInfo.Job;
 import me.kaZep.Commands.commandBankEconomy;
@@ -823,7 +824,7 @@ public class Main extends JavaPlugin
     ENCHANT_DAMAGE = new BonusEnchantment("Damage",false,false,ItemType.WEAPONS,new IntRange(0,40));
     ENCHANT_HEALTH = new BonusEnchantment("Health",false,false,ItemType.ARMOR,new IntRange(0,60));
     ENCHANT_DAMAGE_REDUCTION = new BonusEnchantment("Damage Reduction",true,false,ItemType.ARMOR,new IntRange(0,100));
-    ENCHANT_DURABILITY = new BonusEnchantment("Durability",false,false,ItemType.ARMOR,new IntRange(0,2000));
+    ENCHANT_DURABILITY = new BonusEnchantment("Durability",true,false,ItemType.ARMOR,new IntRange(0,2000));
     ENCHANT_BLOCK_CHANCE = new BonusEnchantment("Block Chance",true,false,ItemType.ARMOR,new IntRange(0,100));
     ENCHANT_SPEED_BOOST_CHANCE = new BonusEnchantment("Speed Boost Chance",true,false,ItemType.ARMOR,new IntRange(0,100));
     ENCHANT_STURDY = new BonusEnchantment("Sturdy",false,true,ItemType.ARMOR,new IntRange(0,10));
@@ -1672,6 +1673,22 @@ public void runTick() {
 					  i=Bukkit.getWorld("world").dropItemNaturally(p.getLocation().add((int)(Math.random()*20)-(int)(Math.random()*20), 256, (int)(Math.random()*20)-(int)(Math.random()*20)),new ItemStack(Material.EGG));
 					  i.setTicksLived(3600);
 				  }
+				  if (Main.SERVER_TICK_TIME%1200==0) {
+					  //Check items in player's inventory for Repair. If it exists, lower durability by 1.
+					  for (int i=0;i<p.getInventory().getSize();i++) {
+						  if (p.getInventory().getItem(i)!=null) {
+							  if (hasBonusEnchantment(p.getInventory().getItem(i),ENCHANT_REPAIR)) {
+								  if (p.getInventory().getItem(i).getDurability()!=0 && (short)(p.getInventory().getItem(i).getDurability()-getBonusEnchantmentLevel(p.getInventory().getItem(i),ENCHANT_REPAIR))>=0) {
+									  p.getInventory().getItem(i).setDurability((short)(p.getInventory().getItem(i).getDurability()-getBonusEnchantmentLevel(p.getInventory().getItem(i),ENCHANT_REPAIR)));
+									  //Bukkit.getLogger().info("Healed "+p.getInventory().getItem(i).toString()+" to "+p.getInventory().getItem(i).getDurability());
+								  } else {
+									  p.getInventory().getItem(i).setDurability((short)0);
+									  //Bukkit.getLogger().info("Healed "+p.getInventory().getItem(i).toString()+" to "+p.getInventory().getItem(i).getDurability());
+								  }
+							  }
+						  }
+					  }
+				  }
 				  if (Main.SERVER_TICK_TIME%90==0) {
 					  for (int i=-15;i<=15;i++) {
 						  for (int j=-15;j<=15;j++) {
@@ -2000,17 +2017,23 @@ public void runTick() {
 									  }
 								  }
 							  }
+								////Bukkit.getLogger().info("Removed "+removeore+"/"+totalore+" ore for chunk "+e.getChunk().getX()+","+e.getChunk().getZ()+". There are now "+newore+" ores left.");
+							  debugmessages.add("  Removed: "+removeore+"/"+totalore+" ores.");
+						}
+						if (!customchunk.contains("limit-ore-generation2")) {
+							customchunk.set("limit-ore-generation2", Boolean.valueOf(true));
+							Chunk c = chunk_queue_list.get(0);
+							  int removeore=0,totalore=0,newore=0;
 							  for (int x=0;x<16;x++) {
 								  for (int y=5;y<96;y++) {
 									  for (int z=0;z<16;z++) {
 										  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,y,z+c.getZ()*16);
-										  if (b!=null && (b.getType()==Material.COAL_ORE ||
-												  b.getType()==Material.IRON_ORE ||
-												  b.getType()==Material.GOLD_ORE ||
-												  b.getType()==Material.REDSTONE_ORE ||
-												  b.getType()==Material.LAPIS_ORE ||
-												  b.getType()==Material.DIAMOND_ORE)) {
-											  newore++;
+										  if (b!=null && (b.getType()==Material.DIAMOND_ORE)) {
+											  if (Math.random()<=0.60) {
+												  removeore++;
+												  b.setType(Material.STONE);
+											  }
+											  totalore++;
 										  }
 									  }
 								  }
@@ -5061,7 +5084,7 @@ public void payDay(int time)
     }
     
     public boolean containsEnchantment(String s, String enchant) {
-  	  if (s.contains(enchant) && (!enchant.equals("Durability") || (enchant.equals("Durability") && !s.contains(ChatColor.RED+"-400% Durability")))) {
+  	  if (s.contains(enchant) && (!enchant.equals("Durability") || (enchant.equals("Durability") && !s.contains(ChatColor.RED+"-400% Durability"))) && !is_PermanentProperty(s)) {
   		  return true;
   	  }
   	  return false;
@@ -5101,7 +5124,10 @@ public void payDay(int time)
 		if (chest.hasItemMeta() && chest.getItemMeta().hasLore()) {
 			//Check to see if the Lore contains anything.
 			for (int i=0;i<chest.getItemMeta().getLore().size();i++) {
-				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!")) {
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!") ||
+						chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"A reward for defeating a mighty") ||
+						chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"It has a stronger energy to it") ||
+						chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"A reward for helping to take on")) {
 					return true;
 				}
 			}
@@ -5127,6 +5153,15 @@ public void payDay(int time)
 				}
 				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"A torrential flow of dark")) {
 					return 5; // Chaos loot
+				}
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"A reward for defeating a mighty")) {
+					return 6; // Boss loot
+				}
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"It has a stronger energy to it")) {
+					return 7; // Mythic Boss loot
+				}
+				if (chest.getItemMeta().getLore().get(i).equalsIgnoreCase(ChatColor.GRAY+""+ChatColor.ITALIC+"A reward for helping to take on")) {
+					return 8; // Boss Assist loot
 				}
 			}
 			
@@ -5204,23 +5239,56 @@ public void payDay(int time)
 		    chest_name.setLore(chestlore);
 
 		    chest.setItemMeta(chest_name);
-	    } else {
-		    chest_name.setDisplayName(ChatColor.YELLOW+"Closed Chest");
-			   
-		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
+	    } else if (tier == 6) {
+	    	chest_name.setDisplayName(ChatColor.AQUA+"Boss Chest");
+		 	   
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A chest obtained from a boss.");
 		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
-		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"Something is rattling");
-		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"around inside; it may");
-		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"contain valuables!");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A reward for defeating a mighty");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"boss. There are many goodies");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"inside.");
 		    chest_name.setLore(chestlore);
 
 		    chest.setItemMeta(chest_name);
-	    }
+	    } else if (tier == 7) {
+	    	chest_name.setDisplayName(ChatColor.AQUA+"Boss Chest");
+		 	   
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A chest obtained from a boss.");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"It has a stronger energy to it");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"than most chests of its kind.");
+		    chest_name.setLore(chestlore);
+
+		    chest.setItemMeta(chest_name);
+	    } else if (tier == 8) {
+	    	chest_name.setDisplayName(ChatColor.BLUE+"Boss Assist Chest");
+		 	   
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A chest obtained from a boss.");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A reward for helping to take on");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"a mighty boss. There are a few");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"goodies inside to commend you for");
+		    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"your hard work and bravery.");
+		    chest_name.setLore(chestlore);
+
+		    chest.setItemMeta(chest_name);
+	    } else {
+	    chest_name.setDisplayName(ChatColor.YELLOW+"Closed Chest");
+		   
+	    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"A mysterious chest!");
+	    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"");
+	    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"Something is rattling");
+	    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"around inside; it may");
+	    chestlore.add(ChatColor.GRAY+""+ChatColor.ITALIC+"contain valuables!");
+	    chest_name.setLore(chestlore);
+
+	    chest.setItemMeta(chest_name);
+    }
 	    
 	    return chest;
     }
     
-    public PlayerListener.Cube get_ItemCubeType(ItemStack item_cube) {
+    public Cube get_ItemCubeType(ItemStack item_cube) {
 		if (item_cube.hasItemMeta() && item_cube.getItemMeta().hasLore()) {
 			//Check to see if the Lore contains anything.
 			for (int i=0;i<item_cube.getItemMeta().getLore().size();i++) {
@@ -5397,10 +5465,16 @@ public void payDay(int time)
 	    			//We have to find a matching hundreds value and replace it.
 	    			for (int j=0;j<hundreds.length;j++) {
 	    				if (roman_numeral.contains(hundreds[hundreds.length-j-1])) {
-	    					roman_numeral = roman_numeral.replaceFirst(hundreds[hundreds.length-j-1], "");
-	    					//Bukkit.getLogger().info("Found "+hundreds[hundreds.length-j-1]+", converting to "+(100*(hundreds.length-j))+". New String is "+roman_numeral);
-	    					finalval+=100*(hundreds.length-j);
-	    					break; //There is only one hundreds place.
+	    					boolean allow=true;
+	    					if (j==4 && roman_numeral.contains("CD")) {
+	    						allow=false;
+	    					}
+	    					if (allow) {
+		    					roman_numeral = roman_numeral.replaceFirst(hundreds[hundreds.length-j-1], "");
+		    					//Bukkit.getLogger().info("Found "+hundreds[hundreds.length-j-1]+", converting to "+(100*(hundreds.length-j))+". New String is "+roman_numeral);
+		    					finalval+=100*(hundreds.length-j);
+		    					break; //There is only one hundreds place.
+	    					}
 	    				}
 	    			}
 	    		}break;
@@ -5408,10 +5482,16 @@ public void payDay(int time)
 	    			//We have to find a matching tens value and replace it.
 	    			for (int j=0;j<tens.length;j++) {
 	    				if (roman_numeral.contains(tens[tens.length-j-1])) {
-	    					roman_numeral = roman_numeral.replaceFirst(tens[tens.length-j-1], "");
-	    					//Bukkit.getLogger().info("Found "+tens[tens.length-j-1]+", converting to "+(10*(tens.length-j))+". New String is "+roman_numeral);
-	    					finalval+=10*(tens.length-j);
-	    					break; //There is only one tens place.
+	    					boolean allow=true;
+	    					if (j==4 && roman_numeral.contains("XL")) {
+	    						allow=false;
+	    					}
+	    					if (allow) {
+		    					roman_numeral = roman_numeral.replaceFirst(tens[tens.length-j-1], "");
+		    					//Bukkit.getLogger().info("Found "+tens[tens.length-j-1]+", converting to "+(10*(tens.length-j))+". New String is "+roman_numeral);
+		    					finalval+=10*(tens.length-j);
+		    					break; //There is only one tens place.
+	    					}
 	    				}
 	    			}
 	    		}break;
@@ -5419,10 +5499,16 @@ public void payDay(int time)
 	    			//We have to find a matching ones value and replace it.
 	    			for (int j=0;j<ones.length;j++) {
 	    				if (roman_numeral.contains(ones[ones.length-j-1])) {
-	    					roman_numeral = roman_numeral.replaceFirst(ones[ones.length-j-1], "");
-	    					//Bukkit.getLogger().info("Found "+ones[ones.length-j-1]+", converting to "+((ones.length-j))+". New String is "+roman_numeral);
-	    					finalval+=ones.length-j;
-	    					break; //There is only one ones place.
+	    					boolean allow=true;
+	    					if (j==4 && roman_numeral.contains("IV")) {
+	    						allow=false;
+	    					}
+	    					if (allow) {
+		    					roman_numeral = roman_numeral.replaceFirst(ones[ones.length-j-1], "");
+		    					//Bukkit.getLogger().info("Found "+ones[ones.length-j-1]+", converting to "+((ones.length-j))+". New String is "+roman_numeral);
+		    					finalval+=ones.length-j;
+		    					break; //There is only one ones place.
+	    					}
 	    				}
 	    			}
 	    		}break;
@@ -5459,7 +5545,8 @@ public void payDay(int time)
     					return (int)getEnchantmentNumb(lore.get(i));
     				} else {
     					String parser = lore.get(i);
-    					parser.replace(enchant_string, "");
+    					parser = parser.replace(enchant_string, "");
+    					//Bukkit.getLogger().info("parser is sending down "+parser+".");
     					return toNumber(parser);
     				}
     			}
@@ -5478,7 +5565,7 @@ public void payDay(int time)
     	if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
     		List<String> newlore = item.getItemMeta().getLore();
     		for (int i=0;i<item.getItemMeta().getLore().size();i++) {
-    			if (item.getItemMeta().getLore().get(i).contains(enchant.name)) {
+    			if (item.getItemMeta().getLore().get(i).contains(enchant.name) && !is_PermanentProperty(item.getItemMeta().getLore().get(i))) {
     				return true;
     			}
     		}
@@ -5501,7 +5588,7 @@ public void payDay(int time)
     	if (item.hasItemMeta() && item.getItemMeta().hasLore()) {
     		List<String> newlore = item.getItemMeta().getLore();
     		for (int i=0;i<item.getItemMeta().getLore().size();i++) {
-    			if (item.getItemMeta().getLore().get(i).contains(enchant.name)) {
+    			if (item.getItemMeta().getLore().get(i).contains(enchant.name) && !is_PermanentProperty(item.getItemMeta().getLore().get(i))) {
     				//Include it in the new meta.
     				newlore.remove(i);
     				break;
@@ -5544,6 +5631,8 @@ public void payDay(int time)
      * @return The item with the new enchantment added in.
      */
     public ItemStack addBonusEnchantment(ItemStack item, BonusEnchantment enchant, int amt, boolean override) {
+    	Bukkit.getLogger().info("Adding bonus enchantment "+enchant.name+" @ level "+amt+" with override set to "+override+". On ItemStack: "+item.toString());
+    	if (amt<=0) {return item;} //Cannot have a negative number or 0 for an enchantment. Just return the item itself instead.
     	List<String> lore = null;
     	String enchant_string = enchant.name;
     	boolean percent=enchant.percent, enchant_format=enchant.enchant_format;
@@ -5554,7 +5643,7 @@ public void payDay(int time)
     		//replace it.
     		boolean added=false;
     		for (int i=0;i<lore.size();i++) {
-    			if (lore.get(i).contains(enchant_string)) {
+    			if (lore.get(i).contains(enchant_string) && !is_PermanentProperty(lore.get(i))) {
     				if (!enchant_format) {
     					//Take that old amount and add onto it.
     					double oldamt=0;
