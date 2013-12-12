@@ -1554,10 +1554,10 @@ public void runTick() {
 					  if (world_entities.get(i).getType()==EntityType.WITHER) {
 						  Wither l = (Wither)world_entities.get(i);
 						  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE+"Mythical Wither")) {
-							  if (l.getMaxHealth()>l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth()))) {
+							  if (l.getMaxHealth()>l.getHealth()+10+((l.getMaxHealth()/l.getHealth()))) {
 							      DecimalFormat df = new DecimalFormat("#0.0");
 							      //Bukkit.broadcastMessage("Healing for "+(+5+(0.2*(l.getMaxHealth()/l.getHealth())))+" health. "+df.format(l.getHealth())+"/"+l.getMaxHealth()+" HP");
-								  l.setHealth(l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth())));
+								  l.setHealth(l.getHealth()+10+((l.getMaxHealth()/l.getHealth())));
 							  }
 						  }
 					  }
@@ -1567,10 +1567,10 @@ public void runTick() {
 					  if (world_entities.get(i).getType()==EntityType.WITHER) {
 						  Wither l = (Wither)world_entities.get(i);
 						  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE+"Mythical Wither")) {
-							  if (l.getMaxHealth()>l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth()))) {
+							  if (l.getMaxHealth()>l.getHealth()+10+((l.getMaxHealth()/l.getHealth()))) {
 							      DecimalFormat df = new DecimalFormat("#0.0");
 							      //Bukkit.broadcastMessage("Healing for "+(+5+(0.2*(l.getMaxHealth()/l.getHealth())))+" health. "+df.format(l.getHealth())+"/"+l.getMaxHealth()+" HP");
-								  l.setHealth(l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth())));
+								  l.setHealth(l.getHealth()+10+((l.getMaxHealth()/l.getHealth())));
 							  }
 						  }
 					  }
@@ -1580,10 +1580,10 @@ public void runTick() {
 					  if (world_entities.get(i).getType()==EntityType.WITHER) {
 						  Wither l = (Wither)world_entities.get(i);
 						  if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE+"Mythical Wither")) {
-							  if (l.getMaxHealth()>l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth()))) {
+							  if (l.getMaxHealth()>l.getHealth()+10+((l.getMaxHealth()/l.getHealth()))) {
 							      DecimalFormat df = new DecimalFormat("#0.0");
 							      //Bukkit.broadcastMessage("Healing for "+(+5+(0.2*(l.getMaxHealth()/l.getHealth())))+" health. "+df.format(l.getHealth())+"/"+l.getMaxHealth()+" HP");
-								  l.setHealth(l.getHealth()+5+(0.2*(l.getMaxHealth()/l.getHealth())));
+								  l.setHealth(l.getHealth()+10+((l.getMaxHealth()/l.getHealth())));
 							  }
 						  }
 					  }

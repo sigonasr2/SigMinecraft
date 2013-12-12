@@ -9992,7 +9992,7 @@ implements Listener
 			if (l instanceof Player) {
 				e.setDamage(e.getDamage()*1.45d);
 				if (e.getDamager() instanceof Wither) {
-					e.setDamage(e.getDamage()*2d);
+					e.setDamage(e.getDamage()*3d);
 					if (Math.random()<=0.75) {
 						l.getWorld().spawnEntity(l.getLocation(), EntityType.CREEPER);
 						l.getWorld().spawnEntity(l.getLocation(), EntityType.ZOMBIE);
@@ -10001,9 +10001,15 @@ implements Listener
 			}
 			if (e.getEntity() instanceof Wither) {
 				if (l.getCustomName()!=null && l.getCustomName().equalsIgnoreCase(ChatColor.LIGHT_PURPLE+"Mythical Wither")) {
-					e.setDamage(e.getDamage()*0.045d);
+					e.setDamage(e.getDamage()*0.015d);
+					if (Math.random()<=0.45) {
+						l.setHealth(l.getHealth()+10);
+					}
 				} else {
-					e.setDamage(e.getDamage()*0.065d);
+					e.setDamage(e.getDamage()*0.035d);
+					if (Math.random()<=0.35) {
+						l.setHealth(l.getHealth()+5);
+					}
 				}
 				try {
 					Iterator<PotionEffect> effects = l.getActivePotionEffects().iterator();
