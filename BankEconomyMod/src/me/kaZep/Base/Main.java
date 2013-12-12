@@ -143,6 +143,7 @@ public class Main extends JavaPlugin
   public long check_lights_time=0;
   public long check_spleef_game=0;
   public static boolean ender_cube_active=true;
+  public static boolean book_shelf_active=true;
   public boolean harrowing_night=false;
   public double randomitemchance = 800;
   public static long SERVER_TICK_TIME = 0;
@@ -3751,6 +3752,15 @@ public void payDay(int time)
       getLogger().log(Level.SEVERE, "Could not save chunk config to " + base, ex);
     }
   }
+  
+  public FileConfiguration reloadBookshelfConfig(int blockx,int blocky, int blockz)
+  {
+	File base;
+	FileConfiguration myFile;
+    base = new File(getDataFolder()+"/bookshelf", "bookshelf"+blockx+"_"+blocky+"_"+blockz+".yml");
+    myFile = YamlConfiguration.loadConfiguration(base);
+    return myFile;
+  }
 
   public FileConfiguration reloadItemCubeConfig(int cubenumb)
   {
@@ -3761,6 +3771,19 @@ public void payDay(int time)
     return myFile;
   }
 
+  public void saveBookshelfConfig(FileConfiguration filer, int blockx ,int blocky, int blockz) {
+	File base;
+    base = new File(getDataFolder()+"/bookshelf", "bookshelf"+blockx+"_"+blocky+"_"+blockz+".yml");
+    if ((filer == null) || (base == null))
+      return;
+    try
+    {
+      filer.save(base);
+    } catch (IOException ex) {
+      getLogger().log(Level.SEVERE, "Could not save Bookshelf config to " + base, ex);
+    }
+  }
+  
   public void saveItemCubeConfig(FileConfiguration filer, int cubenumb) {
 	File base;
     base = new File(getDataFolder()+"/item-cube", "itemcube"+cubenumb+".yml");

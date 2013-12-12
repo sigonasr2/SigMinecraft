@@ -81,6 +81,7 @@ import org.bukkit.entity.Skeleton.SkeletonType;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Wither;
+import org.bukkit.entity.WitherSkull;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.Event.Result;
@@ -9273,6 +9274,17 @@ implements Listener
 			}
 			if (e.getCause()==DamageCause.WITHER) {
 				// For each Witherless Rose, add a multiplicative 25% chance to negate this tick of wither damage.
+				if (p.hasPotionEffect(PotionEffectType.WITHER)) {
+					Collection<PotionEffect> pots = p.getActivePotionEffects();
+					int witherlevel=0;
+					for (PotionEffect effect : pots) {
+						if (effect.getType().getName().equalsIgnoreCase("wither")) {
+							witherlevel = effect.getAmplifier();
+							break;
+						}
+					}
+					e.setDamage(witherlevel*e.getDamage());
+				}
 				if (Math.random() > Math.pow(0.75, this.plugin.getWitherlessRoseCount(p))) {
 					e.setCancelled(true);
 				}
@@ -9566,6 +9578,56 @@ implements Listener
 		}
 		//**********************************//Player buffs end
 		boolean hitByPoweredMob=false;
+		if ((e.getDamager() instanceof WitherSkull) || (e.getDamager() instanceof Wither)) {
+			if (e.getEntity() instanceof Player) {
+				final Player p = (Player)e.getEntity();
+				final Collection<PotionEffect> pots = p.getActivePotionEffects();
+				Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+					@Override
+					public void run() {
+					int witherlevel=0, witherduration=0;
+					for (PotionEffect effect : pots) {
+						if (effect.getType().getName().equalsIgnoreCase("wither")) {
+							witherlevel = effect.getAmplifier();
+							witherduration = effect.getDuration();
+							break;
+						}
+					}
+					//Bukkit.getLogger().info("Wither level adjusted from "+witherlevel+" to "+(++witherlevel)+".");
+					p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, witherduration, witherlevel++),true);
+					}
+				},1);
+			}
+		}
+		if (e.getDamager() instanceof Skeleton || ((e.getDamager() instanceof Projectile) && ((Projectile)e.getDamager()).getShooter() instanceof Skeleton)) {
+			Skeleton s = null;
+			if (e.getDamager() instanceof Projectile) {
+				s = (Skeleton)((Projectile)e.getDamager()).getShooter();
+			} else {
+				s = (Skeleton)e.getDamager();
+			}
+			if (s.getSkeletonType()==SkeletonType.WITHER) {
+				if (e.getEntity() instanceof Player) {
+					final Player p = (Player)e.getEntity();
+					final Collection<PotionEffect> pots = p.getActivePotionEffects();
+					Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+						@Override
+						public void run() {
+						int witherlevel=0, witherduration=0;
+						for (PotionEffect effect : pots) {
+							if (effect.getType().getName().equalsIgnoreCase("wither")) {
+								witherlevel = effect.getAmplifier();
+								witherduration = effect.getDuration();
+								break;
+							}
+						}
+						//Bukkit.getLogger().info("Wither level adjusted from "+witherlevel+" to "+(++witherlevel)+".");
+						p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, witherduration, witherlevel++),true);
+						}
+					},1);
+				}
+			}
+		}
 		if (e.getEntity() instanceof LivingEntity) {
 			final LivingEntity l = (LivingEntity)e.getEntity();
 			if (e.getDamager() instanceof Monster) {
@@ -11916,6 +11978,27 @@ implements Listener
 	@EventHandler
 	public void onInventoryDragEvent(InventoryDragEvent e) {
 		Player p = (Player)e.getWhoClicked();
+		if (isViewingBookshelf(p)) {
+			if (this.plugin.book_shelf_active) {
+				final Player p2 = p;
+				this.plugin.book_shelf_active=false;
+				int inven_amount=0;
+				int item_count=0;
+				for (int i=0;i<9;i++) {
+					if (e.getInventory().getContents()[i]!=null) {
+						inven_amount+=e.getInventory().getContents()[i].getAmount();
+						item_count++;
+						//Bukkit.getLogger().info("Check at "+e.getInventory().getContents()[i].toString());
+					}
+				}
+				//Bukkit.getLogger().info("Marked at "+inven_amount+".");
+				Bookshelf_attemptUpdate(inven_amount,item_count,p2);
+			} else {
+				//Bukkit.getLogger().info("Cannot perform! We are waiting on an update.");
+				e.setCancelled(true);
+				e.setResult(Result.DENY);
+			}
+		}
 		if (isViewingEnderCube(p)) {
 			if (this.plugin.ender_cube_active) {
 				final Player p2 = p;
@@ -11966,6 +12049,17 @@ implements Listener
 				}
 			}
 		} else
+		if (e.getInventory().getName().contains("Bookshelf")) {
+			int identifier=-1;
+			//Get idenfitier.
+			String[] ident_string=e.getInventory().getTitle().substring(e.getInventory().getTitle().indexOf("#")).replace("#", "").split("_");
+			//We are going to save the contents of this inventory appropriately.
+			FileConfiguration f = this.plugin.reloadBookshelfConfig(Integer.valueOf(ident_string[0]),Integer.valueOf(ident_string[1]),Integer.valueOf(ident_string[2]));
+			for (int i=0;i<e.getInventory().getContents().length;i++) {
+				f.set("item-"+i, e.getInventory().getItem(i));
+			}
+			this.plugin.saveBookshelfConfig(f, Integer.valueOf(ident_string[0]),Integer.valueOf(ident_string[1]),Integer.valueOf(ident_string[2]));
+		} else 
 		if (e.getInventory().getName().contains("Item Cube")) {
 			int identifier=-1;
 			//Get idenfitier.
@@ -13378,6 +13472,48 @@ implements Listener
 			}, 1);
 		}
 		//Bukkit.getLogger().info("Click type is "+event.getClick().toString());
+		if (isViewingBookshelf(p) && (event.getClick()==ClickType.NUMBER_KEY || ((event.getClick()==ClickType.SHIFT_LEFT || event.getClick()==ClickType.SHIFT_RIGHT) && event.getCurrentItem()!=null && event.getCurrentItem().getType()!=Material.AIR) || ((event.getClick()==ClickType.LEFT || event.getClick()==ClickType.RIGHT) && event.getRawSlot()<9 && ((event.getCursor()!=null && event.getCursor().getType()!=Material.AIR) || (event.getCurrentItem()!=null && event.getCurrentItem().getType()!=Material.AIR)))) ) {
+			boolean item_cube=false;
+			//Bukkit.getLogger().info("Got to 1.");
+			if ((event.getClick()==ClickType.LEFT || event.getClick()==ClickType.RIGHT) && (event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST)) {
+				int identifier=-1;
+				//Bukkit.getLogger().info("Got to 2.");
+				if (event.getCurrentItem().getItemMeta().getLore()!=null) {
+					//Check to see if the Lore contains anything.
+					for (int i=0;i<event.getCurrentItem().getItemMeta().getLore().size();i++) {
+						if (event.getCurrentItem().getItemMeta().getLore().get(i).contains("ID#")) {
+							identifier=Integer.valueOf(event.getCurrentItem().getItemMeta().getLore().get(i).replace("ID#", ""));
+						}
+					}
+					if (identifier!=-1) {
+						//Bukkit.getLogger().info("Got to 2.5.");
+						//This is an item cube. We will not continue.
+						item_cube=true;
+					}
+				}
+			}
+			if (!item_cube || (item_cube && (event.getClick()!=ClickType.RIGHT && (event.getCursor()==null || event.getCursor().getType()==Material.AIR)))) {
+				//Bukkit.getLogger().info("Got to 3.");
+				if (this.plugin.book_shelf_active) {
+					final Player p2 = p;
+					this.plugin.book_shelf_active=false;
+					int inven_amount=0, inven_items=0;
+					for (int i=0;i<9;i++) {
+						if (event.getInventory().getContents()[i]!=null) {
+							inven_amount+=event.getInventory().getContents()[i].getAmount();
+							inven_items++;
+							//Bukkit.getLogger().info("Check at "+event.getInventory().getContents()[i].toString());
+						}
+					}
+					//Bukkit.getLogger().info("Marked at "+inven_amount+".");
+					Bookshelf_attemptUpdate(inven_amount,inven_items,p2);
+				} else {
+					//Bukkit.getLogger().info("Cannot perform! We are waiting on an update.");
+					event.setCancelled(true);
+					event.setResult(Result.DENY);
+				}
+			}
+		}
 		if (isViewingEnderCube(p) && (event.getClick()==ClickType.NUMBER_KEY || ((event.getClick()==ClickType.SHIFT_LEFT || event.getClick()==ClickType.SHIFT_RIGHT) && event.getCurrentItem()!=null && event.getCurrentItem().getType()!=Material.AIR) || ((event.getClick()==ClickType.LEFT || event.getClick()==ClickType.RIGHT) && event.getRawSlot()<27 && ((event.getCursor()!=null && event.getCursor().getType()!=Material.AIR) || (event.getCurrentItem()!=null && event.getCurrentItem().getType()!=Material.AIR)))) ) {
 			boolean item_cube=false;
 			//Bukkit.getLogger().info("Got to 1.");
@@ -16298,6 +16434,25 @@ implements Listener
 		return this.plugin.is_ItemCube(item_cube);
 	}
 
+	public void viewBookshelf(Player p, Location bookshelf_loc) {
+		Inventory screen=Bukkit.createInventory(p, 9, "Bookshelf #"+bookshelf_loc.getBlockX()+"_"+bookshelf_loc.getBlockY()+"_"+bookshelf_loc.getBlockZ());
+		FileConfiguration f = this.plugin.reloadBookshelfConfig(bookshelf_loc.getBlockX(),bookshelf_loc.getBlockY(),bookshelf_loc.getBlockZ());
+		for (int i=0;i<9;i++) {
+			if (f.contains("item-"+i)) {
+				screen.setItem(i,f.getItemStack("item-"+i));
+			}
+		}
+		final Player p2 = p;
+		final Inventory screen2 = screen;
+		  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+		      @Override
+		      public void run() {
+					p2.closeInventory();
+					p2.openInventory(screen2);
+		      }
+		  	},1);
+	}
+	
 	public void viewItemCube(Player p, ItemStack item_cube) {
 		//This function will figure out what type of Item Cube this item is and then display the correct inventory on-screen, also setting up the identifier.
 		Cube cube_type = null;
@@ -16393,6 +16548,38 @@ implements Listener
 		}
 	}
 
+	public void Bookshelf_attemptUpdate(final int amt,final int count,final Player p) {
+		Bookshelf_attemptUpdate(amt,count,p,0);
+	}
+	
+	public void Bookshelf_attemptUpdate(final int amt,final int count,final Player p,int tracking_amt) {
+		int cur_amt=0;
+		int cur_count=0;
+		p.updateInventory();
+		for (int i=0;i<p.getOpenInventory().getTopInventory().getContents().length;i++) {
+			if (p.getOpenInventory().getTopInventory().getContents()[i]!=null) {
+				cur_amt+=p.getOpenInventory().getTopInventory().getContents()[i].getAmount();
+				cur_count++;
+			}
+		}
+		//Bukkit.getLogger().info("Compare "+cur_amt+" to "+amt+".");
+		if (cur_amt!=amt || cur_count!=count) {
+			Bookshelf_save(p, getViewingBookshelfID(p));
+			Bookshelf_updateSameBookshelf(getViewingBookshelfID(p),p);
+			Main.book_shelf_active=true;
+		} else {
+			final int new_amt = cur_amt;
+			final int new_count = cur_count;
+			final int new_track = tracking_amt++;
+		  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+		      @Override
+		      public void run() {
+		    	  Bookshelf_attemptUpdate(new_amt,new_count,p,new_track);
+		      }
+		  	},1);
+		}
+	}
+	
 	public void ItemCube_attemptUpdate(final int amt,final int count,final Player p) {
 		ItemCube_attemptUpdate(amt,count,p,0);
 	}
@@ -16425,6 +16612,16 @@ implements Listener
 		}
 	}
 
+	public boolean isViewingBookshelf(Player p) {
+		//Returns whether or not this player is viewing a bookshelf.
+		//This is useful for determining if you have to update the bookshelf for other viewers.
+		if (p.getOpenInventory().getTopInventory()!=null && p.getOpenInventory().getTopInventory().getTitle().contains("Bookshelf")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public boolean isViewingEnderCube(Player p) {
 		//Returns whether or not this player is viewing an ender cube.
 		//This is useful for determining if you have to update the ender cube for other viewers.
@@ -16435,6 +16632,15 @@ implements Listener
 		}
 	}
 
+	public Location getViewingBookshelfID(Player p) {
+		if (p.getOpenInventory().getTopInventory()!=null && p.getOpenInventory().getTopInventory().getTitle().contains("Bookshelf")) {
+			String[] newloc = p.getOpenInventory().getTopInventory().getTitle().substring(p.getOpenInventory().getTopInventory().getTitle().indexOf("#")).replace("#", "").split("_");
+			return new Location(Bukkit.getWorld("world"),Integer.valueOf(newloc[0]),Integer.valueOf(newloc[1]),Integer.valueOf(newloc[2]));
+		} else {
+			return null; //Invalid use.
+		}
+	}
+	
 	public int getViewingEnderCubeID(Player p) {
 		//Returns whether or not this player is viewing an ender cube.
 		//This is useful for determining if you have to update the ender cube for other viewers.
@@ -16464,6 +16670,27 @@ implements Listener
 			}
 		}
 	}
+	
+	public void Bookshelf_updateSameBookshelf(Location bookshelf_id, Player player) {
+		//If a player attempts to do something in a Bookshelf, update the Bookshelf for all other viewers that is not player. (The player argument is the player making modifications to the inventory.)
+		for (int i=0;i<Bukkit.getOnlinePlayers().length;i++) {
+			if (!Bukkit.getOnlinePlayers()[i].getName().equals(player.getName())) {
+				if (Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory()!=null) {
+					//Check if it's the same ID.
+					if (Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().contains("Bookshelf") && Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().length()>0) {
+						//Bukkit.getLogger().info("Check inventory title: "+Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().substring(Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().indexOf("#")).replace("#", ""));
+						if (Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().substring(Bukkit.getOnlinePlayers()[i].getOpenInventory().getTopInventory().getTitle().indexOf("#")).replace("#", "").equalsIgnoreCase(bookshelf_id.getBlockX()+"_"+bookshelf_id.getBlockY()+"_"+bookshelf_id.getBlockZ())) {
+							//It is! We need to close it out and re-open with the updated properties of the cube.							
+							final int i2 = i;
+							final Location bookshelf_id2 = bookshelf_id;
+							Bookshelf_load(Bukkit.getOnlinePlayers()[i2], bookshelf_id2);
+							//Bukkit.getLogger().info("Re-loading Item Cube for "+Bukkit.getOnlinePlayers()[i].getName());
+						}
+					}
+				}
+			}
+		}
+	}
 
 	private void ItemCube_addSameEnderCube(ItemStack add_item, int cube_id, Player player) {
 		//Helper function for ItemCube_add.
@@ -16483,6 +16710,16 @@ implements Listener
 		}
 	}
 
+	private void Bookshelf_save(Player p, Location loc) {
+		FileConfiguration f = this.plugin.reloadBookshelfConfig(loc.getBlockX(),loc.getBlockY(),loc.getBlockZ());
+		int slots = -1;
+		String heading = "";
+		for (int i=0;i<p.getOpenInventory().getTopInventory().getContents().length;i++) {
+			f.set("item-"+i, p.getOpenInventory().getTopInventory().getItem(i));
+		}
+		this.plugin.saveBookshelfConfig(f, loc.getBlockX(),loc.getBlockY(),loc.getBlockZ());
+	}
+	
 	private void ItemCube_save(Player p, int identifier, Cube size) {
 		FileConfiguration f = this.plugin.reloadItemCubeConfig(identifier);
 		int slots = -1;
@@ -16505,6 +16742,21 @@ implements Listener
 			f.set("item-"+i, p.getOpenInventory().getTopInventory().getItem(i));
 		}
 		this.plugin.saveItemCubeConfig(f, identifier);
+	}
+
+	private void Bookshelf_load(Player p, Location loc) {
+		FileConfiguration f = this.plugin.reloadBookshelfConfig(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+		int slots = -1;
+		String heading = "";
+		p.getOpenInventory().getTopInventory().clear();
+		for (int i=0;i<9;i++) {
+			//items.add(f.getItemStack("item-"+i));
+			if (f.contains("item-"+i)) {
+				p.getOpenInventory().getTopInventory().addItem(f.getItemStack("item-"+i));
+				//Bukkit.getLogger().info("Reloading item "+f.getItemStack("item-"+i).toString());
+			}
+		}
+		p.updateInventory();
 	}
 	
 	private void ItemCube_load(Player p, int identifier, Cube size) {
@@ -17320,6 +17572,11 @@ implements Listener
 		}
 		
 		//******************************//End Job related buffs.
+		
+		if (e.getAction()==Action.RIGHT_CLICK_BLOCK && p.isSneaking() && e.getClickedBlock().getType()==Material.BOOKSHELF) {
+			viewBookshelf(p, e.getClickedBlock().getLocation());
+			e.setCancelled(true);
+		}
 		
 		if (this.plugin.PlayerinJob(p, "Explorer")) {
 			for (int i=0;i<this.plugin.explorerlist.size();i++) {
