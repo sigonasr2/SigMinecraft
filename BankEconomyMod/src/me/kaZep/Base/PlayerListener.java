@@ -33,6 +33,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.SkullType;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -49,6 +50,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Animals;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Creature;
@@ -129,6 +131,7 @@ import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceExtractEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -223,6 +226,8 @@ import me.kaZep.Base.PersistentExplorerList;
 import me.kaZep.Base.PlayerData;
 import me.kaZep.Base.SupportEntity;
 import me.kaZep.Base.SupportPlayer;
+import me.kaZep.Base.MobHead.MobHeadRareType;
+import me.kaZep.Base.MobHead.MobHeadType;
 import me.kaZep.Commands.JobsDataInfo.Job;
 
 public class PlayerListener
@@ -334,9 +339,9 @@ implements Listener
 	public void onServerListPing(ServerListPingEvent e) {
 		e.setMaxPlayers(16);
 		if (this.plugin.getConfig().getBoolean("maintenance-mode")) {
-			e.setMotd(ChatColor.RED+"Currently in Maintenance Mode.");
+			e.setMotd(ChatColor.AQUA+"Sig's Minecraft!\n"+ChatColor.RED+"Currently in Maintenance Mode.");
 		} else {
-			e.setMotd("Sig's Minecraft - "+ChatColor.BLUE+"Currently Online.");
+			e.setMotd(ChatColor.AQUA+"Sig's Minecraft!\n"+ChatColor.BLUE+"Currently Online.");
 		}
 		return;
 	}
@@ -1957,6 +1962,7 @@ implements Listener
 			Main.economy.depositPlayer(p.getName().toLowerCase(), 70);
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".status", Boolean.valueOf(true));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".money", Double.valueOf(this.plugin.getConfig().getDouble("start-balance")));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".interestdistributedtime", Long.valueOf(Main.SERVER_TICK_TIME));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".revived", Boolean.valueOf(true));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".spleefrating", Double.valueOf(1000.0d));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".spleefwins", Integer.valueOf(0));
@@ -2022,6 +2028,10 @@ implements Listener
 			p.sendMessage(ChatColor.DARK_AQUA+"For a list of all changes made to this server, visit: http://z-gamers.net/changelog.html");
 			p.sendMessage("----------------------------");
 			p.sendMessage(ChatColor.YELLOW+"Current Money Balance: $ "+df.format(Main.economy.bankBalance(p.getName().toLowerCase()).balance)+", Bank Balance: $"+df.format(this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase()+".money")));
+			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".interestdistributedtime")) {
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".interestdistributedtime", Long.valueOf(Main.SERVER_TICK_TIME));
+				//this.plugin.saveAccountsConfig();
+			}
 			//Update account information for the stat point update.
 			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".jobs.job1_30")) {
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".jobs.job1_30", Integer.valueOf(0));
@@ -6098,6 +6108,8 @@ implements Listener
 	public void onItemPrepareCraft(PrepareItemCraftEvent e) {
 		CraftingInventory result = e.getInventory();
 		
+		//Bukkit.getLogger().info("Triggered PrepareItemCraftEvent.");
+		
 		//****************************// Job Boofs poof here.
 
 		if (result.getResult().getType()==Material.WOOD) {
@@ -6149,6 +6161,62 @@ implements Listener
 			} else {
 				result.setResult(new ItemStack(Material.AIR));
 				return; //Don't allow it to continue.
+			}
+		}
+		
+		if (result.getResult().getType()==Material.SKULL_ITEM) {
+			//This could potentially be a mob head.
+			//Find the mob head.
+			boolean found=false;
+			for (int i=0;i<result.getMatrix().length;i++) {
+				if (result.getMatrix()[i]!=null &&
+						result.getMatrix()[i].getType()==Material.SKULL_ITEM) {
+					//Bukkit.getLogger().info("Detected a skull item here.");
+					int gold_blocks=0;
+					int beacons=0;
+					for (int j=0;j<result.getMatrix().length;j++) {
+						if (result.getMatrix()[j]!=null &&
+								result.getMatrix()[j].getType()==Material.GOLD_BLOCK) {
+							gold_blocks++;
+						}
+						if (result.getMatrix()[j]!=null &&
+								result.getMatrix()[j].getType()==Material.BEACON) {
+							beacons++;
+						}
+					}
+					//Bukkit.getLogger().info("Found "+gold_blocks+" gold blocks and "+beacons+" beacons.");
+					if (this.plugin.getMobHead(result.getMatrix()[i])!=null) {
+							//Bukkit.getLogger().info("Mob head is "+this.plugin.getMobHead(result.getMatrix()[i]).toString());
+							if (this.plugin.isUnpoweredHead(this.plugin.getMobHead(result.getMatrix()[i]))) {
+								//Bukkit.getLogger().info("Mob head is considered unpowered, convert.");
+								//Allow this conversion to occur.
+								if (this.plugin.isRareHead(this.plugin.getMobHead(result.getMatrix()[i])) && beacons==4) {
+									short numb = result.getMatrix()[i].clone().getDurability();
+									ItemStack poweredhead = this.plugin.convertToPoweredHead(result.getMatrix()[i].clone());
+									poweredhead.setData(result.getMatrix()[i].getData());
+									found=true;
+									//Bukkit.getLogger().info("Converted head item is "+this.plugin.convertToPoweredHead(result.getMatrix()[i]).toString());
+									poweredhead.setDurability(numb);
+									result.setResult(poweredhead);
+									break;
+								}
+								else
+								if (!this.plugin.isRareHead(this.plugin.getMobHead(result.getMatrix()[i])) && gold_blocks==4) {
+									short numb = result.getMatrix()[i].clone().getDurability();
+									ItemStack poweredhead = this.plugin.convertToPoweredHead(result.getMatrix()[i].clone());
+									found=true;
+									//Bukkit.getLogger().info("Converted head item is "+this.plugin.convertToPoweredHead(result.getMatrix()[i]).toString());
+									poweredhead.setDurability(numb);
+									result.setResult(poweredhead);
+									break;
+								}
+							}
+						}
+					}
+				}
+			if (!found) {
+				result.setResult(new ItemStack(Material.AIR));
+				return;
 			}
 		}
 
@@ -8215,6 +8283,130 @@ implements Listener
 						e.getDrops().remove(i);
 					}
 				}
+				if (e.getDrops().get(i).getAmount()>1) {
+					//Every stack only has half a chance of the previous one to still exist.
+					int newamt=1;
+					for (int j=0;j<e.getDrops().get(i).getAmount()-1 && Math.random()<=0.5;j++) {
+						newamt++;
+					}
+					e.getDrops().get(i).setAmount(newamt);
+				}
+			}
+			if (Math.random()<=Main.HEAD_DROP_CHANCE*chance_increase) {
+				switch (e.getEntity().getType()) {
+					case SKELETON:{
+						if (((Skeleton)e.getEntity()).getSkeletonType()==SkeletonType.WITHER) {
+							e.getDrops().add(new MobHead(MobHeadType.CREEPER).getItemStack());
+						} else {
+							e.getDrops().add(new MobHead(MobHeadType.SKELETON).getItemStack());
+						}
+					}break;
+					case ZOMBIE:{
+						e.getDrops().add(new MobHead(MobHeadType.ZOMBIE).getItemStack());
+					}break;
+					case CREEPER:{
+						e.getDrops().add(new MobHead(MobHeadType.CREEPER).getItemStack());
+					}break;
+					case SPIDER:{
+						e.getDrops().add(new MobHead(MobHeadType.SPIDER).getItemStack());
+					}break;
+					case ENDERMAN:{
+						e.getDrops().add(new MobHead(MobHeadType.ENDERMAN).getItemStack());
+					}break;
+					case CAVE_SPIDER:{
+						e.getDrops().add(new MobHead(MobHeadType.CAVE_SPIDER).getItemStack());
+					}break;
+					case BLAZE:{
+						e.getDrops().add(new MobHead(MobHeadType.BLAZE).getItemStack());
+					}break;
+					case GHAST:{
+						e.getDrops().add(new MobHead(MobHeadType.GHAST).getItemStack());
+					}break;
+					case PIG_ZOMBIE:{
+						e.getDrops().add(new MobHead(MobHeadType.ZOMBIE_PIGMAN).getItemStack());
+					}break;
+					case MAGMA_CUBE:{
+						e.getDrops().add(new MobHead(MobHeadType.MAGMA_CUBE).getItemStack());
+					}break;
+				}
+			}
+			if (Math.random()<=Main.RARE_HEAD_DROP_CHANCE*chance_increase) {
+					switch (e.getEntity().getType()) {
+					case SKELETON:{
+						if (((Skeleton)e.getEntity()).getSkeletonType()==SkeletonType.WITHER) {
+							e.getDrops().add(new MobHead(MobHeadType.WITHER_SKELETON,true).getItemStack());
+						} else {
+							if (Math.random()<=0.5) {
+								e.getDrops().add(new MobHead(MobHeadType.SKELETON,true,MobHeadRareType.RARE_TYPE_A).getItemStack());
+							} else {
+								e.getDrops().add(new MobHead(MobHeadType.SKELETON,true,MobHeadRareType.RARE_TYPE_B).getItemStack());
+							}
+						}
+					}break;
+					case ZOMBIE:{
+						if (Math.random()<=0.5) {
+							e.getDrops().add(new MobHead(MobHeadType.ZOMBIE,true,MobHeadRareType.RARE_TYPE_A).getItemStack());
+						} else {
+							e.getDrops().add(new MobHead(MobHeadType.ZOMBIE,true,MobHeadRareType.RARE_TYPE_B).getItemStack());
+						}
+					}break;
+					case CREEPER:{
+						if (Math.random()<=0.5) {
+							e.getDrops().add(new MobHead(MobHeadType.CREEPER,true,MobHeadRareType.RARE_TYPE_A).getItemStack());
+						} else {
+							e.getDrops().add(new MobHead(MobHeadType.CREEPER,true,MobHeadRareType.RARE_TYPE_B).getItemStack());
+						}
+					}break;
+					case SPIDER:{
+						if (Math.random()<=0.5) {
+							e.getDrops().add(new MobHead(MobHeadType.SPIDER,true,MobHeadRareType.RARE_TYPE_A).getItemStack());
+						} else {
+							e.getDrops().add(new MobHead(MobHeadType.SPIDER,true,MobHeadRareType.RARE_TYPE_B).getItemStack());
+						}
+					}break;
+					case ENDERMAN:{
+						if (Math.random()<=0.5) {
+							e.getDrops().add(new MobHead(MobHeadType.ENDERMAN,true,MobHeadRareType.RARE_TYPE_A).getItemStack());
+						} else {
+							e.getDrops().add(new MobHead(MobHeadType.ENDERMAN,true,MobHeadRareType.RARE_TYPE_B).getItemStack());
+						}
+					}break;
+					case CAVE_SPIDER:{
+						if (Math.random()<=0.5) {
+							e.getDrops().add(new MobHead(MobHeadType.CAVE_SPIDER,true,MobHeadRareType.RARE_TYPE_A).getItemStack());
+						} else {
+							e.getDrops().add(new MobHead(MobHeadType.CAVE_SPIDER,true,MobHeadRareType.RARE_TYPE_B).getItemStack());
+						}
+					}break;
+					case BLAZE:{
+						if (Math.random()<=0.5) {
+							e.getDrops().add(new MobHead(MobHeadType.BLAZE,true,MobHeadRareType.RARE_TYPE_A).getItemStack());
+						} else {
+							e.getDrops().add(new MobHead(MobHeadType.BLAZE,true,MobHeadRareType.RARE_TYPE_B).getItemStack());
+						}
+					}break;
+					case GHAST:{
+						if (Math.random()<=0.5) {
+							e.getDrops().add(new MobHead(MobHeadType.GHAST,true,MobHeadRareType.RARE_TYPE_A).getItemStack());
+						} else {
+							e.getDrops().add(new MobHead(MobHeadType.GHAST,true,MobHeadRareType.RARE_TYPE_B).getItemStack());
+						}
+					}break;
+					case PIG_ZOMBIE:{
+						if (Math.random()<=0.5) {
+							e.getDrops().add(new MobHead(MobHeadType.ZOMBIE_PIGMAN,true,MobHeadRareType.RARE_TYPE_A).getItemStack());
+						} else {
+							e.getDrops().add(new MobHead(MobHeadType.ZOMBIE_PIGMAN,true,MobHeadRareType.RARE_TYPE_B).getItemStack());
+						}
+					}break;
+					case MAGMA_CUBE:{
+						if (Math.random()<=0.5) {
+							e.getDrops().add(new MobHead(MobHeadType.MAGMA_CUBE,true,MobHeadRareType.RARE_TYPE_A).getItemStack());
+						} else {
+							e.getDrops().add(new MobHead(MobHeadType.MAGMA_CUBE,true,MobHeadRareType.RARE_TYPE_B).getItemStack());
+						}
+					}break;
+				}
 			}
 			if (Math.random()<=0.00390625*chance_increase) {
 				ItemStack rename_token = new ItemStack(Material.NAME_TAG);
@@ -8941,7 +9133,6 @@ implements Listener
 
 	@EventHandler
 	public void onInventoryOpen(InventoryOpenEvent e) {
-
 		boolean disabled = false; // set to true to disable custom anvils
 
 		// Inventory override if anvil.
@@ -10723,7 +10914,7 @@ implements Listener
 		if (e.getEntity() instanceof LivingEntity) {
 			final LivingEntity f = (LivingEntity) e.getEntity();
 			final double enemy_starthp = f.getHealth();
-			if (e.getDamager().getType()==EntityType.PLAYER || e.getDamager().getType()==EntityType.ARROW) {
+			if (e.getDamager().getType()==EntityType.PLAYER || (e.getDamager() instanceof Projectile)) {
 				if (e.getEntity() instanceof LivingEntity) {
 					LivingEntity enemy = (LivingEntity)e.getEntity();
 					if (enemy.getCustomName()!=null) {
@@ -10960,6 +11151,31 @@ implements Listener
 						p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 						ItemStack item = p.getItemInHand();
 						double critical_chance=0,armor_pen=0,life_steal=0,attack_speed=0,dmg=0,armor_pen_dmg=0;
+						List<MobHead> player_mobheads = this.plugin.getMobHeads(p);
+						int skeleton_heads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON), player_mobheads);
+						int powered_skeleton_heads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON, false, true), player_mobheads);
+						int rare_skeleton_heads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON, true, MobHeadRareType.RARE_TYPE_A), player_mobheads);
+						int powered_rare_skeleton_heads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON, true, MobHeadRareType.RARE_TYPE_A, true), player_mobheads);
+						/*if (skeleton_heads>0) {
+							Bukkit.getLogger().info("Found "+skeleton_heads+" skeleton mob heads.");
+						}
+						if (powered_skeleton_heads>0) {
+							Bukkit.getLogger().info("Found "+powered_skeleton_heads+" powered skeleton mob heads.");
+						}
+						if (rare_skeleton_heads>0) {
+							Bukkit.getLogger().info("Found "+rare_skeleton_heads+" rare skeleton mob heads.");
+						}
+						if (powered_rare_skeleton_heads>0) {
+							Bukkit.getLogger().info("Found "+powered_rare_skeleton_heads+" powered rare skeleton "s.");
+						}*/
+						if (skeleton_heads+powered_skeleton_heads+rare_skeleton_heads+powered_rare_skeleton_heads>0) {
+							//Bukkit.getLogger().info("Old damage was "+e.getDamage());
+							e.setDamage(e.getDamage()+(e.getDamage()*(0.01*skeleton_heads)));
+							e.setDamage(e.getDamage()+(e.getDamage()*(0.01*powered_skeleton_heads)));
+							e.setDamage(e.getDamage()+(e.getDamage()*(0.03*rare_skeleton_heads)));
+							e.setDamage(e.getDamage()+(e.getDamage()*(0.05*powered_rare_skeleton_heads)));
+							//Bukkit.getLogger().info("New damage is "+e.getDamage());
+						}
 						if (this.plugin.hasJobBuff("Hunter", p, Job.JOB30B)) {
 							armor_pen+=10;
 						}
@@ -11127,8 +11343,10 @@ implements Listener
 									if (f.getCustomName()!=null) {
 										if (enemy_starthp-f.getHealth()+armor_dmg>0.1) {
 											p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+f.getCustomName()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
-										} else {
-											p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+ChatColor.WHITE+f.getType()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
+										}
+									} else {
+										if (enemy_starthp-f.getHealth()+armor_dmg>0.1) {
+											p.sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Dealt "+df.format(enemy_starthp-f.getHealth()+armor_dmg)+" damage to "+ChatColor.WHITE+f.getType().name()+ChatColor.RED+""+ChatColor.ITALIC+" (-"+df2.format(((enemy_starthp-f.getHealth())/f.getMaxHealth())*100)+"%)");
 										}
 									}
 								}
@@ -12414,7 +12632,7 @@ implements Listener
 					//Subtract 1 from cursor.
 					//If the item matches or it's blank.
 					if (event.getInventory().getItem(3)!=null) {
-						if (event.getClick()==ClickType.LEFT) {
+						if (event.getClick()==ClickType.LEFT && event.getAction()!=InventoryAction.COLLECT_TO_CURSOR) {
 							if (event.getInventory().getItem(3).getType()==event.getCursor().getType() || event.getInventory().getItem(3).getType()==Material.AIR) {
 								int amt = event.getInventory().getItem(3).getAmount();
 								if (amt+event.getCursor().getAmount()>event.getInventory().getItem(3).getMaxStackSize()) {
@@ -12425,16 +12643,19 @@ implements Listener
 									newamt.setAmount(leftover);
 									event.getInventory().setItem(3, newamt2);
 									event.setCursor(newamt);
+									event.setResult(Result.ALLOW);
 								} else {
 									//Just transfer it all.
 									event.getInventory().setItem(3, event.getCursor());
 									event.setCursor(new ItemStack(Material.AIR));
+									event.setResult(Result.ALLOW);
 								}
 							} else {
 								//Swap them.
 								ItemStack swap = event.getInventory().getItem(3).clone();
 								event.getInventory().setItem(3, event.getCursor());
 								event.setCursor(swap);
+								event.setResult(Result.ALLOW);
 							}
 						} else 
 						if (event.getClick()==ClickType.RIGHT) {
@@ -12448,6 +12669,7 @@ implements Listener
 									newamt.setAmount(leftover);
 									event.getInventory().setItem(3, newamt2);
 									event.setCursor(newamt);
+									event.setResult(Result.ALLOW);
 								} else {
 									//Just transfer 1.
 									ItemStack curs = event.getCursor().clone();
@@ -12456,28 +12678,33 @@ implements Listener
 									inven.setAmount(inven.getAmount()+1);
 									event.getInventory().setItem(3, inven);
 									event.setCursor(curs);
+									event.setResult(Result.ALLOW);
 								}
 							} else {
 								//Swap them.
 								ItemStack swap = event.getInventory().getItem(3).clone();
 								event.getInventory().setItem(3, event.getCursor());
 								event.setCursor(swap);
+								event.setResult(Result.ALLOW);
 							}
 						}
 					} else {
 						if (event.getClick()==ClickType.LEFT) {
 							event.getInventory().setItem(3, event.getCursor());
 							event.setCursor(new ItemStack(Material.AIR));
+							event.setResult(Result.ALLOW);
 						} else 
 						if (event.getClick()==ClickType.RIGHT) {
 							if (event.getCursor().getAmount()==1) {
 								event.getInventory().setItem(3, event.getCursor());
 								event.setCursor(new ItemStack(Material.AIR));
+								event.setResult(Result.ALLOW);
 							} else {
 								ItemStack curs = event.getCursor().clone(); curs.setAmount(curs.getAmount()-1);
 								ItemStack curs2 = event.getCursor().clone(); curs2.setAmount(1);
 								event.getInventory().setItem(3, curs2);
 								event.setCursor(curs);
+								event.setResult(Result.ALLOW);
 							}
 						}
 					}
@@ -12507,6 +12734,7 @@ implements Listener
 				if (pot1!=null && pot1.getDurability()==0) {brew=true;}
 				if (pot2!=null && pot2.getDurability()==0) {brew=true;}
 				if (pot3!=null && pot3.getDurability()==0) {brew=true;}
+				Bukkit.getLogger().info("Checking in slot 3: "+event.getInventory().getItem(3).toString());
 				if (event.getInventory().getItem(3).getType()==Material.INK_SACK && brew) {
 					ItemStack pot = new ItemStack(Material.POTION);
 					pot.setDurability((short)16391);
@@ -13675,8 +13903,21 @@ implements Listener
 					if (!anvilClicked) {
 						// Clicked the inventory. Leave the operation alone UNLESS it's a shift-click operation.
 						if (event.isShiftClick()) {
-							// Call the scheduled task to validate and update the inventory 
-							Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
+							// Call the scheduled task to validate and update the inventory
+							int task=-1, tries=100;
+							do {
+								task = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
+								tries--;
+								Bukkit.getLogger().info("Trying updateInventoryTask(). tries="+tries);
+							} while (task==-1 && tries>0);
+							if (tries<0) {
+								Bukkit.getLogger().severe("Could not updateInventoryTask() for whatever reason. Stop trying.");
+								//Failed for some reason. Cancel the click instead.
+								event.setCancelled(true);
+								event.getWhoClicked().getInventory().setContents(event.getWhoClicked().getInventory().getContents());
+								event.getInventory().setContents(event.getInventory().getContents());
+								p.updateInventory();
+							}
 						}
 					} else { 
 						// Clicked the anvil. If GUI items are clicked or an invalid operation happens, cancel the operation. 
@@ -13786,8 +14027,20 @@ implements Listener
 												}
 
 												event.getInventory().setItem(OUTPUT, new ItemStack(Material.AIR));
-												Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
-
+												int task=-1, tries=100;
+												do {
+													task = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
+													tries--;
+													Bukkit.getLogger().info("Trying updateInventoryTask(). tries="+tries);
+												} while (task==-1 && tries>0);
+												if (tries<0) {
+													Bukkit.getLogger().severe("Could not updateInventoryTask() for whatever reason. Stop trying.");
+													//Failed for some reason. Cancel the click instead.
+													event.setCancelled(true);
+													event.getWhoClicked().getInventory().setContents(event.getWhoClicked().getInventory().getContents());
+													event.getInventory().setContents(event.getInventory().getContents());
+													p.updateInventory();
+												}
 											}
 										}
 									} else {
@@ -13871,7 +14124,20 @@ implements Listener
 												
 
 												event.getInventory().setItem(OUTPUT, new ItemStack(Material.AIR));
-												Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
+												int task=-1, tries=100;
+												do {
+													task = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
+													tries--;
+													Bukkit.getLogger().info("Trying updateInventoryTask(). tries="+tries);
+												} while (task==-1 && tries>0);
+												if (tries<0) {
+													Bukkit.getLogger().severe("Could not updateInventoryTask() for whatever reason. Stop trying.");
+													//Failed for some reason. Cancel the click instead.
+													event.setCancelled(true);
+													event.getWhoClicked().getInventory().setContents(event.getWhoClicked().getInventory().getContents());
+													event.getInventory().setContents(event.getInventory().getContents());
+													p.updateInventory();
+												}
 											}
 										} else {
 											// Bukkit.getLogger().info("Normal click");
@@ -13935,8 +14201,20 @@ implements Listener
 												Bukkit.getPlayer(event.getWhoClicked().getName()).getWorld().playSound(Bukkit.getPlayer(event.getWhoClicked().getName()).getLocation(), Sound.LEVEL_UP, 10, 1);
 											}
 
-											Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
-
+											int task=-1, tries=100;
+											do {
+												task = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
+												tries--;
+												Bukkit.getLogger().info("Trying updateInventoryTask(). tries="+tries);
+											} while (task==-1 && tries>0);
+											if (tries<0) {
+												Bukkit.getLogger().severe("Could not updateInventoryTask() for whatever reason. Stop trying.");
+												//Failed for some reason. Cancel the click instead.
+												event.setCancelled(true);
+												event.getWhoClicked().getInventory().setContents(event.getWhoClicked().getInventory().getContents());
+												event.getInventory().setContents(event.getInventory().getContents());
+												p.updateInventory();
+											}
 										}
 									}
 
@@ -14022,7 +14300,20 @@ implements Listener
 								Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
 							}
 							 */
-							Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
+							int task=-1, tries=100;
+							do {
+								task = Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new updateInventoryTask(event.getWhoClicked().getName()));
+								tries--;
+								Bukkit.getLogger().info("Trying updateInventoryTask(). tries="+tries);
+							} while (task==-1 && tries>0);
+							if (tries<0) {
+								Bukkit.getLogger().severe("Could not updateInventoryTask() for whatever reason. Stop trying.");
+								//Failed for some reason. Cancel the click instead.
+								event.setCancelled(true);
+								event.getWhoClicked().getInventory().setContents(event.getWhoClicked().getInventory().getContents());
+								event.getInventory().setContents(event.getInventory().getContents());
+								p.updateInventory();
+							}
 						} else {
 							event.setCancelled(true);
 						}
@@ -14066,6 +14357,19 @@ implements Listener
 				break;
 			}
 
+		}
+		if (event.isCancelled()) {
+			final Player p2 = p;
+			final InventoryClickEvent e2 = event;
+			Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new
+					Runnable() {
+				@Override
+				public void run() {
+					e2.getInventory().setContents(e2.getInventory().getContents());
+					p2.getInventory().setContents(p2.getInventory().getContents());
+					p2.updateInventory();
+				}
+			}, 1);
 		}
 	} 
 
@@ -14841,6 +15145,28 @@ implements Listener
 	@EventHandler
 	public void onProjectilLaunch(ProjectileLaunchEvent e) {
 		Projectile thrown_obj = e.getEntity();
+		if (thrown_obj instanceof Arrow) {
+			if (thrown_obj.getShooter()!=null && (thrown_obj.getShooter() instanceof Player)) {
+				Player p = (Player)thrown_obj.getShooter();
+				List<MobHead> mobheads = this.plugin.getMobHeads(p);
+				int skeleton_mob_head = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON, true, MobHeadRareType.RARE_TYPE_B), mobheads);
+				int powered_skeleton_mob_head = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON, false, true), mobheads);
+				int powered_rare_skeleton_mob_head = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON, true, MobHeadRareType.RARE_TYPE_A, true), mobheads);
+				if (skeleton_mob_head+powered_skeleton_mob_head+powered_rare_skeleton_mob_head>0) {
+					//Bukkit.getLogger().info("Old Projectile speed: "+thrown_obj.getVelocity().toString());
+					for (int i=0;i<skeleton_mob_head;i++) {
+						thrown_obj.setVelocity(thrown_obj.getVelocity().add(thrown_obj.getVelocity().multiply((double)1/thrown_obj.getVelocity().length())));
+					}
+					for (int i=0;i<powered_skeleton_mob_head;i++) {
+						thrown_obj.setVelocity(thrown_obj.getVelocity().add(thrown_obj.getVelocity().multiply((double)1/thrown_obj.getVelocity().length())));
+					}
+					for (int i=0;i<powered_rare_skeleton_mob_head*3;i++) {
+						thrown_obj.setVelocity(thrown_obj.getVelocity().add(thrown_obj.getVelocity().multiply((double)1/thrown_obj.getVelocity().length())));
+					}
+					//Bukkit.getLogger().info("New Projectile speed: "+thrown_obj.getVelocity().toString());
+				}
+			}
+		}
 		if (thrown_obj instanceof ThrownPotion) {
 			ThrownPotion thrownpot = (ThrownPotion)thrown_obj;
 			thrownpot.setVelocity(thrownpot.getVelocity().setX(thrownpot.getVelocity().getX()*4).setZ(thrownpot.getVelocity().getZ()*4).setY(thrownpot.getVelocity().getY()*3-0.375));
@@ -16322,8 +16648,10 @@ implements Listener
 	@EventHandler
 	public void onPlayerChat(PlayerChatEvent e) {
 		//Check if they are withdrawing or depositing money.
+		Bukkit.getLogger().info(e.getMessage());
 		DecimalFormat df = new DecimalFormat("#0.00");
 		//e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.SPIDER_DEATH, 5.0f, 0.04f);
+		/*
 		if (this.plugin.getPlayerData(e.getPlayer()).is_renaming_item) {
 			boolean found=false;
 			for (int i=0;i<e.getPlayer().getInventory().getContents().length;i++) {
@@ -16343,7 +16671,7 @@ implements Listener
 			if (!found) {
 				e.getPlayer().sendMessage(ChatColor.RED+"Something bad happened! Please let the administrator know about this event. Your name change did not go through.");
 			}
-		}
+		}*/
 		if (e.getPlayer().getName().equalsIgnoreCase(this.plugin.last_bank_deposit_user) && this.plugin.last_bank_deposit_use_time+200>Main.SERVER_TICK_TIME) {
 			//Parse the amount.
 			double val=0;
@@ -16353,6 +16681,7 @@ implements Listener
 				this.plugin.economy.withdrawPlayer(e.getPlayer().getName(), val);
 				double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money");
 				this.plugin.getAccountsConfig().set(e.getPlayer().getName().toLowerCase() + ".money", Double.valueOf(mymoney+val));
+				this.plugin.compoundInterest(e.getPlayer());
 				//this.plugin.saveAccountsConfig();
 				e.getPlayer().sendMessage(ChatColor.GREEN+"Deposited $" + df.format(val) + " into your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")));
 				this.plugin.last_bank_deposit_use_time=0;
@@ -16366,6 +16695,7 @@ implements Listener
 						this.plugin.economy.withdrawPlayer(e.getPlayer().getName(), val);
 						double mymoney = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money");
 						this.plugin.getAccountsConfig().set(e.getPlayer().getName().toLowerCase() + ".money", Double.valueOf(mymoney+val));
+						this.plugin.compoundInterest(e.getPlayer());
 						//this.plugin.saveAccountsConfig();
 						e.getPlayer().sendMessage(ChatColor.GREEN+"Deposited $" + df.format(val) + " into your account. " + ChatColor.YELLOW + "New Bank Balance: $" + ChatColor.AQUA + df.format(this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")));
 						this.plugin.last_bank_deposit_use_time=0;
@@ -16385,6 +16715,7 @@ implements Listener
 				double val=0;
 				if (e.getMessage().equalsIgnoreCase("all")) {
 					//Withdraw all the money in their account.
+					this.plugin.compoundInterest(e.getPlayer());
 					val = this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money");
 					this.plugin.getAccountsConfig().set(e.getPlayer().getName().toLowerCase() + ".money", Double.valueOf(0));
 					//this.plugin.saveAccountsConfig();
@@ -16395,6 +16726,7 @@ implements Listener
 					try {
 						val = Double.parseDouble(e.getMessage());
 						//Make sure the user is holding at least that much money.
+						this.plugin.compoundInterest(e.getPlayer());
 						if (this.plugin.getAccountsConfig().getDouble(e.getPlayer().getName().toLowerCase() + ".money")>=val && val>0) {
 							//Deposit the money into their account.
 							//this.plugin.economy.bankDeposit(e.getPlayer().getName(), val);
@@ -17579,7 +17911,7 @@ implements Listener
 		
 		//******************************//End Job related buffs.
 		
-		if (e.getAction()==Action.RIGHT_CLICK_BLOCK && p.isSneaking() && e.getClickedBlock().getType()==Material.BOOKSHELF) {
+		if (e.getAction()==Action.RIGHT_CLICK_BLOCK && !p.isSneaking() && e.getClickedBlock().getType()==Material.BOOKSHELF) {
 			viewBookshelf(p, e.getClickedBlock().getLocation());
 			e.setCancelled(true);
 		}
@@ -18093,18 +18425,15 @@ implements Listener
 								} else if ((sign.getLine(0).equalsIgnoreCase(ChatColor.DARK_GREEN + "[Bank]")) && (sign.getLine(1).equalsIgnoreCase(ChatColor.DARK_GRAY + "Check Balance"))) {
 									p.sendMessage(ChatColor.GRAY + "===========[ " + ChatColor.LIGHT_PURPLE + "Current Balance" + ChatColor.GRAY + " ]===========");
 									DecimalFormat df = new DecimalFormat("#0.00");
-									if (actMon <= 1)
-										p.sendMessage(ChatColor.DARK_GREEN + "Balance: $" + ChatColor.BOLD + ChatColor.AQUA + df.format(actMon));
-									else {
-										p.sendMessage(ChatColor.DARK_GREEN + "Balance: $" + ChatColor.BOLD + ChatColor.AQUA + df.format(actMon));
-									}
+									//Update money with interest.
+									actMon=this.plugin.compoundInterest(p);
+									p.sendMessage(ChatColor.DARK_GREEN + "Balance: $" + ChatColor.BOLD + ChatColor.AQUA + df.format(actMon));
 									/*
               if (stats)
                 p.sendMessage(ChatColor.DARK_GREEN + "Status: " + ChatColor.AQUA + "enabled");
               else if (!stats) {
                 p.sendMessage(ChatColor.DARK_GREEN + "Status: " + ChatColor.AQUA + "disabled");
               }*/
-									p.sendMessage(ChatColor.GRAY + "======================================");
 								}
 							}
 							else

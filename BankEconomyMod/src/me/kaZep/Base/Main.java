@@ -22,6 +22,8 @@ import java.util.logging.Logger;
 import java.text.*;
 
 import me.kaZep.Base.BonusEnchantment.ItemType;
+import me.kaZep.Base.MobHead.MobHeadRareType;
+import me.kaZep.Base.MobHead.MobHeadType;
 import me.kaZep.Base.PlayerListener.Cube;
 import me.kaZep.Commands.JobsDataInfo;
 import me.kaZep.Commands.JobsDataInfo.Job;
@@ -43,6 +45,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
+import org.bukkit.SkullType;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -74,6 +77,7 @@ import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Zombie;
+import org.bukkit.entity.Skeleton.SkeletonType;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -118,6 +122,7 @@ public class Main extends JavaPlugin
 {
   public final Logger logger = Logger.getLogger("Minecraft");
   public static Economy economy = null;
+  public static Main plugin = null;
   public ItemStack[] spleef_inventory_a,spleef_inventory_b;
   public ItemStack[] spleef4_inventory_a,spleef4_inventory_b,spleef4_inventory_c,spleef4_inventory_d;
   public ItemStack store_shovel=null;
@@ -154,6 +159,8 @@ public class Main extends JavaPlugin
   public Location BOSS_DEFEAT_LOC;
   public int POLYMORPH=0; 
   public Location POLYMORPH_LOC;
+  public static double HEAD_DROP_CHANCE = 0.01;
+  public static double RARE_HEAD_DROP_CHANCE = 0.000953125;
   
   public int LOGGING_UPDATE_COUNTS=-1;
   public int MAX_LOGGING_COUNT=12;
@@ -248,6 +255,8 @@ public class Main extends JavaPlugin
   {
     getServer().getPluginManager().registerEvents(this.pl, this);
     
+    plugin = this;
+    
     cleaned=false;
     
     if (Bukkit.getPluginManager().isPluginEnabled("MCTowns")) {
@@ -288,6 +297,28 @@ public class Main extends JavaPlugin
     getConfig().addDefault("thanksgiving-enabled", Boolean.valueOf(false));
     getConfig().addDefault("item-cube-numb", Integer.valueOf(0));
     getConfig().addDefault("server-tick-time", Long.valueOf(143000000l));
+    getConfig().addDefault("mob.skeleton", Integer.valueOf(0));
+    getConfig().addDefault("mob.witherskeleton", Integer.valueOf(0));
+    getConfig().addDefault("mob.zombie", Integer.valueOf(0));
+    getConfig().addDefault("mob.creeper", Integer.valueOf(0));
+    getConfig().addDefault("mob.spider", Integer.valueOf(0));
+    getConfig().addDefault("mob.enderman", Integer.valueOf(0));
+    getConfig().addDefault("mob.cavespider", Integer.valueOf(0));
+    getConfig().addDefault("mob.blaze", Integer.valueOf(0));
+    getConfig().addDefault("mob.ghast", Integer.valueOf(0));
+    getConfig().addDefault("mob.zombiepigman", Integer.valueOf(0));
+    getConfig().addDefault("mob.magmacube", Integer.valueOf(0));
+    getConfig().addDefault("mob.rareskeleton", Integer.valueOf(0));
+    getConfig().addDefault("mob.rarewitherskeleton", Integer.valueOf(0));
+    getConfig().addDefault("mob.rarezombie", Integer.valueOf(0));
+    getConfig().addDefault("mob.rarecreeper", Integer.valueOf(0));
+    getConfig().addDefault("mob.rarespider", Integer.valueOf(0));
+    getConfig().addDefault("mob.rareenderman", Integer.valueOf(0));
+    getConfig().addDefault("mob.rarecavespider", Integer.valueOf(0));
+    getConfig().addDefault("mob.rareblaze", Integer.valueOf(0));
+    getConfig().addDefault("mob.rareghast", Integer.valueOf(0));
+    getConfig().addDefault("mob.rarezombiepigman", Integer.valueOf(0));
+    getConfig().addDefault("mob.raremagmacube", Integer.valueOf(0));
     saveConfig();
     
     SERVER_TICK_TIME = getConfig().getLong("server-tick-time");
@@ -693,6 +724,29 @@ public class Main extends JavaPlugin
     artifact_clay.addIngredient(Material.CLAY_BALL);
     artifact_clay.addIngredient(Material.EYE_OF_ENDER);
     Bukkit.addRecipe(artifact_clay);
+    
+    //Add Powered Mob Head recipe.
+    for (int i=0;i<5;i++) {
+    	ItemStack skull_stack = new ItemStack(Material.SKULL_ITEM);
+	    MaterialData newskull = new MaterialData(Material.SKULL_ITEM,(byte)i);
+    	skull_stack.setDurability((short)i);
+	    ShapedRecipe powered_heads = new ShapedRecipe(skull_stack);
+	    powered_heads.shape(" a ","aba"," a ");
+	    powered_heads.setIngredient('a', Material.GOLD_BLOCK);
+	    powered_heads.setIngredient('b', newskull);
+	    Bukkit.addRecipe(powered_heads);
+    }
+    //Add Powered Rare Mob Head recipe.
+    for (int i=0;i<5;i++) {
+    	ItemStack skull_stack = new ItemStack(Material.SKULL_ITEM);
+	    MaterialData newskull = new MaterialData(Material.SKULL_ITEM,(byte)i);
+    	skull_stack.setDurability((short)i);
+	    ShapedRecipe powered_rare_heads = new ShapedRecipe(skull_stack);
+	    powered_rare_heads.shape(" a ","aba"," a ");
+	    powered_rare_heads.setIngredient('a', Material.BEACON);
+	    powered_rare_heads.setIngredient('b', newskull);
+	    Bukkit.addRecipe(powered_rare_heads);
+    }
     
     //Add deconversion recipes.
     ShapelessRecipe DeConv_diamond_chestplate = new ShapelessRecipe(new ItemStack(Material.DIAMOND));
@@ -1768,6 +1822,8 @@ public void runTick() {
 										  meta.setOwner("MHF_Enderman");
 										  skull.setItemMeta(meta);
 										  zombie.getEquipment().setHelmet(skull);
+										  Zombie z = (Zombie)zombie;
+										  z.setBaby(false);
 										  
 										  enderdragon.setCustomName(ChatColor.DARK_PURPLE+"Charge Zombie III");
 										  enderdragon.setMaxHealth(200);
@@ -5427,6 +5483,22 @@ public void payDay(int time)
     	}
     }
     
+    /**
+     * Compounds the interest for the player and updates their account balance appropriately.
+     * Use whenever you need to update their balance.
+     * @param p The player to update the balance for.
+     * @return Returns what the new balance is for displaying / processing.
+     */
+    public double compoundInterest(Player p) {
+    	double oldmon = getAccountsConfig().getDouble(p.getName().toLowerCase()+".money");
+    	double newbalance = getAccountsConfig().getDouble(p.getName().toLowerCase()+".money")*Math.pow(Math.E, getConfig().getDouble("payday.amount") * ((Main.SERVER_TICK_TIME - getAccountsConfig().getLong(p.getName().toLowerCase()+".interestdistributedtime")) / 1728000d));
+		Bukkit.getLogger().info("Money compounded from "+oldmon+" to "+newbalance);
+		//Bukkit.getLogger().info("Equation is "+getAccountsConfig().getDouble(p.getName().toLowerCase()+".money")+"*Math.pow("+Math.E+","+getConfig().getDouble("payday.amount")+"*(("+Main.SERVER_TICK_TIME+"-"+getAccountsConfig().getLong(p.getName().toLowerCase()+".interestdistributedtime")+")/1728000d))");
+		getAccountsConfig().set(p.getName().toLowerCase()+".interestdistributedtime", Long.valueOf(Main.SERVER_TICK_TIME));
+    	getAccountsConfig().set(p.getName().toLowerCase()+".money", Double.valueOf(newbalance));
+    	return newbalance;
+    }
+    
     public void notifyBuffMessages(Player p) {
     	notifyBuffMessages(p, 20);
     }
@@ -6373,6 +6445,90 @@ public void payDay(int time)
     		}
     	}
     	return finallist;
+    }
+    
+    /**
+     * Checks if the given head is powered or
+     * unpowered.
+     * @param head The mob head to check for.
+     * @return Returns true if the head is powered
+     * or false otherwise.
+     */
+    public boolean isUnpoweredHead(MobHead head) {
+    	return !head.is_powered;
+    }
+    
+    /**
+     * Checks if the given head is rare or
+     * unrare.
+     * @param head The mob head to check for.
+     * @return Returns true if the head is rare
+     * or false otherwise.
+     */
+    public boolean isRareHead(MobHead head) {
+		//Bukkit.getLogger().info("Checking mobhead "+head.toString());
+    	return head.rare_head;
+    }
+    
+    /**
+     * Linker function for MobHead.convertToPoweredHead()
+     * @param item
+     * @return
+     */
+    public ItemStack convertToPoweredHead(ItemStack item) {
+    	return MobHead.convertToPoweredHead(item);
+    }
+
+    /**
+     * Linker function for MobHead.getMobHead()
+     * @param item
+     * @return
+     */
+    public MobHead getMobHead(ItemStack item) {
+    	return MobHead.getMobHead(item);
+    }
+    
+    /**
+     * Gets a list of all the valid mob heads that the player
+     * has in their inventory.
+     * @param p The player to check for.
+     * @return A list containing all the MobHead
+     *  objects the player has in their inventory.
+     *  In the case there are none, null is returned.
+     */
+    public List<MobHead> getMobHeads(Player p) {
+    	List<MobHead> mobheadlist = new ArrayList<MobHead>();
+    	for (int i=0;i<p.getInventory().getContents().length;i++) {
+    		ItemStack item = p.getInventory().getContents()[i];
+    		if (item!=null && item.getType()==Material.SKULL_ITEM && item.hasItemMeta() && item.getItemMeta().hasLore()) {
+    			//Check the lore for a valid mob head.
+    			if (getMobHead(item)!=null) {
+    				mobheadlist.add(getMobHead(item));
+    				Bukkit.getLogger().info("Mob head "+getMobHead(item).toString()+" added.");
+    			}
+    		}
+    	}
+    	if (mobheadlist.size()>0) {
+    		return mobheadlist;
+    	} else {
+    		return null;
+    	}
+    }
+    
+    /**
+     * Gets how many mob heads of a certain type of MobHead
+     * exist in the mobhead list provided.
+     * @return Returns the number of that type of head
+     *  in the given list. (0 if there are none)
+     */
+    public int getMobHeadAmt(MobHead mobhead, List<MobHead> mobheads) {
+    	int same_amt=0;
+    	for (int i=0;i<mobheads.size();i++) {
+    		if (mobhead.equals(mobheads.get(i))) {
+    			same_amt++;
+    		}
+    	}
+    	return same_amt;
     }
 }
 

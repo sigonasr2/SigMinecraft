@@ -91,7 +91,9 @@ public class RecyclingCenterNode {
 	}
 	
 	public void recycleItem(ItemStack item) {
-		if (item.getItemMeta().hasDisplayName()==false) {
+		boolean allowed=true;
+		if (item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().toLowerCase().contains("quickshop")) {allowed=false;}
+		if (allowed) {
 			//Choose one of the random recycling centers.
 			int center=(int)(Math.random()*locations.size());
 			double tempchance = chance; //Store the current chance so we can check for duplicates.

@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 
 import me.kaZep.Base.Main;
+import me.kaZep.Base.MobHead;
+import me.kaZep.Base.MobHead.MobHeadRareType;
+import me.kaZep.Base.MobHead.MobHeadType;
 import me.kaZep.Commands.JobsDataInfo.Job;
 import net.jmhertlein.mctowns.MCTowns;
 import net.jmhertlein.mctowns.MCTownsPlugin;
@@ -357,7 +360,8 @@ public String convertToItemName(String val) {
       Player p = (Player)sender;
 
       boolean status = this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase() + ".status");
-      int playerBankBalance = this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase() + ".money");
+      double playerBankBalance = this.plugin.getAccountsConfig().getInt(p.getName().toLowerCase() + ".money");
+	  playerBankBalance = this.plugin.compoundInterest(p);
 
       String currencySingular = Main.economy.currencyNameSingular();
       String currencyPlural = Main.economy.currencyNamePlural();
@@ -387,7 +391,7 @@ public String convertToItemName(String val) {
 	        	}
 	        } else
           if (cmd.getName().toLowerCase().equalsIgnoreCase("tele")) {
-			  p.sendMessage("Usage: "+ChatColor.RED+"/tele to "+ChatColor.GREEN+" <player>"+ChatColor.WHITE+" - Teleport to a player for a cost.");
+			  p.sendMessage("Usage: "+ChatColor.RED+"/tele to "+ChatColor.GREEN+" <player/town>"+ChatColor.WHITE+" - Teleport to a player/town for a cost.");
           } else
           if (cmd.getName().toLowerCase().equalsIgnoreCase("settings")) {
 			  Inventory i = Bukkit.createInventory(p, 27, "Notification Options");
@@ -566,9 +570,13 @@ public String convertToItemName(String val) {
             		if (meta.getDisplayName()==null) {
             			meta.setDisplayName(ChatColor.RESET+"");
             		}
-            		for (int i=0;i<args.length;i++) {
-            			meta.setDisplayName(meta.getDisplayName()+" "+args[i]);
-            		}
+	            		for (int i=0;i<args.length;i++) {
+	                		if (meta.getDisplayName().equals(ChatColor.RESET+"")) {
+	                			meta.setDisplayName(args[i]);
+	                		} else {
+	                			meta.setDisplayName(meta.getDisplayName()+" "+args[i]);
+	                		}
+	            		}
             		p.getItemInHand().setItemMeta(meta);
             		p.sendMessage("Changed name tag's title to "+p.getItemInHand().getItemMeta().getDisplayName()+".");
             	}
@@ -594,6 +602,39 @@ public String convertToItemName(String val) {
   				  }
   				  this.plugin.saveConfig();
   			  }
+			if (args[0].equalsIgnoreCase("cheatheads")) {
+	  			  if (p.hasPermission("maintenance-mode-admin")) {
+	  				  Inventory i = Bukkit.createInventory(p, 63, "Mob Head Inventory");
+	  				  
+	  				  ItemStack temp = null;
+	  				  
+	  				  int count = -1;
+	  				  for (int k=0;k<MobHeadType.values().length;k++) {
+	  					  temp = new MobHead(MobHeadType.values()[k]).getItemStack();
+	  					  temp.setAmount(3);
+	  					  i.setItem(count+=1, temp);
+	  				  }
+	  				  for (int k=0;k<MobHeadType.values().length;k++) {
+		  				  for (int l=0;l<MobHeadRareType.values().length;l++) {
+		  					  temp = new MobHead(MobHeadType.values()[k],true,MobHeadRareType.values()[l]).getItemStack();
+		  					  temp.setAmount(3);
+		  					  i.setItem(count+=1, temp);
+		  				  }
+	  				  }
+	  				  for (int k=0;k<MobHeadType.values().length;k++) {
+	  					  temp = new MobHead(MobHeadType.values()[k],false,true).getItemStack();
+	  					  temp.setAmount(3);
+	  					  i.setItem(count+=1, temp);
+	  				  }
+	  				  for (int k=0;k<MobHeadType.values().length;k++) {
+	  					  temp = new MobHead(MobHeadType.values()[k],true,true).getItemStack();
+	  					  temp.setAmount(3);
+	  					  i.setItem(count+=1, temp);
+	  				  }
+	  				  
+	  				  p.openInventory(i);
+	  			  }
+			}
   			if (args[0].equalsIgnoreCase("cheat")) {
   			  if (p.hasPermission("maintenance-mode-admin")) {
   				  p.sendMessage("Permission granted. Now loading Aperture Science Laboratory Equipment.");
@@ -834,7 +875,10 @@ public String convertToItemName(String val) {
   				  // Arrows
   				  i.setItem(count+=1, new ItemStack(Material.ARROW, 64));
   				  
-				  temp = new ItemStack(Material.getMaterial(34),64);
+  				  //Food
+  				  i.setItem(count+=1, new ItemStack(Material.COOKED_CHICKEN,64));
+  				  
+				  temp = new ItemStack(Material.SIGN,64);
 				  ItemMeta meta = temp.getItemMeta();
 				  meta.setDisplayName(ChatColor.LIGHT_PURPLE+"Job Boost Card");
 				  List<String> lore = new ArrayList<String>();
@@ -845,8 +889,6 @@ public String convertToItemName(String val) {
 				  i.setItem(count+=1, temp);
   				  
   				  p.openInventory(i);
-
-
   			  }
             }
   			  if (args[0].equalsIgnoreCase("newmobs")) {
@@ -1835,10 +1877,9 @@ public String convertToItemName(String val) {
             }
         else if (cmd.getName().toLowerCase().equalsIgnoreCase("bankeconomy") && (args[0].equalsIgnoreCase("info")) && (p.hasPermission("bankeconomy.info"))) {
           if (args.length == 1) {
-            if (playerBankBalance <= 1)
-              p.sendMessage(this.prefix + " " + this.cmdInfo + " " + playerBankBalance + currencySingular + "Åòa.");
-            else if (playerBankBalance > 1)
-              p.sendMessage(this.prefix + " " + this.cmdInfo + " " + playerBankBalance + currencyPlural + "Åòa.");
+        	  p.sendMessage(ChatColor.GRAY + "===========[ " + ChatColor.LIGHT_PURPLE + "Current Balance" + ChatColor.GRAY + " ]===========");
+        	  DecimalFormat df = new DecimalFormat("#0.00");
+        	  p.sendMessage(ChatColor.DARK_GREEN + "Balance: $" + ChatColor.BOLD + ChatColor.AQUA + df.format(playerBankBalance));
           }
           else
             p.sendMessage(this.invARG);
