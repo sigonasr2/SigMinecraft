@@ -1075,7 +1075,19 @@ public String convertToItemName(String val) {
 		  						 if (found) {break;}
 		  					 }
 		  					 if (!found) {
-		  						 break;
+		  						 boolean found2=false;
+			  					 for (int x=0;x<16;x++) {
+			  						 for (int yy=1;yy<4;yy++) {
+				  						 for (int z=0;z<16;z++) {
+				  							 if (!naturalBlock(p.getWorld().getBlockAt(chunkx*16+x,y+yy,chunkz*16+z).getType())) {
+				  								 found2=true;
+				  								 break;
+				  							 }
+				  						 }
+			  						 }
+			  						 if (!found2) {break;}
+			  					 }
+		  						 if (!found2) {break;}
 		  					 }
 		  				 }
 		  				 
