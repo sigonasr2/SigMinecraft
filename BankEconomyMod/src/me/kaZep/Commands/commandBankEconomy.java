@@ -1056,13 +1056,32 @@ public String convertToItemName(String val) {
 	  	  				  iterations++;
 	  	  				  Bukkit.getLogger().info("");
 	  	  				  Bukkit.getLogger().info("BEGINNING Chunk ("+MASTER_i+","+MASTER_j+") correction...");
-	  	  				  int rand_factor = (int)(Math.random()*200d);
+	  	  				  //int rand_factor = (int)(Math.random()*200d);
 		  				  int chunkx=(MASTER_i*16+CenterPoint.getBlockX()+8)/16, chunkz=(MASTER_j*16+CenterPoint.getBlockZ()+8)/16;
 		  				  WorldEditPlugin wep = (WorldEditPlugin)Bukkit.getPluginManager().getPlugin("WorldEdit");
 		  				 final TerrainManager tm = new TerrainManager(wep, p.getWorld());
-		  				  final Location loc1 = new Location(p.getWorld(),chunkx*16-16,60,chunkz*16-16);
+		  				 
+		  				 int lowest=62;
+		  				 for (int y=lowest;y>0;y--) {
+		  					 boolean found=false;
+		  					 for (int x=0;x<16;x++) {
+		  						 for (int z=0;z<16;z++) {
+		  							 if (!naturalBlock(p.getWorld().getBlockAt(chunkx*16+x,y,chunkz*16+z).getType())) {
+		  								 found=true;
+		  								 lowest--;
+		  								 break;
+		  							 }
+		  						 }
+		  						 if (found) {break;}
+		  					 }
+		  					 if (!found) {
+		  						 break;
+		  					 }
+		  				 }
+		  				 
+		  				  final Location loc1 = new Location(p.getWorld(),chunkx*16-16,lowest,chunkz*16-16);
 		  				  final Location loc2 = new Location(p.getWorld(),chunkx*16+32,128,chunkz*16+32);
-		  				  final File saveFile = new File("plugins/WorldEdit/schematics/world_save"+rand_factor);
+		  				  final File saveFile = new File("plugins/WorldEdit/schematics/world_save");
 		  				  try {
 		  					  tm.saveTerrain(saveFile, loc1, loc2);
 		  					} catch (FilenameException ex) {
@@ -1075,73 +1094,30 @@ public String convertToItemName(String val) {
 		  						// TODO Auto-generated catch block
 		  						ex.printStackTrace();
 		  					}
-		  				  final ChunkSnapshot savedChunk = p.getWorld().getChunkAt(chunkx, chunkz).getChunkSnapshot();
+		  				  //final ChunkSnapshot savedChunk = p.getWorld().getChunkAt(chunkx, chunkz).getChunkSnapshot();
 		  				  final Player p2 = p;
 		  				  final int chunkx2=chunkx,chunkz2=chunkz;
-		  				  p.getWorld().regenerateChunk(chunkx2, chunkz2);/*
-						  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
-					      @Override
-					      public void run() {*/
-					    	  int replaced_layers=0;
-			  				  //Bukkit.getLogger().info("-Checking old world bounds...");
-			  				  for (int y=0;y<56;y+=8) {
-			  					  boolean all_natural=true;
-			  	  				  //Bukkit.getLogger().info("--All Natural set.");
-			  					  for (int x=0;x<16;x++) {
-			  						  for (int yy=0;yy<8;yy++) {
-			  							  for (int z=0;z<16;z++) {
-			  								  if (!naturalBlock(Material.getMaterial((savedChunk.getBlockTypeId(x, y+yy, z))))) {
-			  				  	  				  //Bukkit.getLogger().info("--Block of type "+Material.getMaterial((savedChunk.getBlockTypeId(x, y+yy, z))).toString()+" is not natural.");
-			  									  all_natural=false;
-			  									  break;
-			  								  }
-			  							  }
-			  							  if (!all_natural) {break;}
-			  						  }
-			  						  if (!all_natural) {break;}
-			  					  }
-			  					  if (!all_natural) {
-			  						  Bukkit.getLogger().info("--Replacing blocks at positions ("+y+" to "+(y+4)+")");
-			  	  					  for (int x=0;x<16;x++) {
-			  	  						  for (int yy=0;yy<8;yy++) {
-			  	  							  for (int z=0;z<16;z++) {
-			  	  								p2.getWorld().getBlockAt(chunkx2*16+x, y+yy, chunkz2*16+z).setTypeIdAndData(savedChunk.getBlockTypeId(x, y+yy, z),(byte)savedChunk.getBlockData(x, y+yy, z),false);
-			  	  							  }
-			  	  						  }
-			  	  					  }
-			  					  } else {
-									  replaced_layers++;
-								  }
-			  				  }
-		  					  Bukkit.getLogger().info("->REPLACED "+replaced_layers+" layers. ("+(int)(iterations/10000d*100)+"%)");
-			  				  
-			  				  for (int y=63;y<256;y++) {
-			  					  for (int x=0;x<16;x++) {
-									  for (int z=0;z<16;z++) {
-										p2.getWorld().getBlockAt(chunkx2*16+x, y, chunkz2*16+z).setType(Material.AIR);
-									  }
-			  					  }
-			  				  }
-			  				  //p2.getWorld().refreshChunk(chunkx2, chunkz2);
-			  				  try {
-									tm.loadSchematic(saveFile);
-								} catch (FilenameException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (MaxChangedBlocksException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (EmptyClipboardException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (DataException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-			  				  /*}},20);*/
+		  				  p.getWorld().regenerateChunk(chunkx2, chunkz2);
+		  				  
+			  				try {
+								tm.loadSchematic(saveFile);
+							} catch (FilenameException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (MaxChangedBlocksException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (EmptyClipboardException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (DataException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+		  					  Bukkit.getLogger().info("->Updated this layer. ("+(int)(iterations/10000d*100)+"%)");
 			  				  p.getWorld().unloadChunkRequest(chunkx2, chunkz2);
 	  	  				 }
 	  				 }
