@@ -1450,6 +1450,11 @@ public void onDisable()
 		natural_mats.add(Material.SAND);
 		natural_mats.add(Material.CLAY);
 		natural_mats.add(Material.WEB);
+		natural_mats.add(Material.LAVA);
+		natural_mats.add(Material.WATER);
+		natural_mats.add(Material.AIR);
+		natural_mats.add(Material.MOSSY_COBBLESTONE);
+		natural_mats.add(Material.COAL_ORE);
 		natural_mats.add(Material.IRON_ORE);
 		natural_mats.add(Material.GOLD_ORE);
 		natural_mats.add(Material.DIAMOND_ORE);
@@ -6523,10 +6528,12 @@ public void payDay(int time)
      */
     public int getMobHeadAmt(MobHead mobhead, List<MobHead> mobheads) {
     	int same_amt=0;
-    	for (int i=0;i<mobheads.size();i++) {
-    		if (mobhead.equals(mobheads.get(i))) {
-    			same_amt++;
-    		}
+    	if (mobheads!=null) {
+	    	for (int i=0;i<mobheads.size();i++) {
+	    		if (mobhead.equals(mobheads.get(i))) {
+	    			same_amt++;
+	    		}
+	    	}
     	}
     	return same_amt;
     }

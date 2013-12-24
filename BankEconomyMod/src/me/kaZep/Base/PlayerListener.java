@@ -3,6 +3,7 @@ package me.kaZep.Base;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
+//import net.minecraft.server.v1_7_R1.WorldData;
 //import net.minecraft.server.v1_4_R1.EntityWolf;
 
 
@@ -207,8 +209,11 @@ import com.google.common.base.Objects;
 import com.modcrafting.diablodrops.DiabloDrops;
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.EmptyClipboardException;
+import com.sk89q.worldedit.FilenameException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.data.DataException;
 import com.sk89q.worldedit.schematic.SchematicFormat;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
@@ -255,6 +260,11 @@ implements Listener
 		natural_mats.add(Material.SAND);
 		natural_mats.add(Material.CLAY);
 		natural_mats.add(Material.WEB);
+		natural_mats.add(Material.LAVA);
+		natural_mats.add(Material.WATER);
+		natural_mats.add(Material.AIR);
+		natural_mats.add(Material.MOSSY_COBBLESTONE);
+		natural_mats.add(Material.COAL_ORE);
 		natural_mats.add(Material.IRON_ORE);
 		natural_mats.add(Material.GOLD_ORE);
 		natural_mats.add(Material.DIAMOND_ORE);
@@ -339,9 +349,9 @@ implements Listener
 	public void onServerListPing(ServerListPingEvent e) {
 		e.setMaxPlayers(16);
 		if (this.plugin.getConfig().getBoolean("maintenance-mode")) {
-			e.setMotd(ChatColor.AQUA+"Sig's Minecraft!\n"+ChatColor.RED+"Currently in Maintenance Mode.");
+			e.setMotd(ChatColor.AQUA+"Sig's Minecraft!\n"+ChatColor.RED+" Currently in Maintenance Mode.");
 		} else {
-			e.setMotd(ChatColor.AQUA+"Sig's Minecraft!\n"+ChatColor.BLUE+"Currently Online.");
+			e.setMotd(ChatColor.AQUA+"Sig's Minecraft!\n"+ChatColor.BLUE+" Currently Online.");
 		}
 		return;
 	}
@@ -2233,7 +2243,7 @@ implements Listener
 
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEntityEvent ev) {
-		Entity theAnimal = ev.getRightClicked();
+		Entity theAnimal = ev.getRightClicked();		
 		if (ev.getPlayer().getItemInHand().getType()==Material.getMaterial(127)) {
 			if (this.plugin.getAccountsConfig().getLong(ev.getPlayer().getName()+".halloween.wand")<Main.SERVER_TICK_TIME)
 				if (theAnimal.getType()!=EntityType.PLAYER) {
@@ -10948,12 +10958,22 @@ implements Listener
 						/*if (m.hasPotionEffect(PotionEffectType.SLOW) && Main.SERVER_TICK_TIME-this.plugin.getPlayerData(p).lastsneaktime<=60) {
 							m.removePotionEffect(PotionEffectType.SLOW);
 						}*/
+						List<MobHead> playerheads = this.plugin.getMobHeads(p);
+						int witherskeletonheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.WITHER_SKELETON), playerheads);
+						int witherskeletonrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.WITHER_SKELETON,true), playerheads);
+						int witherskeletonpoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.WITHER_SKELETON,false,true), playerheads);
+						int witherskeletonpoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.WITHER_SKELETON,true,true), playerheads);
+						int witherduration = 0, witheramplifier = 0;
 						try {
 							Iterator<PotionEffect> effects = m.getActivePotionEffects().iterator();
 							//Figure out potion effects when player joins.
 							while (effects.hasNext()) {
 								PotionEffect nexteffect = effects.next();
 								//Bukkit.getLogger().info("Effect Type is "+nexteffect.getType().getName()+", amplifier is "+nexteffect.getAmplifier()+", duration is "+nexteffect.getDuration());
+								if (witherskeletonheads+witherskeletonrareheads+witherskeletonpoweredheads+witherskeletonpoweredrareheads>0 && nexteffect.getType().getName().compareTo(PotionEffectType.WITHER.getName())==0) {
+									witherduration=nexteffect.getDuration();
+									witheramplifier=nexteffect.getAmplifier();
+								}
 								if (nexteffect.getType().getName().compareTo(PotionEffectType.SLOW.getName())==0 && nexteffect.getAmplifier()==6 && nexteffect.getDuration()<=60) {
 									m.removePotionEffect(PotionEffectType.SLOW);
 									//Bukkit.getLogger().info("Removed slow.");
@@ -10968,6 +10988,21 @@ implements Listener
 							}
 						} catch (ConcurrentModificationException ex_e) {
 							Bukkit.getLogger().warning("Potion Effect Collection not accessible while trying to remove slow debuff.");
+						}
+						if (witherskeletonpoweredrareheads>0) {
+							if (witherduration==0) {witherduration=400;}
+							Bukkit.getLogger().info("Adding potion effect WITHER with amplifier "+(witheramplifier+2*witherskeletonpoweredrareheads)+" + duration "+witherduration);
+							m.addPotionEffect(new PotionEffect(PotionEffectType.WITHER,witherduration,witheramplifier+2*witherskeletonpoweredrareheads),true);
+						} else if (witherskeletonpoweredheads>0) {
+							if (witherduration==0) {witherduration=100;}
+							Bukkit.getLogger().info("Adding potion effect WITHER with amplifier "+(witheramplifier+1*witherskeletonpoweredrareheads)+" + duration "+witherduration);
+							m.addPotionEffect(new PotionEffect(PotionEffectType.WITHER,witherduration,witheramplifier+1*witherskeletonpoweredrareheads),true);
+						} else if (witherskeletonrareheads>0) {
+							Bukkit.getLogger().info("Adding potion effect WITHER with amplifier 2 + duration "+(witherduration+300*witherskeletonrareheads));
+							m.addPotionEffect(new PotionEffect(PotionEffectType.WITHER,witherduration+300*witherskeletonrareheads,2),true);
+						} else if (witherskeletonheads>0) {
+							Bukkit.getLogger().info("Adding potion effect WITHER with amplifier 0 + duration "+(witherduration+100*witherskeletonrareheads));
+							m.addPotionEffect(new PotionEffect(PotionEffectType.WITHER,witherduration+100*witherskeletonrareheads,0),true);
 						}
 					}
 					if (this.plugin.hasJobBuff("Hunter", p, Job.JOB20) && p.getItemInHand().getType().name().toLowerCase().contains("sword")) {
@@ -11020,6 +11055,19 @@ implements Listener
 							}
 						}
 					}
+					List<MobHead> playerheads = this.plugin.getMobHeads(p);
+					int zombieheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ZOMBIE), playerheads);
+					int zombierareaheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ZOMBIE,true,MobHeadRareType.RARE_TYPE_A), playerheads);
+					//int zombierarebheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ZOMBIE,true,MobHeadRareType.RARE_TYPE_B), playerheads);
+					int zombiepoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ZOMBIE,false,true), playerheads);
+					int zombiepoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ZOMBIE,true,true), playerheads);
+					Bukkit.getLogger().info("Head counts are "+zombieheads+", "+zombierareaheads+", "+zombiepoweredheads+", "+zombiepoweredrareheads);
+					Bukkit.getLogger().info("Life Steal is "+life_steal+"%");
+					life_steal+=zombieheads;
+					life_steal+=zombiepoweredheads;
+					life_steal+=zombierareaheads*3;
+					life_steal+=zombiepoweredrareheads*5;
+					Bukkit.getLogger().info("Life Steal is "+life_steal+"%");
 					if (this.plugin.getPlayerData(p).furytime!=0) {
 						attack_speed+=this.plugin.getPlayerData(p).furyamt;
 					}
@@ -15143,7 +15191,7 @@ implements Listener
 		}
 	}
 	@EventHandler
-	public void onProjectilLaunch(ProjectileLaunchEvent e) {
+	public void onProjectileLaunch(ProjectileLaunchEvent e) {
 		Projectile thrown_obj = e.getEntity();
 		if (thrown_obj instanceof Arrow) {
 			if (thrown_obj.getShooter()!=null && (thrown_obj.getShooter() instanceof Player)) {
@@ -17458,6 +17506,49 @@ implements Listener
 		boolean stats = this.plugin.getAccountsConfig().getBoolean(p.getName() + ".status");
 		double actMon = this.plugin.getAccountsConfig().getDouble(p.getName() + ".money");
 		int actHand = (int)Main.economy.getBalance(p.getName());
+		
+		/* WORKS!!! Now INTEGRATE! */
+		/*if (e.getAction()==Action.LEFT_CLICK_AIR) {
+			//Save the region around ourself.
+			 WorldEditPlugin wep = (WorldEditPlugin)Bukkit.getPluginManager().getPlugin("WorldEdit");
+			 final TerrainManager tm = new TerrainManager(wep, p);
+			  final Location loc1 = new Location(p.getWorld(),p.getLocation().getBlockX()-32,0,p.getLocation().getBlockZ()-32);
+			  final Location loc2 = new Location(p.getWorld(),p.getLocation().getBlockX()+32,128,p.getLocation().getBlockZ()+32);
+			  final File saveFile = new File("plugins/WorldEdit/schematics/world_save");
+			  try {
+				  tm.saveTerrain(saveFile, loc1, loc2);
+				} catch (FilenameException ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
+				} catch (DataException ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
+				} catch (IOException ex) {
+					// TODO Auto-generated catch block
+					ex.printStackTrace();
+				}
+		}
+		if (e.getAction()==Action.RIGHT_CLICK_AIR) {
+			File file = new File("plugins/WorldEdit/schematics/world_save.schematic");
+		    if (file.exists()) {
+		        try {
+		            com.sk89q.worldedit.Vector v = new com.sk89q.worldedit.Vector(p.getLocation().getX()+8, p.getLocation().getY(), p.getLocation().getZ()+8);
+		            World worldf = Bukkit.getWorld("world");
+		            BukkitWorld BWf = new BukkitWorld(worldf);
+		            EditSession es = new EditSession(BWf, 2000000);
+		            CuboidClipboard c1 = SchematicFormat.MCEDIT.load(file);
+		            c1.place(es, v, true);
+		        } catch (DataException ex) {
+		            Bukkit.getLogger().warning("DataException while trying to create structure.");
+		        } catch (IOException ex) {
+		        	Bukkit.getLogger().warning("IOException while trying to create structure.");
+		        } catch (MaxChangedBlocksException ex) {
+		        	Bukkit.getLogger().warning("MaxChangedBlocksException while trying to create structure.");
+		        }
+		    } else {
+		    	Bukkit.getLogger().warning(("File does not exist."));
+		    }
+		}*/
 		
 		if (p.hasPotionEffect(PotionEffectType.BLINDNESS)) {
 			e.setCancelled(true);

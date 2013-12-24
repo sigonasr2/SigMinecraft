@@ -8,11 +8,13 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import me.kaZep.Base.Main;
 import me.kaZep.Base.MobHead;
 import me.kaZep.Base.MobHead.MobHeadRareType;
 import me.kaZep.Base.MobHead.MobHeadType;
+import me.kaZep.Base.TerrainManager;
 import me.kaZep.Commands.JobsDataInfo.Job;
 import net.jmhertlein.mctowns.MCTowns;
 import net.jmhertlein.mctowns.MCTownsPlugin;
@@ -22,6 +24,7 @@ import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.ChunkSnapshot;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -30,6 +33,9 @@ import org.bukkit.Server;
 import org.bukkit.SkullType;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Skull;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -46,6 +52,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.generator.ChunkGenerator.BiomeGrid;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
@@ -61,9 +68,14 @@ import sig.ItemSets.DiabloDropsHook.Tier;
 
 import com.sk89q.worldedit.CuboidClipboard;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.EmptyClipboardException;
+import com.sk89q.worldedit.FilenameException;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.data.DataException;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.schematic.MCEditSchematicFormat;
 import com.sk89q.worldedit.schematic.SchematicFormat;
 
 
@@ -114,6 +126,40 @@ public class commandBankEconomy
     this.plugin = plugin;
   }
   
+  short getBlock(short[][] result, int x, int y, int z) {
+      if (result[y >> 4] == null) {
+          return (short)0;
+      }
+      return result[y >> 4][((y & 0xF) << 8) | (z << 4) | x];
+  }
+  
+	public boolean naturalBlock(Material mat) {
+		List<Material> natural_mats = new ArrayList<Material>();
+		natural_mats.add(Material.DIRT);
+		natural_mats.add(Material.STONE);
+		natural_mats.add(Material.WOOD);
+		natural_mats.add(Material.FENCE);
+		natural_mats.add(Material.GRAVEL);
+		natural_mats.add(Material.SAND);
+		natural_mats.add(Material.CLAY);
+		natural_mats.add(Material.WEB);
+		natural_mats.add(Material.LAVA);
+		natural_mats.add(Material.WATER);
+		natural_mats.add(Material.AIR);
+		natural_mats.add(Material.MOSSY_COBBLESTONE);
+		natural_mats.add(Material.COAL_ORE);
+		natural_mats.add(Material.IRON_ORE);
+		natural_mats.add(Material.GOLD_ORE);
+		natural_mats.add(Material.DIAMOND_ORE);
+		natural_mats.add(Material.EMERALD_ORE);
+		natural_mats.add(Material.LAPIS_ORE);
+		natural_mats.add(Material.REDSTONE_ORE);
+		if (natural_mats.contains(mat)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 public String convertToItemName(String val) {
 	val=val.replace('_', ' ');
@@ -605,9 +651,9 @@ public String convertToItemName(String val) {
 			if (args[0].equalsIgnoreCase("cheatheads")) {
 	  			  if (p.hasPermission("maintenance-mode-admin")) {
 	  				  Inventory i = Bukkit.createInventory(p, 63, "Mob Head Inventory");
-	  				  
+	  				 
 	  				  ItemStack temp = null;
-	  				  
+	  				   
 	  				  int count = -1;
 	  				  for (int k=0;k<MobHeadType.values().length;k++) {
 	  					  temp = new MobHead(MobHeadType.values()[k]).getItemStack();
@@ -978,6 +1024,129 @@ public String convertToItemName(String val) {
 				  i.setItemMeta(meta);
 				  f.getInventory().addItem(i);
 			  }
+
+	  			if (args[0].equalsIgnoreCase("regen_chunk")) {
+	  			  if (p.hasPermission("maintenance-mode-admin")) {
+	  				  //boolean result=p.getWorld().regenerateChunk(p.getLocation().getBlockX()/16, p.getLocation().getBlockZ()/16);
+	  				  //Bukkit.getLogger().info("Chunk regenerated: "+result+" ("+p.getLocation().getBlockX()/16+","+p.getLocation().getBlockZ()/16+")");
+	  				  /*byte[] worldarray = p.getWorld().getGenerator().generate(p.getWorld(), new Random(), p.getLocation().getBlockX()/16, p.getLocation().getBlockZ()/16);
+		  				for (int x = 0; x < 16; x++) {
+		  				    for (int z = 0; z < 16; z++) {
+		  				        for (int y = 0; y < 128; y++) {
+		  				        	Bukkit.getLogger().info("Block @ ("+x+","+y+","+z+") is "+worldarray[(x * 16 + z) * 128 + y]);
+		  				        }
+		  				    }
+		  				}*/
+	  				  /*
+	  				  //Create a new tempworld that mimics the real world, generator-wise.
+	  				  World newworld = Bukkit.createWorld(new WorldCreator("newworld").copy(p.getWorld()));
+	  				  p.teleport(new Location(newworld,0,0,0));
+	  				  for (int x=-720;x<721;x++) {
+	  					  for (int z=-720;z<721;z++) {
+	  						  Bukkit.getLogger().info("Creating new chunk at ("+x+","+z+") for world newworld.");
+	  						  newworld.loadChunk(x,z,true);
+	  					  }
+	  				  }*/
+	  				  
+	  				  Location CenterPoint = new Location(p.getWorld(),1627,67,-268); //Center of Twoside.
+	  				  int iterations=100*(Integer.valueOf(args[1])+50);
+	  				 for (int MASTER_i=Integer.valueOf(args[1]);MASTER_i<51;MASTER_i++) {
+	  					 p.getWorld().save();
+	  	  				 for (int MASTER_j=-50;MASTER_j<51;MASTER_j++) {
+	  	  				  iterations++;
+	  	  				  Bukkit.getLogger().info("");
+	  	  				  Bukkit.getLogger().info("BEGINNING Chunk ("+MASTER_i+","+MASTER_j+") correction...");
+	  	  				  int rand_factor = (int)(Math.random()*200d);
+		  				  int chunkx=(MASTER_i*16+CenterPoint.getBlockX()+8)/16, chunkz=(MASTER_j*16+CenterPoint.getBlockZ()+8)/16;
+		  				  WorldEditPlugin wep = (WorldEditPlugin)Bukkit.getPluginManager().getPlugin("WorldEdit");
+		  				 final TerrainManager tm = new TerrainManager(wep, p.getWorld());
+		  				  final Location loc1 = new Location(p.getWorld(),chunkx*16-16,60,chunkz*16-16);
+		  				  final Location loc2 = new Location(p.getWorld(),chunkx*16+32,128,chunkz*16+32);
+		  				  final File saveFile = new File("plugins/WorldEdit/schematics/world_save"+rand_factor);
+		  				  try {
+		  					  tm.saveTerrain(saveFile, loc1, loc2);
+		  					} catch (FilenameException ex) {
+		  						// TODO Auto-generated catch block
+		  						ex.printStackTrace();
+		  					} catch (DataException ex) {
+		  						// TODO Auto-generated catch block
+		  						ex.printStackTrace();
+		  					} catch (IOException ex) {
+		  						// TODO Auto-generated catch block
+		  						ex.printStackTrace();
+		  					}
+		  				  final ChunkSnapshot savedChunk = p.getWorld().getChunkAt(chunkx, chunkz).getChunkSnapshot();
+		  				  final Player p2 = p;
+		  				  final int chunkx2=chunkx,chunkz2=chunkz;
+		  				  p.getWorld().regenerateChunk(chunkx2, chunkz2);/*
+						  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+					      @Override
+					      public void run() {*/
+					    	  int replaced_layers=0;
+			  				  //Bukkit.getLogger().info("-Checking old world bounds...");
+			  				  for (int y=0;y<56;y+=8) {
+			  					  boolean all_natural=true;
+			  	  				  //Bukkit.getLogger().info("--All Natural set.");
+			  					  for (int x=0;x<16;x++) {
+			  						  for (int yy=0;yy<8;yy++) {
+			  							  for (int z=0;z<16;z++) {
+			  								  if (!naturalBlock(Material.getMaterial((savedChunk.getBlockTypeId(x, y+yy, z))))) {
+			  				  	  				  //Bukkit.getLogger().info("--Block of type "+Material.getMaterial((savedChunk.getBlockTypeId(x, y+yy, z))).toString()+" is not natural.");
+			  									  all_natural=false;
+			  									  break;
+			  								  }
+			  							  }
+			  							  if (!all_natural) {break;}
+			  						  }
+			  						  if (!all_natural) {break;}
+			  					  }
+			  					  if (!all_natural) {
+			  						  Bukkit.getLogger().info("--Replacing blocks at positions ("+y+" to "+(y+4)+")");
+			  	  					  for (int x=0;x<16;x++) {
+			  	  						  for (int yy=0;yy<8;yy++) {
+			  	  							  for (int z=0;z<16;z++) {
+			  	  								p2.getWorld().getBlockAt(chunkx2*16+x, y+yy, chunkz2*16+z).setTypeIdAndData(savedChunk.getBlockTypeId(x, y+yy, z),(byte)savedChunk.getBlockData(x, y+yy, z),false);
+			  	  							  }
+			  	  						  }
+			  	  					  }
+			  					  } else {
+									  replaced_layers++;
+								  }
+			  				  }
+		  					  Bukkit.getLogger().info("->REPLACED "+replaced_layers+" layers. ("+(int)(iterations/10000d*100)+"%)");
+			  				  
+			  				  for (int y=63;y<256;y++) {
+			  					  for (int x=0;x<16;x++) {
+									  for (int z=0;z<16;z++) {
+										p2.getWorld().getBlockAt(chunkx2*16+x, y, chunkz2*16+z).setType(Material.AIR);
+									  }
+			  					  }
+			  				  }
+			  				  //p2.getWorld().refreshChunk(chunkx2, chunkz2);
+			  				  try {
+									tm.loadSchematic(saveFile);
+								} catch (FilenameException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (MaxChangedBlocksException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (EmptyClipboardException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (DataException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+			  				  /*}},20);*/
+			  				  p.getWorld().unloadChunkRequest(chunkx2, chunkz2);
+	  	  				 }
+	  				 }
+	  			  }
+	  			}
   			  if (args[0].equalsIgnoreCase("halloween") && args[1].equalsIgnoreCase("end")) {
   				  p.sendMessage(ChatColor.GRAY+"Ending Harrowing night... Did you make sure it was night time? If not, type this command again after /time night instead.");
   				  this.plugin.harrowing_night=true;
@@ -1649,6 +1818,22 @@ public String convertToItemName(String val) {
 						l.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 1));
 					}
   			  }
+			  if (args[0].equalsIgnoreCase("save_topworld") && args[1].equalsIgnoreCase("5000")) {
+				  com.sk89q.worldedit.Vector v1 = new com.sk89q.worldedit.Vector(2500,77,2500);
+				  com.sk89q.worldedit.Vector v2 = new com.sk89q.worldedit.Vector(p.getLocation().getX(), 63, p.getLocation().getZ());
+	            World worldf = Bukkit.getWorld("world");
+	            //BukkitWorld BWf = new BukkitWorld(worldf);
+	            //EditSession es = new EditSession(BWf, 2100000000);
+	            try {
+					SchematicFormat.MCEDIT.save(new CuboidClipboard(v2,v1),new File("plugins/WorldEdit/schematics/world_save.schematic"));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (DataException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			  }
 			  if (args[0].equalsIgnoreCase("spawn_dungeon") && args[1].equalsIgnoreCase("boss")) {
 				//Empty the whole area.
 	  				double xoffset = Math.random()*10+15;

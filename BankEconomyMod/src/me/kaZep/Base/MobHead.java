@@ -27,7 +27,7 @@ public class MobHead {
 	}
 	MobHeadType head_type = null;
 	MobHeadRareType rare_head_type =null;
-	boolean rare_head;
+	boolean rare_head=false;
 	boolean is_powered=false;
 	/**
 	 * Compares if two MobHeads are equal to each other
@@ -291,7 +291,7 @@ public class MobHead {
 					Main.plugin.getConfig().set(key, Main.plugin.getConfig().getInt(key)+1);
 	  		        newhead.setItemMeta(skullMeta);
 					ItemMeta meta = newhead.getItemMeta();
-					meta.setDisplayName(ChatColor.BLUE+"Rare Spider Head");
+					//meta.setDisplayName(ChatColor.BLUE+"Rare Spider Head");
 					List<String> newlore = new ArrayList<String>();
 					if (rare_head_type==MobHeadRareType.RARE_TYPE_A) {
 						newlore.add(ChatColor.LIGHT_PURPLE+"+2 "+ChatColor.GOLD+"second Poison duration");
@@ -452,101 +452,239 @@ public class MobHead {
     static public MobHead getMobHead(ItemStack item) {
     	if (item!=null && item.getType()==Material.SKULL_ITEM && item.hasItemMeta() && item.getItemMeta().hasLore()) {
     		List<String> getLore = item.getItemMeta().getLore();
+    		MobHeadType headtype = null;
+    		MobHeadRareType raretype = null;
+    		boolean powered = false;
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+5 "+ChatColor.GOLD+"second "+ChatColor.GRAY+"Wither I"+ChatColor.GOLD+" duration")) {
-    			return new MobHead(MobHeadType.WITHER_SKELETON);
+    			//return new MobHead(MobHeadType.WITHER_SKELETON);
+    			headtype=MobHeadType.WITHER_SKELETON;
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+1% "+ChatColor.GOLD+"Ranged Damage")) {
-    			return new MobHead(MobHeadType.SKELETON);
+    			//return new MobHead(MobHeadType.SKELETON);
+    			headtype=MobHeadType.SKELETON;
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+1% "+ChatColor.GOLD+"Lifesteal")) {
-    			return new MobHead(MobHeadType.ZOMBIE);
+    			//return new MobHead(MobHeadType.ZOMBIE);
+    			headtype=MobHeadType.ZOMBIE;
     		}
-    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"AoE Damage")) {
-    			return new MobHead(MobHeadType.CREEPER);
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"AoE Damage") ||
+    				getLore.contains(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"AoE Damage"+ChatColor.BLUE+" &")) {
+    			//return new MobHead(MobHeadType.CREEPER);
+    			headtype=MobHeadType.CREEPER;
     		}
-    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"Slow on hit")) {
-    			return new MobHead(MobHeadType.SPIDER);
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"Slow on hit") ||
+    				getLore.contains(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"Slow on hit"+ChatColor.BLUE+" &")) {
+    			//return new MobHead(MobHeadType.SPIDER);
+    			headtype=MobHeadType.SPIDER;
     		}
-    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+1% "+ChatColor.GOLD+"Critical Chance")) {
-    			return new MobHead(MobHeadType.ENDERMAN);
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+1% "+ChatColor.GOLD+"Critical Chance") ||
+    				getLore.contains(ChatColor.LIGHT_PURPLE+"+1% "+ChatColor.GOLD+"Critical Chance"+ChatColor.BLUE+" &")) {
+    			//return new MobHead(MobHeadType.ENDERMAN);
+    			headtype=MobHeadType.ENDERMAN;
     		}
-    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+1 "+ChatColor.GOLD+"second Poison duration")) {
-    			return new MobHead(MobHeadType.CAVE_SPIDER);
+    		if ((getLore.contains(ChatColor.LIGHT_PURPLE+"+1 "+ChatColor.GOLD+"second Poison duration") ||
+    				getLore.contains(ChatColor.LIGHT_PURPLE+"+2 "+ChatColor.GOLD+"second Poison duration")) &&
+    				!getLore.contains(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"Slow on hit"+ChatColor.BLUE+" &")) {
+    			//return new MobHead(MobHeadType.CAVE_SPIDER);
+    			headtype=MobHeadType.CAVE_SPIDER;
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+1 "+ChatColor.GOLD+"second ignite duration")) {
-    			return new MobHead(MobHeadType.BLAZE);
+    			//return new MobHead(MobHeadType.BLAZE);
+    			headtype=MobHeadType.BLAZE;
     		}
-    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"-1% "+ChatColor.GOLD+"damage taken on hit")) {
-    			return new MobHead(MobHeadType.GHAST);
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"-1% "+ChatColor.GOLD+"damage taken on hit") ||
+    				getLore.contains(ChatColor.LIGHT_PURPLE+"-1% "+ChatColor.GOLD+"damage taken on hit"+ChatColor.BLUE+" &")) {
+    			//return new MobHead(MobHeadType.GHAST);
+    			headtype=MobHeadType.GHAST;
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+1% "+ChatColor.GOLD+"chance of being fully")) {
-    			return new MobHead(MobHeadType.ZOMBIE_PIGMAN);
+    			//return new MobHead(MobHeadType.ZOMBIE_PIGMAN);
+    			headtype=MobHeadType.ZOMBIE_PIGMAN;
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+1% "+ChatColor.GOLD+"chance of setting the")) {
-    			return new MobHead(MobHeadType.MAGMA_CUBE);
+    			//return new MobHead(MobHeadType.MAGMA_CUBE);
+    			headtype=MobHeadType.MAGMA_CUBE;
     		}
+    		boolean ampersand=false;
+			for (int i=0;i<getLore.size();i++) {
+				if (getLore.get(i).contains(ChatColor.BLUE+" &")) {
+					powered=true;
+					ampersand=true;
+				}
+			}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+15 "+ChatColor.GOLD+"second "+ChatColor.GRAY+"Wither III"+ChatColor.GOLD+" duration")) {
-    			return new MobHead(MobHeadType.WITHER_SKELETON, true, MobHeadRareType.RARE_TYPE_A);
+    			//return new MobHead(MobHeadType.WITHER_SKELETON, true, MobHeadRareType.RARE_TYPE_A);
+    			headtype=MobHeadType.WITHER_SKELETON;
+    			raretype=MobHeadRareType.RARE_TYPE_A;
+    		}
+    		if (getLore.contains(ChatColor.GOLD+"Stacks Wither effect by 1")) {
+    			headtype=MobHeadType.WITHER_SKELETON;
+    			powered=true;
+    		}
+    		if (getLore.contains(ChatColor.GOLD+"Stacks Wither effect by 2")) {
+    			headtype=MobHeadType.WITHER_SKELETON;
+    			raretype=MobHeadRareType.RARE_TYPE_A;
+    			powered=true;
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+3% "+ChatColor.GOLD+"Ranged Damage")) {
-    			return new MobHead(MobHeadType.SKELETON, true, MobHeadRareType.RARE_TYPE_A);
+    			//return new MobHead(MobHeadType.SKELETON, true, MobHeadRareType.RARE_TYPE_A);
+    			headtype=MobHeadType.SKELETON;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_A;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+1 "+ChatColor.GOLD+"m/s Projectile Speed")) {
-    			return new MobHead(MobHeadType.SKELETON, true, MobHeadRareType.RARE_TYPE_B);
+    			//return new MobHead(MobHeadType.SKELETON, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.SKELETON;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_B;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+3% "+ChatColor.GOLD+"Lifesteal")) {
-    			return new MobHead(MobHeadType.ZOMBIE, true, MobHeadRareType.RARE_TYPE_A);
+    			//return new MobHead(MobHeadType.ZOMBIE, true, MobHeadRareType.RARE_TYPE_A);
+    			headtype=MobHeadType.ZOMBIE;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_A;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+1 "+ChatColor.GOLD+"Max Health")) {
-    			return new MobHead(MobHeadType.ZOMBIE, true, MobHeadRareType.RARE_TYPE_B);
+    			//return new MobHead(MobHeadType.ZOMBIE, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.ZOMBIE;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_B;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+1 "+ChatColor.GOLD+"Damage to all nearby enemies.")) {
-    			return new MobHead(MobHeadType.CREEPER, true, MobHeadRareType.RARE_TYPE_A);
+    			//return new MobHead(MobHeadType.CREEPER, true, MobHeadRareType.RARE_TYPE_A);
+    			headtype=MobHeadType.ZOMBIE;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_A;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+20% "+ChatColor.GOLD+"AoE Damage")) {
-    			return new MobHead(MobHeadType.CREEPER, true, MobHeadRareType.RARE_TYPE_B);
+    			//return new MobHead(MobHeadType.CREEPER, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.CREEPER;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_B;}
     		}
-    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+2 "+ChatColor.GOLD+"second Poison duration on hit")) {
-    			return new MobHead(MobHeadType.SPIDER, true, MobHeadRareType.RARE_TYPE_A);
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+2 "+ChatColor.GOLD+"second Poison duration") &&
+    				!getLore.contains(ChatColor.GOLD+" on hit."+ChatColor.BLUE+" &")) {
+    			//return new MobHead(MobHeadType.SPIDER, true, MobHeadRareType.RARE_TYPE_A);
+    			headtype=MobHeadType.SPIDER;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_A;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+15% "+ChatColor.GOLD+"Slow on hit")) {
-    			return new MobHead(MobHeadType.SPIDER, true, MobHeadRareType.RARE_TYPE_B);
+    			//return new MobHead(MobHeadType.SPIDER, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.SPIDER;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_B;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+1% "+ChatColor.GOLD+"Item Drop Amount Increase")) {
-    			return new MobHead(MobHeadType.ENDERMAN, true, MobHeadRareType.RARE_TYPE_A);
+    			//return new MobHead(MobHeadType.ENDERMAN, true, MobHeadRareType.RARE_TYPE_A);
+    			headtype=MobHeadType.ENDERMAN;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_A;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"Critical Chance")) {
-    			return new MobHead(MobHeadType.ENDERMAN, true, MobHeadRareType.RARE_TYPE_B);
+    			//return new MobHead(MobHeadType.ENDERMAN, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.ENDERMAN;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_B;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"of snaring a target")) {
-    			return new MobHead(MobHeadType.CAVE_SPIDER, true, MobHeadRareType.RARE_TYPE_A);
+    			//return new MobHead(MobHeadType.CAVE_SPIDER, true, MobHeadRareType.RARE_TYPE_A);
+    			headtype=MobHeadType.CAVE_SPIDER;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_A;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+3 "+ChatColor.GOLD+"second Poison duration")) {
-    			return new MobHead(MobHeadType.CAVE_SPIDER, true, MobHeadRareType.RARE_TYPE_B);
+    			//return new MobHead(MobHeadType.CAVE_SPIDER, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.CAVE_SPIDER;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_B;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+3% "+ChatColor.GOLD+"chance to send enemy")) {
-    			return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_A);
+    			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_A);
+    			headtype=MobHeadType.BLAZE;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_A;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+3 "+ChatColor.GOLD+"second ignite duration")) {
-    			return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
+    			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.BLAZE;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_B;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+3% "+ChatColor.GOLD+"chance to send down")) {
-    			return new MobHead(MobHeadType.GHAST, true, MobHeadRareType.RARE_TYPE_A);
+    			//return new MobHead(MobHeadType.GHAST, true, MobHeadRareType.RARE_TYPE_A);
+    			headtype=MobHeadType.GHAST;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_A;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"-5% "+ChatColor.GOLD+"damage taken on hit")) {
-    			return new MobHead(MobHeadType.GHAST, true, MobHeadRareType.RARE_TYPE_B);
+    			//return new MobHead(MobHeadType.GHAST, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.GHAST;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_B;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+10% "+ChatColor.GOLD+"chance of dropping a")) {
-    			return new MobHead(MobHeadType.ZOMBIE_PIGMAN, true, MobHeadRareType.RARE_TYPE_A);
+    			//return new MobHead(MobHeadType.ZOMBIE_PIGMAN, true, MobHeadRareType.RARE_TYPE_A);
+    			headtype=MobHeadType.ZOMBIE_PIGMAN;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_A;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+3% "+ChatColor.GOLD+"chance of being fully")) {
-    			return new MobHead(MobHeadType.ZOMBIE_PIGMAN, true, MobHeadRareType.RARE_TYPE_B);
+    			//return new MobHead(MobHeadType.ZOMBIE_PIGMAN, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.ZOMBIE_PIGMAN;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_B;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"chance of burning an")) {
-    			return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_A);
+    			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_A);
+    			headtype=MobHeadType.BLAZE;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_A;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"chance of setting the")) {
-    			return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
+    			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.BLAZE;
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_B;}
+    		}
+    		////////////////////////////////////////////
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"-10% "+ChatColor.GOLD+"damage taken on hit"+ChatColor.BLUE+" &")) {
+    			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.GHAST;
+    			raretype=MobHeadRareType.RARE_TYPE_A;
+    		}
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+5 "+ChatColor.GOLD+"second ignite duration")) {
+    			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.BLAZE;
+    			raretype=MobHeadRareType.RARE_TYPE_A;
+    		}
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+5 "+ChatColor.GOLD+"second Poison duration")) {
+    			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.CAVE_SPIDER;
+    			raretype=MobHeadRareType.RARE_TYPE_A;
+    		}
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+10% "+ChatColor.GOLD+"Critical Chance"+ChatColor.BLUE+" &")) {
+    			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.ENDERMAN;
+    			raretype=MobHeadRareType.RARE_TYPE_A;
+    		}
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+30% "+ChatColor.GOLD+"Slow on hit"+ChatColor.BLUE+" &")) {
+    			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.SPIDER;
+    			raretype=MobHeadRareType.RARE_TYPE_A;
+    		}
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+30% "+ChatColor.GOLD+"AoE Damage"+ChatColor.BLUE+" &")) {
+    			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.CREEPER;
+    			raretype=MobHeadRareType.RARE_TYPE_A;
+    		}
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"Lifesteal"+ChatColor.BLUE+" &")) {
+    			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.ZOMBIE;
+    			raretype=MobHeadRareType.RARE_TYPE_A;
+    		}
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"Ranged Damage"+ChatColor.BLUE+" &")) {
+    			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.SKELETON;
+    			raretype=MobHeadRareType.RARE_TYPE_A;
+    		}
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+10% "+ChatColor.GOLD+"chance of setting the")) {
+    			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.MAGMA_CUBE;
+    			raretype=MobHeadRareType.RARE_TYPE_A;
+    		}
+    		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"chance of being fully")) {
+    			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
+    			headtype=MobHeadType.ZOMBIE_PIGMAN;
+    			raretype=MobHeadRareType.RARE_TYPE_A;
+    		}
+    		if (getLore.contains(ChatColor.GOLD+"Stacks Wither effect by 2") || getLore.contains(ChatColor.GOLD+"Stacks Wither effect by 1")) {
+    			powered=true;
+    		}
+    		if (raretype!=null) {
+    			return new MobHead(headtype,true,raretype,powered);
+    		} else {
+    			return new MobHead(headtype,false,powered);
     		}
     	}
     	return null;
@@ -556,7 +694,7 @@ public class MobHead {
      * Checks if the given head is powered or
      * unpowered.
      * @param head The mob head to check for.
-     * @return Returns true if the head is powered
+     * @return Returns true if the head is unpowered
      * or false otherwise.
      */
     static public boolean isUnpoweredHead(MobHead head) {
@@ -645,9 +783,9 @@ public class MobHead {
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+1 "+ChatColor.GOLD+"second Poison duration")) {
     			ItemMeta meta = newitem.getItemMeta();
     			List<String> newLore = new ArrayList<String>();
-    			newLore.add(ChatColor.LIGHT_PURPLE+"+1 "+ChatColor.GOLD+"second Poison duration");
+    			newLore.add(ChatColor.LIGHT_PURPLE+"+2 "+ChatColor.GOLD+"second Poison duration");
     			newLore.add(ChatColor.GOLD+" on hit."+ChatColor.BLUE+" &");
-    			newLore.add(ChatColor.LIGHT_PURPLE+"+1% "+ChatColor.GOLD+"chance of snaring the");
+    			newLore.add(ChatColor.LIGHT_PURPLE+"+3% "+ChatColor.GOLD+"chance of snaring the");
     			newLore.add(ChatColor.GOLD+" target for 5 seconds.");
     			meta.setLore(newLore);
     			newitem.setItemMeta(meta);
@@ -710,7 +848,7 @@ public class MobHead {
     				getLore.contains(ChatColor.LIGHT_PURPLE+"+1 "+ChatColor.GOLD+"m/s Projectile Speed")) {
     			ItemMeta meta = newitem.getItemMeta();
     			List<String> newLore = new ArrayList<String>();
-    			newLore.add(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"Ranged Damage "+ChatColor.BLUE+" &");
+    			newLore.add(ChatColor.LIGHT_PURPLE+"+5% "+ChatColor.GOLD+"Ranged Damage"+ChatColor.BLUE+" &");
     			newLore.add(ChatColor.LIGHT_PURPLE+"+3 "+ChatColor.GOLD+"m/s Projectile Speed");
     			meta.setLore(newLore);
     			newitem.setItemMeta(meta);
@@ -823,7 +961,7 @@ public class MobHead {
     }
 	@Override
 	public String toString() {
-		return "MobHead(Type: "+head_type.name()+", Rare Type: "+rare_head_type.name()+", is_rare:"+rare_head+", is_powered:"+is_powered+")";
+		return "MobHead(Type: "+(head_type!=null?head_type.name():"null")+", Rare Type: "+(rare_head_type!=null?rare_head_type.name():"null")+", is_rare:"+rare_head+", is_powered:"+is_powered+")";
 	}
 	public MobHead(MobHeadType head_type) {
 		MobHead(head_type, false, MobHeadRareType.RARE_TYPE_A, false);
