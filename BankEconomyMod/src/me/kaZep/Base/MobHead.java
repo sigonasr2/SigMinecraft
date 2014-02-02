@@ -354,11 +354,11 @@ public class MobHead {
 	  		        skullMeta.setOwner("MHF_Blaze");
 					List<String> newlore = new ArrayList<String>();
 					if (rare_head_type==MobHeadRareType.RARE_TYPE_A) {
-						newlore.add(ChatColor.LIGHT_PURPLE+"+3% "+ChatColor.GOLD+"chance to send enemy");
-						newlore.add(ChatColor.GOLD+" airborne.");
-					} else {
 						newlore.add(ChatColor.LIGHT_PURPLE+"+3 "+ChatColor.GOLD+"second ignite duration");
 						newlore.add(ChatColor.GOLD+" on hit.");
+					} else {
+						newlore.add(ChatColor.LIGHT_PURPLE+"+3% "+ChatColor.GOLD+"chance to send enemy");
+						newlore.add(ChatColor.GOLD+" airborne.");
 					}
 					skullMeta.setLore(newlore);
 	  		        newhead.setItemMeta(skullMeta);
@@ -590,12 +590,12 @@ public class MobHead {
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+3% "+ChatColor.GOLD+"chance to send enemy")) {
     			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_A);
     			headtype=MobHeadType.BLAZE;
-    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_A;}
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_B;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+3 "+ChatColor.GOLD+"second ignite duration")) {
     			//return new MobHead(MobHeadType.BLAZE, true, MobHeadRareType.RARE_TYPE_B);
     			headtype=MobHeadType.BLAZE;
-    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_B;}
+    			if (!ampersand) {raretype=MobHeadRareType.RARE_TYPE_A;}
     		}
     		if (getLore.contains(ChatColor.LIGHT_PURPLE+"+3% "+ChatColor.GOLD+"chance to send down")) {
     			//return new MobHead(MobHeadType.GHAST, true, MobHeadRareType.RARE_TYPE_A);

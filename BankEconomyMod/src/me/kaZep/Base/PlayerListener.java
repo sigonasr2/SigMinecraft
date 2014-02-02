@@ -11088,12 +11088,48 @@ implements Listener
 						ignitedur+=blazerareheads*3;
 						ignitedur+=blazepoweredheads;
 						ignitedur+=blazepoweredrareheads*5;
+						
+						blazerareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.BLAZE,true,MobHeadRareType.RARE_TYPE_B), playerheads);
+						int airbornechance=0;
+
+						airbornechance+=blazerareheads*3;
+						airbornechance+=blazepoweredheads;
+						airbornechance+=blazepoweredrareheads*10;
 								
 						if (Math.random()*100<=critchance) {
 							e.setDamage(e.getDamage()*2);
 						}		
 						if (Math.random()*100<=snarechance) {
 							m.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,100,7,true));
+						}		
+						if (Math.random()*100<=airbornechance) {
+							//m.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,100,7,true));
+							
+							final LivingEntity l = (LivingEntity)e.getEntity();
+							
+							Location airborne_loc = l.getLocation();
+							//Check upwards. Stop if we hit a solid block.
+							int starty=l.getLocation().getBlockY();
+							int checky=l.getLocation().getBlockY();
+							/*16 is max height that a mob will be set to.*/
+							while (checky-starty<19 && l.getWorld().getBlockAt(l.getLocation().getBlockX(),l.getLocation().getBlockY()+checky,l.getLocation().getBlockZ()).getType()==Material.AIR) {
+								checky++;
+							}
+							
+							if (checky-starty>3) {
+								checky-=3;
+							} else {
+								checky=starty;
+							}
+							
+							final Location teleport_to = new Location(l.getWorld(),l.getLocation().getBlockX(),checky,l.getLocation().getBlockZ());
+							
+							Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+								@Override
+								public void run() {
+									l.teleport(teleport_to);
+								}
+							},1);
 						}
 						
 						if (ignitedur>0) {
@@ -11127,10 +11163,12 @@ implements Listener
 								i--;
 							}
 						}
-						for (int i=0;i<nearby_mobs.size();i++) {
-							if (!nearby_mobs.get(i).getUniqueId().equals(m)) {
-								LivingEntity m2 = (LivingEntity)nearby_mobs.get(i);
-								m2.damage(e.getDamage()*(aoedmg/100.0d));
+						if (aoedmg>0) {
+							for (int i=0;i<nearby_mobs.size();i++) {
+								if (!nearby_mobs.get(i).getUniqueId().equals(m)) {
+									LivingEntity m2 = (LivingEntity)nearby_mobs.get(i);
+									m2.damage(e.getDamage()*(aoedmg/100.0d));
+								}
 							}
 						}
 						/*if (m.hasPotionEffect(PotionEffectType.SLOW) && Main.SERVER_TICK_TIME-this.plugin.getPlayerData(p).lastsneaktime<=60) {
@@ -11447,12 +11485,48 @@ implements Listener
 							ignitedur+=blazerareheads*3;
 							ignitedur+=blazepoweredheads;
 							ignitedur+=blazepoweredrareheads*5;
+							
+							blazerareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.BLAZE,true,MobHeadRareType.RARE_TYPE_B), playerheads);
+							int airbornechance=0;
+
+							airbornechance+=blazerareheads*3;
+							airbornechance+=blazepoweredheads;
+							airbornechance+=blazepoweredrareheads*10;
 									
 							if (Math.random()*100<=critchance) {
 								e.setDamage(e.getDamage()*2);
 							}		
 							if (Math.random()*100<=snarechance) {
 								m.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,100,7,true));
+							}		
+							if (Math.random()*100<=airbornechance) {
+								//m.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,100,7,true));
+								
+								final LivingEntity l = (LivingEntity)e.getEntity();
+								
+								Location airborne_loc = l.getLocation();
+								//Check upwards. Stop if we hit a solid block.
+								int starty=l.getLocation().getBlockY();
+								int checky=l.getLocation().getBlockY();
+								/*16 is max height that a mob will be set to.*/
+								while (checky-starty<19 && l.getWorld().getBlockAt(l.getLocation().getBlockX(),l.getLocation().getBlockY()+checky,l.getLocation().getBlockZ()).getType()==Material.AIR) {
+									checky++;
+								}
+								
+								if (checky-starty>3) {
+									checky-=3;
+								} else {
+									checky=starty;
+								}
+								
+								final Location teleport_to = new Location(l.getWorld(),l.getLocation().getBlockX(),checky,l.getLocation().getBlockZ());
+								
+								Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+									@Override
+									public void run() {
+										l.teleport(teleport_to);
+									}
+								},1);
 							}
 							
 							if (ignitedur>0) {
@@ -11487,10 +11561,12 @@ implements Listener
 									i--;
 								}
 							}
-							for (int i=0;i<nearby_mobs.size();i++) {
-								if (!nearby_mobs.get(i).getUniqueId().equals(m)) {
-									LivingEntity m2 = (LivingEntity)nearby_mobs.get(i);
-									m2.damage(e.getDamage()*(aoedmg/100.0d));
+							if (aoedmg>0) {
+								for (int i=0;i<nearby_mobs.size();i++) {
+									if (!nearby_mobs.get(i).getUniqueId().equals(m)) {
+										LivingEntity m2 = (LivingEntity)nearby_mobs.get(i);
+										m2.damage(e.getDamage()*(aoedmg/100.0d));
+									}
 								}
 							}
 							int witherskeletonheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.WITHER_SKELETON), playerheads);
