@@ -203,6 +203,7 @@ public class Main extends JavaPlugin
   public List<ReviveInventory> revive_inventory_list = null;
   public List<PoweredMob> powered_mob_list = null;
   public List<Chunk> chunk_queue_list = null;
+  public List<MobManager> mob_list = null;
   public static List<RecyclingCenterNode> recycling_center_list = null;
   public static List<BonusEnchantment> bonus_enchantment_list = null;
   public DamageAPI DMGCALC = null;
@@ -355,6 +356,7 @@ public class Main extends JavaPlugin
     chunk_queue_list = new ArrayList<Chunk>();
     bonus_enchantment_list = new ArrayList<BonusEnchantment>();
     powered_mob_list = new ArrayList<PoweredMob>();
+    mob_list = new ArrayList<MobManager>();
     
     recycling_center_list = new ArrayList<RecyclingCenterNode>();
     
@@ -1863,6 +1865,14 @@ public void runTick() {
 					  }
 				  }
 				  if (Main.SERVER_TICK_TIME%20==0) {
+					List<MobHead> playerheads = getMobHeads(p);
+					int creeperrareheads = getMobHeadAmt(new MobHead(MobHeadType.CREEPER,true,MobHeadRareType.RARE_TYPE_B), playerheads);
+					int creeperpoweredheads = getMobHeadAmt(new MobHead(MobHeadType.CREEPER,false,true), playerheads);
+					int creeperpoweredrareheads = getMobHeadAmt(new MobHead(MobHeadType.CREEPER,true,true), playerheads);
+					int aoedmg = 0;
+					aoedmg+=creeperrareheads;
+					aoedmg+=creeperpoweredheads;
+					aoedmg+=creeperpoweredrareheads*3;
 					  for (int j=0;j<powered_mob_list.size();j++) {
 						  if (powered_mob_list.get(j).power_time+1200<Main.SERVER_TICK_TIME) {
 							  powered_mob_list.remove(j);
@@ -2119,8 +2129,38 @@ public void runTick() {
 					  for (int i=0;i<nearby.size();i++) {
 						  //EntityType allowedtypes[] = {EntityType.BAT,EntityType.BLAZE,EntityType.CAVE_SPIDER,EntityType.ENDERMAN,EntityType.GHAST,EntityType.MAGMA_CUBE,EntityType.PIG_ZOMBIE,EntityType.SILVERFISH,EntityType.SLIME,EntityType.SPIDER,EntityType.ZOMBIE,EntityType.SKELETON,EntityType.CREEPER};
 						  boolean contains=nearby.get(i) instanceof LivingEntity;
+						  boolean containsmonster=nearby.get(i) instanceof Monster;
+						  if (containsmonster && aoedmg>0) {
+							  if (nearby.get(i).getLocation().distance(p.getLocation())<=9) {
+								  //p.sendMessage("AOE Damage is "+aoedmg);
+								  LivingEntity l = (LivingEntity)nearby.get(i);
+								  l.damage(aoedmg);
+							  }
+						  }
 						  if (contains) {
 							  LivingEntity l = (LivingEntity)nearby.get(i);
+							  /*
+							  if (l.hasPotionEffect(PotionEffectType.POISON)) {
+								Collection<PotionEffect> pots = l.getActivePotionEffects();
+								int poison_power=0;
+								for (PotionEffect effect : pots) {
+									if (effect.getType().getName().equalsIgnoreCase("poison")) {
+										poison_power = effect.getAmplifier();
+										break;
+									}
+								}
+								l.damage(poison_power+1);
+							  }*/
+							  for (int j=0;j<mob_list.size();j++) {
+								  if (mob_list.get(j).id.compareTo(l.getUniqueId())==0) {
+									  if (mob_list.get(j).getPoisonTicks()>0) {
+										  l.damage(1);
+									  } else {
+										  mob_list.remove(j);
+										  j--;
+									  }
+								  }
+							  }
 							  if (l.getCustomName()!=null && l.hasLineOfSight(p)) {
 									 if (!lineofsight_check.contains(l.getUniqueId())) {
 										 l.setCustomNameVisible(true);
@@ -2319,6 +2359,10 @@ public void runTick() {
 						  Bukkit.getLogger().warning("Could not check nearby entities in the nether.");
 					  }
 				  }
+			  }
+			  if (Main.SERVER_TICK_TIME%36000==0) {
+				  //Every 30 minutes, clear out the list of poisoned mobs, in case some are non-existent now.
+				  mob_list.clear();
 			  }
 			  if (Main.SERVER_TICK_TIME%600==0) {
 				  saveAccountsConfig(); //Save account data once every 30 seconds.
@@ -6271,6 +6315,7 @@ public void payDay(int time)
     public static void playFirework(Location loc)
     {
         Random gen = new Random();
+        
         try
         {
             Firework fw = loc.getWorld().spawn(loc, Firework.class);
@@ -6509,7 +6554,7 @@ public void payDay(int time)
     			//Check the lore for a valid mob head.
     			if (getMobHead(item)!=null) {
     				mobheadlist.add(getMobHead(item));
-    				Bukkit.getLogger().info("Mob head "+getMobHead(item).toString()+" added.");
+    				//Bukkit.getLogger().info("Mob head "+getMobHead(item).toString()+" added.");
     			}
     		}
     	}

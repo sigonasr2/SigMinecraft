@@ -1025,7 +1025,7 @@ public String convertToItemName(String val) {
 				  f.getInventory().addItem(i);
 			  }
 
-	  			if (args[0].equalsIgnoreCase("regen_chunk")) {
+	  			if (args[0].equalsIgnoreCase("regen_chunk") && 0==1 /*DISABLED to prevent accidental execution.*/) {
 	  			  if (p.hasPermission("maintenance-mode-admin")) {
 	  				  //boolean result=p.getWorld().regenerateChunk(p.getLocation().getBlockX()/16, p.getLocation().getBlockZ()/16);
 	  				  //Bukkit.getLogger().info("Chunk regenerated: "+result+" ("+p.getLocation().getBlockX()/16+","+p.getLocation().getBlockZ()/16+")");

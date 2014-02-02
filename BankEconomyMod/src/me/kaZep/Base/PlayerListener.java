@@ -10155,7 +10155,7 @@ implements Listener
 							l2.setHealth(l2.getHealth()-dmg);
 							if (l2 instanceof Player) {
 								Player p = (Player)l2;
-								p.playSound(p.getLocation(), Sound.HURT, 0.5f, 1.0f);
+								p.playSound(p.getLocation(), Sound.HURT_FLESH, 0.5f, 1.0f);
 								DecimalFormat df = new DecimalFormat("#0.0");
 								DecimalFormat df2 = new DecimalFormat("#0");
 								if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
@@ -10955,10 +10955,74 @@ implements Listener
 					final Player p = (Player) e.getDamager();
 					if (e.getEntity() instanceof Monster) {
 						Monster m = (Monster)e.getEntity();
+
+						List<MobHead> playerheads = this.plugin.getMobHeads(p);
+						int creeperheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CREEPER), playerheads);
+						int creeperrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CREEPER,true), playerheads);
+						int creeperpoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CREEPER,false,true), playerheads);
+						int creeperpoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CREEPER,true,true), playerheads);
+						int aoedmg = 0;
+						
+						aoedmg+=creeperheads*5;
+						aoedmg+=creeperrareheads*20;
+						aoedmg+=creeperpoweredheads*5;
+						aoedmg+=creeperpoweredrareheads*30;
+						
+
+						int spiderheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SPIDER), playerheads);
+						int spiderrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SPIDER,true), playerheads);
+						int spiderpoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SPIDER,false,true), playerheads);
+						int spiderpoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SPIDER,true,true), playerheads);
+						int slowdownpct = 0;
+						
+						slowdownpct+=spiderheads*5;
+						slowdownpct+=spiderrareheads*15;
+						slowdownpct+=spiderpoweredheads*5;
+						slowdownpct+=spiderpoweredrareheads*30;
+						
+						spiderrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SPIDER,true,MobHeadRareType.RARE_TYPE_B), playerheads);
+						int poisondur = 0; //Amount of poison duration (seconds) to add to the current poison amount.
+						
+						poisondur+=spiderrareheads*2;
+						poisondur+=spiderpoweredheads*1;
+						poisondur+=spiderpoweredrareheads*5;
+						
+						m.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,60,slowdownpct/15,true));
+						
+						int poisonduration=0;
+						//First see if the mob is already a poisoned mob.
+						boolean found=false;
+						for (int i=0;i<this.plugin.mob_list.size();i++) {
+							if (this.plugin.mob_list.get(i).id.compareTo(m.getUniqueId())==0) {
+								//We found it. Add onto current poison duration.
+								this.plugin.mob_list.get(i).addPoison(poisondur*20);
+								found=true;
+								break;
+							}
+						}
+						if (!found) {
+							//We didn't find it, so add a new entry to the poison list.
+							MobManager newm = new MobManager(m.getUniqueId());
+							newm.addPoison(poisondur*20);
+							this.plugin.mob_list.add(newm);
+						}
+						
+						List<Entity> nearby_mobs = m.getNearbyEntities(2, 2, 2);
+						for (int i=0;i<nearby_mobs.size();i++) {
+							if (!(nearby_mobs.get(i) instanceof Monster)) {
+								nearby_mobs.remove(i);
+								i--;
+							}
+						}
+						for (int i=0;i<nearby_mobs.size();i++) {
+							if (!nearby_mobs.get(i).getUniqueId().equals(m)) {
+								LivingEntity m2 = (LivingEntity)nearby_mobs.get(i);
+								m2.damage(e.getDamage()*(aoedmg/100.0d));
+							}
+						}
 						/*if (m.hasPotionEffect(PotionEffectType.SLOW) && Main.SERVER_TICK_TIME-this.plugin.getPlayerData(p).lastsneaktime<=60) {
 							m.removePotionEffect(PotionEffectType.SLOW);
 						}*/
-						List<MobHead> playerheads = this.plugin.getMobHeads(p);
 						int witherskeletonheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.WITHER_SKELETON), playerheads);
 						int witherskeletonrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.WITHER_SKELETON,true), playerheads);
 						int witherskeletonpoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.WITHER_SKELETON,false,true), playerheads);
@@ -11061,13 +11125,13 @@ implements Listener
 					//int zombierarebheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ZOMBIE,true,MobHeadRareType.RARE_TYPE_B), playerheads);
 					int zombiepoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ZOMBIE,false,true), playerheads);
 					int zombiepoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ZOMBIE,true,true), playerheads);
-					Bukkit.getLogger().info("Head counts are "+zombieheads+", "+zombierareaheads+", "+zombiepoweredheads+", "+zombiepoweredrareheads);
-					Bukkit.getLogger().info("Life Steal is "+life_steal+"%");
+					//Bukkit.getLogger().info("Head counts are "+zombieheads+", "+zombierareaheads+", "+zombiepoweredheads+", "+zombiepoweredrareheads);
+					//Bukkit.getLogger().info("Life Steal is "+life_steal+"%");
 					life_steal+=zombieheads;
 					life_steal+=zombiepoweredheads;
 					life_steal+=zombierareaheads*3;
 					life_steal+=zombiepoweredrareheads*5;
-					Bukkit.getLogger().info("Life Steal is "+life_steal+"%");
+					//Bukkit.getLogger().info("Life Steal is "+life_steal+"%");
 					if (this.plugin.getPlayerData(p).furytime!=0) {
 						attack_speed+=this.plugin.getPlayerData(p).furyamt;
 					}
@@ -11199,11 +11263,124 @@ implements Listener
 						p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
 						ItemStack item = p.getItemInHand();
 						double critical_chance=0,armor_pen=0,life_steal=0,attack_speed=0,dmg=0,armor_pen_dmg=0;
-						List<MobHead> player_mobheads = this.plugin.getMobHeads(p);
-						int skeleton_heads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON), player_mobheads);
-						int powered_skeleton_heads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON, false, true), player_mobheads);
-						int rare_skeleton_heads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON, true, MobHeadRareType.RARE_TYPE_A), player_mobheads);
-						int powered_rare_skeleton_heads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON, true, MobHeadRareType.RARE_TYPE_A, true), player_mobheads);
+
+						List<MobHead> playerheads = this.plugin.getMobHeads(p);
+						if (e.getEntity() instanceof Monster) {
+							Monster m = (Monster)e.getEntity();
+							int creeperheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CREEPER), playerheads);
+							int creeperrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CREEPER,true), playerheads);
+							int creeperpoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CREEPER,false,true), playerheads);
+							int creeperpoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CREEPER,true,true), playerheads);
+							int aoedmg = 0;
+							
+							aoedmg+=creeperheads*5;
+							aoedmg+=creeperrareheads*20;
+							aoedmg+=creeperpoweredheads*5;
+							aoedmg+=creeperpoweredrareheads*30;
+							
+
+							int spiderheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SPIDER), playerheads);
+							int spiderrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SPIDER,true), playerheads);
+							int spiderpoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SPIDER,false,true), playerheads);
+							int spiderpoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SPIDER,true,true), playerheads);
+							int slowdownpct = 0;
+							
+							slowdownpct+=spiderheads*5;
+							slowdownpct+=spiderrareheads*15;
+							slowdownpct+=spiderpoweredheads*5;
+							slowdownpct+=spiderpoweredrareheads*30;
+							
+							spiderrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SPIDER,true,MobHeadRareType.RARE_TYPE_B), playerheads);
+							int poisondur = 0; //Amount of poison duration (seconds) to add to the current poison amount.
+							
+							poisondur+=spiderrareheads*2;
+							poisondur+=spiderpoweredheads*1;
+							poisondur+=spiderpoweredrareheads*5;
+							
+							m.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,60,slowdownpct/15,true));
+							
+
+							int poisonduration=0;
+							//First see if the mob is already a poisoned mob.
+							boolean found=false;
+							for (int i=0;i<this.plugin.mob_list.size();i++) {
+								if (this.plugin.mob_list.get(i).id.compareTo(m.getUniqueId())==0) {
+									//We found it. Add onto current poison duration.
+									this.plugin.mob_list.get(i).addPoison(poisondur*20);
+									found=true;
+									break;
+								}
+							}
+							if (!found) {
+								//We didn't find it, so add a new entry to the poison list.
+								MobManager newm = new MobManager(m.getUniqueId());
+								newm.addPoison(poisondur*20);
+								this.plugin.mob_list.add(newm);
+							}
+														
+							List<Entity> nearby_mobs = m.getNearbyEntities(2, 2, 2);
+							for (int i=0;i<nearby_mobs.size();i++) {
+								if (!(nearby_mobs.get(i) instanceof Monster)) {
+									nearby_mobs.remove(i);
+									i--;
+								}
+							}
+							for (int i=0;i<nearby_mobs.size();i++) {
+								if (!nearby_mobs.get(i).getUniqueId().equals(m)) {
+									LivingEntity m2 = (LivingEntity)nearby_mobs.get(i);
+									m2.damage(e.getDamage()*(aoedmg/100.0d));
+								}
+							}
+							int witherskeletonheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.WITHER_SKELETON), playerheads);
+							int witherskeletonrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.WITHER_SKELETON,true), playerheads);
+							int witherskeletonpoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.WITHER_SKELETON,false,true), playerheads);
+							int witherskeletonpoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.WITHER_SKELETON,true,true), playerheads);
+							int witherduration = 0, witheramplifier = 0;
+							try {
+								Iterator<PotionEffect> effects = m.getActivePotionEffects().iterator();
+								//Figure out potion effects when player joins.
+								while (effects.hasNext()) {
+									PotionEffect nexteffect = effects.next();
+									//Bukkit.getLogger().info("Effect Type is "+nexteffect.getType().getName()+", amplifier is "+nexteffect.getAmplifier()+", duration is "+nexteffect.getDuration());
+									if (witherskeletonheads+witherskeletonrareheads+witherskeletonpoweredheads+witherskeletonpoweredrareheads>0 && nexteffect.getType().getName().compareTo(PotionEffectType.WITHER.getName())==0) {
+										witherduration=nexteffect.getDuration();
+										witheramplifier=nexteffect.getAmplifier();
+									}
+									if (nexteffect.getType().getName().compareTo(PotionEffectType.SLOW.getName())==0 && nexteffect.getAmplifier()==6 && nexteffect.getDuration()<=60) {
+										m.removePotionEffect(PotionEffectType.SLOW);
+										//Bukkit.getLogger().info("Removed slow.");
+										//p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 200, nexteffect.getAmplifier()+1, true));
+										break;
+									}
+									/*if (nexteffect.getType().getName().compareTo(PotionEffectType.JUMP.getName())==0) {
+										p.removePotionEffect(PotionEffectType.JUMP);
+										p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 360000, nexteffect.getAmplifier()+2, true));
+									}*/
+									effects.remove();
+								}
+							} catch (ConcurrentModificationException ex_e) {
+								Bukkit.getLogger().warning("Potion Effect Collection not accessible while trying to remove slow debuff.");
+							}
+							if (witherskeletonpoweredrareheads>0) {
+								if (witherduration==0) {witherduration=400;}
+								Bukkit.getLogger().info("Adding potion effect WITHER with amplifier "+(witheramplifier+2*witherskeletonpoweredrareheads)+" + duration "+witherduration);
+								m.addPotionEffect(new PotionEffect(PotionEffectType.WITHER,witherduration,witheramplifier+2*witherskeletonpoweredrareheads),true);
+							} else if (witherskeletonpoweredheads>0) {
+								if (witherduration==0) {witherduration=100;}
+								Bukkit.getLogger().info("Adding potion effect WITHER with amplifier "+(witheramplifier+1*witherskeletonpoweredrareheads)+" + duration "+witherduration);
+								m.addPotionEffect(new PotionEffect(PotionEffectType.WITHER,witherduration,witheramplifier+1*witherskeletonpoweredrareheads),true);
+							} else if (witherskeletonrareheads>0) {
+								Bukkit.getLogger().info("Adding potion effect WITHER with amplifier 2 + duration "+(witherduration+300*witherskeletonrareheads));
+								m.addPotionEffect(new PotionEffect(PotionEffectType.WITHER,witherduration+300*witherskeletonrareheads,2),true);
+							} else if (witherskeletonheads>0) {
+								Bukkit.getLogger().info("Adding potion effect WITHER with amplifier 0 + duration "+(witherduration+100*witherskeletonrareheads));
+								m.addPotionEffect(new PotionEffect(PotionEffectType.WITHER,witherduration+100*witherskeletonrareheads,0),true);
+							}
+						}
+						int skeleton_heads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON), playerheads);
+						int powered_skeleton_heads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON, false, true), playerheads);
+						int rare_skeleton_heads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON, true, MobHeadRareType.RARE_TYPE_A), playerheads);
+						int powered_rare_skeleton_heads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.SKELETON, true, MobHeadRareType.RARE_TYPE_A, true), playerheads);
 						/*if (skeleton_heads>0) {
 							Bukkit.getLogger().info("Found "+skeleton_heads+" skeleton mob heads.");
 						}
