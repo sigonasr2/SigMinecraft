@@ -2882,20 +2882,36 @@ implements Listener
 
 				if (e.getEntity().getCustomName()!=null && e.getEntity().getCustomName().equals(ChatColor.GOLD+"Charge Zombie II")) {
 					//Destroy an area around itself.
-					int size=((int)(Math.random()*5))+1;
-					for (int k=-size;k<size;k++) {
-						for (int j=-size;j<size;j++) {
-							for (int m=-1;m<size/2;m++) {
-								if (Math.random()<=1.00-((m+4)*0.05d)) {
-									Location checkloc = e.getEntity().getLocation().add(k,m,j);
-									Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
-									if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND && bl.getType()!=Material.MOSSY_COBBLESTONE && naturalBlock(bl.getType())) {
-										bl.setType(Material.AIR);
+					//Check air density. Please.
+	    			int airmeasure=0;
+	    			//Get the underground chunk density of this chunk.
+	    			//Max chunk density is 12800.
+	    			Chunk c = e.getEntity().getWorld().getChunkAt(e.getEntity().getLocation());
+	    			for (int x=0;x<16;x++) {
+	        			for (int y=0;y<50;y++) {
+	            			for (int z=0;z<16;z++) {
+	            				if (c.getBlock(x, y, z).getType()==Material.AIR) {
+	            					airmeasure++;
+	            				}
+	            			}
+	        			}
+	    			}
+	    			if (((double)airmeasure/12800)*100.0d<=10) {
+						int size=((int)(Math.random()*5))+1;
+						for (int k=-size;k<size;k++) {
+							for (int j=-size;j<size;j++) {
+								for (int m=-1;m<size/2;m++) {
+									if (Math.random()<=1.00-((m+4)*0.05d)) {
+										Location checkloc = e.getEntity().getLocation().add(k,m,j);
+										Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+										if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND && bl.getType()!=Material.MOSSY_COBBLESTONE && naturalBlock(bl.getType())) {
+											bl.setType(Material.AIR);
+										}
 									}
 								}
 							}
 						}
-					}
+	    			}
 				}
 
 
@@ -4796,17 +4812,37 @@ implements Listener
 							}
 						}
 					}
+					boolean clearair=false;
+					//Check air density. Please.
+	    			int airmeasure=0;
+	    			//Get the underground chunk density of this chunk.
+	    			//Max chunk density is 12800.
+	    			Chunk c = p.getWorld().getChunkAt(p.getLocation());
+	    			for (int x=0;x<16;x++) {
+	        			for (int y=0;y<50;y++) {
+	            			for (int z=0;z<16;z++) {
+	            				if (c.getBlock(x, y, z).getType()==Material.AIR) {
+	            					airmeasure++;
+	            				}
+	            			}
+	        			}
+	    			}
+	    			if (((double)airmeasure/12800)*100.0d<=10) {
+	    				clearair=true;
+	    			}
 					if (!torch1) {
-						int lb1=(int)(Math.random()*5)+1,lb2=(int)(Math.random()*5)+1,ub1=-(int)(Math.random()*6)+1,ub2=-(int)(Math.random()*6)+1;
-						for (int j=lb1;j>ub1;j--) {
-							for (int k=2;k>-1;k--) {
-								for (int l=lb2;l>-ub2;l--) {
-									Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(10+j,k,spread+l));
-									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
-										b.setType(Material.AIR);
+						if (clearair) {
+	 						int lb1=(int)(Math.random()*5)+1,lb2=(int)(Math.random()*5)+1,ub1=-(int)(Math.random()*6)+1,ub2=-(int)(Math.random()*6)+1;
+							for (int j=lb1;j>ub1;j--) {
+								for (int k=2;k>-1;k--) {
+									for (int l=lb2;l>-ub2;l--) {
+										Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(10+j,k,spread+l));
+										if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
+											b.setType(Material.AIR);
+										}
 									}
 								}
-							}
+							}	
 						}
 						e1 = Bukkit.getWorld("world").spawnEntity(p.getLocation().add(10,0,spread), EntityType.ZOMBIE);
 					}
@@ -4823,13 +4859,15 @@ implements Listener
 						}
 					}
 					if (!torch2) {
-						int lb1=(int)(Math.random()*5)+1,lb2=(int)(Math.random()*5)+1,ub1=-(int)(Math.random()*6)+1,ub2=-(int)(Math.random()*6)+1;
-						for (int j=lb1;j>ub1;j--) {
-							for (int k=2;k>-1;k--) {
-								for (int l=lb2;l>-ub2;l--) {
-									Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(-10+j,k,spread+l));
-									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
-										b.setType(Material.AIR);
+						if (clearair) {
+							int lb1=(int)(Math.random()*5)+1,lb2=(int)(Math.random()*5)+1,ub1=-(int)(Math.random()*6)+1,ub2=-(int)(Math.random()*6)+1;
+							for (int j=lb1;j>ub1;j--) {
+								for (int k=2;k>-1;k--) {
+									for (int l=lb2;l>-ub2;l--) {
+										Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(-10+j,k,spread+l));
+										if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
+											b.setType(Material.AIR);
+										}
 									}
 								}
 							}
@@ -4848,13 +4886,15 @@ implements Listener
 						}
 					}
 					if (!torch3) {
-						int lb1=(int)(Math.random()*5)+1,lb2=(int)(Math.random()*5)+1,ub1=-(int)(Math.random()*6)+1,ub2=-(int)(Math.random()*6)+1;
-						for (int j=lb1;j>ub1;j--) {
-							for (int k=2;k>-1;k--) {
-								for (int l=lb2;l>-ub2;l--) {
-									Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(spread+j,k,10+l));
-									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
-										b.setType(Material.AIR);
+						if (clearair) {
+							int lb1=(int)(Math.random()*5)+1,lb2=(int)(Math.random()*5)+1,ub1=-(int)(Math.random()*6)+1,ub2=-(int)(Math.random()*6)+1;
+							for (int j=lb1;j>ub1;j--) {
+								for (int k=2;k>-1;k--) {
+									for (int l=lb2;l>-ub2;l--) {
+										Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(spread+j,k,10+l));
+										if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
+											b.setType(Material.AIR);
+										}
 									}
 								}
 							}
@@ -4873,13 +4913,15 @@ implements Listener
 						}
 					}
 					if (!torch4) {
-						int lb1=(int)(Math.random()*5)+1,lb2=(int)(Math.random()*5)+1,ub1=-(int)(Math.random()*6)+1,ub2=-(int)(Math.random()*6)+1;
-						for (int j=lb1;j>ub1;j--) {
-							for (int k=2;k>-1;k--) {
-								for (int l=lb2;l>-ub2;l--) {
-									Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(spread+j,k,-10+l));
-									if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
-										b.setType(Material.AIR);
+						if (clearair) {
+							int lb1=(int)(Math.random()*5)+1,lb2=(int)(Math.random()*5)+1,ub1=-(int)(Math.random()*6)+1,ub2=-(int)(Math.random()*6)+1;
+							for (int j=lb1;j>ub1;j--) {
+								for (int k=2;k>-1;k--) {
+									for (int l=lb2;l>-ub2;l--) {
+										Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(spread+j,k,-10+l));
+										if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
+											b.setType(Material.AIR);
+										}
 									}
 								}
 							}
@@ -8287,7 +8329,29 @@ implements Listener
 			if (e.getEntity().getKiller()!=null && ((Player)e.getEntity().getKiller()).getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS)>0) {
 				chance_increase=((Player)e.getEntity().getKiller()).getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS)/2;
 			}
+			int magicfind = 0;
+			
+			Player p = null;
+			if (e.getEntity().getKiller()!=null) {
+				p = e.getEntity().getKiller();
+			}
+			if (p!=null) {
+				List<MobHead> playerheads = this.plugin.getMobHeads(p);
+				int endermanrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ENDERMAN,true,MobHeadRareType.RARE_TYPE_B), playerheads);
+				int endermanpoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ENDERMAN,false,true), playerheads);
+				int endermanpoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ENDERMAN,true,true), playerheads);
+				
+				magicfind+=endermanrareheads;
+				magicfind+=endermanpoweredheads;
+				magicfind+=endermanpoweredrareheads*3;
+			}
+			
 			for (int i=0;i<e.getDrops().size();i++) {
+				if (Math.random()*100<=magicfind) {
+					if (e.getDrops().get(i).getMaxStackSize()>=e.getDrops().get(i).getAmount()+1) {
+						e.getDrops().get(i).setAmount(e.getDrops().get(i).getAmount()+1);
+					}
+				}
 				if (e.getDrops().get(i).getType()==Material.SKULL_ITEM) {
 					if (Math.random()>0.085*chance_increase) {
 						e.getDrops().remove(i);
@@ -10986,6 +11050,55 @@ implements Listener
 						poisondur+=spiderrareheads*2;
 						poisondur+=spiderpoweredheads*1;
 						poisondur+=spiderpoweredrareheads*5;
+
+						int endermanheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ENDERMAN), playerheads);
+						int endermanrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ENDERMAN,true), playerheads);
+						int endermanpoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ENDERMAN,false,true), playerheads);
+						int endermanpoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ENDERMAN,true,true), playerheads);
+						int critchance = 0;
+						
+						critchance+=endermanheads;
+						critchance+=endermanrareheads*5;
+						critchance+=endermanpoweredheads;
+						critchance+=endermanpoweredrareheads*10;
+
+						int cavespiderheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CAVE_SPIDER), playerheads);
+						int cavespiderrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CAVE_SPIDER,true), playerheads);
+						int cavespiderpoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CAVE_SPIDER,false,true), playerheads);
+						int cavespiderpoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CAVE_SPIDER,true,true), playerheads);
+						
+						poisondur+=cavespiderheads;
+						poisondur+=cavespiderrareheads*3;
+						poisondur+=cavespiderpoweredheads*2;
+						poisondur+=cavespiderpoweredrareheads*5;
+
+						cavespiderrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CAVE_SPIDER,true,MobHeadRareType.RARE_TYPE_B), playerheads);
+						int snarechance=0;
+						
+						snarechance+=cavespiderrareheads*5;
+						snarechance+=cavespiderpoweredheads*3;
+						snarechance+=cavespiderpoweredrareheads*8;
+						
+						int blazeheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.BLAZE), playerheads);
+						int blazerareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.BLAZE,true), playerheads);
+						int blazepoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.BLAZE,false,true), playerheads);
+						int blazepoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.BLAZE,true,true), playerheads);
+						int ignitedur = 0;
+						ignitedur+=blazeheads;
+						ignitedur+=blazerareheads*3;
+						ignitedur+=blazepoweredheads;
+						ignitedur+=blazepoweredrareheads*5;
+								
+						if (Math.random()*100<=critchance) {
+							e.setDamage(e.getDamage()*2);
+						}		
+						if (Math.random()*100<=snarechance) {
+							m.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,100,7,true));
+						}
+						
+						if (ignitedur>0) {
+							m.setFireTicks(m.getFireTicks()+(ignitedur*20));
+						}
 						
 						m.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,60,slowdownpct/15,true));
 						
@@ -11296,6 +11409,55 @@ implements Listener
 							poisondur+=spiderrareheads*2;
 							poisondur+=spiderpoweredheads*1;
 							poisondur+=spiderpoweredrareheads*5;
+							
+							int endermanheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ENDERMAN), playerheads);
+							int endermanrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ENDERMAN,true), playerheads);
+							int endermanpoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ENDERMAN,false,true), playerheads);
+							int endermanpoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ENDERMAN,true,true), playerheads);
+							int critchance = 0;
+							
+							critchance+=endermanheads;
+							critchance+=endermanrareheads*5;
+							critchance+=endermanpoweredheads;
+							critchance+=endermanpoweredrareheads*10;
+
+							int cavespiderheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CAVE_SPIDER), playerheads);
+							int cavespiderrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CAVE_SPIDER,true), playerheads);
+							int cavespiderpoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CAVE_SPIDER,false,true), playerheads);
+							int cavespiderpoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CAVE_SPIDER,true,true), playerheads);
+							
+							poisondur+=cavespiderheads;
+							poisondur+=cavespiderrareheads*3;
+							poisondur+=cavespiderpoweredheads*2;
+							poisondur+=cavespiderpoweredrareheads*5;
+
+							cavespiderrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.CAVE_SPIDER,true,MobHeadRareType.RARE_TYPE_B), playerheads);
+							int snarechance=0;
+							
+							snarechance+=cavespiderrareheads*5;
+							snarechance+=cavespiderpoweredheads*3;
+							snarechance+=cavespiderpoweredrareheads*8;
+							
+							int blazeheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.BLAZE), playerheads);
+							int blazerareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.BLAZE,true), playerheads);
+							int blazepoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.BLAZE,false,true), playerheads);
+							int blazepoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.BLAZE,true,true), playerheads);
+							int ignitedur = 0;
+							ignitedur+=blazeheads;
+							ignitedur+=blazerareheads*3;
+							ignitedur+=blazepoweredheads;
+							ignitedur+=blazepoweredrareheads*5;
+									
+							if (Math.random()*100<=critchance) {
+								e.setDamage(e.getDamage()*2);
+							}		
+							if (Math.random()*100<=snarechance) {
+								m.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,100,7,true));
+							}
+							
+							if (ignitedur>0) {
+								m.setFireTicks(m.getFireTicks()+(ignitedur*20));
+							}
 							
 							m.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,60,slowdownpct/15,true));
 							
