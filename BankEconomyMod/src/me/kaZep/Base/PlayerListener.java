@@ -9811,6 +9811,37 @@ implements Listener
 				e.setCancelled(true);
 				return;
 			}
+			if (p.getItemInHand()!=null) {
+				if (p.getItemInHand().getType().toString().toLowerCase().contains("sword")) {
+					//Divide damage by 4.
+					e.setDamage(e.getDamage()/4.0d);
+					//Increase damage based on power level of weapon.
+					double dmg_ratio = 0;
+					if (p.getItemInHand().getType()==Material.WOOD_SWORD) {
+						//Damage increases by 0.5 per Power level.
+						dmg_ratio = 0.5;
+					}
+					if (p.getItemInHand().getType()==Material.STONE_SWORD) {
+						//Damage increases by 1.0 per Power level.
+						dmg_ratio = 1;
+					}
+					if (p.getItemInHand().getType()==Material.IRON_SWORD) {
+						//Damage increases by 1.5 per Power level.
+						dmg_ratio = 1.5;
+					}
+					if (p.getItemInHand().getType()==Material.DIAMOND_SWORD) {
+						//Damage increases by 2.0 per Power level.
+						dmg_ratio = 2;
+					}
+					if (p.getItemInHand().getType()==Material.GOLD_SWORD) {
+						//Damage increases by 8.0 per Power level.
+						dmg_ratio = 8;
+					}
+					if (p.getItemInHand().containsEnchantment(Enchantment.ARROW_DAMAGE)) {
+						e.setDamage(e.getDamage()+(p.getItemInHand().getEnchantmentLevel(Enchantment.ARROW_DAMAGE)*dmg_ratio));
+					}
+				}
+			}
 			if (p.getItemInHand()!=null && this.plugin.hasBonusEnchantment(p.getItemInHand(), this.plugin.ENCHANT_EXECUTE)) {
 				if (e.getEntity() instanceof LivingEntity) {
 					LivingEntity l = (LivingEntity)e.getEntity();
@@ -11112,7 +11143,7 @@ implements Listener
 							int starty=l.getLocation().getBlockY();
 							int checky=l.getLocation().getBlockY();
 							/*16 is max height that a mob will be set to.*/
-							while (checky-starty<19 && l.getWorld().getBlockAt(l.getLocation().getBlockX(),l.getLocation().getBlockY()+checky,l.getLocation().getBlockZ()).getType()==Material.AIR) {
+							while (checky-starty<19 && l.getWorld().getBlockAt(l.getLocation().getBlockX(),checky,l.getLocation().getBlockZ()).getType()==Material.AIR) {
 								checky++;
 							}
 							
@@ -11509,7 +11540,7 @@ implements Listener
 								int starty=l.getLocation().getBlockY();
 								int checky=l.getLocation().getBlockY();
 								/*16 is max height that a mob will be set to.*/
-								while (checky-starty<19 && l.getWorld().getBlockAt(l.getLocation().getBlockX(),l.getLocation().getBlockY()+checky,l.getLocation().getBlockZ()).getType()==Material.AIR) {
+								while (checky-starty<19 && l.getWorld().getBlockAt(l.getLocation().getBlockX(),checky,l.getLocation().getBlockZ()).getType()==Material.AIR) {
 									checky++;
 								}
 								
