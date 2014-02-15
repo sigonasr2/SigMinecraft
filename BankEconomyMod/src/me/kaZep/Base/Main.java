@@ -858,9 +858,9 @@ public class Main extends JavaPlugin
 	
 	ShapedRecipe wood_sword_upgrade_recipe = new ShapedRecipe(new ItemStack(Material.WOOD_SWORD));
 	MaterialData base_mat = new MaterialData(Material.STICK);
+	wood_sword_upgrade_recipe.shape("aaa","aba","aaa");
 	wood_sword_upgrade_recipe.setIngredient('a', base_mat);
 	wood_sword_upgrade_recipe.setIngredient('b', Material.WOOD_SWORD);
-	wood_sword_upgrade_recipe.shape("aaa","aba","aaa");
 	Bukkit.addRecipe(wood_sword_upgrade_recipe);
 	base_mat = new MaterialData(Material.WOOD);
 	wood_sword_upgrade_recipe.setIngredient('a', base_mat);
@@ -873,9 +873,9 @@ public class Main extends JavaPlugin
 	Bukkit.addRecipe(wood_sword_upgrade_recipe);
 	ShapedRecipe stone_sword_upgrade_recipe = new ShapedRecipe(new ItemStack(Material.STONE_SWORD));
 	base_mat = new MaterialData(Material.COBBLESTONE);
+	stone_sword_upgrade_recipe.shape("aaa","aba","aaa");
 	stone_sword_upgrade_recipe.setIngredient('a', base_mat);
 	stone_sword_upgrade_recipe.setIngredient('b', Material.STONE_SWORD);
-	stone_sword_upgrade_recipe.shape("aaa","aba","aaa");
 	Bukkit.addRecipe(stone_sword_upgrade_recipe);
 	base_mat = new MaterialData(Material.STONE);
 	stone_sword_upgrade_recipe.setIngredient('a', base_mat);
@@ -888,9 +888,9 @@ public class Main extends JavaPlugin
 	Bukkit.addRecipe(stone_sword_upgrade_recipe);
 	ShapedRecipe iron_sword_upgrade_recipe = new ShapedRecipe(new ItemStack(Material.IRON_SWORD));
 	base_mat = new MaterialData(Material.IRON_INGOT);
+	iron_sword_upgrade_recipe.shape("aaa","aba","aaa");
 	iron_sword_upgrade_recipe.setIngredient('a', base_mat);
 	iron_sword_upgrade_recipe.setIngredient('b', Material.IRON_SWORD);
-	iron_sword_upgrade_recipe.shape("aaa","aba","aaa");
 	Bukkit.addRecipe(iron_sword_upgrade_recipe);
 	base_mat = new MaterialData(Material.IRON_BLOCK);
 	iron_sword_upgrade_recipe.setIngredient('a', base_mat);
@@ -903,9 +903,9 @@ public class Main extends JavaPlugin
 	Bukkit.addRecipe(iron_sword_upgrade_recipe);
 	ShapedRecipe gold_sword_upgrade_recipe = new ShapedRecipe(new ItemStack(Material.GOLD_SWORD));
 	base_mat = new MaterialData(Material.GOLD_INGOT);
+	gold_sword_upgrade_recipe.shape("aaa","aba","aaa");
 	gold_sword_upgrade_recipe.setIngredient('a', base_mat);
 	gold_sword_upgrade_recipe.setIngredient('b', Material.IRON_SWORD);
-	gold_sword_upgrade_recipe.shape("aaa","aba","aaa");
 	Bukkit.addRecipe(gold_sword_upgrade_recipe);
 	base_mat = new MaterialData(Material.GOLD_BLOCK);
 	gold_sword_upgrade_recipe.setIngredient('a', base_mat);
@@ -918,9 +918,9 @@ public class Main extends JavaPlugin
 	Bukkit.addRecipe(gold_sword_upgrade_recipe);
 	ShapedRecipe diamond_sword_upgrade_recipe = new ShapedRecipe(new ItemStack(Material.DIAMOND_SWORD));
 	base_mat = new MaterialData(Material.DIAMOND);
+	diamond_sword_upgrade_recipe.shape("aaa","aba","aaa");
 	diamond_sword_upgrade_recipe.setIngredient('a', base_mat);
 	diamond_sword_upgrade_recipe.setIngredient('b', Material.DIAMOND_SWORD);
-	diamond_sword_upgrade_recipe.shape("aaa","aba","aaa");
 	Bukkit.addRecipe(diamond_sword_upgrade_recipe);
 	base_mat = new MaterialData(Material.DIAMOND_BLOCK);
 	diamond_sword_upgrade_recipe.setIngredient('a', base_mat);
@@ -2177,7 +2177,7 @@ public void runTick() {
 									  for (int z=0;z<16;z++) {
 										  Block b = Bukkit.getWorld("world").getBlockAt(x+c.getX()*16,y,z+c.getZ()*16);
 										  if (b!=null && (b.getType()==Material.DIAMOND_ORE)) {
-											  if (Math.random()<=0.60) {
+											  if (Math.random()<=0.32) {
 												  removeore++;
 												  b.setType(Material.STONE);
 											  }
@@ -2328,6 +2328,51 @@ public void runTick() {
 							  if (!contains_mob) {
 								  powered_mob_list.add(new PoweredMob(l.getUniqueId(), Main.SERVER_TICK_TIME));
 								  l.getWorld().playSound(l.getLocation(), Sound.SPIDER_DEATH, 0.4f, 0.04f);
+							  }
+						  }
+					  }
+					  if (nearby.get(i).getType()==EntityType.ZOMBIE) {
+						  Creature l = (Creature)nearby.get(i);
+						  if (l.getCustomName().compareTo(ChatColor.GOLD+"Charge Zombie II")==0 && !l.isDead() && l.getKiller()!=null) {
+							  for (int k=-2;k<3;k++) {
+								  for (int j=-2;j<3;j++) {
+									  Location checkloc = l.getLocation().add(k,1,j);
+									  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+									  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND && naturalBlock(bl.getType())) {
+										  bl.breakNaturally();
+									  }
+									  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+									  checkloc = l.getLocation().add(k,2,j);
+									  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND && naturalBlock(bl.getType())) {
+										  bl.breakNaturally();
+									  }
+									  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+									  checkloc = l.getLocation().add(k,0,j);
+									  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND && naturalBlock(bl.getType())) {
+										  bl.breakNaturally();
+									  }
+								  }
+							  }
+						  }
+						  if (l.getCustomName().compareTo(ChatColor.YELLOW+"Charge Zombie")==0 && !l.isDead() && l.getKiller()!=null) {
+							  for (int k=-1;k<2;k++) {
+								  for (int j=-1;j<2;j++) {
+									  Location checkloc = l.getLocation().add(k,1,j);
+									  Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+									  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND && naturalBlock(bl.getType())) {
+										  bl.breakNaturally();
+									  }
+									  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+									  checkloc = l.getLocation().add(k,2,j);
+									  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND && naturalBlock(bl.getType())) {
+										  bl.breakNaturally();
+									  }
+									  bl = Bukkit.getWorld("world").getBlockAt(checkloc);
+									  checkloc = l.getLocation().add(k,0,j);
+									  if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND && naturalBlock(bl.getType())) {
+										  bl.breakNaturally();
+									  }
+								  }
 							  }
 						  }
 					  }
@@ -3242,7 +3287,7 @@ public void checkJukeboxes() {
         			}
     			}
     			//Bukkit.getLogger().info("For player "+list[i].getName()+", Chunk air density is "+((double)airmeasure/12800)*100.0d+"%");
-    			if (!spawneddungeon && ((double)airmeasure/12800)*100.0d<=10) { //Make sure the air density is small enough that we are allowed to carve things.
+    			if (!spawneddungeon && ((double)airmeasure/12800)*100.0d<=6.5) { //Make sure the air density is small enough that we are allowed to carve things.
 	    			//See if the player is very far underground and there is nothing around him/her. This would be odd behavior (Hint at strip mining) and we will force Charge Zombie II's to spawn and create areas.
 	    			List<Entity> nearby = list[i].getNearbyEntities(20, 5, 20);
 	    			for (int j=0;j<nearby.size();j++) {
@@ -3277,7 +3322,7 @@ public void checkJukeboxes() {
 		            				for (int l=lb2;l>-ub2;l--) {
 		            					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(20+j,k,spread+l));
 		            					if (Math.random()<=0.75 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
-		            						b.setType(Material.AIR);
+		            						//b.setType(Material.AIR);
 		            					}
 		            				}
 		        				}
@@ -3303,7 +3348,7 @@ public void checkJukeboxes() {
 		            				for (int l=lb2;l>-ub2;l--) {
 		            					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(-20+j,k,spread+l));
 		            					if (Math.random()<=0.75 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
-		            						b.setType(Material.AIR);
+		            						//b.setType(Material.AIR);
 		            					}
 		            				}
 		        				}
@@ -3328,7 +3373,7 @@ public void checkJukeboxes() {
 		            				for (int l=lb2;l>-ub2;l--) {
 			        					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(spread+j,k,20+l));
 			        					if (Math.random()<=0.75 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
-			        						b.setType(Material.AIR);
+			        						//b.setType(Material.AIR);
 			        					}
 			        				}
 			    				}
@@ -3353,7 +3398,7 @@ public void checkJukeboxes() {
 		            				for (int l=lb2;l>-ub2;l--) {
 		            					Block b =Bukkit.getWorld("world").getBlockAt(list[i].getLocation().add(spread+j,k,-20+l));
 		            					if (Math.random()<=0.75 && b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
-		            						b.setType(Material.AIR);
+		            						//b.setType(Material.AIR);
 		            					}
 		            				}
 		        				}

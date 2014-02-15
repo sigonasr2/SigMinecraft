@@ -2896,7 +2896,7 @@ implements Listener
 	            			}
 	        			}
 	    			}
-	    			if (((double)airmeasure/12800)*100.0d<=10) {
+	    			if (((double)airmeasure/12800)*100.0d<=6.5) {
 						int size=((int)(Math.random()*5))+1;
 						for (int k=-size;k<size;k++) {
 							for (int j=-size;j<size;j++) {
@@ -2905,7 +2905,7 @@ implements Listener
 										Location checkloc = e.getEntity().getLocation().add(k,m,j);
 										Block bl = Bukkit.getWorld("world").getBlockAt(checkloc);
 										if (bl.getType()!=Material.BEDROCK && bl.getType()!=Material.ENDER_PORTAL_FRAME && bl.getType()!=Material.ENDER_PORTAL && bl.getType()!=Material.MOB_SPAWNER && bl.getType()!=Material.COMMAND && bl.getType()!=Material.MOSSY_COBBLESTONE && naturalBlock(bl.getType())) {
-											bl.setType(Material.AIR);
+											//bl.setType(Material.AIR);
 										}
 									}
 								}
@@ -4827,7 +4827,7 @@ implements Listener
 	            			}
 	        			}
 	    			}
-	    			if (((double)airmeasure/12800)*100.0d<=10) {
+	    			if (((double)airmeasure/12800)*100.0d<=6.5) {
 	    				clearair=true;
 	    			}
 					if (!torch1) {
@@ -4838,7 +4838,7 @@ implements Listener
 									for (int l=lb2;l>-ub2;l--) {
 										Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(10+j,k,spread+l));
 										if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
-											b.setType(Material.AIR);
+											//b.setType(Material.AIR);
 										}
 									}
 								}
@@ -4866,7 +4866,7 @@ implements Listener
 									for (int l=lb2;l>-ub2;l--) {
 										Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(-10+j,k,spread+l));
 										if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
-											b.setType(Material.AIR);
+											//b.setType(Material.AIR);
 										}
 									}
 								}
@@ -4893,7 +4893,7 @@ implements Listener
 									for (int l=lb2;l>-ub2;l--) {
 										Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(spread+j,k,10+l));
 										if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
-											b.setType(Material.AIR);
+											//b.setType(Material.AIR);
 										}
 									}
 								}
@@ -4920,7 +4920,7 @@ implements Listener
 									for (int l=lb2;l>-ub2;l--) {
 										Block b =Bukkit.getWorld("world").getBlockAt(p.getLocation().add(spread+j,k,-10+l));
 										if (b.getType()!=Material.BEDROCK && b.getType()!=Material.MOB_SPAWNER && b.getType()!=Material.ENDER_PORTAL && b.getType()!=Material.ENDER_PORTAL_FRAME && naturalBlock(b.getType())) {
-											b.setType(Material.AIR);
+											//b.setType(Material.AIR);
 										}
 									}
 								}
@@ -9813,8 +9813,8 @@ implements Listener
 			}
 			if (p.getItemInHand()!=null) {
 				if (p.getItemInHand().getType().toString().toLowerCase().contains("sword")) {
-					//Divide damage by 4.
-					e.setDamage(e.getDamage()/4.0d);
+					//Divide damage by 2.4.
+					e.setDamage(e.getDamage()/2.4d);
 					//Increase damage based on power level of weapon.
 					double dmg_ratio = 0;
 					if (p.getItemInHand().getType()==Material.WOOD_SWORD) {

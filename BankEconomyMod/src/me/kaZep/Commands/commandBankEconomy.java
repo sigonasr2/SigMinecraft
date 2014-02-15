@@ -627,6 +627,124 @@ public String convertToItemName(String val) {
             		p.sendMessage("Changed name tag's title to "+p.getItemInHand().getItemMeta().getDisplayName()+".");
             	}
             } else
+            if (cmd.getName().toLowerCase().equalsIgnoreCase("event") && args.length==3 && p.hasPermission("maintenance-mode-admin")) {
+
+
+	  			if (args[0].equalsIgnoreCase("regen_chunk") /*DISABLED to prevent accidental execution.*/) {
+	  			  if (p.hasPermission("maintenance-mode-admin")) {
+	  				  //boolean result=p.getWorld().regenerateChunk(p.getLocation().getBlockX()/16, p.getLocation().getBlockZ()/16);
+	  				  //Bukkit.getLogger().info("Chunk regenerated: "+result+" ("+p.getLocation().getBlockX()/16+","+p.getLocation().getBlockZ()/16+")");
+	  				  /*byte[] worldarray = p.getWorld().getGenerator().generate(p.getWorld(), new Random(), p.getLocation().getBlockX()/16, p.getLocation().getBlockZ()/16);
+		  				for (int x = 0; x < 16; x++) {
+		  				    for (int z = 0; z < 16; z++) {
+		  				        for (int y = 0; y < 128; y++) {
+		  				        	Bukkit.getLogger().info("Block @ ("+x+","+y+","+z+") is "+worldarray[(x * 16 + z) * 128 + y]);
+		  				        }
+		  				    }
+		  				}*/
+	  				  /*
+	  				  //Create a new tempworld that mimics the real world, generator-wise.
+	  				  World newworld = Bukkit.createWorld(new WorldCreator("newworld").copy(p.getWorld()));
+	  				  p.teleport(new Location(newworld,0,0,0));
+	  				  for (int x=-720;x<721;x++) {
+	  					  for (int z=-720;z<721;z++) {
+	  						  Bukkit.getLogger().info("Creating new chunk at ("+x+","+z+") for world newworld.");
+	  						  newworld.loadChunk(x,z,true);
+	  					  }
+	  				  }*/
+	  				  
+	  				  Location CenterPoint = new Location(p.getWorld(),1627,67,-268); //Center of Twoside.
+	  				  int iterations=100*(Integer.valueOf(args[1])+50);
+	  				 for (int MASTER_i=-Integer.valueOf(args[1]);MASTER_i<Integer.valueOf(args[1])+1;MASTER_i++) {
+	  					 p.getWorld().save();
+	  	  				 for (int MASTER_j=-Integer.valueOf(args[2]);MASTER_j<Integer.valueOf(args[2])+1;MASTER_j++) {
+	  	  				  iterations++;
+	  	  				  //Bukkit.getLogger().info("");
+	  	  				  Bukkit.getLogger().info("Correcting Chunk ("+MASTER_i+","+MASTER_j+")...");
+	  	  				  //int rand_factor = (int)(Math.random()*200d);
+		  				  int chunkx=(MASTER_i*16+CenterPoint.getBlockX()+8)/16, chunkz=(MASTER_j*16+CenterPoint.getBlockZ()+8)/16;
+		  				  WorldEditPlugin wep = (WorldEditPlugin)Bukkit.getPluginManager().getPlugin("WorldEdit");
+		  				 final TerrainManager tm = new TerrainManager(wep, p.getWorld());
+		  				 
+		  				 int lowest=62;
+		  				 for (int y=lowest;y>0;y--) {
+		  					 boolean found=false;
+		  					 /*
+		  					 for (int x=0;x<16;x++) {
+		  						 for (int z=0;z<16;z++) {
+		  							 if (!naturalBlock(p.getWorld().getBlockAt(chunkx*16+x,y,chunkz*16+z).getType())) {
+		  								 found=true;
+		  								 lowest-=8;
+		  								 y-=7;
+		  								 break;
+		  							 }
+		  						 }
+		  						 if (found) {break;}
+		  					 }*/
+		  					 if (!found) {
+		  						 boolean found2=false;
+			  					 for (int x=0;x<16;x++) {
+			  						 for (int yy=0;yy<8;yy++) {
+				  						 for (int z=0;z<16;z++) {
+				  							 if (!naturalBlock(p.getWorld().getBlockAt(chunkx*16+x,y+yy,chunkz*16+z).getType())) {
+				  								 found2=true;
+				  								 lowest-=8;
+				  								 y-=7;
+				  								 break;
+				  							 }
+				  						 }
+			  						 }
+			  						 if (!found2) {break;}
+			  					 }
+		  						 if (!found2) {break;}
+		  					 }
+		  				 }
+		  				 
+		  				  final Location loc1 = new Location(p.getWorld(),chunkx*16-16,Math.max(lowest,1),chunkz*16-16);
+		  				  final Location loc2 = new Location(p.getWorld(),chunkx*16+32,128,chunkz*16+32);
+		  				  final File saveFile = new File("plugins/WorldEdit/schematics/world_save");
+		  				  try {
+		  					  tm.saveTerrain(saveFile, loc1, loc2);
+		  					} catch (FilenameException ex) {
+		  						// TODO Auto-generated catch block
+		  						ex.printStackTrace();
+		  					} catch (DataException ex) {
+		  						// TODO Auto-generated catch block
+		  						ex.printStackTrace();
+		  					} catch (IOException ex) {
+		  						// TODO Auto-generated catch block
+		  						ex.printStackTrace();
+		  					}
+		  				  //final ChunkSnapshot savedChunk = p.getWorld().getChunkAt(chunkx, chunkz).getChunkSnapshot();
+		  				  final Player p2 = p;
+		  				  final int chunkx2=chunkx,chunkz2=chunkz;
+		  				  p.getWorld().regenerateChunk(chunkx2, chunkz2);
+		  				  
+			  				try {
+								tm.loadSchematic(saveFile);
+							} catch (FilenameException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (MaxChangedBlocksException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (EmptyClipboardException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (DataException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+		  					  //Bukkit.getLogger().info("->Updated this layer. ("+(int)(iterations/10000d*100)+"%)");
+			  				  p.getWorld().unloadChunkRequest(chunkx2, chunkz2);
+	  	  				 }
+	  				 }
+	  			  }
+	  			}
+            }
             if (cmd.getName().toLowerCase().equalsIgnoreCase("event") && args.length==1 && p.hasPermission("maintenance-mode-admin")) {
   			  if (args[0].equalsIgnoreCase("halloween")) {
   				  if (this.plugin.getConfig().getBoolean("halloween-enabled")) {
@@ -1024,117 +1142,6 @@ public String convertToItemName(String val) {
 				  i.setItemMeta(meta);
 				  f.getInventory().addItem(i);
 			  }
-
-	  			if (args[0].equalsIgnoreCase("regen_chunk") && 0==1 /*DISABLED to prevent accidental execution.*/) {
-	  			  if (p.hasPermission("maintenance-mode-admin")) {
-	  				  //boolean result=p.getWorld().regenerateChunk(p.getLocation().getBlockX()/16, p.getLocation().getBlockZ()/16);
-	  				  //Bukkit.getLogger().info("Chunk regenerated: "+result+" ("+p.getLocation().getBlockX()/16+","+p.getLocation().getBlockZ()/16+")");
-	  				  /*byte[] worldarray = p.getWorld().getGenerator().generate(p.getWorld(), new Random(), p.getLocation().getBlockX()/16, p.getLocation().getBlockZ()/16);
-		  				for (int x = 0; x < 16; x++) {
-		  				    for (int z = 0; z < 16; z++) {
-		  				        for (int y = 0; y < 128; y++) {
-		  				        	Bukkit.getLogger().info("Block @ ("+x+","+y+","+z+") is "+worldarray[(x * 16 + z) * 128 + y]);
-		  				        }
-		  				    }
-		  				}*/
-	  				  /*
-	  				  //Create a new tempworld that mimics the real world, generator-wise.
-	  				  World newworld = Bukkit.createWorld(new WorldCreator("newworld").copy(p.getWorld()));
-	  				  p.teleport(new Location(newworld,0,0,0));
-	  				  for (int x=-720;x<721;x++) {
-	  					  for (int z=-720;z<721;z++) {
-	  						  Bukkit.getLogger().info("Creating new chunk at ("+x+","+z+") for world newworld.");
-	  						  newworld.loadChunk(x,z,true);
-	  					  }
-	  				  }*/
-	  				  
-	  				  Location CenterPoint = new Location(p.getWorld(),1627,67,-268); //Center of Twoside.
-	  				  int iterations=100*(Integer.valueOf(args[1])+50);
-	  				 for (int MASTER_i=Integer.valueOf(args[1]);MASTER_i<51;MASTER_i++) {
-	  					 p.getWorld().save();
-	  	  				 for (int MASTER_j=-50;MASTER_j<51;MASTER_j++) {
-	  	  				  iterations++;
-	  	  				  Bukkit.getLogger().info("");
-	  	  				  Bukkit.getLogger().info("BEGINNING Chunk ("+MASTER_i+","+MASTER_j+") correction...");
-	  	  				  //int rand_factor = (int)(Math.random()*200d);
-		  				  int chunkx=(MASTER_i*16+CenterPoint.getBlockX()+8)/16, chunkz=(MASTER_j*16+CenterPoint.getBlockZ()+8)/16;
-		  				  WorldEditPlugin wep = (WorldEditPlugin)Bukkit.getPluginManager().getPlugin("WorldEdit");
-		  				 final TerrainManager tm = new TerrainManager(wep, p.getWorld());
-		  				 
-		  				 int lowest=62;
-		  				 for (int y=lowest;y>0;y--) {
-		  					 boolean found=false;
-		  					 for (int x=0;x<16;x++) {
-		  						 for (int z=0;z<16;z++) {
-		  							 if (!naturalBlock(p.getWorld().getBlockAt(chunkx*16+x,y,chunkz*16+z).getType())) {
-		  								 found=true;
-		  								 lowest--;
-		  								 break;
-		  							 }
-		  						 }
-		  						 if (found) {break;}
-		  					 }
-		  					 if (!found) {
-		  						 boolean found2=false;
-			  					 for (int x=0;x<16;x++) {
-			  						 for (int yy=1;yy<4;yy++) {
-				  						 for (int z=0;z<16;z++) {
-				  							 if (!naturalBlock(p.getWorld().getBlockAt(chunkx*16+x,y+yy,chunkz*16+z).getType())) {
-				  								 found2=true;
-				  								 break;
-				  							 }
-				  						 }
-			  						 }
-			  						 if (!found2) {break;}
-			  					 }
-		  						 if (!found2) {break;}
-		  					 }
-		  				 }
-		  				 
-		  				  final Location loc1 = new Location(p.getWorld(),chunkx*16-16,lowest,chunkz*16-16);
-		  				  final Location loc2 = new Location(p.getWorld(),chunkx*16+32,128,chunkz*16+32);
-		  				  final File saveFile = new File("plugins/WorldEdit/schematics/world_save");
-		  				  try {
-		  					  tm.saveTerrain(saveFile, loc1, loc2);
-		  					} catch (FilenameException ex) {
-		  						// TODO Auto-generated catch block
-		  						ex.printStackTrace();
-		  					} catch (DataException ex) {
-		  						// TODO Auto-generated catch block
-		  						ex.printStackTrace();
-		  					} catch (IOException ex) {
-		  						// TODO Auto-generated catch block
-		  						ex.printStackTrace();
-		  					}
-		  				  //final ChunkSnapshot savedChunk = p.getWorld().getChunkAt(chunkx, chunkz).getChunkSnapshot();
-		  				  final Player p2 = p;
-		  				  final int chunkx2=chunkx,chunkz2=chunkz;
-		  				  p.getWorld().regenerateChunk(chunkx2, chunkz2);
-		  				  
-			  				try {
-								tm.loadSchematic(saveFile);
-							} catch (FilenameException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (MaxChangedBlocksException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (EmptyClipboardException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (DataException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-		  					  Bukkit.getLogger().info("->Updated this layer. ("+(int)(iterations/10000d*100)+"%)");
-			  				  p.getWorld().unloadChunkRequest(chunkx2, chunkz2);
-	  	  				 }
-	  				 }
-	  			  }
-	  			}
   			  if (args[0].equalsIgnoreCase("halloween") && args[1].equalsIgnoreCase("end")) {
   				  p.sendMessage(ChatColor.GRAY+"Ending Harrowing night... Did you make sure it was night time? If not, type this command again after /time night instead.");
   				  this.plugin.harrowing_night=true;
