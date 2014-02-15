@@ -655,8 +655,10 @@ public String convertToItemName(String val) {
 	  				  
 	  				  Location CenterPoint = new Location(p.getWorld(),1627,67,-268); //Center of Twoside.
 	  				  int iterations=100*(Integer.valueOf(args[1])+50);
+	  				  List<Integer> storedy = new ArrayList<Integer>();
 	  				 for (int MASTER_i=-Integer.valueOf(args[1]);MASTER_i<Integer.valueOf(args[1])+1;MASTER_i++) {
 	  					 p.getWorld().save();
+	  					 storedy.clear();
 	  	  				 for (int MASTER_j=-Integer.valueOf(args[2]);MASTER_j<Integer.valueOf(args[2])+1;MASTER_j++) {
 	  	  				  iterations++;
 	  	  				  //Bukkit.getLogger().info("");
@@ -687,16 +689,16 @@ public String convertToItemName(String val) {
 			  						 for (int yy=0;yy<8;yy++) {
 				  						 for (int z=0;z<16;z++) {
 				  							 if (!naturalBlock(p.getWorld().getBlockAt(chunkx*16+x,y+yy,chunkz*16+z).getType())) {
-				  								 found2=true;
-				  								 lowest-=8;
+				  								 if (!found2) {lowest-=8;}
 				  								 y-=7;
+				  								 storedy.add(y);
 				  								 break;
 				  							 }
 				  						 }
 			  						 }
-			  						 if (!found2) {break;}
+			  						 //if (!found2) {break;}
 			  					 }
-		  						 if (!found2) {break;}
+		  						 //if (!found2) {break;}
 		  					 }
 		  				 }
 		  				 
@@ -715,6 +717,24 @@ public String convertToItemName(String val) {
 		  						// TODO Auto-generated catch block
 		  						ex.printStackTrace();
 		  					}
+			  				  for (int i=0;i<storedy.size();i++) {
+			  					final Location loc1 = new Location(p.getWorld(),chunkx*16-16,storedy.get(i),chunkz*16-16);
+				  				  final Location loc2 = new Location(p.getWorld(),chunkx*16+32,storedy.get(i)+8,chunkz*16+32);
+				  				  final File saveFile2 = new File("plugins/WorldEdit/schematics/world_savey"+storedy.get(i));
+				  				  try {
+				  					  tm.saveTerrain(saveFile2, loc1, loc2);
+				  					} catch (FilenameException ex) {
+				  						// TODO Auto-generated catch block
+				  						ex.printStackTrace();
+				  					} catch (DataException ex) {
+				  						// TODO Auto-generated catch block
+				  						ex.printStackTrace();
+				  					} catch (IOException ex) {
+				  						// TODO Auto-generated catch block
+				  						ex.printStackTrace();
+				  					}
+			  				  }
+		  				  }
 		  				  //final ChunkSnapshot savedChunk = p.getWorld().getChunkAt(chunkx, chunkz).getChunkSnapshot();
 		  				  final Player p2 = p;
 		  				  final int chunkx2=chunkx,chunkz2=chunkz;
@@ -738,6 +758,27 @@ public String convertToItemName(String val) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
+			  				  for (int i=0;i<storedy.size();i++) {
+			  					final File saveFile2 = new File("plugins/WorldEdit/schematics/world_savey"+storedy.get(i));
+					  				try {
+										tm.loadSchematic(saveFile2);
+									} catch (FilenameException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									} catch (MaxChangedBlocksException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									} catch (EmptyClipboardException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									} catch (DataException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									} catch (IOException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+			  				  }
 		  					  //Bukkit.getLogger().info("->Updated this layer. ("+(int)(iterations/10000d*100)+"%)");
 			  				  p.getWorld().unloadChunkRequest(chunkx2, chunkz2);
 	  	  				 }
