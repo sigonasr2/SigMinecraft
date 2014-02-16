@@ -5593,7 +5593,7 @@ implements Listener
 	@EventHandler
 	public void onPotionSplash(PotionSplashEvent e) {
 		ThrownPotion pot = e.getEntity();
-		LivingEntity theshooter = pot.getShooter();
+		LivingEntity theshooter = (LivingEntity)pot.getShooter();
 		if (pot.getItem().getItemMeta().hasLore() &&
 				pot.getItem().getItemMeta().getLore().contains(ChatColor.GOLD+"+50% Attack Speed (1:20)")) {
 			int duration = 1600;
@@ -5856,7 +5856,7 @@ implements Listener
 		try {
 			Iterator<LivingEntity> entities = e.getAffectedEntities().iterator();
 			Player shooter;
-			if (e.getPotion().getShooter().getType() == EntityType.PLAYER) {
+			if (((LivingEntity)e.getPotion().getShooter()).getType() == EntityType.PLAYER) {
 				shooter=(Player)e.getPotion().getShooter();
 				if (this.plugin.PlayerinJob(shooter,"Support")) {
 					//Bukkit.getPlayer("sigonasr2").sendMessage("Shooter is "+shooter.getName());
@@ -9918,7 +9918,7 @@ implements Listener
 			}
 			if (e.getDamager() instanceof Projectile) {
 				if (((Projectile)e.getDamager()).getShooter() instanceof LivingEntity) {
-					LivingEntity l2 = ((Projectile)e.getDamager()).getShooter();
+					LivingEntity l2 = (LivingEntity)(((Projectile)e.getDamager()).getShooter());
 					if (l2.hasPotionEffect(PotionEffectType.INVISIBILITY)) {l2.removePotionEffect(PotionEffectType.INVISIBILITY);}
 					for (int i=0;i<this.plugin.powered_mob_list.size();i++) {
 						if (this.plugin.powered_mob_list.get(i).power_time+40<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).id.equals(l2.getUniqueId())) {
@@ -10540,7 +10540,7 @@ implements Listener
 			}
 			if (e.getDamager() instanceof Projectile) {
 				if (((Projectile)e.getDamager()).getShooter() instanceof LivingEntity) {
-					LivingEntity l = ((Projectile)e.getDamager()).getShooter();
+					LivingEntity l = (LivingEntity)(((Projectile)e.getDamager()).getShooter());
 					if (l.getCustomName()!=null && l.getCustomName().contains(ChatColor.RED+"Silencer")) {
 						p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 64));
 					}
@@ -11426,7 +11426,7 @@ implements Listener
 						},1);
 					}
 				} else {
-					if (((Projectile)e.getDamager()).getShooter()!=null && ((Projectile)e.getDamager()).getShooter().getType()==EntityType.PLAYER) {
+					if (((Projectile)e.getDamager()).getShooter()!=null && ((LivingEntity)((Projectile)e.getDamager()).getShooter()).getType()==EntityType.PLAYER) {
 						final Player p = (Player)((Projectile)e.getDamager()).getShooter();
 						this.plugin.getPlayerData(p).lastsneaktime=0;
 						p.getScoreboard().getTeam(p.getName().toLowerCase()).setSuffix(healthbar(p.getHealth(),p.getMaxHealth(),p.getFoodLevel()));
@@ -15602,7 +15602,7 @@ implements Listener
 
 	@EventHandler
 	public void onShootArrow(ProjectileHitEvent e) {
-		LivingEntity l = e.getEntity().getShooter();
+		LivingEntity l = (LivingEntity)(e.getEntity().getShooter());
 		//Bukkit.getLogger().info("Arrow vector is: "+e.getEntity().getVelocity().toString());
 		if (l!=null && l.getType()==EntityType.SKELETON && l.getCustomName()!=null) {
 			if ((l.getCustomName().compareTo(ChatColor.YELLOW+"Sniper")==0)) {
@@ -15656,7 +15656,7 @@ implements Listener
 	}
 	@EventHandler
 	public void onEggThrow(ProjectileHitEvent e) {
-		LivingEntity l = e.getEntity().getShooter();
+		LivingEntity l = (LivingEntity)(e.getEntity().getShooter());
 		if (e.getEntity() instanceof ThrownPotion) {
 			ThrownPotion thrownpot = (ThrownPotion)e.getEntity();
 			if (thrownpot.getShooter() instanceof Player) {
