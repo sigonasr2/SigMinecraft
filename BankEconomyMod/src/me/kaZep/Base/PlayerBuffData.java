@@ -261,7 +261,7 @@ public class PlayerBuffData {
 				last_money_report_time=Main.SERVER_TICK_TIME;
 				if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify6")) {
 				    DecimalFormat df = new DecimalFormat("#0.00");
-					p.sendMessage(ChatColor.YELLOW+""+ChatColor.ITALIC+"You have earned $"+df.format(money_gained)+" from your jobs in the past hour.");
+					//p.sendMessage(ChatColor.YELLOW+""+ChatColor.ITALIC+"You have earned $"+df.format(money_gained)+" from your jobs in the past hour.");
 				}
 				money_gained=0;
 			}

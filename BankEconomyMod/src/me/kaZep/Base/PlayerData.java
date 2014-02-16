@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 public class PlayerData {
 	int buildamt=10;
 	Material lastblocktype=null;
+	int gameinteractions=0;
 	long lastinteracttime=0;
 	long lastminetime=0;
 	long lastsneaktime=0;

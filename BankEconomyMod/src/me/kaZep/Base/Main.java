@@ -2489,13 +2489,29 @@ public void runTick() {
 					  }
 				  }
 			  }
+			  if (Main.SERVER_TICK_TIME%72000==0) {
+		          for (int i=0;i<SPEED_CONTROL.size();i++) {
+		        	  SPEED_CONTROL.get(i).p.sendMessage(ChatColor.AQUA+""+ChatColor.ITALIC+"  Please report any and all bugs on the bug report website! http://zgamers.domain.com/");
+		        	  SPEED_CONTROL.get(i).p.sendMessage(ChatColor.WHITE+"No matter how small, we'll get things resolved faster with your help!");
+		        	  SPEED_CONTROL.get(i).p.sendMessage("");
+		          }
+			  }
 			  if (Main.SERVER_TICK_TIME%36000==0) {
 				  //Every 30 minutes, clear out the list of poisoned mobs, in case some are non-existent now.
 				  mob_list.clear();
 				  //Report player incomes.
 		          for (int i=0;i<SPEED_CONTROL.size();i++) {
+					  //Every 30 minutes, award players with income who are doing things.
+		        	  double earned = 0;
+		        	  if (getPlayerData(SPEED_CONTROL.get(i).p).gameinteractions>10000) {earned=20;} else {
+		        		  earned=(getPlayerData(SPEED_CONTROL.get(i).p).gameinteractions/10000d)*10d;
+		        	  }
+		        	  economy.depositPlayer(p.getName(), earned);
+		        	  getPlayerData(SPEED_CONTROL.get(i).p).gameinteractions=0;
+		  			DecimalFormat df = new DecimalFormat("#0.00");
+		        	  SPEED_CONTROL.get(i).p.sendMessage(ChatColor.YELLOW+"You made $"+df.format(earned)+" in the past hour!");
 		        	  SPEED_CONTROL.get(i).updatePlayerSpd();
-		        	  try
+		        	  /*try
 		        	  {
 		        	      String filename= "PlayerBuffData.txt";
 		        	      FileWriter fw = new FileWriter(filename,true); //the true will append the new data
@@ -2509,7 +2525,7 @@ public void runTick() {
 		        	  catch(IOException ioe)
 		        	  {
 		        	      System.err.println("IOException: " + ioe.getMessage());
-		        	  }
+		        	  }*/
 		          }
 			  }
 			  if (Main.SERVER_TICK_TIME%600==0) {
@@ -4231,7 +4247,9 @@ public void payDay(int time)
 	public void gainMoneyExp(String p,String job,double amount,double exp) {
 		Player m = Bukkit.getPlayer(p);
 		if (m!=null) {
+			/* DISABLED AT THE MOMENT.
 			gainMoneyExp(m,job,amount,exp);
+			*/
 		} else {
 			Bukkit.getLogger().severe("Could not find player "+p+"! Could not add in job experience!");
 		}
@@ -4272,6 +4290,7 @@ public void payDay(int time)
 	}
 
 	public void gainMoneyExp(Player p,String job,double amount,double exp) {
+		/* DISABLED AT THE MOMENT.
 		String[] jobs = getJobs(p);
 		int slot=-1;
 		if (getConfig().getBoolean("halloween-enabled") || getConfig().getBoolean("thanksgiving-enabled")) {
@@ -4314,6 +4333,7 @@ public void payDay(int time)
 			}
 		}
 		//saveAccountsConfig() //Commented out;
+		 */
 	}
 	
 	public void levelUpJob(Player p, String job) {

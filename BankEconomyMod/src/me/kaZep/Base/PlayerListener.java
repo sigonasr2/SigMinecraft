@@ -4479,6 +4479,8 @@ implements Listener
 		//p.sendMessage("Name is: "+p.getItemInHand().getItemMeta().getDisplayName());
 		int myData=this.plugin.getPlayerDataSlot(p);
 		boolean has_silktouch=p.getItemInHand().containsEnchantment(Enchantment.SILK_TOUCH);
+		
+		this.plugin.getPlayerData(p).gameinteractions+=50;
 
 		//*******************************//Job Buffs Begin here!
 		if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && p.getAllowFlight()) {
@@ -12053,6 +12055,7 @@ implements Listener
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent e) {
 		Player p = e.getPlayer();
+		this.plugin.getPlayerData(p).gameinteractions+=50;
 		//***********************************//JOB BUFFFS!!! HYPE
 		if (this.plugin.PlayerinJob(p, "Builder")) {
 			if (this.plugin.hasJobBuff("Builder", p, Job.JOB40) && !p.getAllowFlight()) {
@@ -16228,6 +16231,7 @@ implements Listener
   	public void onPlayerMove(PlayerMoveEvent e) {
 		if (e.getPlayer().isOnGround() && this.plugin.hasJobBuff("Fisherman", e.getPlayer(), Job.JOB40) && e.getPlayer().getItemInHand().getType()==Material.FISHING_ROD && !e.getPlayer().getAllowFlight()) {
 			this.plugin.getPlayerData(e.getPlayer()).haslanded=true;
+			this.plugin.getPlayerData(e.getPlayer()).gameinteractions+=1;
 			e.getPlayer().setAllowFlight(true);
 			e.getPlayer().sendMessage(ChatColor.DARK_GRAY+""+ChatColor.ITALIC+"Flight enabled...");
 		}
