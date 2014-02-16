@@ -2341,7 +2341,7 @@ public void runTick() {
 					  }
 					  if (nearby.get(i).getType()==EntityType.ZOMBIE) {
 						  Creature l = (Creature)nearby.get(i);
-						  if (l.getCustomName().compareTo(ChatColor.GOLD+"Charge Zombie II")==0 && !l.isDead() && l.getKiller()!=null) {
+						  if (l.getCustomName()!=null && l.getCustomName().compareTo(ChatColor.GOLD+"Charge Zombie II")==0 && !l.isDead() && l.getKiller()!=null) {
 							  for (int k=-2;k<3;k++) {
 								  for (int j=-2;j<3;j++) {
 									  Location checkloc = l.getLocation().add(k,1,j);
@@ -2362,7 +2362,7 @@ public void runTick() {
 								  }
 							  }
 						  }
-						  if (l.getCustomName().compareTo(ChatColor.YELLOW+"Charge Zombie")==0 && !l.isDead() && l.getKiller()!=null) {
+						  if (l.getCustomName()!=null && l.getCustomName().compareTo(ChatColor.YELLOW+"Charge Zombie")==0 && !l.isDead() && l.getKiller()!=null) {
 							  for (int k=-1;k<2;k++) {
 								  for (int j=-1;j<2;j++) {
 									  Location checkloc = l.getLocation().add(k,1,j);
