@@ -14279,14 +14279,42 @@ implements Listener
 			if (event.getCurrentItem()!=null) {
 				if (event.getCursor()!=null && event.getSlotType()!=SlotType.RESULT && event.getCursor().getType()!=Material.AIR && (event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST) && event.getClick()==ClickType.LEFT) {
 					ItemStack extra_item = insertIntoItemCube(p, event.getCurrentItem(), event.getCursor());
+					final Player p2 = p;
+					final InventoryClickEvent event2 = event;
+					Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new
+							Runnable() {
+						@Override
+						public void run() {
+							p2.getInventory().setContents(p2.getInventory().getContents());
+							event2.getInventory().setContents(event2.getInventory().getContents());
+							p2.updateInventory();
+						}
+					}, 1);
 					if (!extra_item.equals(event.getCursor())) {
 						//If the items don't match, it means something happened to the items, so some got inserted into the Item Cube.
 						//If they are the same, instead we will simply swap them. Normal functionality.
-						event.setCursor(extra_item);
-						p.updateInventory();
-						event.setCancelled(true);
+						final ItemStack item = extra_item;
+						Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new
+								Runnable() {
+							@Override
+							public void run() {
+								p2.setItemOnCursor(item);
+								p2.getInventory().setContents(p2.getInventory().getContents());
+								event2.getInventory().setContents(event2.getInventory().getContents());
+								p2.updateInventory();
+							}
+						}, 1);
 						return;
 					}
+					Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new
+							Runnable() {
+						@Override
+						public void run() {
+							p2.getInventory().setContents(p2.getInventory().getContents());
+							event2.getInventory().setContents(event2.getInventory().getContents());
+							p2.updateInventory();
+						}
+					}, 1);
 				}
 			}
 		}
@@ -15553,6 +15581,14 @@ implements Listener
 	public void onMinecartExit(VehicleExitEvent e) {
 		if (e.getVehicle().getType()==EntityType.MINECART && e.getVehicle().getPassenger().getType()==EntityType.PLAYER) {
 			Bukkit.getWorld("world").dropItemNaturally(e.getVehicle().getLocation(),new ItemStack(Material.MINECART));
+			final Player p = (Player)e.getVehicle().getPassenger();
+			final Location tele_loc = e.getVehicle().getLocation();
+	  		  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+			      @Override
+			      public void run() {
+			    		  p.teleport(tele_loc);
+			      }
+			  	},5);
 			e.getVehicle().remove();
 		}
 	}
@@ -16648,12 +16684,16 @@ implements Listener
 			p.closeInventory();
 		}
 		for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
+			if (this.plugin.SPEED_CONTROL.get(i).p==null) {
+				this.plugin.SPEED_CONTROL.remove(i);
+				i--;
+			} else
 			if (this.plugin.SPEED_CONTROL.get(i).p.getName().toLowerCase().compareTo(p.getName().toLowerCase())==0) {
 				p.removePotionEffect(PotionEffectType.SPEED);
 				//If they have a "speed" potion, give it back.
 				p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((this.plugin.SPEED_CONTROL.get(i).potion_time-Main.SERVER_TICK_TIME)*2), this.plugin.SPEED_CONTROL.get(i).potion_spdlv, true));
 				this.plugin.SPEED_CONTROL.remove(i);
-				break;
+				i--;
 			}
 		}
 		Player[] list = Bukkit.getOnlinePlayers();
