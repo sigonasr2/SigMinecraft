@@ -134,31 +134,7 @@ public class commandBankEconomy
   }
   
 	public boolean naturalBlock(Material mat) {
-		List<Material> natural_mats = new ArrayList<Material>();
-		natural_mats.add(Material.DIRT);
-		natural_mats.add(Material.STONE);
-		natural_mats.add(Material.WOOD);
-		natural_mats.add(Material.FENCE);
-		natural_mats.add(Material.GRAVEL);
-		natural_mats.add(Material.SAND);
-		natural_mats.add(Material.CLAY);
-		natural_mats.add(Material.WEB);
-		natural_mats.add(Material.LAVA);
-		natural_mats.add(Material.WATER);
-		natural_mats.add(Material.AIR);
-		natural_mats.add(Material.MOSSY_COBBLESTONE);
-		natural_mats.add(Material.COAL_ORE);
-		natural_mats.add(Material.IRON_ORE);
-		natural_mats.add(Material.GOLD_ORE);
-		natural_mats.add(Material.DIAMOND_ORE);
-		natural_mats.add(Material.EMERALD_ORE);
-		natural_mats.add(Material.LAPIS_ORE);
-		natural_mats.add(Material.REDSTONE_ORE);
-		if (natural_mats.contains(mat)) {
-			return true;
-		} else {
-			return false;
-		}
+		return Main.naturalBlock(mat);
 	}
 
 public String convertToItemName(String val) {
@@ -658,8 +634,8 @@ public String convertToItemName(String val) {
 	  				  List<Integer> storedy = new ArrayList<Integer>();
 	  				 for (int MASTER_i=-Integer.valueOf(args[1]);MASTER_i<Integer.valueOf(args[1])+1;MASTER_i++) {
 	  					 p.getWorld().save();
-	  					 storedy.clear();
 	  	  				 for (int MASTER_j=-Integer.valueOf(args[2]);MASTER_j<Integer.valueOf(args[2])+1;MASTER_j++) {
+		  				  storedy.clear();
 	  	  				  iterations++;
 	  	  				  //Bukkit.getLogger().info("");
 	  	  				  Bukkit.getLogger().info("Correcting Chunk ("+MASTER_i+","+MASTER_j+")...");
@@ -686,11 +662,12 @@ public String convertToItemName(String val) {
 		  					 if (!found) {
 		  						 boolean found2=false;
 			  					 for (int x=0;x<16;x++) {
-			  						 for (int yy=0;yy<8;yy++) {
+			  						 for (int yy=0;yy<4;yy++) {
 				  						 for (int z=0;z<16;z++) {
 				  							 if (!naturalBlock(p.getWorld().getBlockAt(chunkx*16+x,y+yy,chunkz*16+z).getType())) {
-				  								 if (!found2) {lowest-=8;}
-				  								 y-=7;
+				  								 if (!found2) {lowest-=4;}
+				  								 Bukkit.getLogger().info("____>Found block "+p.getWorld().getBlockAt(chunkx*16+x,y+yy,chunkz*16+z).getType());
+				  								 y-=3;
 				  								 storedy.add(y);
 				  								 break;
 				  							 }
@@ -718,11 +695,12 @@ public String convertToItemName(String val) {
 		  						ex.printStackTrace();
 		  					}
 			  				  for (int i=0;i<storedy.size();i++) {
-			  					final Location loc1 = new Location(p.getWorld(),chunkx*16-16,storedy.get(i),chunkz*16-16);
-				  				  final Location loc2 = new Location(p.getWorld(),chunkx*16+32,storedy.get(i)+8,chunkz*16+32);
+			  	  				Bukkit.getLogger().info("--Found unnatural at y:"+storedy.get(i)+".");
+			  					final Location loc1a = new Location(p.getWorld(),chunkx*16-16,storedy.get(i),chunkz*16-16);
+				  				  final Location loc2a = new Location(p.getWorld(),chunkx*16+32,storedy.get(i)+4,chunkz*16+32);
 				  				  final File saveFile2 = new File("plugins/WorldEdit/schematics/world_savey"+storedy.get(i));
 				  				  try {
-				  					  tm.saveTerrain(saveFile2, loc1, loc2);
+				  					  tm.saveTerrain(saveFile2, loc1a, loc2a);
 				  					} catch (FilenameException ex) {
 				  						// TODO Auto-generated catch block
 				  						ex.printStackTrace();
@@ -734,7 +712,6 @@ public String convertToItemName(String val) {
 				  						ex.printStackTrace();
 				  					}
 			  				  }
-		  				  }
 		  				  //final ChunkSnapshot savedChunk = p.getWorld().getChunkAt(chunkx, chunkz).getChunkSnapshot();
 		  				  final Player p2 = p;
 		  				  final int chunkx2=chunkx,chunkz2=chunkz;
@@ -759,6 +736,7 @@ public String convertToItemName(String val) {
 								e.printStackTrace();
 							}
 			  				  for (int i=0;i<storedy.size();i++) {
+				  	  			Bukkit.getLogger().info("--Kept area at y:"+storedy.get(i)+".");
 			  					final File saveFile2 = new File("plugins/WorldEdit/schematics/world_savey"+storedy.get(i));
 					  				try {
 										tm.loadSchematic(saveFile2);

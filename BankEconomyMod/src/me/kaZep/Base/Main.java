@@ -1518,7 +1518,7 @@ public void onDisable()
 	  sign.update();
   }
 
-	public boolean naturalBlock(Material mat) {
+	public static boolean naturalBlock(Material mat) {
 		List<Material> natural_mats = new ArrayList<Material>();
 		natural_mats.add(Material.DIRT);
 		natural_mats.add(Material.STONE);
@@ -1530,6 +1530,14 @@ public void onDisable()
 		natural_mats.add(Material.WEB);
 		natural_mats.add(Material.LAVA);
 		natural_mats.add(Material.WATER);
+		natural_mats.add(Material.TORCH);
+		natural_mats.add(Material.RED_MUSHROOM);
+		natural_mats.add(Material.BROWN_MUSHROOM);
+		natural_mats.add(Material.MOB_SPAWNER);
+		natural_mats.add(Material.STATIONARY_WATER);
+		natural_mats.add(Material.STATIONARY_LAVA);
+		natural_mats.add(Material.OBSIDIAN);
+		natural_mats.add(Material.BEDROCK);
 		natural_mats.add(Material.AIR);
 		natural_mats.add(Material.MOSSY_COBBLESTONE);
 		natural_mats.add(Material.COAL_ORE);
@@ -3154,6 +3162,7 @@ public void checkJukeboxes() {
           LOGGING_UPDATE_COUNTS++; //2
     		Player[] list = Bukkit.getOnlinePlayers();
     		for (int i=0;i<list.length;i++) {
+    			/*
     			if (getPlayerData(list[i]).furytime!=0 && Main.SERVER_TICK_TIME>getPlayerData(list[i]).furytime) {
     				getPlayerData(list[i]).furytime=0;
     				list[i].sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Fury Potion effect has worn off...");
@@ -3161,7 +3170,7 @@ public void checkJukeboxes() {
     			if (getPlayerData(list[i]).invulntime!=0 && Main.SERVER_TICK_TIME>getPlayerData(list[i]).invulntime) {
     				getPlayerData(list[i]).invulntime=0;
     				list[i].sendMessage(ChatColor.RED+""+ChatColor.ITALIC+"Invulnerability Potion effect has worn off...");
-    			}
+    			}*/
     			if (hasJobBuff("Hunter", list[i],Job.JOB40)) {
     				if (Bukkit.getWorld("world").getTime()>13000) {
     					list[i].addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,200,1,true));

@@ -251,31 +251,7 @@ implements Listener
 		CHILLING_GOLEM, POWERSURGE_ZOMBIE, LIGHTNING_MAGE }
 
 	public boolean naturalBlock(Material mat) {
-		List<Material> natural_mats = new ArrayList<Material>();
-		natural_mats.add(Material.DIRT);
-		natural_mats.add(Material.STONE);
-		natural_mats.add(Material.WOOD);
-		natural_mats.add(Material.FENCE);
-		natural_mats.add(Material.GRAVEL);
-		natural_mats.add(Material.SAND);
-		natural_mats.add(Material.CLAY);
-		natural_mats.add(Material.WEB);
-		natural_mats.add(Material.LAVA);
-		natural_mats.add(Material.WATER);
-		natural_mats.add(Material.AIR);
-		natural_mats.add(Material.MOSSY_COBBLESTONE);
-		natural_mats.add(Material.COAL_ORE);
-		natural_mats.add(Material.IRON_ORE);
-		natural_mats.add(Material.GOLD_ORE);
-		natural_mats.add(Material.DIAMOND_ORE);
-		natural_mats.add(Material.EMERALD_ORE);
-		natural_mats.add(Material.LAPIS_ORE);
-		natural_mats.add(Material.REDSTONE_ORE);
-		if (natural_mats.contains(mat)) {
-			return true;
-		} else {
-			return false;
-		}
+		return Main.naturalBlock(mat);
 	}
 
 	public void updateTopSPLEEFSigns() {
@@ -2942,14 +2918,23 @@ implements Listener
 
 					double levelsmult=1.0;
 					
-					double COUNTER_SLIME_SPAWN_RATE = 0.04,
+					/*double COUNTER_SLIME_SPAWN_RATE = 0.04,
 							VIRAL_SPIDER_SPAWN_RATE = 0.02,
 							SILENCER_SPAWN_RATE = 0.02,
 							HOUND_CALLER_SPAWN_RATE = 0.01,
 							FISH_CALLER_SPAWN_RATE = 0.04,
 							SUICIDAL_CREEPER_SPAWN_RATE = 0.05,
 							POWER_SURGE_ZOMBIE_SPAWN_RATE = 0.02,
-							LIGHTNING_MAGE_SPAWN_RATE = 0.04;
+							LIGHTNING_MAGE_SPAWN_RATE = 0.04;*/
+					
+					double COUNTER_SLIME_SPAWN_RATE = 0,
+							VIRAL_SPIDER_SPAWN_RATE = 0,
+							SILENCER_SPAWN_RATE = 0,
+							HOUND_CALLER_SPAWN_RATE = 0,
+							FISH_CALLER_SPAWN_RATE = 0,
+							SUICIDAL_CREEPER_SPAWN_RATE = 0,
+							POWER_SURGE_ZOMBIE_SPAWN_RATE = 0,
+							LIGHTNING_MAGE_SPAWN_RATE = 0;
 					
 					if (totallvs>60*levelsmult && e.getEntity().getLocation().getY()<50 && e.getEntity().getWorld().getName().equalsIgnoreCase("world")) {
 						//Try to spawn a counter slime.
@@ -18448,10 +18433,11 @@ implements Listener
 		
 		//******************************//End Job related buffs.
 		
+		/* DISABLED FOR NOW. GLITCHY.
 		if (e.getAction()==Action.RIGHT_CLICK_BLOCK && !p.isSneaking() && e.getClickedBlock().getType()==Material.BOOKSHELF) {
 			viewBookshelf(p, e.getClickedBlock().getLocation());
 			e.setCancelled(true);
-		}
+		}*/
 		
 		if (this.plugin.PlayerinJob(p, "Explorer")) {
 			for (int i=0;i<this.plugin.explorerlist.size();i++) {
