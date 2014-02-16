@@ -6505,6 +6505,7 @@ public void payDay(int time)
     public void notifyBuffMessages(final Player p, int tick_delay) {
     	//Same as notifyBuffMessages(), but waits a number of ticks before displaying it.
     	//See which messages we have to display.
+    	/* DISABLED for now.
     	int total_tick_delay=tick_delay;
     	if (getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job1lv")>=30 && getAccountsConfig().getInt(p.getName().toLowerCase()+".jobs.job1_30")==0) {
     		//Have not selected first job's buff.
@@ -6583,7 +6584,7 @@ public void payDay(int time)
 			    	  p.sendMessage(ChatColor.ITALIC+"Type "+ChatColor.RESET+ChatColor.YELLOW+"/jobs ultimate <job>"+ChatColor.RESET+ChatColor.ITALIC+" replacing it with the ultimate job you want!");
 			      }
 			  	},total_tick_delay+=tick_delay);
-    	}
+    	}*/
     }
     
     /**

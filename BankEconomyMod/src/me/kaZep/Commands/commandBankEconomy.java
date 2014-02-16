@@ -632,7 +632,7 @@ public String convertToItemName(String val) {
 	  				  Location CenterPoint = new Location(p.getWorld(),1627,67,-268); //Center of Twoside.
 	  				  int iterations=100*(Integer.valueOf(args[1])+50);
 	  				  List<Integer> storedy = new ArrayList<Integer>();
-	  				 for (int MASTER_i=-Integer.valueOf(args[1]);MASTER_i<Integer.valueOf(args[1])+1;MASTER_i++) {
+	  				 for (int MASTER_i=-4;MASTER_i<Integer.valueOf(args[1])+1;MASTER_i++) {
 	  					 p.getWorld().save();
 	  	  				 for (int MASTER_j=-Integer.valueOf(args[2]);MASTER_j<Integer.valueOf(args[2])+1;MASTER_j++) {
 		  				  storedy.clear();
