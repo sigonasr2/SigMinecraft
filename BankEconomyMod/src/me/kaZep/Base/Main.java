@@ -2271,12 +2271,12 @@ public void runTick() {
 							  //Play particley effects.
 							  //nearby.get(i).getWorld().playEffect(nearby.get(i).getLocation(), Effect.BLAZE_SHOOT, 0);
 							  nearby.get(i).getWorld().playSound(nearby.get(i).getLocation(), Sound.BLAZE_BREATH, 0.1f, 0.2f);
-							  for (int z=0;z<10;z++) {
+							  for (int z=0;z<3;z++) {
 								  final Entity mob = nearby.get(i);
 									Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 										@Override
 										public void run() {
-											mob.getWorld().playEffect(new Location(mob.getWorld(), mob.getLocation().getX()+(Math.random()*1-Math.random()*1), mob.getLocation().getY()+(Math.random()*1-Math.random()*1), mob.getLocation().getZ()+(Math.random()*1-Math.random()*1)), Effect.MOBSPAWNER_FLAMES, 0);
+											mob.getWorld().playEffect(new Location(mob.getWorld(), mob.getLocation().getX()+(Math.random()*1-Math.random()*1), mob.getLocation().getY()+(Math.random()*1-Math.random()*1), mob.getLocation().getZ()+(Math.random()*1-Math.random()*1)), Effect.STEP_SOUND, Material.STATIONARY_LAVA.getId());
 										}
 									},(int)(Math.random()*30));
 							  }
@@ -2509,7 +2509,7 @@ public void runTick() {
 		        	  economy.depositPlayer(p.getName(), earned);
 		        	  getPlayerData(SPEED_CONTROL.get(i).p).gameinteractions=0;
 		  			DecimalFormat df = new DecimalFormat("#0.00");
-		        	  SPEED_CONTROL.get(i).p.sendMessage(ChatColor.YELLOW+"You made $"+df.format(earned)+" in the past hour!");
+		        	  SPEED_CONTROL.get(i).p.sendMessage(ChatColor.YELLOW+"You made $"+df.format(earned)+" in the past 30 minutes!");
 		        	  SPEED_CONTROL.get(i).updatePlayerSpd();
 		        	  /*try
 		        	  {
@@ -3831,6 +3831,9 @@ public void checkJukeboxes() {
     			  //Bukkit.getPlayer("sigonasr2").sendMessage("Jukebox "+i+" Properties: "+((Jukebox)(jukeboxlist.get(i).getJukebox().getState())).getPlaying()+","+((Jukebox)(jukeboxlist.get(i).getJukebox().getState())).isPlaying());
     		  }
               LOGGING_UPDATE_COUNTS++; //11
+              for (int i=0;i<SPEED_CONTROL.size();i++) {
+            	  SPEED_CONTROL.get(i).updatePlayerSpd();
+              }
               
               LOGGING_UPDATE_COUNTS++; //12
     	}

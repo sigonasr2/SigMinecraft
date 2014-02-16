@@ -8353,6 +8353,8 @@ implements Listener
 					e.getDrops().get(i).setAmount(newamt);
 				}
 			}
+			if (Math.random()<=0.00390625) {e.getDrops().add(getGoodie(2));}
+			if (Math.random()<=0.00390625/4.0d) {e.getDrops().add(getGoodie(3));}
 			if (Math.random()<=Main.HEAD_DROP_CHANCE*chance_increase) {
 				switch (e.getEntity().getType()) {
 					case SKELETON:{

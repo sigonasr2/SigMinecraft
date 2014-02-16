@@ -2121,15 +2121,6 @@ public String convertToItemName(String val) {
           } else {
             p.sendMessage(this.invARG);
           }
-        } else if ((args[0].equalsIgnoreCase("reload")) && (p.hasPermission("bankeconomy.reload"))) {
-          if (args.length == 1) {
-            p.sendMessage(this.prefix + " " + this.cmdReload);
-
-            FileConfiguration conf = this.plugin.getConfig();
-            this.plugin.reloadConfig();
-            return conf == this.plugin.getConfig();
-          }
-          p.sendMessage(this.invARG);
         }
         else if (cmd.getName().toLowerCase().equalsIgnoreCase("bankeconomy") && (args[0].equalsIgnoreCase("transfer")) && (p.hasPermission("bankeconomy.transfer"))) {
           if (args.length == 1) {
@@ -2865,7 +2856,7 @@ public String convertToItemName(String val) {
 	  	  this.plugin.setLv30Choice(p,args[0],args[1]);
 	    } 
       else {
-          p.sendMessage(this.invARGT2);
+          //p.sendMessage(this.invARGT2);
         }
       }
 
