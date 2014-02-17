@@ -388,9 +388,6 @@ public String convertToItemName(String val) {
       String currencySingular = Main.economy.currencyNameSingular();
       String currencyPlural = Main.economy.currencyNamePlural();
 
-      if (!status)
-        p.sendMessage(this.prefix + " " + this.accountDisabled);
-      else if (status) {
         if ((args.length == 0)) {
 	        if (cmd.getName().toLowerCase().equalsIgnoreCase("sp")) {
 			  //Show a list of all stat points and what you have currently allocated.
@@ -2858,7 +2855,6 @@ public String convertToItemName(String val) {
       else {
           //p.sendMessage(this.invARGT2);
         }
-      }
 
     }
 

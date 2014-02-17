@@ -1903,6 +1903,16 @@ implements Listener
 		}
 		//Bukkit.getPlayer("sigonasr2").sendMessage("Got to here.");
 		newplayer.updatePlayerSpd();
+		boolean contains=false;
+		for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
+			if (this.plugin.SPEED_CONTROL.get(i).p==null || this.plugin.SPEED_CONTROL.get(i).p.getName().compareToIgnoreCase(p.getName())==0) {
+				contains=true;
+				//This is a duplicate, delete it.
+				this.plugin.SPEED_CONTROL.remove(i);
+				Bukkit.getPlayer("sigonasr2").sendMessage("Removed index "+i+" from SPEED CONTROL. Elements left: "+this.plugin.SPEED_CONTROL.size());
+				i--;
+			}
+		}
 		this.plugin.SPEED_CONTROL.add(newplayer);
 		//Bukkit.getPlayer("sigonasr2").sendMessage("Got to here.");
 		Iterator<OfflinePlayer> players = Bukkit.getWhitelistedPlayers().iterator();
@@ -2633,13 +2643,17 @@ implements Listener
 							l.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 2, true));
 							//l.setCustomNameVisible(true);
 							//A Zombie Ninja will not wear armor to stay hidden. But may carry a sword.
+							if (l.getEquipment().getItemInHand()!=null) {
+								l.getEquipment().setItemInHand(new ItemStack(l.getEquipment().getItemInHand().getType()));
+								//This effectively removes all properties from it.
+							}
 							l.getEquipment().setChestplate(new ItemStack(Material.AIR));
 							l.getEquipment().setBoots(new ItemStack(Material.AIR));
 							l.getEquipment().setLeggings(new ItemStack(Material.AIR));
 							l.getEquipment().setHelmet(new ItemStack(Material.AIR));
 							Zombie g = (Zombie)l;
 							g.setBaby(true);
-							l.setMaxHealth(l.getMaxHealth()*0.65d);
+							l.setMaxHealth(l.getMaxHealth()*0.2d+1);
 							l.setHealth(l.getMaxHealth());
 						}
 					}
@@ -2828,8 +2842,112 @@ implements Listener
 				if (nearbylist.get(k).getType()==EntityType.PLAYER) {
 					//This is a player.
 					Player g = (Player)nearbylist.get(k);
-					maxgroup+=plugin.getJobTotalLvs(g)/10;
-					totallvs+=plugin.getJobTotalLvs(g);
+					//OLD LEVEL DETERMINING SYSTEM
+					//maxgroup+=plugin.getJobTotalLvs(g)/10;
+					//totallvs+=plugin.getJobTotalLvs(g);
+					if (g.getInventory().getHelmet()!=null) {
+						ItemStack equip = g.getInventory().getHelmet();
+						if (equip.getType().toString().toLowerCase().contains("leather")) {
+							maxgroup+=0.2d;
+							totallvs+=2;
+						}
+						if (equip.getType().toString().toLowerCase().contains("gold")) {
+							maxgroup+=3d;
+							totallvs+=3;
+						}
+						if (equip.getType().toString().toLowerCase().contains("chainmail")) {
+							maxgroup+=1d;
+							totallvs+=10;
+						}
+						if (equip.getType().toString().toLowerCase().contains("iron")) {
+							maxgroup+=1d;
+							totallvs+=10;
+						}
+						if (equip.getType().toString().toLowerCase().contains("diamond")) {
+							maxgroup+=3d;
+							totallvs+=30;
+						}
+					}
+					if (g.getInventory().getBoots()!=null) {
+						ItemStack equip = g.getInventory().getBoots();
+						if (equip.getType().toString().toLowerCase().contains("leather")) {
+							maxgroup+=0.2d;
+							totallvs+=2;
+						}
+						if (equip.getType().toString().toLowerCase().contains("gold")) {
+							maxgroup+=3d;
+							totallvs+=3;
+						}
+						if (equip.getType().toString().toLowerCase().contains("chainmail")) {
+							maxgroup+=1d;
+							totallvs+=10;
+						}
+						if (equip.getType().toString().toLowerCase().contains("iron")) {
+							maxgroup+=1d;
+							totallvs+=10;
+						}
+						if (equip.getType().toString().toLowerCase().contains("diamond")) {
+							maxgroup+=3d;
+							totallvs+=30;
+						}
+					}
+					if (g.getInventory().getLeggings()!=null) {
+						ItemStack equip = g.getInventory().getLeggings();
+						if (equip.getType().toString().toLowerCase().contains("leather")) {
+							maxgroup+=0.2d;
+							totallvs+=2*1.5;
+						}
+						if (equip.getType().toString().toLowerCase().contains("gold")) {
+							maxgroup+=3d;
+							totallvs+=3*1.5;
+						}
+						if (equip.getType().toString().toLowerCase().contains("chainmail")) {
+							maxgroup+=1d;
+							totallvs+=10*1.5;
+						}
+						if (equip.getType().toString().toLowerCase().contains("iron")) {
+							maxgroup+=1d;
+							totallvs+=10*1.5;
+						}
+						if (equip.getType().toString().toLowerCase().contains("diamond")) {
+							maxgroup+=3d;
+							totallvs+=30*1.5;
+						}
+					}
+					if (g.getInventory().getChestplate()!=null) {
+						ItemStack equip = g.getInventory().getChestplate();
+						if (equip.getType().toString().toLowerCase().contains("leather")) {
+							maxgroup+=0.2d;
+							totallvs+=2*2;
+						}
+						if (equip.getType().toString().toLowerCase().contains("gold")) {
+							maxgroup+=3d;
+							totallvs+=3*2;
+						}
+						if (equip.getType().toString().toLowerCase().contains("chainmail")) {
+							maxgroup+=1d;
+							totallvs+=10*2;
+						}
+						if (equip.getType().toString().toLowerCase().contains("iron")) {
+							maxgroup+=1d;
+							totallvs+=10*2;
+						}
+						if (equip.getType().toString().toLowerCase().contains("diamond")) {
+							maxgroup+=3d;
+							totallvs+=30*2;
+						}
+					}
+					if (g.getInventory().getItemInHand()!=null) {
+						ItemStack equip = g.getInventory().getItemInHand();
+						if (equip.getType().toString().toLowerCase().contains("bow")) {
+							maxgroup+=1.5d;
+							totallvs+=15;
+						}
+						if (equip.getType().toString().toLowerCase().contains("diamond")) {
+							maxgroup+=2d;
+							totallvs+=20;
+						}
+					}
 					////Bukkit.getLogger().info("Mob maxgroup increased to "+maxgroup+" down here.");
 				}
 				if (nearbylist.get(k).getType()!=EntityType.SKELETON &&
@@ -9923,7 +10041,7 @@ implements Listener
 					LivingEntity l2 = (LivingEntity)(((Projectile)e.getDamager()).getShooter());
 					if (l2.hasPotionEffect(PotionEffectType.INVISIBILITY)) {l2.removePotionEffect(PotionEffectType.INVISIBILITY);}
 					for (int i=0;i<this.plugin.powered_mob_list.size();i++) {
-						if (this.plugin.powered_mob_list.get(i).power_time+40<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).id.equals(l2.getUniqueId())) {
+						if (this.plugin.powered_mob_list.get(i).power_time+40<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).power_time+140<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).id.equals(l2.getUniqueId())) {
 							//This mob will damage you if you are not blocking.
 							if (l instanceof Player) {
 								Player p = (Player)l;
@@ -9964,7 +10082,7 @@ implements Listener
 				LivingEntity l2 = (LivingEntity)e.getDamager();
 				if (l2.hasPotionEffect(PotionEffectType.INVISIBILITY)) {l2.removePotionEffect(PotionEffectType.INVISIBILITY);}
 				for (int i=0;i<this.plugin.powered_mob_list.size();i++) {
-					if (this.plugin.powered_mob_list.get(i).power_time+40<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).id.equals(l2.getUniqueId())) {
+					if (this.plugin.powered_mob_list.get(i).power_time+40<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).power_time+140<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).id.equals(l2.getUniqueId())) {
 						//This mob will damage you if you are not blocking.
 						if (l instanceof Player) {
 							Player p = (Player)l;
@@ -14275,6 +14393,7 @@ implements Listener
 			}
 		}
 		if (event.getCursor()!=null) {
+			/* DISABLED for now.
 			//Regardless of the inventory, if we try to put it inside a chest, got to try to insert it in there.
 			if (event.getCurrentItem()!=null) {
 				if (event.getCursor()!=null && event.getSlotType()!=SlotType.RESULT && event.getCursor().getType()!=Material.AIR && (event.getCurrentItem().getType()==Material.CHEST || event.getCurrentItem().getType()==Material.TRAPPED_CHEST || event.getCurrentItem().getType()==Material.ENDER_CHEST) && event.getClick()==ClickType.LEFT) {
@@ -14316,7 +14435,7 @@ implements Listener
 						}
 					}, 1);
 				}
-			}
+			}*/
 		}
 		if (event.getInventory().getType()==InventoryType.CRAFTING || event.getInventory().getType()==InventoryType.CHEST/*Buggy for some reason. We can't open chests in chests.*/) {
 			if (event.getCurrentItem()!=null) {
@@ -16686,6 +16805,7 @@ implements Listener
 		for (int i=0;i<this.plugin.SPEED_CONTROL.size();i++) {
 			if (this.plugin.SPEED_CONTROL.get(i).p==null) {
 				this.plugin.SPEED_CONTROL.remove(i);
+				Bukkit.getPlayer("sigonasr2").sendMessage("Removed index "+i+" from SPEED CONTROL. Elements left: "+this.plugin.SPEED_CONTROL.size());
 				i--;
 			} else
 			if (this.plugin.SPEED_CONTROL.get(i).p.getName().toLowerCase().compareTo(p.getName().toLowerCase())==0) {
@@ -16693,6 +16813,13 @@ implements Listener
 				//If they have a "speed" potion, give it back.
 				p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, (int) ((this.plugin.SPEED_CONTROL.get(i).potion_time-Main.SERVER_TICK_TIME)*2), this.plugin.SPEED_CONTROL.get(i).potion_spdlv, true));
 				this.plugin.SPEED_CONTROL.remove(i);
+				Bukkit.getPlayer("sigonasr2").sendMessage("Removed index "+i+" from SPEED CONTROL. Elements left: "+this.plugin.SPEED_CONTROL.size());
+				i--;
+			}
+		}
+		for (int i=0;i<this.plugin.playerdata_list.size();i++) {
+			if (this.plugin.playerdata_list.get(i).getPlayer().getName().toLowerCase().compareTo(p.getName().toLowerCase())==0) {
+				this.plugin.playerdata_list.remove(i);
 				i--;
 			}
 		}
@@ -18517,7 +18644,14 @@ implements Listener
 				return;
 			}
 			if (p.getItemInHand()!=null && this.plugin.is_PocketWorkbench(p.getItemInHand())) {
-				p.openWorkbench(null, true);
+				final Player p2=p;
+			  Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+			      @Override
+			      public void run() {
+						p2.closeInventory();
+						p2.openWorkbench(null, true);
+			      }
+			  	},1);
 				e.setCancelled(true);
 				return;
 			}
@@ -18937,7 +19071,6 @@ implements Listener
 										//this.plugin.saveAccountsConfig();
 									}
 								}
-						if (stats) {
 							if (p.hasPermission("bankeconomy.sign.use")) {
 								if ((sign.getLine(0).equalsIgnoreCase(ChatColor.DARK_GREEN + "[Bank]")) && (sign.getLine(1).equalsIgnoreCase(ChatColor.DARK_RED + "Deposit"))) {
 									/*double value = Double.parseDouble(arg0);
@@ -19009,8 +19142,6 @@ implements Listener
 							{
 								p.sendMessage(ChatColor.RED+"You do not have permission.");
 							}
-						}
-						else p.sendMessage(ChatColor.DARK_GREEN+"[BankEconomy]" + ChatColor.RED + " Your account is disabled.");
 					}
 		}
 		else;
