@@ -245,6 +245,7 @@ implements Listener
 		this.plugin = plugin;
 	}
 
+	enum SocketColor { RED, GREEN, BLUE }
 	enum Cube { SMALL, LARGE, ENDER }
 	enum SpecialMob { COUNTER_SLIME, VIRAL_SPIDER, SILENCER,
 		HOUND_CALLER, FISH_CALLER, EXPLOSIVE_BOMBER, SUICIDAL_CREEPER,
@@ -1960,6 +1961,8 @@ implements Listener
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".money", Double.valueOf(this.plugin.getConfig().getDouble("start-balance")));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".interestdistributedtime", Long.valueOf(Main.SERVER_TICK_TIME));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".revived", Boolean.valueOf(true));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".experience", Double.valueOf(0));
+			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".level", Integer.valueOf(1));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".spleefrating", Double.valueOf(1000.0d));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".spleefwins", Integer.valueOf(0));
 			this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".spleeflosses", Integer.valueOf(0));
@@ -2024,6 +2027,23 @@ implements Listener
 			p.sendMessage(ChatColor.DARK_AQUA+"For a list of all changes made to this server, visit: http://z-gamers.net/changelog.html");
 			p.sendMessage("----------------------------");
 			p.sendMessage(ChatColor.YELLOW+"Current Money Balance: $ "+df.format(Main.economy.bankBalance(p.getName().toLowerCase()).balance)+", Bank Balance: $"+df.format(this.plugin.getAccountsConfig().getDouble(p.getName().toLowerCase()+".money")));
+			/* IN THE NEAR FUTURE.
+			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".experience")) {
+				//Apply new experience/leveling system to players.
+				//Also reset stat points to 0. New system implementation.
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".experience", Double.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".level", Integer.valueOf(1));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat1", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat2", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat3", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat4", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat5", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat6", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat7", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat8", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat9", Integer.valueOf(0));
+				this.plugin.getAccountsConfig().set(p.getName().toLowerCase() + ".stats.stat10", Integer.valueOf(0));
+			}*/
 			if (!this.plugin.getAccountsConfig().contains(p.getName().toLowerCase() + ".interestdistributedtime")) {
 				this.plugin.getAccountsConfig().set(p.getName().toLowerCase()+".interestdistributedtime", Long.valueOf(Main.SERVER_TICK_TIME));
 				//this.plugin.saveAccountsConfig();
@@ -2635,7 +2655,7 @@ implements Listener
 						l.setHealth(l.getMaxHealth());
 					}
 				} else {
-					if (Math.random()<=0.10+((heightmodifier-l.getLocation().getY())*0.01d)) {
+					if (l.getLocation().getY()<=30 && Math.random()<=0.10+((heightmodifier-l.getLocation().getY())*0.01d)) {
 						if (Math.random()<=0.25) {
 							l.setCustomName(ChatColor.GRAY+"Zombie Ninja");
 							l.setCustomNameVisible(false);
@@ -2765,14 +2785,22 @@ implements Listener
 			}
 
 		} else {
-			float groupmult=1.0f; //Change this to modify the global grouping multiplier.
-			int maxgroup=(int)(10*groupmult);
+			float groupmult=1.25f; //Change this to modify the global grouping multiplier.
+			double maxgroup=(int)(4);
 			double chancer=0.10d;
 			double despawnchancer=0.25d;
 
 			if (e.getEntity().getHealth()>65 /*Meaning it's not a special mob.*/) {
 				e.getEntity().remove(); //Too much HP. Nothing should have this much.
 				return;
+			}
+			
+			if (e.getEntity().getLocation().getY()>=60) {
+				//This is above ground, there is a higher chance it will despawn.
+				if (Math.random()<=0.6) {
+					e.getEntity().remove();
+					return;
+				}
 			}
 
 			boolean allow=false; //If this is set to true, it will not be marked for removal.
@@ -2835,7 +2863,7 @@ implements Listener
 
 
 			int totallvs=0;
-			List<Entity> nearbylist = e.getEntity().getNearbyEntities(30, 30, 30);
+			List<Entity> nearbylist = e.getEntity().getNearbyEntities(20, 20, 20);
 			//Filter out all unrelated e.getEntity() types.
 			for (int k=0;k<nearbylist.size();k++) {
 				//See if human players are near. If so, factor that in for determining how many mobs may exist.
@@ -2848,118 +2876,114 @@ implements Listener
 					if (g.getInventory().getHelmet()!=null) {
 						ItemStack equip = g.getInventory().getHelmet();
 						if (equip.getType().toString().toLowerCase().contains("leather")) {
-							maxgroup+=0.2d;
+							maxgroup+=0.02d;
 							totallvs+=2;
 						}
 						if (equip.getType().toString().toLowerCase().contains("gold")) {
-							maxgroup+=3d;
+							maxgroup+=0.03d;
 							totallvs+=3;
 						}
 						if (equip.getType().toString().toLowerCase().contains("chainmail")) {
-							maxgroup+=1d;
+							maxgroup+=0.1d;
 							totallvs+=10;
 						}
 						if (equip.getType().toString().toLowerCase().contains("iron")) {
-							maxgroup+=1d;
+							maxgroup+=0.1d;
 							totallvs+=10;
 						}
 						if (equip.getType().toString().toLowerCase().contains("diamond")) {
-							maxgroup+=3d;
+							maxgroup+=0.3d;
 							totallvs+=30;
 						}
 					}
 					if (g.getInventory().getBoots()!=null) {
 						ItemStack equip = g.getInventory().getBoots();
 						if (equip.getType().toString().toLowerCase().contains("leather")) {
-							maxgroup+=0.2d;
+							maxgroup+=0.02d;
 							totallvs+=2;
 						}
 						if (equip.getType().toString().toLowerCase().contains("gold")) {
-							maxgroup+=3d;
+							maxgroup+=0.03d;
 							totallvs+=3;
 						}
 						if (equip.getType().toString().toLowerCase().contains("chainmail")) {
-							maxgroup+=1d;
+							maxgroup+=0.1d;
 							totallvs+=10;
 						}
 						if (equip.getType().toString().toLowerCase().contains("iron")) {
-							maxgroup+=1d;
+							maxgroup+=0.1d;
 							totallvs+=10;
 						}
 						if (equip.getType().toString().toLowerCase().contains("diamond")) {
-							maxgroup+=3d;
+							maxgroup+=0.3d;
 							totallvs+=30;
 						}
 					}
 					if (g.getInventory().getLeggings()!=null) {
 						ItemStack equip = g.getInventory().getLeggings();
 						if (equip.getType().toString().toLowerCase().contains("leather")) {
-							maxgroup+=0.2d;
-							totallvs+=2*1.5;
+							maxgroup+=0.02d;
+							totallvs+=2;
 						}
 						if (equip.getType().toString().toLowerCase().contains("gold")) {
-							maxgroup+=3d;
-							totallvs+=3*1.5;
+							maxgroup+=0.03d;
+							totallvs+=3;
 						}
 						if (equip.getType().toString().toLowerCase().contains("chainmail")) {
-							maxgroup+=1d;
-							totallvs+=10*1.5;
+							maxgroup+=0.1d;
+							totallvs+=10;
 						}
 						if (equip.getType().toString().toLowerCase().contains("iron")) {
-							maxgroup+=1d;
-							totallvs+=10*1.5;
+							maxgroup+=0.1d;
+							totallvs+=10;
 						}
 						if (equip.getType().toString().toLowerCase().contains("diamond")) {
-							maxgroup+=3d;
-							totallvs+=30*1.5;
+							maxgroup+=0.3d;
+							totallvs+=30;
 						}
 					}
 					if (g.getInventory().getChestplate()!=null) {
 						ItemStack equip = g.getInventory().getChestplate();
 						if (equip.getType().toString().toLowerCase().contains("leather")) {
-							maxgroup+=0.2d;
-							totallvs+=2*2;
+							maxgroup+=0.02d;
+							totallvs+=2;
 						}
 						if (equip.getType().toString().toLowerCase().contains("gold")) {
-							maxgroup+=3d;
-							totallvs+=3*2;
+							maxgroup+=0.03d;
+							totallvs+=3;
 						}
 						if (equip.getType().toString().toLowerCase().contains("chainmail")) {
-							maxgroup+=1d;
-							totallvs+=10*2;
+							maxgroup+=0.1d;
+							totallvs+=10;
 						}
 						if (equip.getType().toString().toLowerCase().contains("iron")) {
-							maxgroup+=1d;
-							totallvs+=10*2;
+							maxgroup+=0.1d;
+							totallvs+=10;
 						}
 						if (equip.getType().toString().toLowerCase().contains("diamond")) {
-							maxgroup+=3d;
-							totallvs+=30*2;
+							maxgroup+=0.3d;
+							totallvs+=30;
 						}
 					}
 					if (g.getInventory().getItemInHand()!=null) {
 						ItemStack equip = g.getInventory().getItemInHand();
 						if (equip.getType().toString().toLowerCase().contains("bow")) {
-							maxgroup+=1.5d;
+							maxgroup+=0.15d;
 							totallvs+=15;
 						}
 						if (equip.getType().toString().toLowerCase().contains("diamond")) {
-							maxgroup+=2d;
+							maxgroup+=0.2d;
 							totallvs+=20;
 						}
 					}
 					////Bukkit.getLogger().info("Mob maxgroup increased to "+maxgroup+" down here.");
 				}
-				if (nearbylist.get(k).getType()!=EntityType.SKELETON &&
-						nearbylist.get(k).getType()!=EntityType.ZOMBIE &&
-						nearbylist.get(k).getType()!=EntityType.CREEPER &&
-						nearbylist.get(k).getType()!=EntityType.SPIDER &&
-						nearbylist.get(k).getType()!=EntityType.ENDERMAN) {
+				if (!(nearbylist.get(k) instanceof Monster)) {
 					nearbylist.remove(k);
 					k--;
 				}
 			}
-			maxgroup/=groupmult;
+			maxgroup*=groupmult;
 			int currentnearby = nearbylist.size();
 			if (currentnearby>maxgroup) {
 				allow=false; //Too many mobs, can't have more.
@@ -5352,6 +5376,58 @@ implements Listener
 	@EventHandler
 	public void onItemPickup(PlayerPickupItemEvent e) {
 		Player p = e.getPlayer();
+		ItemStack check=e.getItem().getItemStack();
+		if (check.hasItemMeta() &&
+				check.getItemMeta().hasLore()) {
+			//Look through the lore for any (Socket) entries.
+			//Count how many there are, and replace them with legitimate
+			//and random enchantments.
+			//Also divide the durability of the items by 12 or so. Make it MUCH smaller.
+			List<String> oldLore = new ArrayList<String>();
+			int socket_count=0;
+			for (int j=0;j<check.getItemMeta().getLore().size();j++) {
+				if (check.getItemMeta().getLore().get(j).contains("(Socket)")) {
+					socket_count++;
+				} else {
+					oldLore.add(check.getItemMeta().getLore().get(j));
+				}
+			}
+			ItemMeta meta = check.getItemMeta();
+			meta.setLore(oldLore);
+			check.setItemMeta(meta);
+			for (int j=0;j<socket_count;j++) {
+				check.setDurability((short)(check.getDurability()/12));
+				//Main.addB
+				if (check.getType().toString().toLowerCase().contains("sword") ||
+						check.getType().toString().toLowerCase().contains("bow") ||
+						check.getType().toString().toLowerCase().contains("spade") ||
+						check.getType().toString().toLowerCase().contains("hoe") ||
+						check.getType().toString().toLowerCase().contains("axe") ||
+						check.getType().toString().toLowerCase().contains("rod") ||
+						check.getType().toString().toLowerCase().contains("shears")) {
+					int enchantment_numb = (int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+					check=Main.addBonusEnchantment(check, Main.getBonusWeaponEnchantments().get(enchantment_numb), Main.getBonusWeaponEnchantments().get(enchantment_numb).value_range.getMaximumInteger()/4+Main.getBonusWeaponEnchantments().get(enchantment_numb).value_range.getMinimumInteger());
+				} else {
+					int enchantment_numb = (int)(Math.random()*Main.getBonusArmorEnchantments().size());
+					check=Main.addBonusEnchantment(check, Main.getBonusArmorEnchantments().get(enchantment_numb), Main.getBonusArmorEnchantments().get(enchantment_numb).value_range.getMaximumInteger()/4+Main.getBonusArmorEnchantments().get(enchantment_numb).value_range.getMinimumInteger());
+				}
+			}
+		}
+		if (check.hasItemMeta() && check.getItemMeta().hasLore()) {
+			List<String> newLore = new ArrayList<String>();
+			for (String s : check.getItemMeta().getLore()) {
+				//Bukkit.getLogger().info("OLD: "+s);
+				s=s.replace("Put in the","Put in a");
+				s=s.replace("bottom of a furnace", "crafting table with");
+				s=s.replace("with another item in the top","another item with (Socket)");
+				//Bukkit.getLogger().info("NEW: "+s);
+				newLore.add(s);
+			}
+			ItemMeta meta = check.getItemMeta();
+			meta.setLore(newLore);
+			check.setItemMeta(meta);
+		}
+		e.getItem().setItemStack(check);
 		if (this.plugin.supportstackslist.contains(e.getItem())) {
 			boolean alreadyhas=false;
 			for (int i=0;i<p.getInventory().getSize();i++) {
@@ -6265,7 +6341,7 @@ implements Listener
 	public void onItemPrepareCraft(PrepareItemCraftEvent e) {
 		CraftingInventory result = e.getInventory();
 		
-		//Bukkit.getLogger().info("Triggered PrepareItemCraftEvent.");
+		Bukkit.getLogger().info("Triggered PrepareItemCraftEvent. With result: "+e.getInventory().getResult().toString());
 		
 		//****************************// Job Boofs poof here.
 
@@ -6280,6 +6356,7 @@ implements Listener
 				result.setResult(new ItemStack(Material.WOOD,6,result.getResult().getData().getData()));
 			}
 		}
+		//if (!result.getResult().getType().toString().contains("AIR")) {Bukkit.getLogger().info("Got to here.1");}
 		if (result.getResult().getType()==Material.CLAY_BALL) {
 			//Check to see if there is an artifact in the crafting grid.
 			boolean artifact=false, ender_eye=false;
@@ -6320,7 +6397,7 @@ implements Listener
 				return; //Don't allow it to continue.
 			}
 		}
-		
+		//if (!result.getResult().getType().toString().contains("AIR")) {Bukkit.getLogger().info("Got to here.2");}
 		if (result.getResult().getType()==Material.SKULL_ITEM) {
 			//This could potentially be a mob head.
 			//Find the mob head.
@@ -6376,6 +6453,7 @@ implements Listener
 				return;
 			}
 		}
+		//if (!result.getResult().getType().toString().contains("AIR")) {Bukkit.getLogger().info("Got to here.3");}
 
 		boolean is_battleShovel=false;
 		if (result.getResult().getType()==Material.WOOD_SPADE) {
@@ -6389,6 +6467,7 @@ implements Listener
 				}
 			}
 		}
+		//if (!result.getResult().getType().toString().contains("AIR")) {Bukkit.getLogger().info("Got to here.4");}
 		boolean allowed=false;
 		if (is_battleShovel) {
 			for (int i=0;i<e.getInventory().getViewers().size();i++) {
@@ -6399,6 +6478,87 @@ implements Listener
 			if (!allowed) {
 				result.setResult(new ItemStack(Material.AIR));
 				return;
+			}
+		}
+		
+		//Find out if we have a socket enchancement inside.
+		boolean has_socket=false;
+		ItemStack socket = new ItemStack(Material.AIR);
+		boolean has_equip=false;
+		ItemStack equip = new ItemStack(Material.AIR);
+		for (int i=0;i<result.getMatrix().length;i++) {
+			if (result.getMatrix()[i]!=null) {
+				if (result.getMatrix()[i].getType()==Material.DIAMOND ||
+					result.getMatrix()[i].getType()==Material.EMERALD ||
+					result.getMatrix()[i].getType()==Material.SKULL_ITEM) {
+					//This might be a socket.
+					ItemStack socket_check = result.getMatrix()[i];
+					if (socket_check.hasItemMeta() && socket_check.getItemMeta().hasLore()) {
+						for (String s : socket_check.getItemMeta().getLore()) {
+							if (s.contains("Put in a crafting table with")) {
+								//This is a socket. Socket found.
+								//So now find the equipment piece.
+								Bukkit.getLogger().info("Found socket: "+socket.toString());
+								socket=result.getMatrix()[i];
+								has_socket=true;
+								break;
+							}
+						}
+					}
+				} else {
+					if (result.getMatrix()[i].getType()!=Material.AIR) {
+						has_equip=true;
+						Bukkit.getLogger().info("Found equip: "+equip.toString());
+						equip=result.getMatrix()[i];
+					}
+				}
+			}
+		}
+		
+		if (has_equip && has_socket) {
+			//This item can be socketed. Set the result to ???.
+			result.setResult(equip);
+			
+			//Figure out the color of the socket.
+			SocketColor thiscolor = null;
+			if (socket.getItemMeta().getDisplayName().contains(ChatColor.BLUE+"Socket Enhancement")) {
+				thiscolor = SocketColor.BLUE;
+			}
+			if (socket.getItemMeta().getDisplayName().contains(ChatColor.GREEN+"Socket Enhancement")) {
+				thiscolor = SocketColor.GREEN;
+			}
+			if (socket.getItemMeta().getDisplayName().contains(ChatColor.RED+"Socket Enhancement")) {
+				thiscolor = SocketColor.RED;
+			}
+			Bukkit.getLogger().info("Socket color is "+thiscolor.toString());
+			
+			//Now that we know the color, find the first match of that color, if possible.
+			boolean foundsocket=false;
+			if (equip.hasItemMeta() && equip.getItemMeta().hasLore()) {
+				List<String> newLore = new ArrayList<String>();
+				for (String s : equip.getItemMeta().getLore()) {
+					ChatColor checkcolor = ChatColor.WHITE;
+					switch (thiscolor) {
+						case BLUE:{
+							checkcolor=ChatColor.BLUE;
+						}break;
+						case GREEN:{
+							checkcolor=ChatColor.GREEN;
+						}break;
+						case RED:{
+							checkcolor=ChatColor.RED;
+						}break;
+					}
+					if (!foundsocket && s.contains(checkcolor+"(Socket)")) {
+						Bukkit.getLogger().info("Found a matching color! Replacing...");
+						s=s.replace(checkcolor+"(Socket)",checkcolor+"???");
+						foundsocket=true;
+					}
+					newLore.add(s);
+				}
+				ItemMeta meta = equip.getItemMeta();
+				meta.setLore(newLore);
+				equip.setItemMeta(meta);
 			}
 		}
 
@@ -6418,8 +6578,17 @@ implements Listener
 					result.getMatrix()[i].getType().name().toLowerCase().contains("hoe")) {
 					check=true;
 					count++;
+				} else {
+					if (result.getMatrix()[i].getType()!=Material.AIR) {
+						//This is a different item. check is false, this is irrelevant now.
+						check=false;
+						count=0;
+					}
 				}
 			}
+		}
+		if (count==3) {
+			
 		}
 		if (check && count==1) {
 			//Bukkit.getLogger().info("Found only 1 piece inside.");
@@ -6480,7 +6649,8 @@ implements Listener
 				result.setResult(offering);
 			}
 		}
-		
+
+		//if (!result.getResult().getType().toString().contains("AIR")) {Bukkit.getLogger().info("Got to here.5");}
 		Player p = null;
 		for (int i=0;i<e.getInventory().getViewers().size();i++) {
 			if (this.plugin.hasJobBuff("Cook", e.getInventory().getViewers().get(i).getName(), Job.JOB10)) {
@@ -6531,7 +6701,7 @@ implements Listener
 		}
 		
 		//****************************//Job Non-Boofs go below.
-		
+		//if (!result.getResult().getType().toString().contains("AIR")) {Bukkit.getLogger().info("Got to here.6");}
 		if (result.getResult().getType()==Material.NAME_TAG) {
 			ItemStack dye = null;
 			ItemStack name_tag = null;
@@ -6586,7 +6756,7 @@ implements Listener
 				return;
 			}
 		}
-
+		//if (!result.getResult().getType().toString().contains("AIR")) {Bukkit.getLogger().info("Got to here.7");}
 		ItemStack armor1 = null;
 		for (int i=0;i<result.getMatrix().length;i++) {
 			//Disable crafting if two pieces of the same armor are in the slots.
@@ -6605,6 +6775,7 @@ implements Listener
 					result.getMatrix()[i].getType().name().toLowerCase().contains("shears")) {
 					if (armor1.getType()==result.getMatrix()[i].getType()) {
 						//Two pieces with the same type. Disable merge crafting.
+						Bukkit.getLogger().info("Found two pieces of the same type. Disabled crafting.");
 						result.setResult(new ItemStack(Material.AIR));
 						return;
 					} else {
@@ -6617,16 +6788,24 @@ implements Listener
 				(result.getMatrix()[i].getType().name().toLowerCase().contains("helmet") ||
 					result.getMatrix()[i].getType().name().toLowerCase().contains("chestplate") ||
 					result.getMatrix()[i].getType().name().toLowerCase().contains("leggings") ||
-					result.getMatrix()[i].getType().name().toLowerCase().contains("boots"))) {
+					result.getMatrix()[i].getType().name().toLowerCase().contains("boots") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("pickaxe") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("bow") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("sword") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("spade") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("axe") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("hoe") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("fishing_rod") ||
+					result.getMatrix()[i].getType().name().toLowerCase().contains("shears"))) {
 				armor1 = result.getMatrix()[i];
 			}
 		}
-
+		//if (!result.getResult().getType().toString().contains("AIR")) {Bukkit.getLogger().info("Got to here.8");}
 		// Disable melon crafting recipe
 		if (result.getResult().getType()==Material.MELON_BLOCK) {
 			result.setResult(new ItemStack(Material.AIR));
 		}
-
+		//if (!result.getResult().getType().toString().contains("AIR")) {Bukkit.getLogger().info("Got to here.9");}
 		if (result.getResult().getType()==Material.WOOL && result.getResult().getAmount() == 1) {
 			//Make sure the crafting matrix only contains three string.
 			int stringcount=0;
@@ -6640,7 +6819,7 @@ implements Listener
 				return;
 			}
 		}
-		
+		//if (!result.getResult().getType().toString().contains("AIR")) {Bukkit.getLogger().info("Got to here.10");}
 		// Increase stairs recipe efficiency
 		if (result.getResult().getType()==Material.WOOD_STAIRS) {
 			result.setResult(new ItemStack(Material.WOOD_STAIRS, 8));
@@ -6672,7 +6851,7 @@ implements Listener
 		if (result.getResult().getType()==Material.SMOOTH_STAIRS) {
 			result.setResult(new ItemStack(Material.SMOOTH_STAIRS, 8));
 		}	  
-
+		//if (!result.getResult().getType().toString().contains("AIR")) {Bukkit.getLogger().info("Got to here.11");}
 		if (result.getResult().getType()==Material.IRON_HELMET ||
 				result.getResult().getType()==Material.IRON_CHESTPLATE ||
 				result.getResult().getType()==Material.IRON_LEGGINGS ||
@@ -6823,6 +7002,7 @@ implements Listener
 						result.setResult(newarmor);
 					}
 				}
+		//if (!result.getResult().getType().toString().contains("AIR")) {Bukkit.getLogger().info("Got to here.12");}
 	}
 	
 	private void restoreItems(CraftingInventory craft, ClickType click, Player p, double restore_chance) {
@@ -8470,6 +8650,42 @@ implements Listener
 					}
 					e.getDrops().get(i).setAmount(newamt);
 				}
+				if (e.getDrops().get(i).hasItemMeta() &&
+						e.getDrops().get(i).getItemMeta().hasLore()) {
+					//Look through the lore for any (Socket) entries.
+					//Count how many there are, and replace them with legitimate
+					//and random enchantments.
+					//Also divide the durability of the items by 12 or so. Make it MUCH smaller.
+					List<String> oldLore = new ArrayList<String>();
+					int socket_count=0;
+					for (int j=0;j<e.getDrops().get(i).getItemMeta().getLore().size();j++) {
+						if (e.getDrops().get(i).getItemMeta().getLore().get(j).contains("(Socket)")) {
+							socket_count++;
+						} else {
+							oldLore.add(e.getDrops().get(i).getItemMeta().getLore().get(j));
+						}
+					}
+					ItemMeta meta = e.getDrops().get(i).getItemMeta();
+					meta.setLore(oldLore);
+					e.getDrops().get(i).setItemMeta(meta);
+					for (int j=0;j<socket_count;j++) {
+						e.getDrops().get(i).setDurability((short)(e.getDrops().get(i).getDurability()/12));
+						//Main.addB
+						if (e.getDrops().get(i).getType().toString().toLowerCase().contains("sword") ||
+								e.getDrops().get(i).getType().toString().toLowerCase().contains("bow") ||
+								e.getDrops().get(i).getType().toString().toLowerCase().contains("spade") ||
+								e.getDrops().get(i).getType().toString().toLowerCase().contains("hoe") ||
+								e.getDrops().get(i).getType().toString().toLowerCase().contains("axe") ||
+								e.getDrops().get(i).getType().toString().toLowerCase().contains("rod") ||
+								e.getDrops().get(i).getType().toString().toLowerCase().contains("shears")) {
+							int enchantment_numb = (int)(Math.random()*Main.getBonusWeaponEnchantments().size());
+							e.getDrops().set(i, Main.addBonusEnchantment(e.getDrops().get(i), Main.getBonusWeaponEnchantments().get(enchantment_numb), Main.getBonusWeaponEnchantments().get(enchantment_numb).value_range.getMaximumInteger()/2+Main.getBonusWeaponEnchantments().get(enchantment_numb).value_range.getMinimumInteger()));
+						} else {
+							int enchantment_numb = (int)(Math.random()*Main.getBonusArmorEnchantments().size());
+							e.getDrops().set(i, Main.addBonusEnchantment(e.getDrops().get(i), Main.getBonusArmorEnchantments().get(enchantment_numb), Main.getBonusArmorEnchantments().get(enchantment_numb).value_range.getMaximumInteger()/2+Main.getBonusArmorEnchantments().get(enchantment_numb).value_range.getMinimumInteger()));
+						}
+					}
+				}
 			}
 			if (Math.random()<=0.00390625) {e.getDrops().add(getGoodie(2));}
 			if (Math.random()<=0.00390625/4.0d) {e.getDrops().add(getGoodie(3));}
@@ -9136,6 +9352,8 @@ implements Listener
 			}
 		}
 		if (e.getState()==State.CAUGHT_FISH) {
+			PlayerData pd = this.plugin.getPlayerData(p);
+			pd.gameinteractions+=300;
 			if (this.plugin.getConfig().getBoolean("thanksgiving-enabled")) {
 				if (Math.random() < 0.50) {
 					// 50% chance of fishing up a chicken plus feathers
@@ -9591,44 +9809,186 @@ implements Listener
 	@EventHandler
 	public void onHurt(EntityDamageEvent e) {
 		final EntityDamageEvent f = e;
+		
+		double maxgroup=4;
+		double groupmult=1.25d;
+		int totallvs=0;
+		List<Entity> nearbylist = e.getEntity().getNearbyEntities(30, 30, 30);
+		//Filter out all unrelated e.getEntity() types.
+		for (int k=0;k<nearbylist.size();k++) {
+			//See if human players are near. If so, factor that in for determining how many mobs may exist.
+			if (nearbylist.get(k).getType()==EntityType.PLAYER) {
+				//This is a player.
+				Player g = (Player)nearbylist.get(k);
+				//OLD LEVEL DETERMINING SYSTEM
+				//maxgroup+=plugin.getJobTotalLvs(g)/10;
+				//totallvs+=plugin.getJobTotalLvs(g);
+				if (g.getInventory().getHelmet()!=null) {
+					ItemStack equip = g.getInventory().getHelmet();
+					if (equip.getType().toString().toLowerCase().contains("leather")) {
+						maxgroup+=0.02d;
+						totallvs+=2;
+					}
+					if (equip.getType().toString().toLowerCase().contains("gold")) {
+						maxgroup+=0.03d;
+						totallvs+=3;
+					}
+					if (equip.getType().toString().toLowerCase().contains("chainmail")) {
+						maxgroup+=0.1d;
+						totallvs+=10;
+					}
+					if (equip.getType().toString().toLowerCase().contains("iron")) {
+						maxgroup+=0.1d;
+						totallvs+=10;
+					}
+					if (equip.getType().toString().toLowerCase().contains("diamond")) {
+						maxgroup+=0.3d;
+						totallvs+=30;
+					}
+				}
+				if (g.getInventory().getBoots()!=null) {
+					ItemStack equip = g.getInventory().getBoots();
+					if (equip.getType().toString().toLowerCase().contains("leather")) {
+						maxgroup+=0.02d;
+						totallvs+=2;
+					}
+					if (equip.getType().toString().toLowerCase().contains("gold")) {
+						maxgroup+=0.03d;
+						totallvs+=3;
+					}
+					if (equip.getType().toString().toLowerCase().contains("chainmail")) {
+						maxgroup+=0.1d;
+						totallvs+=10;
+					}
+					if (equip.getType().toString().toLowerCase().contains("iron")) {
+						maxgroup+=0.1d;
+						totallvs+=10;
+					}
+					if (equip.getType().toString().toLowerCase().contains("diamond")) {
+						maxgroup+=0.3d;
+						totallvs+=30;
+					}
+				}
+				if (g.getInventory().getLeggings()!=null) {
+					ItemStack equip = g.getInventory().getLeggings();
+					if (equip.getType().toString().toLowerCase().contains("leather")) {
+						maxgroup+=0.02d;
+						totallvs+=2;
+					}
+					if (equip.getType().toString().toLowerCase().contains("gold")) {
+						maxgroup+=0.03d;
+						totallvs+=3;
+					}
+					if (equip.getType().toString().toLowerCase().contains("chainmail")) {
+						maxgroup+=0.1d;
+						totallvs+=10;
+					}
+					if (equip.getType().toString().toLowerCase().contains("iron")) {
+						maxgroup+=0.1d;
+						totallvs+=10;
+					}
+					if (equip.getType().toString().toLowerCase().contains("diamond")) {
+						maxgroup+=0.3d;
+						totallvs+=30;
+					}
+				}
+				if (g.getInventory().getChestplate()!=null) {
+					ItemStack equip = g.getInventory().getChestplate();
+					if (equip.getType().toString().toLowerCase().contains("leather")) {
+						maxgroup+=0.02d;
+						totallvs+=2;
+					}
+					if (equip.getType().toString().toLowerCase().contains("gold")) {
+						maxgroup+=0.03d;
+						totallvs+=3;
+					}
+					if (equip.getType().toString().toLowerCase().contains("chainmail")) {
+						maxgroup+=0.1d;
+						totallvs+=10;
+					}
+					if (equip.getType().toString().toLowerCase().contains("iron")) {
+						maxgroup+=0.1d;
+						totallvs+=10;
+					}
+					if (equip.getType().toString().toLowerCase().contains("diamond")) {
+						maxgroup+=0.3d;
+						totallvs+=30;
+					}
+				}
+				if (g.getInventory().getItemInHand()!=null) {
+					ItemStack equip = g.getInventory().getItemInHand();
+					if (equip.getType().toString().toLowerCase().contains("bow")) {
+						maxgroup+=0.15d;
+						totallvs+=15;
+					}
+					if (equip.getType().toString().toLowerCase().contains("diamond")) {
+						maxgroup+=0.2d;
+						totallvs+=20;
+					}
+				}
+				////Bukkit.getLogger().info("Mob maxgroup increased to "+maxgroup+" down here.");
+			}
+			if (!(nearbylist.get(k) instanceof Monster)) {
+				nearbylist.remove(k);
+				k--;
+			}
+		}
+		boolean allow=true;
+		maxgroup*=groupmult;
+		int currentnearby = nearbylist.size();
+		if (currentnearby>maxgroup) {
+			allow=false; //Too many mobs, can't have more.
+		}
 		if (e.getEntity() instanceof Monster && e.getCause()==DamageCause.SUFFOCATION) {
 			LivingEntity l = (LivingEntity)e.getEntity();
 			if (l.getTicksLived()<60) {
 				//Check around itself for other mobs. Teleport it there possibly. Higher chance
 				//of teleporting to mobs of the same type.
-				boolean mobfound=false;
-				List<Entity> nearby = l.getNearbyEntities(20, 20, 20);
-				for (int i=0;i<nearby.size();i++) {
-					if (!(nearby.get(i) instanceof Monster)) {
-						nearby.remove(i);
-						i--;
+				if (allow) {
+					boolean mobfound=false;
+					List<Entity> nearby = l.getNearbyEntities(20, 20, 20);
+					for (int i=0;i<nearby.size();i++) {
+						if (!(nearby.get(i) instanceof Monster)) {
+							nearby.remove(i);
+							i--;
+						}
 					}
-				}
-				for (int i=0;i<nearby.size();i++) {
-					double chancer=0;
-					if (nearby.get(i).getType()==l.getType()) {
-						chancer=0.5;
-					}
-					final Entity teleport_entity = e.getEntity();
-					final Entity teleport_to = nearby.get(i);
-					if (Math.random()<=chancer+0.25 && nearby.get(i).getTicksLived()>60 && (nearby.get(i).getLastDamageCause()==null || nearby.get(i).getLastDamageCause().getCause()!=DamageCause.SUFFOCATION)) {
-						Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
-							@Override
-							public void run() {
-								teleport_entity.teleport(teleport_to);
+					for (int i=0;i<nearby.size();i++) {
+						double chancer=0;
+						if (nearby.get(i).getType()==l.getType()) {
+							chancer=0.5;
+						}
+						final Entity teleport_entity = e.getEntity();
+						final Entity teleport_to = nearby.get(i);
+						List<Entity> playercheck = nearby.get(i).getNearbyEntities(nearby.get(i).getLocation().getX(), nearby.get(i).getLocation().getY(), nearby.get(i).getLocation().getZ());
+						for (int j=0;j<playercheck.size();j++) {
+							if (!(playercheck.get(j) instanceof Player)) {
+								playercheck.remove(j);
+								j--;
 							}
-						},1);
-						mobfound=true;
-						break;
+						}
+						if (playercheck.size()>0) {
+							break;
+						}
+						if (Math.random()<=chancer+0.25 && !nearby.get(i).equals(teleport_entity) && nearby.get(i).getTicksLived()>60 && (nearby.get(i).getLastDamageCause()==null || nearby.get(i).getLastDamageCause().getCause()!=DamageCause.SUFFOCATION)) {
+							Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+								@Override
+								public void run() {
+									teleport_entity.teleport(teleport_to);
+								}
+							},1);
+							mobfound=true;
+							break;
+						}
 					}
-				}
-				if (mobfound) {
-					e.setDamage(0);
-					e.setCancelled(true);
+					if (mobfound) {
+						e.setDamage(0);
+						e.setCancelled(true);
+					} else {
+						e.getEntity().remove();
+					}
 				} else {
 					e.getEntity().remove();
-					e.setDamage(0);
-					e.setCancelled(true);
 				}
 			}
 		}
@@ -9980,6 +10340,9 @@ implements Listener
 			}
 		}
 		//**********************************//Player buffs end
+		if (e.getEntity() instanceof Player && e.getDamager() instanceof Monster) {
+			e.setDamage(e.getDamage()/1.3);
+		}
 		boolean hitByPoweredMob=false;
 		if ((e.getDamager() instanceof WitherSkull) || (e.getDamager() instanceof Wither)) {
 			if (e.getEntity() instanceof Player) {
@@ -10041,34 +10404,47 @@ implements Listener
 					LivingEntity l2 = (LivingEntity)(((Projectile)e.getDamager()).getShooter());
 					if (l2.hasPotionEffect(PotionEffectType.INVISIBILITY)) {l2.removePotionEffect(PotionEffectType.INVISIBILITY);}
 					for (int i=0;i<this.plugin.powered_mob_list.size();i++) {
-						if (this.plugin.powered_mob_list.get(i).power_time+40<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).power_time+140<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).id.equals(l2.getUniqueId())) {
+						if (this.plugin.powered_mob_list.get(i).power_time+40<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).power_time+140>Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).id.equals(l2.getUniqueId())) {
 							//This mob will damage you if you are not blocking.
 							if (l instanceof Player) {
 								Player p = (Player)l;
-								if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
-									if (l2.getCustomName()!=null) {
-										DecimalFormat df = new DecimalFormat("#0.0");
-										DecimalFormat df2 = new DecimalFormat("#0");
-										p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(e.getDamage()*2)+" damage from "+l2.getCustomName()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((e.getDamage()*2)/p.getMaxHealth())*100)+"%)");
+								if (p.getNoDamageTicks()<=p.getMaximumNoDamageTicks()/2) {								
+									/*if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
+										if (l2.getCustomName()!=null) {
+											DecimalFormat df = new DecimalFormat("#0.0");
+											DecimalFormat df2 = new DecimalFormat("#0");
+											p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(e.getDamage()*2)+" damage from "+l2.getCustomName()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((e.getDamage()*2)/p.getMaxHealth())*100)+"%)");
+										} else {
+											DecimalFormat df = new DecimalFormat("#0.0");
+											DecimalFormat df2 = new DecimalFormat("#0");
+											p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(e.getDamage()*2)+" damage from "+ChatColor.WHITE+""+l2.getType().name()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((e.getDamage()*2)/p.getMaxHealth())*100)+"%)");
+										}
+									}*/
+									if (!p.isBlocking()) {
+										//hitByPoweredMob=true;
+										/*if (p.getHealth()-e.getDamage()*2<0) {
+											p.setHealth(0);
+										} else {
+											p.setHealth(p.getHealth()-e.getDamage()*2);
+										}*/
+										e.setDamage(e.getDamage()*4);
+										Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+											@Override
+											public void run() {
+												//Multiplying by a number lower than 1 will reduce knockback
+												//Multiplying by a number greater than 1 will increase knockback
+												Vector knockback = l.getVelocity().multiply(3f);
+												l.setVelocity(knockback);
+											}
+										}, 1L);
+										//Main.playFirework(p.getLocation());
+										//Main.playFirework(p.getLocation());
+										//Main.playFirework(p.getLocation());
 									} else {
-										DecimalFormat df = new DecimalFormat("#0.0");
-										DecimalFormat df2 = new DecimalFormat("#0");
-										p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(e.getDamage()*2)+" damage from "+ChatColor.WHITE+""+l2.getType().name()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((e.getDamage()*2)/p.getMaxHealth())*100)+"%)");
+										p.playSound(p.getLocation(), Sound.ANVIL_LAND, 0.1f, 3.6f);
+										e.setDamage(e.getDamage()/8);
 									}
-								}
-								if (!p.isBlocking()) {
-									hitByPoweredMob=true;
-									if (p.getHealth()-e.getDamage()*4<0) {
-										p.setHealth(0);
-									} else {
-										p.setHealth(p.getHealth()-e.getDamage()*4);
-									}
-									Main.playFirework(p.getLocation());
-									Main.playFirework(p.getLocation());
-									Main.playFirework(p.getLocation());
-								} else {
-									p.playSound(p.getLocation(), Sound.ANVIL_LAND, 0.1f, 3.6f);
-									e.setDamage(e.getDamage()/8);
+									//p.setNoDamageTicks(p.getMaximumNoDamageTicks());
 								}
 							}
 							this.plugin.powered_mob_list.remove(i);
@@ -10082,34 +10458,47 @@ implements Listener
 				LivingEntity l2 = (LivingEntity)e.getDamager();
 				if (l2.hasPotionEffect(PotionEffectType.INVISIBILITY)) {l2.removePotionEffect(PotionEffectType.INVISIBILITY);}
 				for (int i=0;i<this.plugin.powered_mob_list.size();i++) {
-					if (this.plugin.powered_mob_list.get(i).power_time+40<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).power_time+140<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).id.equals(l2.getUniqueId())) {
+					if (this.plugin.powered_mob_list.get(i).power_time+40<=Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).power_time+140>Main.SERVER_TICK_TIME && this.plugin.powered_mob_list.get(i).id.equals(l2.getUniqueId())) {
 						//This mob will damage you if you are not blocking.
 						if (l instanceof Player) {
 							Player p = (Player)l;
-							if (!p.isBlocking()) {
-								hitByPoweredMob=true;
-								if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
-									if (l2.getCustomName()!=null) {
-										DecimalFormat df = new DecimalFormat("#0.0");
-										DecimalFormat df2 = new DecimalFormat("#0");
-										p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(e.getDamage()*2)+" damage from "+l2.getCustomName()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((e.getDamage()*2)/p.getMaxHealth())*100)+"%)");
+							if (p.getNoDamageTicks()<=p.getMaximumNoDamageTicks()/2) {
+								if (!p.isBlocking()) {
+									/*hitByPoweredMob=true;
+									if (this.plugin.getAccountsConfig().getBoolean(p.getName().toLowerCase()+".settings.notify5")) {
+										if (l2.getCustomName()!=null) {
+											DecimalFormat df = new DecimalFormat("#0.0");
+											DecimalFormat df2 = new DecimalFormat("#0");
+											p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(e.getDamage()*2)+" damage from "+l2.getCustomName()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((e.getDamage()*2)/p.getMaxHealth())*100)+"%)");
+										} else {
+											DecimalFormat df = new DecimalFormat("#0.0");
+											DecimalFormat df2 = new DecimalFormat("#0");
+											p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(e.getDamage()*2)+" damage from "+ChatColor.WHITE+""+l2.getType().name()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((e.getDamage()*2)/p.getMaxHealth())*100)+"%)");
+										}
+									}*/
+									/*if (p.getHealth()-e.getDamage()*2<0) {
+										p.setHealth(0);
 									} else {
-										DecimalFormat df = new DecimalFormat("#0.0");
-										DecimalFormat df2 = new DecimalFormat("#0");
-										p.sendMessage(ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+"Took "+df.format(e.getDamage()*2)+" damage from "+ChatColor.WHITE+""+l2.getType().name()+ChatColor.DARK_PURPLE+""+ChatColor.ITALIC+" (-"+df2.format(((e.getDamage()*2)/p.getMaxHealth())*100)+"%)");
-									}
-								}
-								if (p.getHealth()-e.getDamage()*2<0) {
-									p.setHealth(0);
+										p.setHealth(p.getHealth()-e.getDamage()*2);
+									}*/
+									e.setDamage(e.getDamage()*3);
+									//Main.playFirework(p.getLocation());
+									//Main.playFirework(p.getLocation());
+									//Main.playFirework(p.getLocation());
+									Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+										@Override
+										public void run() {
+											//Multiplying by a number lower than 1 will reduce knockback
+											//Multiplying by a number greater than 1 will increase knockback
+											Vector knockback = l.getVelocity().multiply(3f);
+											l.setVelocity(knockback);
+										}
+									}, 1L);
 								} else {
-									p.setHealth(p.getHealth()-e.getDamage()*2);
+									p.playSound(p.getLocation(), Sound.ANVIL_LAND, 0.1f, 3.6f);
+									e.setDamage(e.getDamage()/8);
 								}
-								Main.playFirework(p.getLocation());
-								Main.playFirework(p.getLocation());
-								Main.playFirework(p.getLocation());
-							} else {
-								p.playSound(p.getLocation(), Sound.ANVIL_LAND, 0.1f, 3.6f);
-								e.setDamage(e.getDamage()/8);
+								//p.setNoDamageTicks(p.getMaximumNoDamageTicks());
 							}
 						}
 						this.plugin.powered_mob_list.remove(i);
@@ -14130,6 +14519,31 @@ implements Listener
 		//****************************//End job buffs.
 		
 		if (event.getCursor()!=null || event.getCurrentItem()!=null) {
+			if (event.getCursor().getType()==Material.DIAMOND ||
+					event.getCursor().getType()==Material.EMERALD ||
+					event.getCursor().getType()==Material.SKULL_ITEM) {
+				ItemStack check = new ItemStack(Material.AIR);
+				if (event.getCursor()!=null) {
+					check = event.getCursor();
+				} else {
+					check = event.getCurrentItem();
+				}
+				boolean is_socket=false;
+				if (check.hasItemMeta() && check.getItemMeta().hasLore()) {
+					List<String> newLore = new ArrayList<String>();
+					for (String s : check.getItemMeta().getLore()) {
+						//Bukkit.getLogger().info("OLD: "+s);
+						s=s.replace("Put in the","Put in a");
+						s=s.replace("bottom of a furnace", "crafting table with");
+						s=s.replace("with another item in the top","another item with (Socket)");
+						//Bukkit.getLogger().info("NEW: "+s);
+						newLore.add(s);
+					}
+					ItemMeta meta = check.getItemMeta();
+					meta.setLore(newLore);
+					check.setItemMeta(meta);
+				}
+			}
 			if (event.getCursor().getType()==Material.SULPHUR) {
 				//This is a broken Halloween item...Maybe. Let's find out.
 				boolean is_halloween=false;

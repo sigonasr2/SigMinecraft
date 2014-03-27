@@ -164,11 +164,11 @@ public class PlayerBuffData {
 				int zombierarebheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ZOMBIE,true,MobHeadRareType.RARE_TYPE_B), playerheads);
 				int zombiepoweredheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ZOMBIE,false,true), playerheads);
 				int zombiepoweredrareheads = this.plugin.getMobHeadAmt(new MobHead(MobHeadType.ZOMBIE,true,true), playerheads);
-				Bukkit.getLogger().info("Base Health is "+base_hplv+".");
+				//Bukkit.getLogger().info("Base Health is "+base_hplv+".");
 				base_hplv+=zombierarebheads;
 				base_hplv+=zombiepoweredheads;
 				base_hplv+=zombiepoweredrareheads*4;
-				Bukkit.getLogger().info("Base Health is "+base_hplv+".");
+				//Bukkit.getLogger().info("Base Health is "+base_hplv+".");
 			}
 			extra_hp=0;
 			//p.setMaxHealth(base_hplv);

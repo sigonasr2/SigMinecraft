@@ -504,9 +504,9 @@ public class Main extends JavaPlugin
 
     ShapelessRecipe portable_table = new ShapelessRecipe(table);
     
-    portable_table.addIngredient(Material.WORKBENCH);
-    portable_table.addIngredient(Material.CHEST);
-    portable_table.addIngredient(Material.IRON_AXE);
+    portable_table.addIngredient(1,Material.WORKBENCH);
+    portable_table.addIngredient(1,Material.CHEST);
+    portable_table.addIngredient(1,Material.IRON_AXE);
 
     Bukkit.addRecipe(portable_table);
 
@@ -750,6 +750,80 @@ public class Main extends JavaPlugin
 	    Bukkit.addRecipe(powered_rare_heads);
     }
     
+    List<Material> equip_list = new ArrayList<Material>();
+    List<Material> sockets_list = new ArrayList<Material>();
+    
+    equip_list.add(Material.DIAMOND_CHESTPLATE);
+    equip_list.add(Material.IRON_CHESTPLATE);
+    equip_list.add(Material.CHAINMAIL_CHESTPLATE);
+    equip_list.add(Material.GOLD_CHESTPLATE);
+    equip_list.add(Material.LEATHER_CHESTPLATE);
+    
+    equip_list.add(Material.DIAMOND_BOOTS);
+    equip_list.add(Material.IRON_BOOTS);
+    equip_list.add(Material.CHAINMAIL_BOOTS);
+    equip_list.add(Material.GOLD_BOOTS);
+    equip_list.add(Material.LEATHER_BOOTS);
+    
+    equip_list.add(Material.DIAMOND_LEGGINGS);
+    equip_list.add(Material.IRON_LEGGINGS);
+    equip_list.add(Material.CHAINMAIL_LEGGINGS);
+    equip_list.add(Material.GOLD_LEGGINGS);
+    equip_list.add(Material.LEATHER_LEGGINGS);
+    
+    equip_list.add(Material.DIAMOND_HELMET);
+    equip_list.add(Material.IRON_HELMET);
+    equip_list.add(Material.CHAINMAIL_HELMET);
+    equip_list.add(Material.GOLD_HELMET);
+    equip_list.add(Material.LEATHER_HELMET);
+    
+    equip_list.add(Material.WOOD_SWORD);
+    equip_list.add(Material.STONE_SWORD);
+    equip_list.add(Material.IRON_SWORD);
+    equip_list.add(Material.GOLD_SWORD);
+    equip_list.add(Material.DIAMOND_SWORD);
+    
+    equip_list.add(Material.WOOD_PICKAXE);
+    equip_list.add(Material.STONE_PICKAXE);
+    equip_list.add(Material.IRON_PICKAXE);
+    equip_list.add(Material.GOLD_PICKAXE);
+    equip_list.add(Material.DIAMOND_PICKAXE);
+    
+    equip_list.add(Material.WOOD_SPADE);
+    equip_list.add(Material.STONE_SPADE);
+    equip_list.add(Material.IRON_SPADE);
+    equip_list.add(Material.GOLD_SPADE);
+    equip_list.add(Material.DIAMOND_SPADE);
+    
+    equip_list.add(Material.WOOD_AXE);
+    equip_list.add(Material.STONE_AXE);
+    equip_list.add(Material.IRON_AXE);
+    equip_list.add(Material.GOLD_AXE);
+    equip_list.add(Material.DIAMOND_AXE);
+    
+    equip_list.add(Material.WOOD_HOE);
+    equip_list.add(Material.STONE_HOE);
+    equip_list.add(Material.IRON_HOE);
+    equip_list.add(Material.GOLD_HOE);
+    equip_list.add(Material.DIAMOND_HOE);
+    
+    equip_list.add(Material.BOW);
+    
+    sockets_list.add(Material.SKULL_ITEM);
+    sockets_list.add(Material.DIAMOND);
+    sockets_list.add(Material.EMERALD);
+    
+    //Add socket crafting recipes.
+    for (int i=0;i<equip_list.size();i++) {
+    	for (int j=0;j<sockets_list.size();j++) {
+    		ShapelessRecipe socket_rec = new ShapelessRecipe(new ItemStack(equip_list.get(i)));
+    		socket_rec.addIngredient(1,sockets_list.get(j));
+    		socket_rec.addIngredient(1,equip_list.get(i));
+    		Bukkit.getLogger().info("Add recipe: "+socket_rec.getIngredientList().toString());
+    		Bukkit.addRecipe(socket_rec);
+    	}
+    }
+    
     //Add deconversion recipes.
     ShapelessRecipe DeConv_diamond_chestplate = new ShapelessRecipe(new ItemStack(Material.DIAMOND));
     DeConv_diamond_chestplate.addIngredient(Material.DIAMOND_CHESTPLATE);
@@ -847,6 +921,10 @@ public class Main extends JavaPlugin
     Bukkit.addRecipe(DeConv_iron_spade);
     Bukkit.addRecipe(DeConv_gold_spade);
     Bukkit.addRecipe(DeConv_stone_spade);
+    
+    //FurnaceRecipe socket_enchantment = new FurnaceRecipe(new ItemStack(Material.IRON_CHESTPLATE),Material.DIAMOND);
+    
+    //Bukkit.addRecipe(socket_enchantment);
     
 	for (int i=0;i<16;i++) {
 	    ShapelessRecipe nametag_color = new ShapelessRecipe(new ItemStack(Material.NAME_TAG));
@@ -950,19 +1028,19 @@ public class Main extends JavaPlugin
     ItemSetList.addSet(set);
     
     //Add in custom enchantments.
-    ENCHANT_CRITICAL_CHANCE = new BonusEnchantment("Critical Chance",true,false,ItemType.WEAPONS,new IntRange(0,100));
-    ENCHANT_ARMOR_PENETRATION = new BonusEnchantment("Armor Penetration",false,false,ItemType.WEAPONS,new IntRange(0,100));
-    ENCHANT_LIFE_STEAL = new BonusEnchantment("Life Steal",true,false,ItemType.WEAPONS,new IntRange(0,100));
-    ENCHANT_ATTACK_SPEED = new BonusEnchantment("Attack Speed",true,false,ItemType.WEAPONS,new IntRange(0,200));
-    ENCHANT_DAMAGE = new BonusEnchantment("Damage",false,false,ItemType.WEAPONS,new IntRange(0,40));
-    ENCHANT_HEALTH = new BonusEnchantment("Health",false,false,ItemType.ARMOR,new IntRange(0,60));
-    ENCHANT_DAMAGE_REDUCTION = new BonusEnchantment("Damage Reduction",true,false,ItemType.ARMOR,new IntRange(0,100));
-    ENCHANT_DURABILITY = new BonusEnchantment("Durability",true,false,ItemType.ARMOR,new IntRange(0,2000));
-    ENCHANT_BLOCK_CHANCE = new BonusEnchantment("Block Chance",true,false,ItemType.ARMOR,new IntRange(0,100));
-    ENCHANT_SPEED_BOOST_CHANCE = new BonusEnchantment("Speed Boost Chance",true,false,ItemType.ARMOR,new IntRange(0,100));
-    ENCHANT_STURDY = new BonusEnchantment("Sturdy",false,true,ItemType.ARMOR,new IntRange(0,10));
-    ENCHANT_REPAIR = new BonusEnchantment("Repair",false,true,ItemType.ARMOR,new IntRange(0,10));
-    ENCHANT_EXECUTE = new BonusEnchantment("Execute",false,true,ItemType.WEAPONS,new IntRange(0,10));
+    ENCHANT_CRITICAL_CHANCE = new BonusEnchantment("Critical Chance",true,false,ItemType.WEAPONS,new IntRange(1,100));
+    ENCHANT_ARMOR_PENETRATION = new BonusEnchantment("Armor Penetration",false,false,ItemType.WEAPONS,new IntRange(1,100));
+    ENCHANT_LIFE_STEAL = new BonusEnchantment("Life Steal",true,false,ItemType.WEAPONS,new IntRange(1,100));
+    ENCHANT_ATTACK_SPEED = new BonusEnchantment("Attack Speed",true,false,ItemType.WEAPONS,new IntRange(1,200));
+    ENCHANT_DAMAGE = new BonusEnchantment("Damage",false,false,ItemType.WEAPONS,new IntRange(1,40));
+    ENCHANT_HEALTH = new BonusEnchantment("Health",false,false,ItemType.ARMOR,new IntRange(1,60));
+    ENCHANT_DAMAGE_REDUCTION = new BonusEnchantment("Damage Reduction",true,false,ItemType.ARMOR,new IntRange(1,100));
+    ENCHANT_DURABILITY = new BonusEnchantment("Durability",true,false,ItemType.ARMOR,new IntRange(1,2000));
+    ENCHANT_BLOCK_CHANCE = new BonusEnchantment("Block Chance",true,false,ItemType.ARMOR,new IntRange(1,100));
+    ENCHANT_SPEED_BOOST_CHANCE = new BonusEnchantment("Speed Boost Chance",true,false,ItemType.ARMOR,new IntRange(1,100));
+    ENCHANT_STURDY = new BonusEnchantment("Sturdy",false,true,ItemType.ARMOR,new IntRange(1,10));
+    ENCHANT_REPAIR = new BonusEnchantment("Repair",false,true,ItemType.ARMOR,new IntRange(1,10));
+    ENCHANT_EXECUTE = new BonusEnchantment("Execute",false,true,ItemType.WEAPONS,new IntRange(1,10));
     
     DMGCALC = new DamageAPI();
     //System.out.println("Running BankEconomy in "+this.getDataFolder().getAbsolutePath());
@@ -2287,7 +2365,7 @@ public void runTick() {
 							  boolean contains=nearby.get(i) instanceof LivingEntity;
 							  boolean containsmonster=nearby.get(i) instanceof Monster;
 							  if (containsmonster && aoedmg>0) {
-								  if (nearby.get(i).getLocation().distance(p.getLocation())<=9) {
+								  if (((Monster)(nearby.get(i))).hasLineOfSight(p) && nearby.get(i).getLocation().distance(p.getLocation())<=9) {
 									  //p.sendMessage("AOE Damage is "+aoedmg);
 									  LivingEntity l = (LivingEntity)nearby.get(i);
 									  l.damage(aoedmg);
@@ -2338,17 +2416,25 @@ public void runTick() {
 					  for (int i=0;i<nearby.size();i++) {
 						  boolean contains_mob=false;
 						  for (int j=0;j<powered_mob_list.size();j++) {
-							  if (powered_mob_list.get(j).id.equals(nearby.get(i).getUniqueId())) {
+							  if (powered_mob_list.get(j).id.equals(nearby.get(i).getUniqueId()) && !nearby.get(i).isDead()) {
 								  contains_mob=true;
 								  //Play particley effects.
 								  //nearby.get(i).getWorld().playEffect(nearby.get(i).getLocation(), Effect.BLAZE_SHOOT, 0);
-								  nearby.get(i).getWorld().playSound(nearby.get(i).getLocation(), Sound.BLAZE_BREATH, 0.1f, 0.2f);
+								  nearby.get(i).getWorld().playSound(nearby.get(i).getLocation(), Sound.BLAZE_BREATH, 0.1f, 0.3f);
 								  for (int z=0;z<3;z++) {
 									  final Entity mob = nearby.get(i);
 										Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 											@Override
 											public void run() {
-												mob.getWorld().playEffect(new Location(mob.getWorld(), mob.getLocation().getX()+(Math.random()*1-Math.random()*1), mob.getLocation().getY()+(Math.random()*1-Math.random()*1), mob.getLocation().getZ()+(Math.random()*1-Math.random()*1)), Effect.STEP_SOUND, Material.STATIONARY_LAVA.getId());
+										      boolean contains=false;
+											  for (int j=0;j<powered_mob_list.size();j++) {
+												  if (powered_mob_list.get(j).id.equals(mob.getUniqueId()) && !mob.isDead()) {
+													  contains=true;
+												  }
+											  }
+											  if (contains) {
+												mob.getWorld().playEffect(new Location(mob.getWorld(), mob.getLocation().getX()+(Math.random()*0.5-Math.random()*0.5), mob.getLocation().getY()+(Math.random()*2), mob.getLocation().getZ()+(Math.random()*0.5-Math.random()*0.5)), Effect.MOBSPAWNER_FLAMES, 0);
+											  }
 											}
 										},(int)(Math.random()*30));
 								  }
@@ -2404,8 +2490,14 @@ public void runTick() {
 							  if (!something) {
 								  chance/=4;
 							  }
-							  if (Math.random()<=0.05/ents.size() && l.hasLineOfSight(p)) {
-								  if (!contains_mob) {
+							  if (Math.random()<=0.007/ents.size() && l.hasLineOfSight(p)) {
+								  boolean is_baby=false;
+								  if (l instanceof Zombie) {
+									  if (((Zombie)l).isBaby()) {
+										  is_baby=true;
+									  }
+								  }
+								  if (!contains_mob && !is_baby) {
 									  powered_mob_list.add(new PoweredMob(l.getUniqueId(), Main.SERVER_TICK_TIME));
 									  l.getWorld().playSound(l.getLocation(), Sound.SPIDER_DEATH, 0.4f, 0.04f);
 								  }
@@ -3906,6 +3998,7 @@ public void payDay(int time)
     {
       public void run()
       {
+    	  /*
         for (Player allOnlineP : Bukkit.getOnlinePlayers()) {
           allOnlineP.sendMessage(ChatColor.DARK_GREEN+"<=========["+ChatColor.LIGHT_PURPLE+"Interest"+ChatColor.DARK_GREEN+"]=========>");
           DecimalFormat df = new DecimalFormat("#0.00");
@@ -3920,7 +4013,7 @@ public void payDay(int time)
         		getAccountsConfig().set(allOnlineP.getName().toLowerCase() + ".money", ((Main.this.getConfig().getDouble("payday.amount")*(getAccountsConfig().getDouble(allOnlineP.getName().toLowerCase() + ".money"))+getAccountsConfig().getDouble(allOnlineP.getName().toLowerCase() + ".money"))));
         	}
             //Main.economy.depositPlayer(allOnlineP.getName().toLowerCase(), (Main.this.getConfig().getDouble("payday.amount")*Main.economy.bankBalance(allOnlineP.getName().toLowerCase()).balance));
-        }
+        }*/
         //saveAccountsConfig() //Commented out;
         List<UUID> expired_uuids = new ArrayList<UUID>();
         String moblist = getConfig().getString("fed.mobs");
@@ -5605,7 +5698,7 @@ public void payDay(int time)
 		return -1;
     }
     
-    public boolean is_PermanentProperty(String property) {
+    public static boolean is_PermanentProperty(String property) {
     	//This function determines if the certain lore property is supposed to be kept on the item.
     	//Useful for checking what to remove and not remove from lore.
     	List<String> permanent_properties = new ArrayList<String>();
@@ -5620,7 +5713,7 @@ public void payDay(int time)
     	}
     }
     
-    public double getEnchantmentNumb(String s) {
+    public static double getEnchantmentNumb(String s) {
   	  //Parse the string for spaces.
   	  String[] enchant = s.split(" ");
   	  if (!s.contains(ChatColor.RED+"-400% Durability") && enchant[0].contains(ChatColor.YELLOW+"")) {
@@ -5716,7 +5809,7 @@ public void payDay(int time)
      * @param numb The number to convert to Roman Numerals.
      * @return A String version of the number converted in Roman Numeral Format.
      */
-    public String toRomanNumeral(int numb) {
+    public static String toRomanNumeral(int numb) {
     	String[] ones = {"I","II","III","IV","V","VI","VII","VIII","IX"};
     	String[] tens = {"X","XX","XXX","XL","L","LX","LXX","LXXX","XC"};
     	String[] hundreds = {"C","CC","CCC","CD","D","DC","DCC","DCCC","CM"};
@@ -5757,7 +5850,7 @@ public void payDay(int time)
      * @param roman_numeral The string in roman numeral form.
      * @return The integer version of the roman numeral given.
      */
-    public int toNumber(String roman_numeral) {
+    public static int toNumber(String roman_numeral) {
     	String[] ones = {"I","II","III","IV","V","VI","VII","VIII","IX"};
     	String[] tens = {"X","XX","XXX","XL","L","LX","LXX","LXXX","XC"};
     	String[] hundreds = {"C","CC","CCC","CD","D","DC","DCC","DCCC","CM"};
@@ -5918,7 +6011,7 @@ public void payDay(int time)
      * @param amt The value of the enchantment to apply.
      * @return The item with the new enchantment added in.
      */
-    public ItemStack addBonusEnchantment(ItemStack item, BonusEnchantment enchant, int amt) {
+    public static ItemStack addBonusEnchantment(ItemStack item, BonusEnchantment enchant, int amt) {
     	return addBonusEnchantment(item, enchant, amt, false);
     }
     
@@ -5933,7 +6026,7 @@ public void payDay(int time)
      * @param override Whether or not the enchantment should be overwritten.
      * @return The item with the new enchantment added in.
      */
-    public ItemStack addBonusEnchantment(ItemStack item, BonusEnchantment enchant, int amt, boolean override) {
+    public static ItemStack addBonusEnchantment(ItemStack item, BonusEnchantment enchant, int amt, boolean override) {
     	Bukkit.getLogger().info("Adding bonus enchantment "+enchant.name+" @ level "+amt+" with override set to "+override+". On ItemStack: "+item.toString());
     	if (amt<=0) {return item;} //Cannot have a negative number or 0 for an enchantment. Just return the item itself instead.
     	List<String> lore = null;
@@ -5951,12 +6044,20 @@ public void payDay(int time)
     					//Take that old amount and add onto it.
     					double oldamt=0;
     					if (!override) {oldamt = getEnchantmentNumb(lore.get(i));} else {oldamt=0;}
+    					if (oldamt+amt>enchant.value_range.getMaximumInteger()) {
+    						oldamt=0;
+    						amt=enchant.value_range.getMaximumInteger();
+    					}
     					lore.set(i, ChatColor.YELLOW+"+"+(int)(oldamt+amt)+((percent)?"% ":" ")+ChatColor.BLUE+enchant_string);
     				} else {
     					double oldamt=0;
     					String parser = lore.get(i);
     					parser.replace(enchant_string, "");
     					if (!override) {oldamt=toNumber(parser);} else {oldamt=0;}
+    					if (oldamt+amt>enchant.value_range.getMaximumInteger()) {
+    						oldamt=0;
+    						amt=enchant.value_range.getMaximumInteger();
+    					}
     					lore.set(i, ChatColor.GRAY+enchant_string+" "+toRomanNumeral((int)(oldamt+amt)));
     				}
     				added=true;
@@ -5995,7 +6096,7 @@ public void payDay(int time)
      * @param item The item to sort Enchantments on.
      * @return The item with all enchantments sorted out.
      */
-    public ItemStack sortEnchantments(ItemStack item) {
+    public static ItemStack sortEnchantments(ItemStack item) {
     	//Sorts the enchantments so they are in the intended order.
     	//(All Enchantments with Roman numerals are first.)
     	//(All bonus enchantments are sorted via their ID.)
